@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Peach Project – Trainings-App</title>
+<meta name="theme-color" content="#1a1418"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#1a1418;color:#fff;font-family:'DM Sans',system-ui,sans-serif;min-height:100vh;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:#3a2a35;border-radius:4px;}
+input,textarea,button{font-family:inherit;}
+button{cursor:pointer;}
+#header{background:linear-gradient(160deg,#2e1a28 0%,#1a1418 100%);padding:22px 20px 18px;border-bottom:1px solid rgba(255,255,255,0.08);position:sticky;top:0;z-index:50;}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-emoji{font-size:26px;}
+.logo-title{font-weight:800;font-size:20px;letter-spacing:-0.5px;}
+.logo-sub{color:#C8729A;font-size:12px;font-weight:500;}
+.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.tab-btn{padding:6px 13px;border-radius:8px;border:none;font-size:12px;font-weight:600;transition:background .15s,color .15s;}
+.tab-btn.active{background:#C8729A;color:#fff;}
+.tab-btn.inactive{background:rgba(255,255,255,0.08);color:#888;}
+.plan-btn{padding:5px 12px;border-radius:8px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,0.12);background:transparent;color:#777;}
+.plan-btn.active{border-color:#C8729A;background:rgba(200,114,154,0.13);color:#C8729A;}
+.cycle-btn{padding:5px 12px;border-radius:8px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,0.12);background:transparent;color:#777;}
+.cycle-btn.active{border-color:#B88CC0;background:rgba(184,140,192,0.13);color:#B88CC0;}
+.week-nav{margin-left:auto;display:flex;align-items:center;gap:6px;}
+.week-arrow{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.08);border:none;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;}
+.week-label{font-size:14px;font-weight:700;min-width:62px;text-align:center;}
+#content{padding:16px 16px 40px;max-width:680px;margin:0 auto;}
+.week-progress{background:rgba(255,255,255,0.04);border-radius:12px;padding:10px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;}
+.wp-bar-wrap{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,0.10);overflow:hidden;}
+.wp-bar{height:100%;border-radius:3px;transition:width .5s;}
+.day-card{background:rgba(255,255,255,0.04);border-radius:16px;margin-bottom:12px;overflow:visible;border:1px solid rgba(255,255,255,0.08);}
+.day-header{width:100%;background:none;border:none;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;color:#fff;text-align:left;}
+.day-body{padding:0 14px 14px;}
+.ex-row{background:rgba(255,255,255,0.04);border-radius:12px;padding:12px 14px;margin-bottom:8px;}
+.ex-row-top{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
+.cat-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;letter-spacing:0.5px;text-transform:uppercase;}
+.picker-wrap{flex:1;min-width:140px;position:relative;}
+.pick-btn{width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#666;font-size:13px;padding:5px 10px 5px 8px;display:flex;align-items:center;justify-content:space-between;gap:6px;text-align:left;}
+.pick-btn.has-val{color:#fff;}
+.pick-btn-txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
+.pick-btn-arr{color:#666;font-size:10px;flex-shrink:0;}
+.dropdown{position:absolute;left:0;right:0;z-index:200;background:#2a1e26;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,0.7);overflow:hidden;}
+.drop-search{padding:8px 8px 4px;}
+.drop-search input{width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:#fff;font-size:12px;padding:5px 8px;outline:none;}
+.drop-list{max-height:220px;overflow-y:auto;}
+.drop-opt{padding:8px 12px;font-size:13px;color:#ddd;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.04);}
+.drop-opt:hover{background:rgba(255,255,255,0.07);}
+.drop-opt.sel{font-weight:600;}
+.drop-empty-opt{color:#666;border-bottom:1px solid rgba(255,255,255,0.06);}
+.drop-no-results{padding:10px 12px;color:#555;font-size:12px;}
+.pbadge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;white-space:nowrap;}
+.ex-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
+.sets-info{color:#777;font-size:12px;}
+.w-wrap{display:flex;align-items:center;gap:6px;}
+.w-label{color:#777;font-size:12px;}
+.w-input{width:62px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);border-radius:6px;color:#fff;font-size:13px;font-weight:600;padding:4px 6px;outline:none;}
+.reps-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.rep-col{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.rep-lbl{color:#555;font-size:10px;}
+.rep-inp{width:38px;text-align:center;background:rgba(255,255,255,0.07);border-radius:6px;color:#fff;font-size:13px;font-weight:600;padding:4px 2px;outline:none;}
+.rep-prev{color:#555;font-size:10px;}
+.add-set-btn{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px dashed rgba(255,255,255,0.2);color:#666;font-size:16px;display:flex;align-items:center;justify-content:center;}
+.phint{margin-top:8px;font-size:11px;color:#666;}
+.tip-toggle{background:none;border:none;color:#666;font-size:11px;font-weight:600;padding:2px 0;display:flex;align-items:center;gap:5px;margin-top:6px;}
+.tip-toggle.open{color:#C8729A;}
+.tip-i{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;border:1px solid #555;font-size:9px;font-weight:800;}
+.tip-toggle.open .tip-i{border-color:#C8729A;color:#C8729A;}
+.tip-custom{color:#B88CC0;font-size:10px;}
+.tip-panel{margin-top:6px;background:rgba(255,255,255,0.05);border-radius:10px;border:1px solid rgba(255,255,255,0.10);padding:10px 12px;}
+.tip-text{color:#bbb;font-size:12px;line-height:1.7;white-space:pre-wrap;}
+.tip-edit-btn{margin-top:8px;background:none;border:none;color:#666;font-size:11px;padding:2px 0;}
+.tip-ta{width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:7px;color:#ddd;font-size:12px;line-height:1.6;padding:7px 9px;resize:vertical;outline:none;}
+.tip-acts{display:flex;gap:8px;margin-top:7px;}
+.tip-save{background:#C8729A;border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:700;padding:4px 12px;}
+.tip-cancel{background:rgba(255,255,255,0.08);border:none;border-radius:6px;color:#aaa;font-size:11px;padding:4px 10px;}
+.tip-reset{background:none;border:none;color:#666;font-size:11px;padding:4px 8px;margin-left:auto;}
+.ov-title{font-size:18px;font-weight:700;margin-bottom:6px;color:#C8729A;}
+.ov-sub{color:#777;font-size:13px;margin-bottom:20px;line-height:1.6;}
+.ov-day{margin-bottom:24px;}
+.ov-day-lbl{font-weight:700;font-size:13px;color:#B88CC0;margin-bottom:10px;}
+.ov-ex{background:rgba(255,255,255,0.04);border-radius:12px;padding:12px 14px;margin-bottom:8px;}
+.ov-bars{display:flex;align-items:flex-end;gap:3px;height:40px;}
+.ov-bar{flex:1;border-radius:2px 2px 0 0;transition:height .3s;min-height:2px;}
+.hidden{display:none!important;}
+</style>
+</head>
+<body>
+<div style="max-width:680px;margin:0 auto;">
+<div id="header">
+  <div class="header-top">
+    <div class="logo">
+      <span class="logo-emoji">🍑</span>
+      <div><div class="logo-title">Peach Project</div><div class="logo-sub">Trainings-App</div></div>
+    </div>
+    <div style="display:flex;gap:6px;">
+      <button class="tab-btn active" id="btn-training" onclick="setView('training')">Training</button>
+      <button class="tab-btn inactive" id="btn-overview" onclick="setView('overview')">Übersicht</button>
+    </div>
+  </div>
+  <div class="controls">
+    <div style="display:flex;gap:4px;">
+      <button class="plan-btn" id="plan-3" onclick="setPlan(3)">3-Tage</button>
+      <button class="plan-btn active" id="plan-4" onclick="setPlan(4)">4-Tage</button>
+    </div>
+    <div style="display:flex;gap:4px;">
+      <button class="cycle-btn active" id="cycle-cycle1" onclick="setCycle('cycle1')">Zyklus 1</button>
+      <button class="cycle-btn" id="cycle-cycle2" onclick="setCycle('cycle2')">Zyklus 2</button>
+      <button class="cycle-btn" id="cycle-cycle3" onclick="setCycle('cycle3')">Zyklus 3</button>
+    </div>
+    <div class="week-nav">
+      <button class="week-arrow" onclick="changeWeek(-1)">&#8249;</button>
+      <span class="week-label" id="week-label">Woche 1 / 12</span>
+      <button class="week-arrow" onclick="changeWeek(1)">&#8250;</button>
+    </div>
+  </div>
+</div>
+<div id="content">
+  <div id="view-training"></div>
+  <div id="view-overview" class="hidden"></div>
+</div>
+</div>
+<script>
+const EXERCISES={
+"Glute Max":["Hip Thrusts Langhantel","Hip Thrust Kurzhantel","Hip Thrusts Multipresse","Hip Thrust Maschine","Glute Bridge Langhantel","Glute Bridge Kurzhantel","Glute Bridge Multipresse","Kabel Kickback Stehend","Kabel Kickback Flachbank","Kabel Kickback Schrägbank","Kabel Kickback Liegend","Kickback Multipresse","Kickback Maschine"],
+"Glute Med":["Kabel Abduktion Stehend","Kabel Abduktion Liegend","Kabel Abduktion Schrägbank","Abduktionsmaschine","Pelvic Drop","Standing Hip Abduction Maschine","Fire Hydrants Kabel"],
+"Glute & Quad":["Low Bar Squat","Beinpresse","Step Ups","Split Squat Kurzhantel","Split Squat Multipresse","Hack Squat","Reverse Lunge"],
+"Glute & Hams":["RDL Langhantel","RDL Kurzhanteln","Glute Hyperextensions","Reverse Hack RDL","Good Mornings","Hip Extension Maschine","Single-Leg RDL","Kabel Pull-Through","Nordic Curls"],
+"Rücken":["LH Rudern","KH Rudern","KH Rudern (breit)","Rudern Kabel (eng)","Rudern Kabel (breit)","Rudermaschine (neutral)","Rudermaschine (breit)","Latzug (eng)","Latzug (breit)","Überzug am Kabel","T Bar Rudern (neutral)","T Bar Rudern (breit)","Assistierter Klimmzug (eng)","Assistierter Klimmzug (breit)","Face Pull Kabel","Straight-Arm Pulldown","Einarmiger Latzug Kabel"],
+"Brust":["LH Bankdrücken","KH Bankdrücken","Bankdrücken Multipresse","LH Schrägbankdrücken","KH Schrägbankdrücken","Schrägbankdrücken Multipresse","Brustpresse","Butterfly Maschine","Flys von oben Kabel","Flys von unten Kabel","Flachbank KH Flys","Schrägbank KH Flys"],
+"Schultern":["KH Seitheben","Vorgebeugtes KH Seitheben","Seithebemaschine","Seitheben Kabel","Vorgebeugtes Seitheben Kabel","LH Überkopfdrücken","KH Überkopfdrücken","Überkopfmaschine","Butterfly Reverse Maschine","Upright Row Kabel","Arnold Press","Einarmiges Überkopfdrücken Kabel"],
+"Bizeps":["SZ Curls","LH Curls","KH Curls","Kabel Curls","KH Hammer Curls","SZ Preacher Curls","KH Preacher Curls","Bizeps Maschine","Konzentrations Curls","Spinne Curls","Kabel Curls einarmig","Reverse Curls"],
+"Trizeps":["SZ Skullcrusher","Enges Bankdrücken","Pushdown Kabel","Pushdown Kabel einarmig","SZ Überkopf Tri. Drücken","KH Überkopf Tri. Drücken","Kabel Überkopf Tri. Drücken","Dips Maschine","Trizeps Maschine","KH Kickback Trizeps"],
+"Bauch":["Crunches","Crunches am Kabelzug","Decline Crunches","Bauch Maschine","Beinheben (Liegend)","Beinheben (Hängend)","Reverse Crunch","Dead Bug","Ab Rollout","Pallof Press","Hollow Body Hold"]
+};
+const TIPS={
+"Hip Thrusts Langhantel":"Stange auf Hüftbeugern auflegen, Schulterblätter auf Bank. Hüfte vollständig strecken, Gesäß oben kurz anspannen. Kinn zur Brust, Blick nach oben.",
+"Hip Thrust Kurzhantel":"KH auf Hüfte halten. Gleicher Bewegungsablauf wie LH-Variante. Für isolierte Anspannung oben kurz halten.",
+"Hip Thrusts Multipresse":"Stange in Multipresse auf Hüfte. Fußposition ausprobieren – etwas weiter vorne betont mehr den Po.",
+"Hip Thrust Maschine":"Rücken fest an die Maschine. Hüfte vollständig durchstrecken, keine Hohlkreuz-Überkompensation.",
+"Glute Bridge Langhantel":"Wie Hip Thrust, aber flach auf dem Boden liegend. Schulterblätter am Boden. Hüfte vollständig strecken.",
+"Glute Bridge Kurzhantel":"KH auf Hüfte. Flach auf dem Boden, Hüfte hochdrücken bis volle Streckung.",
+"Glute Bridge Multipresse":"Boden-Variante in der Multipresse. Fußstellung leicht erhöht möglich für mehr Range.",
+"Kabel Kickback Stehend":"Gewicht am Fußgelenk. Oberkörper leicht vorgebeugt, Hüfte stabil. Bein nach hinten-oben, Gesäß anspannen – nicht schwingen.",
+"Kabel Kickback Flachbank":"Auf Flachbank kniend, Gewicht am Fußgelenk. Bein nach hinten-oben strecken, oben kurz halten.",
+"Kabel Kickback Schrägbank":"Oberkörper auf Schrägbank gestützt. Gibt mehr Stabilität für isolierte Ausführung.",
+"Kabel Kickback Liegend":"Auf dem Bauch liegend, Kabel am Fußgelenk. Bein vom Boden abheben und nach oben-hinten strecken. Hüfte bleibt am Boden – isolierte Glute-Max-Kontraktion.",
+"Kickback Multipresse":"Multipresse ermöglicht geführte Bewegung. Auf alle vier stützen, Bein nach hinten durchstrecken.",
+"Kickback Maschine":"Maschinenführung nutzen. Bein nach hinten drücken, oben 1 Sek. halten, langsam zurück.",
+"Kabel Abduktion Stehend":"Standbein leicht gebeugt. Bein seitlich hochführen, Hüfte nicht mitrotieren. Oberkörper stabil halten.",
+"Kabel Abduktion Liegend":"Auf der Seite liegend, Kabel am unteren Fußgelenk. Bein seitlich heben, kurz halten.",
+"Kabel Abduktion Schrägbank":"Auf Schrägbank gestützt für stabilen Oberkörper. Bein seitlich führen.",
+"Abduktionsmaschine":"Sitzend, Knie nach außen drücken. Langsam zurück – exzentrische Phase nutzen.",
+"Pelvic Drop":"Einbeinig auf einer Stufe stehen. Hüfte der Hängeseite langsam absinken lassen, dann Glute Med anspannen und anheben.",
+"Standing Hip Abduction Maschine":"Stehend an der Maschine. Mehr Glute-Med-Aktivierung als sitzend. Standbein stabil, Oberkörper nicht wegkippen.",
+"Fire Hydrants Kabel":"Auf allen Vieren, Kabel am Knie/Fußgelenk. Bein seitlich-nach-oben führen wie ein Feuerhydrant. Hüfte nicht mitdrehen.",
+"Low Bar Squat":"Stange tief auf den hinteren Deltamuskeln. Breite Fußstellung, Knie über Zehen. Gesäß nach hinten-unten, Oberkörper etwas vorgebeugt – betont Glutes.",
+"Beinpresse":"Füße hoch und weit auf der Plattform für mehr Glute-Fokus. Knie nicht ganz durchstrecken. Langsam ablassen.",
+"Step Ups":"Hohe Box (mind. Kniehöhe) für maximale Glute-Aktivierung. Ferse fest aufstellen, durch die Ferse drücken.",
+"Split Squat Kurzhantel":"Hinterer Fuß auf Bank (bulgarisch) oder am Boden. Knie der hinteren Seite Richtung Boden, Oberkörper leicht vorgebeugt.",
+"Split Squat Multipresse":"Geführte Variante. Gleiches Prinzip wie KH-Version. Mehr Stabilität für Fokus auf Gewicht.",
+"Hack Squat":"Füße auf der Plattform leicht hochstellen. Rücken an der Maschine halten, tief absenken.",
+"Reverse Lunge":"Schritt nach hinten statt vorne – weniger Quad-dominant als Ausfallschritt vorwärts. Gewicht auf Vorderfuß lassen, durch Ferse nach oben drücken.",
+"RDL Langhantel":"Füße hüftbreit, Stange nah am Körper. Hüfte nach hinten schieben, Rücken gerade. Dehnung in den Hamstrings spüren, dann durch Gesäß nach oben.",
+"RDL Kurzhanteln":"Gleiche Technik wie LH-RDL. KH vor dem Körper, nah an den Beinen entlangführen.",
+"Glute Hyperextensions":"An der Hyperextensionsbank, Hüfte an der Auflagekante. Oberkörper absenken, dann durch Gesäß strecken – nicht mit dem Rücken.",
+"Reverse Hack RDL":"Rückwärts in der Hack-Squat-Maschine. Hüfte-Hinge-Bewegung – stark auf hintere Kette.",
+"Good Mornings":"Stange auf den Schultern. Hüfte nach hinten schieben, Rücken neutral. Hamstring-Dehnung halten, dann zurück.",
+"Hip Extension Maschine":"Reine hintere Kette. Kein Quad-Einsatz. Bein nach hinten-unten drücken, oben kurz anspannen.",
+"Single-Leg RDL":"Einbeinig, hinteres Bein gestreckt nach hinten heben. Mehr Glute-Aktivierung als beidbeinig. Hüfte stabil halten – nicht rotieren.",
+"Kabel Pull-Through":"Kabel zwischen den Beinen, Hüfte-Hinge wie beim RDL. Arme bleiben passiv – der Po zieht die Bewegung. Sehr glute-freundlich.",
+"Nordic Curls":"Knie auf gepolsterter Unterlage, Füße fixiert. Oberkörper langsam nach vorne fallen lassen – exzentrische Hamstring-Arbeit. Fortgeschrittene Übung.",
+"LH Rudern":"Oberkörper ca. 45° vorgebeugt. Stange zum Bauch ziehen, Ellbogen nah am Körper.",
+"KH Rudern":"Einarmig auf Bank gestützt. KH zum Hüftknochen ziehen, Schulterblatt einziehen.",
+"KH Rudern (breit)":"Ellbogen weiter außen – betont oberen Rücken und hintere Schulter.",
+"Rudern Kabel (eng)":"Sitzend, enges Griffstück. Zur Bauchgegend ziehen, Schulterblätter zusammenziehen.",
+"Rudern Kabel (breit)":"Breites Griffstück. Ellbogen seitlich – mehr Latissimus.",
+"Rudermaschine (neutral)":"Neutraler Griff. Rücken aufrecht, nicht mit dem Oberkörper schwingen.",
+"Rudermaschine (breit)":"Breiter Griff. Schulterblätter aktiv zusammenziehen am Ende.",
+"Latzug (eng)":"Enger Parallelgriff. Zur Brust ziehen, Ellbogen nach unten-hinten.",
+"Latzug (breit)":"Breiter Overhand-Griff. Zur Brust ziehen, Latissimus aktiv.",
+"Überzug am Kabel":"Liegend oder stehend vorgebeugt. Gerade Arme, Lat zieht den Arm nach unten.",
+"T Bar Rudern (neutral)":"Neutraler Griff. Brust auf Pad, Stange zum Bauch ziehen.",
+"T Bar Rudern (breit)":"Breiter Griff. Mehr oberer Rücken.",
+"Assistierter Klimmzug (eng)":"Enger Parallelgriff. Maschine unterstützt. Schulterblätter zuerst einziehen, dann Ellbogen.",
+"Assistierter Klimmzug (breit)":"Breiter Griff. Lat-Fokus. Körper nicht schwingen.",
+"Face Pull Kabel":"Kabel auf Kopfhöhe, Seil-Aufsatz. Zur Stirn ziehen, Ellbogen hoch. Betont hintere Schulter und oberen Rücken – gut für Haltung.",
+"Straight-Arm Pulldown":"Kabel oben, Arme gestreckt. Lat nach unten ziehen bis Oberschenkel. Isolierter Lat ohne Bizeps.",
+"Einarmiger Latzug Kabel":"Einarmig am Kabel. Mehr Range und Rotation möglich. Lat gut einziehen am Ende.",
+"LH Bankdrücken":"Schulterbreiter Griff. Stange zur unteren Brust, Ellbogen ca. 75° vom Körper.",
+"KH Bankdrücken":"Ermöglicht mehr Bewegungsfreiheit. KH am Ende leicht zusammenführen.",
+"Bankdrücken Multipresse":"Geführte Bewegung. Griffposition anpassen – leicht schräg für natürlichere Bewegung.",
+"LH Schrägbankdrücken":"30–45° Neigung. Betont obere Brust. Griffbreite wie flaches Drücken.",
+"KH Schrägbankdrücken":"Mehr Range als LH-Variante. KH am Ende zusammenführen.",
+"Schrägbankdrücken Multipresse":"Maschinen-Führung. Bank auf 30–45° einstellen.",
+"Brustpresse":"Ellbogen in Linie mit Schultern oder leicht darunter. Volle Streckung oben.",
+"Butterfly Maschine":"Arme leicht gebeugt. Brust aktiv zusammendrücken, nicht mit Schwung.",
+"Flys von oben Kabel":"Kabel oben befestigt. Arme bogenmäßig nach unten-vorne führen – Brust komprimieren.",
+"Flys von unten Kabel":"Kabel unten befestigt. Arme bogenmäßig nach oben-vorne führen – betont obere Brust.",
+"Flachbank KH Flys":"Arme weit öffnen für maximale Dehnung. Leicht gebeugte Ellbogen, Brust zusammenziehen oben.",
+"Schrägbank KH Flys":"30–45° Bank. Mehr Stretch für obere Brust. Gleiche Technik wie Flachbank-Variante.",
+"KH Seitheben":"Leichtes Gewicht, sauber ausführen. Arme leicht gebeugt, seitlich bis Schulterhöhe heben. Kleine Finger leicht oben.",
+"Vorgebeugtes KH Seitheben":"Oberkörper 45–90° vorgebeugt. Hintere Schulter. Arme seitlich heben.",
+"Seithebemaschine":"Maschine einstellen, Ellbogenauflagen nutzen. Schultern aktiv heben.",
+"Seitheben Kabel":"Kabel unten befestigt, Arm seitlich heben. Konstante Spannung.",
+"Vorgebeugtes Seitheben Kabel":"Kabel oben befestigt, Oberkörper vorgebeugt. Hintere Schulter.",
+"LH Überkopfdrücken":"Stange vor oder hinter dem Kopf. Ellbogen leicht nach vorne für Schultergelenk.",
+"KH Überkopfdrücken":"Sitzend oder stehend. KH am Ende leicht zusammenführen.",
+"Überkopfmaschine":"Sitzend in der Maschine. Griffhöhe auf Schulterhöhe einstellen.",
+"Butterfly Reverse Maschine":"Rückseite Schulter. Arme gestreckt oder leicht gebeugt, nach hinten führen.",
+"Upright Row Kabel":"Kabel unten, schulterbreiter Griff. Stange nah am Körper hochziehen bis Kinnhöhe. Ellbogen führen die Bewegung.",
+"Arnold Press":"KH auf Schulterhöhe, Handflächen zu dir. Beim Drücken nach außen rotieren. Kombiniert Front- und Seite-Schulter.",
+"Einarmiges Überkopfdrücken Kabel":"Kabel auf Schulterhöhe, einarmig drücken. Mehr Stabilisationsarbeit als Maschine.",
+"SZ Curls":"SZ-Stange reduziert Handgelenkbelastung. Ellbogen stabil, nicht mitschwingen.",
+"LH Curls":"Supinierter Griff. Ellbogen nah am Körper. Volle Streckung unten.",
+"KH Curls":"Abwechselnd oder gleichzeitig. Volle Supination am Endpunkt.",
+"Kabel Curls":"Konstante Spannung durch Kabel. Langsam ablassen.",
+"KH Hammer Curls":"Neutraler Griff. Brachialis und Brachioradialis. Ellbogen stabil.",
+"SZ Preacher Curls":"Auflagekante auf Trizepsseite. Volle Streckung – gut für Dehnung.",
+"KH Preacher Curls":"Einarmig, gleiche Technik. Mehr Kontrolle als beidhändig.",
+"Bizeps Maschine":"Maschine einstellen, Ellbogen auf Pads. Volle Streckung und Kontraktion.",
+"Konzentrations Curls":"Sitzend, Ellbogen am Innenknie gestützt. Sehr isoliert – maximale Kontraktion oben.",
+"Spinne Curls":"Auf Schrägbank liegend (Brust nach unten). Arme hängen frei – keine Möglichkeit zu schwingen.",
+"Kabel Curls einarmig":"Einarmig für symmetrische Entwicklung. Kabel unten, volle Streckung nutzen.",
+"Reverse Curls":"Pronierter Griff. Trainiert Brachioradialis und Unterarme. Wichtig für ausgewogene Armkraft.",
+"SZ Skullcrusher":"Stange zur Stirn absenken, Ellbogen stabil halten – nicht aufklappen.",
+"Enges Bankdrücken":"Schulterbreiter oder enger Griff. Ellbogen nah am Körper. Trizeps-Fokus.",
+"Pushdown Kabel":"Ellbogen stabil an den Seiten. Volles Durchstrecken des Arms, kurz halten.",
+"Pushdown Kabel einarmig":"Einarmig – mehr Bewegungsfreiheit und Kontrolle pro Seite.",
+"SZ Überkopf Tri. Drücken":"SZ-Stange hinter dem Kopf absenken. Ellbogen eng halten. Trizeps-Dehnung oben.",
+"KH Überkopf Tri. Drücken":"Einarmig oder beidhändig. KH hinter dem Kopf, Ellbogen stabil.",
+"Kabel Überkopf Tri. Drücken":"Kabel hinter dem Kopf. Konstante Spannung in der Dehnung.",
+"Dips Maschine":"Hände schulterbreit. Ellbogen eng am Körper für Trizeps-Fokus. Tief absenken.",
+"Trizeps Maschine":"Ellbogen auf Pads. Arme vollständig durchstrecken, langsam zurück.",
+"KH Kickback Trizeps":"Oberkörper waagerecht, Oberarm parallel zum Boden fixiert. KH nach hinten strecken, kurz halten.",
+"Crunches":"Nur Schulterblätter vom Boden heben – kein komplettes Aufrichten. Langsam und kontrolliert.",
+"Crunches am Kabelzug":"Kniend am Kabel. Oberkörper nach vorne-unten runden. Gewicht skalieren.",
+"Decline Crunches":"Auf Schrägbank. Mehr Range of Motion als flache Crunches.",
+"Bauch Maschine":"Maschine auf Schulterhöhe einstellen. Oberkörper nach vorne runden, nicht mit Hüfte.",
+"Beinheben (Liegend)":"Beine gestreckt oder leicht gebeugt. Langsam senken ohne Boden zu berühren. Kein Hüfteinsatz – Becken kippen vermeiden.",
+"Beinheben (Hängend)":"An der Stange hängen. Hüfte runden am Endpunkt für mehr Bauch-Aktivierung. Nicht schwingen.",
+"Reverse Crunch":"Auf dem Rücken liegend. Becken vom Boden heben, Knie zur Brust. Unterer Bauch, kein Hüftbeuger-Einsatz.",
+"Dead Bug":"Rücken flach am Boden. Gegenüberliegenden Arm und Bein strecken, Lendenwirbelkurve bleibt am Boden. Sehr sicher für die Wirbelsäule.",
+"Ab Rollout":"Mit Rollrad oder Stange. Fortgeschrittene Übung. Rücken gerade halten – nicht durchhängen. Langsam zurückrollen.",
+"Pallof Press":"Kabel seitlich, in Bauchhöhe. Arme nach vorne drücken und halten – Anti-Rotation. Schmal und stabil, keine Hüftbewegung.",
+"Hollow Body Hold":"Rücken flach, Arme und Beine gestreckt leicht über dem Boden halten. Isometrische Ganzkörperspannung – sehr effektiv für flachen Bauch."
+};
+const CC={"Glute Max":"#C8729A","Glute Med":"#B88CC0","Glute & Quad":"#C4A882","Glute & Hams":"#A8C4A0","Rücken":"#8AB4C4","Brust":"#C4A8A8","Schultern":"#B4C4A0","Bizeps":"#C4B8A0","Trizeps":"#A0B4C4","Bauch":"#C0BEA0"};
+const P3=[
+{l:"Tag A – Ganzkörper",e:[{c:"Glute Max",s:2,r:[4,8]},{c:"Glute Max",s:2,r:[8,12]},{c:"Glute & Hams",s:3,r:[4,8]},{c:"Rücken",s:2,r:[6,10]},{c:"Brust",s:2,r:[6,10]},{c:"Trizeps",s:2,r:[8,12]},{c:"Bauch",s:2,r:[8,12]}]},
+{l:"Tag B – Ganzkörper",e:[{c:"Glute Max",s:3,r:[6,10]},{c:"Glute Med",s:2,r:[6,10]},{c:"Glute & Quad",s:2,r:[4,8]},{c:"Rücken",s:2,r:[8,12]},{c:"Brust",s:2,r:[8,12]},{c:"Schultern",s:2,r:[8,12]},{c:"Trizeps",s:2,r:[6,10]}]},
+{l:"Tag C – Ganzkörper",e:[{c:"Glute & Hams",s:2,r:[4,8]},{c:"Glute Max",s:3,r:[6,10]},{c:"Glute & Quad",s:2,r:[6,10]},{c:"Glute Med",s:2,r:[8,12]},{c:"Schultern",s:2,r:[8,12]},{c:"Bizeps",s:2,r:[8,12]},{c:"Bauch",s:2,r:[8,12]}]}
+];
+const P4=[
+{l:"Tag A – Unterkörper",e:[{c:"Glute Max",s:3,r:[4,8]},{c:"Glute Max",s:2,r:[8,12]},{c:"Glute Med",s:2,r:[6,10]},{c:"Glute & Hams",s:2,r:[4,8]},{c:"Glute & Quad",s:2,r:[6,10]},{c:"Bauch",s:2,r:[8,12]}]},
+{l:"Tag B – Oberkörper",e:[{c:"Rücken",s:2,r:[6,10]},{c:"Rücken",s:2,r:[8,12]},{c:"Brust",s:2,r:[6,10]},{c:"Schultern",s:3,r:[8,12]},{c:"Trizeps",s:2,r:[8,12]},{c:"Bizeps",s:2,r:[6,10]}]},
+{l:"Tag C – Ganzkörper",e:[{c:"Glute & Hams",s:2,r:[4,8]},{c:"Glute & Hams",s:2,r:[6,10]},{c:"Glute Max",s:3,r:[6,10]},{c:"Glute & Quad",s:2,r:[4,8]},{c:"Schultern",s:2,r:[8,12]},{c:"Bauch",s:2,r:[8,12]}]},
+{l:"Tag D – Ganzkörper",e:[{c:"Glute Max",s:3,r:[4,8]},{c:"Glute Med",s:3,r:[8,12]},{c:"Rücken",s:2,r:[6,10]},{c:"Brust",s:2,r:[6,10]},{c:"Trizeps",s:2,r:[6,10]},{c:"Bizeps",s:2,r:[6,10]}]}
+];
+
+// STATE
+let S={view:'training',pt:4,week:1,cy:'cycle1',data:{},openDays:{},drop:null,dropSearch:'',tips:{},tipEdit:{}};
+function load(){try{const r=localStorage.getItem('peach_v4');return r?JSON.parse(r):{}}catch{return{}}}
+function save(){try{localStorage.setItem('peach_v4',JSON.stringify(S.data))}catch{}}
+S.data=load();
+
+function mk(c,w,d,e){return c+'__w'+w+'__d'+d+'__e'+e}
+function mkt(c,w,d,e){return 'tip__'+c+'__w'+w+'__d'+d+'__e'+e}
+function plan(){return S.pt===3?P3:P4}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function rcol(v,r){if(v===''||v==null)return'#555';const n=parseInt(v);if(isNaN(n))return'#555';if(n>=r[1])return'#7bc47a';if(n>=r[0])return'#e8b860';return'#d86868'}
+function prog(cr,pr,cw,pw){
+  if(!pr||!pr.length)return null;
+  if((parseFloat(cw)||0)>(parseFloat(pw)||0))return'w';
+  let imp=false;
+  for(let i=0;i<Math.max(cr.length,pr.length);i++){const c=parseInt(cr[i])||0,p=parseInt(pr[i])||0;if(c>p)imp=true;if(c<p)return'd'}
+  return imp?'r':'s'
+}
+function pbadge(p){
+  if(!p)return'';
+  const m={w:['↑ Gewicht','#7bc47a'],r:['↑ Reps','#7aafdf'],s:['= Gleich','#e8b860'],d:['↓ Weniger','#d86868']};
+  const[l,c]=m[p]||[];if(!l)return'';
+  return'<span class="pbadge" style="background:'+c+'22;border:1px solid '+c+';color:'+c+'">'+l+'</span>'
+}
+
+// RENDER
+function render(){
+  document.getElementById('week-label').textContent='Woche '+S.week+' / 12';
+  [3,4].forEach(p=>document.getElementById('plan-'+p).className='plan-btn'+(S.pt==p?' active':''));
+  ['cycle1','cycle2','cycle3'].forEach(c=>document.getElementById('cycle-'+c).className='cycle-btn'+(S.cy===c?' active':''));
+  document.getElementById('btn-training').className='tab-btn'+(S.view==='training'?' active':' inactive');
+  document.getElementById('btn-overview').className='tab-btn'+(S.view==='overview'?' active':' inactive');
+  document.getElementById('view-training').classList.toggle('hidden',S.view!=='training');
+  document.getElementById('view-overview').classList.toggle('hidden',S.view!=='overview');
+  if(S.view==='training')renderT();else renderOv();
+}
+
+function renderT(){
+  const pl=plan();let h='';
+  // week bar
+  if(S.week>1){
+    let tot=0,imp=0;
+    pl.forEach((d,di)=>d.e.forEach((ex,ei)=>{
+      const k=mk(S.cy,S.week,di,ei),pk=mk(S.cy,S.week-1,di,ei);
+      const cur=S.data[k]||{},prv=S.data[pk]||{};
+      if(!prv.weight&&!(prv.reps||[]).some(Boolean))return;
+      tot++;const p=prog(cur.reps||[],prv.reps||[],cur.weight,prv.weight);
+      if(p==='w'||p==='r')imp++;
+    }));
+    if(tot>0){const pct=Math.round(imp/tot*100),bc=pct>=70?'#7bc47a':pct>=40?'#e8b860':'#d86868';
+      h+='<div class="week-progress"><span style="font-size:12px;color:#777">Woche '+S.week+'</span><div class="wp-bar-wrap"><div class="wp-bar" style="width:'+pct+'%;background:'+bc+'"></div></div><span style="font-size:12px;color:#aaa;white-space:nowrap">'+imp+'/'+tot+' gesteigert ('+pct+'%)</span></div>';
+    }
+  }
+  pl.forEach((day,di)=>{
+    const op=S.openDays[di]!==false;
+    h+='<div class="day-card"><button class="day-header" onclick="toggleDay('+di+')"><span style="font-weight:700;font-size:15px">'+esc(day.l)+'</span><span style="color:#777;font-size:13px">'+(op?'▲':'▼')+' '+day.e.length+' Übungen</span></button>';
+    if(op){h+='<div class="day-body">';day.e.forEach((ex,ei)=>{h+=renderEx(ex,ei,di)});h+='</div>'}
+    h+='</div>';
+  });
+  document.getElementById('view-training').innerHTML=h;
+}
+
+function renderEx(ex,ei,di){
+  const k=mk(S.cy,S.week,di,ei),pk=S.week>1?mk(S.cy,S.week-1,di,ei):null;
+  const tk=mkt(S.cy,S.week,di,ei);
+  const cur=S.data[k]||{},prv=pk?S.data[pk]||{}:{};
+  const xs=cur.extraSets||0,ms=Math.min(5,ex.s+xs);
+  const reps=cur.reps||Array(ms).fill('');
+  const col=CC[ex.c]||'#aaa';
+  const p=S.week>1?prog(reps,prv.reps||[],cur.weight,prv.weight):null;
+  const dropOpen=S.drop&&S.drop.di===di&&S.drop.ei===ei;
+  const opts=EXERCISES[ex.c]||[];
+  const filt=S.dropSearch?opts.filter(o=>o.toLowerCase().includes(S.dropSearch.toLowerCase())):opts;
+
+  // dropdown html
+  let dh='';
+  if(dropOpen){
+    let oh='<div class="drop-opt drop-empty-opt" onclick="selEx('+di+','+ei+',\'\')">– Übung wählen –</div>';
+    filt.forEach(o=>{
+      const s=cur.exercise===o;
+      oh+='<div class="drop-opt'+(s?' sel':'')+'" style="'+(s?'color:'+col+';background:'+col+'18':'')+'" onclick="selEx('+di+','+ei+',this.textContent)">'+esc(o)+'</div>';
+    });
+    if(!filt.length)oh+='<div class="drop-no-results">Keine Treffer</div>';
+    dh='<div class="dropdown" id="dd-'+di+'-'+ei+'" style="border:1px solid '+col+'55"><div class="drop-search"><input id="ds-'+di+'-'+ei+'" type="text" placeholder="Suchen…" value="'+esc(S.dropSearch)+'" oninput="onDS('+di+','+ei+',this.value)"/></div><div class="drop-list">'+oh+'</div></div>';
+  }
+
+  // tips
+  const tipOpen=S.tips[tk],tipEdit=S.tipEdit[tk];
+  const stored=S.data[tk],defTip=TIPS[cur.exercise]||'',tip=stored!==undefined?stored:defTip,custom=stored!==undefined&&stored!==defTip;
+  let tipH='';
+  if(cur.exercise){
+    tipH='<button class="tip-toggle'+(tipOpen?' open':'')+'" onclick="togTip(\''+tk+'\')"><span class="tip-i">i</span> Ausführungstipps '+(custom?'<span class="tip-custom">● angepasst</span>':'')+' <span style="font-size:9px;opacity:.7">'+(tipOpen?'▲':'▼')+'</span></button>';
+    if(tipOpen){
+      const tid='ta-'+tk.replace(/[^a-z0-9]/gi,'_');
+      if(tipEdit){
+        tipH+='<div class="tip-panel"><textarea class="tip-ta" rows="4" id="'+tid+'">'+esc(tip)+'</textarea><div class="tip-acts"><button class="tip-save" onclick="savTip(\''+tk+'\',\''+tid+'\')">Speichern</button><button class="tip-cancel" onclick="canTip(\''+tk+'\')">Abbrechen</button>'+(custom?'<button class="tip-reset" onclick="resTip(\''+tk+'\')">&#8634; Zurücksetzen</button>':'')+'</div></div>';
+      }else{
+        tipH+='<div class="tip-panel"><p class="tip-text">'+(tip?esc(tip):'<span style="color:#555">Noch kein Tipp.</span>')+'</p><button class="tip-edit-btn" onclick="edTip(\''+tk+'\')">&#9998; Bearbeiten</button></div>';
+      }
+    }
+  }
+
+  // hint
+  let hint='';
+  if(S.week>1&&prv.weight){
+    const pm=p==='w'?' <span style="color:#7bc47a">→ Gewicht gesteigert! ✓</span>':p==='r'?' <span style="color:#7aafdf">→ Mehr Wiederholungen! ✓</span>':p==='s'?' <span style="color:#e8b860">→ Gleiche Leistung!</span>':p==='d'?' <span style="color:#d86868">→ Kein Problem!</span>':'';
+    hint='<div class="phint">VW: '+esc(prv.weight)+' kg · '+esc((prv.reps||[]).filter(Boolean).join(' / '))+' Wdh'+pm+'</div>';
+  }
+
+  // reps
+  let rh='';
+  for(let i=0;i<ms;i++){
+    const c=rcol(reps[i],ex.r),pr=(prv.reps||[])[i];
+    rh+='<div class="rep-col"><span class="rep-lbl">S'+(i+1)+'</span><input class="rep-inp" type="text" inputmode="numeric" value="'+esc(reps[i]||'')+'" placeholder="–" style="border:2px solid '+c+'" onchange="updRep('+di+','+ei+','+i+',this.value)"/>'+(pr!=null&&pr!==''?'<span class="rep-prev">'+pr+'</span>':'')+'</div>';
+  }
+  if(ms<5)rh+='<button class="add-set-btn" onclick="addSet('+di+','+ei+')">+</button>';
+
+  return '<div class="ex-row" style="border-left:3px solid '+col+'">'
+    +'<div class="ex-row-top"><span class="cat-badge" style="background:'+col+'28;color:'+col+'">'+esc(ex.c)+'</span>'
+    +'<div class="picker-wrap" id="pw-'+di+'-'+ei+'">'
+    +'<button class="pick-btn'+(cur.exercise?' has-val':'')+'" style="border-color:'+(dropOpen?col:'rgba(255,255,255,0.15)')+'" onclick="togDrop('+di+','+ei+',event)">'
+    +'<span class="pick-btn-txt">'+esc(cur.exercise||'– Übung wählen –')+'</span>'
+    +'<span class="pick-btn-arr">'+(dropOpen?'▲':'▼')+'</span></button>'+dh+'</div>'
+    +pbadge(p)+'</div>'
+    +'<div class="ex-meta"><span class="sets-info">'+ms+' Sätze · <span style="color:'+col+'">'+ex.r[0]+'–'+ex.r[1]+' Reps</span></span>'
+    +'<div class="w-wrap"><span class="w-label">Gewicht:</span><input class="w-input" type="text" value="'+esc(cur.weight||'')+'" placeholder="kg" onchange="updW('+di+','+ei+',this.value)"/>'+(prv.weight?'<span style="color:#555;font-size:11px">(VW: '+esc(prv.weight)+')</span>':'')+'</div></div>'
+    +'<div class="reps-row">'+rh+'</div>'+hint+tipH+'</div>';
+}
+
+function renderOv(){
+  const pl=plan();let h='<h2 class="ov-title">Fortschritts-Übersicht</h2><p class="ov-sub">Gewichtsentwicklung pro Übung über alle 12 Wochen.</p>';
+  pl.forEach((day,di)=>{
+    h+='<div class="ov-day"><div class="ov-day-lbl">'+esc(day.l)+'</div>';
+    day.e.forEach((ex,ei)=>{
+      const ws=Array.from({length:12},(_,i)=>{const d=S.data[mk(S.cy,i+1,di,ei)]||{};return{w:i+1,name:d.exercise,wt:parseFloat(d.weight)||0}});
+      const filled=ws.filter(x=>x.wt>0),name=(ws.find(x=>x.name)||{}).name,nums=ws.map(x=>x.wt),mx=Math.max(...nums,1);
+      const col=CC[ex.c]||'#aaa',gain=filled.length>=2?filled[filled.length-1].wt-filled[0].wt:null;
+      const bars=nums.map((v,i)=>'<div class="ov-bar" title="W'+(i+1)+': '+(v||'–')+' kg" style="height:'+Math.max(2,v>0?(v/mx*36):2)+'px;background:'+(v>0?col:'rgba(255,255,255,0.08)')+'"></div>').join('');
+      h+='<div class="ov-ex" style="border-left:3px solid '+col+'"><div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px"><span style="font-weight:700">'+(name||'<span style="color:#555">—</span>')+'</span><div style="display:flex;gap:12px;align-items:center"><span style="color:'+col+';font-size:11px">'+esc(ex.c)+'</span>'+(gain&&gain>0?'<span style="color:#7bc47a;font-weight:700">+'+gain.toFixed(1)+' kg</span>':'')+'</div></div><div class="ov-bars">'+bars+'</div><div style="display:flex;justify-content:space-between;margin-top:4px"><span style="font-size:10px;color:#555">W1</span><span style="font-size:10px;color:#555">W12</span></div>'+(filled.length?'<div style="font-size:11px;color:#777;margin-top:4px">Start: <b style="color:#fff">'+filled[0].wt+' kg</b>'+(filled.length>1?' · Aktuell: <b style="color:#7bc47a">'+filled[filled.length-1].wt+' kg</b>':'')+'</div>':'')+'</div>';
+    });
+    h+='</div>';
+  });
+  document.getElementById('view-overview').innerHTML=h;
+}
+
+// ACTIONS
+function setView(v){S.view=v;render()}
+function setPlan(p){S.pt=Number(p);render()}
+function setCycle(c){S.cy=c;render()}
+function changeWeek(d){S.week=Math.max(1,Math.min(12,S.week+d));render()}
+function toggleDay(di){S.openDays[di]=S.openDays[di]!==false?false:true;render()}
+
+function togDrop(di,ei,ev){
+  ev.stopPropagation();
+  if(S.drop&&S.drop.di===di&&S.drop.ei===ei){S.drop=null}else{S.drop={di,ei};S.dropSearch=''}
+  renderT();
+  if(S.drop){setTimeout(()=>{
+    const el=document.getElementById('ds-'+di+'-'+ei);
+    if(el)el.focus();
+    const dd=document.getElementById('dd-'+di+'-'+ei);
+    const pw=document.getElementById('pw-'+di+'-'+ei);
+    if(dd&&pw){const r=pw.getBoundingClientRect();if(window.innerHeight-r.bottom<280){dd.style.bottom='calc(100% + 4px)';dd.style.top='auto'}}
+  },20)}
+}
+function onDS(di,ei,v){S.dropSearch=v;renderT()}
+function selEx(di,ei,v){
+  // v comes from textContent so already decoded
+  const k=mk(S.cy,S.week,di,ei);
+  S.data[k]={...(S.data[k]||{}),exercise:v};save();
+  S.drop=null;S.dropSearch='';renderT();
+}
+function updW(di,ei,v){const k=mk(S.cy,S.week,di,ei);S.data[k]={...(S.data[k]||{}),weight:v};save()}
+function updRep(di,ei,i,v){
+  const k=mk(S.cy,S.week,di,ei);const cur=S.data[k]||{};
+  const ms=Math.min(5,(cur.extraSets||0)+(plan()[di].e[ei].s));
+  const r=[...(cur.reps||Array(ms).fill(''))];while(r.length<=i)r.push('');r[i]=v;
+  S.data[k]={...cur,reps:r};save();
+}
+function addSet(di,ei){const k=mk(S.cy,S.week,di,ei);const cur=S.data[k]||{};S.data[k]={...cur,extraSets:(cur.extraSets||0)+1};save();renderT()}
+function togTip(tk){S.tips[tk]=!S.tips[tk];if(!S.tips[tk])S.tipEdit[tk]=false;renderT()}
+function edTip(tk){S.tipEdit[tk]=true;renderT()}
+function canTip(tk){S.tipEdit[tk]=false;renderT()}
+function savTip(tk,tid){const el=document.getElementById(tid);if(el){S.data[tk]=el.value;save()}S.tipEdit[tk]=false;renderT()}
+function resTip(tk){const k=S.drop;S.data[tk]=undefined;delete S.data[tk];save();S.tipEdit[tk]=false;renderT()}
+
+document.addEventListener('click',e=>{
+  if(S.drop&&!e.target.closest('.picker-wrap')){S.drop=null;renderT()}
+});
+
+render();
+</script>
+</body>
+</html>
