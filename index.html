@@ -108,10 +108,6 @@ button{cursor:pointer;}
   </div>
   <div class="controls">
     <div style="display:flex;gap:4px;">
-      <button class="plan-btn" id="plan-3" onclick="setPlan(3)">3-Tage</button>
-      <button class="plan-btn active" id="plan-4" onclick="setPlan(4)">4-Tage</button>
-    </div>
-    <div style="display:flex;gap:4px;">
       <button class="cycle-btn active" id="cycle-cycle1" onclick="setCycle('cycle1')">Zyklus 1</button>
       <button class="cycle-btn" id="cycle-cycle2" onclick="setCycle('cycle2')">Zyklus 2</button>
       <button class="cycle-btn" id="cycle-cycle3" onclick="setCycle('cycle3')">Zyklus 3</button>
@@ -132,8 +128,8 @@ button{cursor:pointer;}
 const EXERCISES={
 "Glute Max":["Hip Thrusts Langhantel","Hip Thrust Kurzhantel","Hip Thrusts Multipresse","Hip Thrust Maschine","Glute Bridge Langhantel","Glute Bridge Kurzhantel","Glute Bridge Multipresse","Kabel Kickback Stehend","Kabel Kickback Flachbank","Kabel Kickback Schrägbank","Kabel Kickback Liegend","Kickback Multipresse","Kickback Maschine"],
 "Glute Med":["Kabel Abduktion Stehend","Kabel Abduktion Liegend","Kabel Abduktion Schrägbank","Abduktionsmaschine","Pelvic Drop","Standing Hip Abduction Maschine","Fire Hydrants Kabel"],
-"Glute & Quad":["Low Bar Squat","Beinpresse","Step Ups","Split Squat Kurzhantel","Split Squat Multipresse","Hack Squat","Reverse Lunge"],
-"Glute & Hams":["RDL Langhantel","RDL Kurzhanteln","Glute Hyperextensions","Reverse Hack RDL","Good Mornings","Hip Extension Maschine","Single-Leg RDL","Kabel Pull-Through","Nordic Curls"],
+"Glute & Quad":["Low Bar Squat","Beinpresse","Step Ups","Split Squat Kurzhantel","Split Squat Langhantel","Split Squat Multipresse","Hack Squat","Reverse Lunge"],
+"Glute & Hams":["RDL Langhantel","RDL Kurzhanteln","Glute Hyperextensions","Reverse Hack RDL","Good Mornings","Single-Leg RDL","Nordic Curls","Leg Curl (Maschine)"],
 "Rücken":["LH Rudern","KH Rudern","KH Rudern (breit)","Rudern Kabel (eng)","Rudern Kabel (breit)","Rudermaschine (neutral)","Rudermaschine (breit)","Latzug (eng)","Latzug (breit)","Überzug am Kabel","T Bar Rudern (neutral)","T Bar Rudern (breit)","Assistierter Klimmzug (eng)","Assistierter Klimmzug (breit)","Face Pull Kabel","Straight-Arm Pulldown","Einarmiger Latzug Kabel"],
 "Brust":["LH Bankdrücken","KH Bankdrücken","Bankdrücken Multipresse","LH Schrägbankdrücken","KH Schrägbankdrücken","Schrägbankdrücken Multipresse","Brustpresse","Butterfly Maschine","Flys von oben Kabel","Flys von unten Kabel","Flachbank KH Flys","Schrägbank KH Flys"],
 "Schultern":["KH Seitheben","Vorgebeugtes KH Seitheben","Seithebemaschine","Seitheben Kabel","Vorgebeugtes Seitheben Kabel","LH Überkopfdrücken","KH Überkopfdrücken","Überkopfmaschine","Butterfly Reverse Maschine","Upright Row Kabel","Arnold Press","Einarmiges Überkopfdrücken Kabel"],
@@ -162,21 +158,21 @@ const TIPS={
 "Pelvic Drop":"Einbeinig auf einer Stufe stehen. Hüfte der Hängeseite langsam absinken lassen, dann Glute Med anspannen und anheben.",
 "Standing Hip Abduction Maschine":"Stehend an der Maschine. Mehr Glute-Med-Aktivierung als sitzend. Standbein stabil, Oberkörper nicht wegkippen.",
 "Fire Hydrants Kabel":"Auf allen Vieren, Kabel am Knie/Fußgelenk. Bein seitlich-nach-oben führen wie ein Feuerhydrant. Hüfte nicht mitdrehen.",
-"Low Bar Squat":"Stange tief auf den hinteren Deltamuskeln. Breite Fußstellung, Knie über Zehen. Gesäß nach hinten-unten, Oberkörper etwas vorgebeugt – betont Glutes.",
-"Beinpresse":"Füße hoch und weit auf der Plattform für mehr Glute-Fokus. Knie nicht ganz durchstrecken. Langsam ablassen.",
+"Low Bar Squat":"⚠️ Für Po-Fokus: Füße weit auseinander, Zehen leicht nach außen, Fersen ggf. erhöht. Tief absenken, Knie über Zehen. Enger Stand + volle Tiefe = mehr Quad – bei Ziel schmale Beine vermeiden!",
+"Beinpresse":"⚠️ Für Po-Fokus: Füße hoch und weit auf der Plattform, Knie weit auseinander. Enge tiefe Fußstellung = mehr Quad. Bei Ziel schmale Beine: lieber Reverse Lunge oder Split Squat wählen.",
 "Step Ups":"Hohe Box (mind. Kniehöhe) für maximale Glute-Aktivierung. Ferse fest aufstellen, durch die Ferse drücken.",
-"Split Squat Kurzhantel":"Hinterer Fuß auf Bank (bulgarisch) oder am Boden. Knie der hinteren Seite Richtung Boden, Oberkörper leicht vorgebeugt.",
-"Split Squat Multipresse":"Geführte Variante. Gleiches Prinzip wie KH-Version. Mehr Stabilität für Fokus auf Gewicht.",
-"Hack Squat":"Füße auf der Plattform leicht hochstellen. Rücken an der Maschine halten, tief absenken.",
-"Reverse Lunge":"Schritt nach hinten statt vorne – weniger Quad-dominant als Ausfallschritt vorwärts. Gewicht auf Vorderfuß lassen, durch Ferse nach oben drücken.",
+"Split Squat Kurzhantel":"✅ Gute Wahl bei Ziel schmale Beine. Hinterer Fuß auf Bank oder am Boden. Oberkörper leicht vorgebeugt – mehr Po, weniger Quad.",
+"Split Squat Langhantel":"✅ Gute Wahl bei Ziel schmale Beine. Stange auf Schultern, Oberkörper leicht vorgebeugt – mehr Glute-Aktivierung als aufrecht.",
+"Split Squat Multipresse":"✅ Gute Wahl bei Ziel schmale Beine. Geführte Variante, mehr Stabilität. Oberkörper leicht vorgebeugt halten.",
+"Hack Squat":"⚠️ Für Po-Fokus: Füße weit oben auf der Plattform, weit auseinander, tief absenken. Enger Stand + flache Fußstellung = dominanter Quad – bei Ziel schmale Beine nur mit weitem Stand.",
+"Reverse Lunge":"✅ Beste Wahl bei Ziel schmale Beine. Weniger Quad-dominant als alle anderen Varianten. Schritt weit nach hinten, durch Ferse drücken.",
 "RDL Langhantel":"Füße hüftbreit, Stange nah am Körper. Hüfte nach hinten schieben, Rücken gerade. Dehnung in den Hamstrings spüren, dann durch Gesäß nach oben.",
 "RDL Kurzhanteln":"Gleiche Technik wie LH-RDL. KH vor dem Körper, nah an den Beinen entlangführen.",
 "Glute Hyperextensions":"An der Hyperextensionsbank, Hüfte an der Auflagekante. Oberkörper absenken, dann durch Gesäß strecken – nicht mit dem Rücken.",
 "Reverse Hack RDL":"Rückwärts in der Hack-Squat-Maschine. Hüfte-Hinge-Bewegung – stark auf hintere Kette.",
 "Good Mornings":"Stange auf den Schultern. Hüfte nach hinten schieben, Rücken neutral. Hamstring-Dehnung halten, dann zurück.",
-"Hip Extension Maschine":"Reine hintere Kette. Kein Quad-Einsatz. Bein nach hinten-unten drücken, oben kurz anspannen.",
 "Single-Leg RDL":"Einbeinig, hinteres Bein gestreckt nach hinten heben. Mehr Glute-Aktivierung als beidbeinig. Hüfte stabil halten – nicht rotieren.",
-"Kabel Pull-Through":"Kabel zwischen den Beinen, Hüfte-Hinge wie beim RDL. Arme bleiben passiv – der Po zieht die Bewegung. Sehr glute-freundlich.",
+"Leg Curl (Maschine)":"Liegend oder sitzend. Isolierter Hamstring-Fokus – gibt der Rückseite des Oberschenkels die runde Form direkt unterhalb des Pos. Langsam ablassen, volle Streckung unten nutzen. Fersen zur Gesäßgegend ziehen, kurz halten.",
 "Nordic Curls":"Knie auf gepolsterter Unterlage, Füße fixiert. Oberkörper langsam nach vorne fallen lassen – exzentrische Hamstring-Arbeit. Fortgeschrittene Übung.",
 "LH Rudern":"Oberkörper ca. 45° vorgebeugt. Stange zum Bauch ziehen, Ellbogen nah am Körper.",
 "KH Rudern":"Einarmig auf Bank gestützt. KH zum Hüftknochen ziehen, Schulterblatt einziehen.",
@@ -255,9 +251,9 @@ const TIPS={
 };
 const CC={"Glute Max":"#C8729A","Glute Med":"#B88CC0","Glute & Quad":"#C4A882","Glute & Hams":"#A8C4A0","Rücken":"#8AB4C4","Brust":"#C4A8A8","Schultern":"#B4C4A0","Bizeps":"#C4B8A0","Trizeps":"#A0B4C4","Bauch":"#C0BEA0"};
 const P3=[
-{l:"Tag A – Ganzkörper",e:[{c:"Glute Max",s:2,r:[4,8]},{c:"Glute Max",s:2,r:[8,12]},{c:"Glute & Hams",s:3,r:[4,8]},{c:"Rücken",s:2,r:[6,10]},{c:"Brust",s:2,r:[6,10]},{c:"Trizeps",s:2,r:[8,12]},{c:"Bauch",s:2,r:[8,12]}]},
-{l:"Tag B – Ganzkörper",e:[{c:"Glute Max",s:3,r:[6,10]},{c:"Glute Med",s:2,r:[6,10]},{c:"Glute & Quad",s:2,r:[4,8]},{c:"Rücken",s:2,r:[8,12]},{c:"Brust",s:2,r:[8,12]},{c:"Schultern",s:2,r:[8,12]},{c:"Trizeps",s:2,r:[6,10]}]},
-{l:"Tag C – Ganzkörper",e:[{c:"Glute & Hams",s:2,r:[4,8]},{c:"Glute Max",s:3,r:[6,10]},{c:"Glute & Quad",s:2,r:[6,10]},{c:"Glute Med",s:2,r:[8,12]},{c:"Schultern",s:2,r:[8,12]},{c:"Bizeps",s:2,r:[8,12]},{c:"Bauch",s:2,r:[8,12]}]}
+{l:"Tag A",e:[{c:"Glute Max",s:3,r:[4,8]},{c:"Glute Max",s:2,r:[8,12]},{c:"Glute Med",s:2,r:[6,10]},{c:"Glute & Hams",s:2,r:[4,8]},{c:"Glute & Quad",s:2,r:[4,8]},{c:"Bauch",s:2,r:[8,12]},{c:"Rücken",s:2,r:[6,10]},{c:"Brust",s:2,r:[6,10]}]},
+{l:"Tag B",e:[{c:"Glute & Hams",s:2,r:[4,8]},{c:"Glute & Hams",s:2,r:[6,10]},{c:"Glute Max",s:3,r:[6,10]},{c:"Glute & Quad",s:2,r:[6,10]},{c:"Glute Med",s:2,r:[8,12]},{c:"Bauch",s:2,r:[8,12]},{c:"Rücken",s:2,r:[8,12]},{c:"Schultern",s:2,r:[8,12]}]},
+{l:"Tag C",e:[{c:"Glute Max",s:3,r:[4,8]},{c:"Glute Max",s:2,r:[8,12]},{c:"Glute Med",s:3,r:[8,12]},{c:"Bauch",s:2,r:[8,12]},{c:"Brust",s:2,r:[8,12]},{c:"Schultern",s:2,r:[8,12]},{c:"Bizeps",s:2,r:[8,12]},{c:"Trizeps",s:2,r:[8,12]}]}
 ];
 const P4=[
 {l:"Tag A – Unterkörper",e:[{c:"Glute Max",s:3,r:[4,8]},{c:"Glute Max",s:2,r:[8,12]},{c:"Glute Med",s:2,r:[6,10]},{c:"Glute & Hams",s:2,r:[4,8]},{c:"Glute & Quad",s:2,r:[6,10]},{c:"Bauch",s:2,r:[8,12]}]},
@@ -267,10 +263,12 @@ const P4=[
 ];
 
 // STATE
-let S={view:'training',pt:4,week:1,cy:'cycle1',data:{},openDays:{},drop:null,dropSearch:'',tips:{},tipEdit:{}};
+let S={view:'training',pt:3,week:1,cy:'cycle1',data:{},openDays:{},drop:null,dropSearch:'',tips:{},tipEdit:{}};
 function load(){try{const r=localStorage.getItem('peach_v4');return r?JSON.parse(r):{}}catch{return{}}}
 function save(){try{localStorage.setItem('peach_v4',JSON.stringify(S.data))}catch{}}
 S.data=load();
+
+const REC=new Set(["Hip Thrusts Langhantel","Hip Thrusts Multipresse","Hip Thrust Maschine","Glute Bridge Langhantel","Kabel Kickback Liegend","Kickback Maschine","Abduktionsmaschine","Kabel Abduktion Liegend","Standing Hip Abduction Maschine","Reverse Lunge","Split Squat Kurzhantel","Split Squat Langhantel","Split Squat Multipresse","RDL Langhantel","Glute Hyperextensions","Single-Leg RDL","Leg Curl (Maschine)","Latzug (breit)","Assistierter Klimmzug (breit)","Straight-Arm Pulldown","Überzug am Kabel","KH Seitheben","Seitheben Kabel","Seithebemaschine","Pallof Press","Hollow Body Hold"]);
 
 function mk(c,w,d,e){return c+'__w'+w+'__d'+d+'__e'+e}
 function mkt(c,w,d,e){return 'tip__'+c+'__w'+w+'__d'+d+'__e'+e}
@@ -294,7 +292,6 @@ function pbadge(p){
 // RENDER
 function render(){
   document.getElementById('week-label').textContent='Woche '+S.week+' / 12';
-  [3,4].forEach(p=>document.getElementById('plan-'+p).className='plan-btn'+(S.pt==p?' active':''));
   ['cycle1','cycle2','cycle3'].forEach(c=>document.getElementById('cycle-'+c).className='cycle-btn'+(S.cy===c?' active':''));
   document.getElementById('btn-training').className='tab-btn'+(S.view==='training'?' active':' inactive');
   document.getElementById('btn-overview').className='tab-btn'+(S.view==='overview'?' active':' inactive');
@@ -325,14 +322,45 @@ function renderT(){
     if(op){h+='<div class="day-body">';day.e.forEach((ex,ei)=>{h+=renderEx(ex,ei,di)});h+='</div>'}
     h+='</div>';
   });
+  if(S.week===12){
+    const nextCy=S.cy==='cycle1'?'2':S.cy==='cycle2'?'3':'1 (neu)';
+    h+='<div style="background:linear-gradient(135deg,#2a1e1a 0%,#1a1a2e 100%);border:1px solid #e8b860;border-radius:14px;padding:16px 18px;margin-top:8px">'
+      +'<div style="font-weight:800;font-size:15px;color:#e8b860;margin-bottom:6px">🏁 Woche 12 – Zyklus fast abgeschlossen!</div>'
+      +'<p style="color:#ccc;font-size:13px;line-height:1.7;margin:0 0 10px">Nach dieser Woche folgt eine <b style="color:#e8b860">Deload-Woche</b> – danach startest du Zyklus '+nextCy+' mit neuem Gewicht.</p>'
+      +'<div style="color:#aaa;font-size:12px;line-height:1.9">'
+      +'<b style="color:#fff">Deload-Woche – so geht\'s:</b><br>'
+      +'• Gleiche Übungen wie gewohnt – nichts Neues einführen<br>'
+      +'• Gewicht auf <b style="color:#e8b860">50–60%</b> deines normalen Arbeitsgewichts reduzieren<br>'
+      +'• Sätze auf <b style="color:#e8b860">2 pro Übung</b> reduzieren<br>'
+      +'• Wiederholungen moderat halten (nicht bis ans Limit gehen)<br>'
+      +'• Ziel: Erholung, Gelenke entlasten, Nervensystem regenerieren<br>'
+      +'• <b style="color:#7bc47a">Kein Muskelabbau</b> – 1 Woche Deload verändert nichts an deiner Leistung!'
+      +'</div></div>';
+  }
   document.getElementById('view-training').innerHTML=h;
+}
+
+function autoExtraSets(di,ei,baseSets){
+  if(S.week<4)return 0;
+  let streak=0;
+  for(let w=S.week-1;w>=Math.max(1,S.week-3);w--){
+    const k=mk(S.cy,w,di,ei),pk=mk(S.cy,w-1,di,ei);
+    const cur=S.data[k]||{},prv=S.data[pk]||{};
+    if(!prv.weight&&!(prv.reps||[]).some(Boolean))break;
+    const st=prog(cur.reps||[],prv.reps||[],cur.weight,prv.weight);
+    if(st==='s'||st==='d')streak++;else break;
+  }
+  return streak>=3?1:0;
 }
 
 function renderEx(ex,ei,di){
   const k=mk(S.cy,S.week,di,ei),pk=S.week>1?mk(S.cy,S.week-1,di,ei):null;
   const tk=mkt(S.cy,S.week,di,ei);
   const cur=S.data[k]||{},prv=pk?S.data[pk]||{}:{};
-  const xs=cur.extraSets||0,ms=Math.min(5,ex.s+xs);
+  const xs=cur.extraSets||0;
+  const autoX=autoExtraSets(di,ei,ex.s);
+  const ms=Math.min(5,ex.s+xs+autoX);
+  const autoTriggered=autoX>0&&xs===0;
   const reps=cur.reps||Array(ms).fill('');
   const col=CC[ex.c]||'#aaa';
   const p=S.week>1?prog(reps,prv.reps||[],cur.weight,prv.weight):null;
@@ -346,7 +374,8 @@ function renderEx(ex,ei,di){
     let oh='<div class="drop-opt drop-empty-opt" onclick="selEx('+di+','+ei+',\'\')">– Übung wählen –</div>';
     filt.forEach(o=>{
       const s=cur.exercise===o;
-      oh+='<div class="drop-opt'+(s?' sel':'')+'" style="'+(s?'color:'+col+';background:'+col+'18':'')+'" onclick="selEx('+di+','+ei+',this.textContent)">'+esc(o)+'</div>';
+      const rec=REC.has(o);
+      oh+='<div class="drop-opt'+(s?' sel':'')+'" style="'+(s?'color:'+col+';background:'+col+'18;font-weight:700':(rec?'font-weight:700':''))+'" onclick="selEx('+di+','+ei+',this.getAttribute(\'data-val\'))" data-val="'+esc(o)+'">'+(rec?'<span style="color:'+col+';font-size:9px;margin-right:5px">★</span>':'')+esc(o)+'</div>';
     });
     if(!filt.length)oh+='<div class="drop-no-results">Keine Treffer</div>';
     dh='<div class="dropdown" id="dd-'+di+'-'+ei+'" style="border:1px solid '+col+'55"><div class="drop-search"><input id="ds-'+di+'-'+ei+'" type="text" placeholder="Suchen…" value="'+esc(S.dropSearch)+'" oninput="onDS('+di+','+ei+',this.value)"/></div><div class="drop-list">'+oh+'</div></div>';
@@ -375,13 +404,16 @@ function renderEx(ex,ei,di){
     hint='<div class="phint">VW: '+esc(prv.weight)+' kg · '+esc((prv.reps||[]).filter(Boolean).join(' / '))+' Wdh'+pm+'</div>';
   }
 
-  // reps
+  // reps + +/- buttons
   let rh='';
   for(let i=0;i<ms;i++){
     const c=rcol(reps[i],ex.r),pr=(prv.reps||[])[i];
     rh+='<div class="rep-col"><span class="rep-lbl">S'+(i+1)+'</span><input class="rep-inp" type="text" inputmode="numeric" value="'+esc(reps[i]||'')+'" placeholder="–" style="border:2px solid '+c+'" onchange="updRep('+di+','+ei+','+i+',this.value)"/>'+(pr!=null&&pr!==''?'<span class="rep-prev">'+pr+'</span>':'')+'</div>';
   }
+  if(xs>0)rh+='<button class="add-set-btn" style="border-color:rgba(216,104,104,0.4);color:#d86868" onclick="removeSet('+di+','+ei+')">−</button>';
   if(ms<5)rh+='<button class="add-set-btn" onclick="addSet('+di+','+ei+')">+</button>';
+
+  const autoLabel=autoTriggered?'<span style="color:#e8b860;font-size:10px;margin-left:6px">⚡ +1 Satz (3 Wo. kein Fortschritt)</span>':'';
 
   return '<div class="ex-row" style="border-left:3px solid '+col+'">'
     +'<div class="ex-row-top"><span class="cat-badge" style="background:'+col+'28;color:'+col+'">'+esc(ex.c)+'</span>'
@@ -390,7 +422,7 @@ function renderEx(ex,ei,di){
     +'<span class="pick-btn-txt">'+esc(cur.exercise||'– Übung wählen –')+'</span>'
     +'<span class="pick-btn-arr">'+(dropOpen?'▲':'▼')+'</span></button>'+dh+'</div>'
     +pbadge(p)+'</div>'
-    +'<div class="ex-meta"><span class="sets-info">'+ms+' Sätze · <span style="color:'+col+'">'+ex.r[0]+'–'+ex.r[1]+' Reps</span></span>'
+    +'<div class="ex-meta"><span class="sets-info">'+ms+' Sätze · <span style="color:'+col+'">'+ex.r[0]+'–'+ex.r[1]+' Reps</span>'+autoLabel+'</span>'
     +'<div class="w-wrap"><span class="w-label">Gewicht:</span><input class="w-input" type="text" value="'+esc(cur.weight||'')+'" placeholder="kg" onchange="updW('+di+','+ei+',this.value)"/>'+(prv.weight?'<span style="color:#555;font-size:11px">(VW: '+esc(prv.weight)+')</span>':'')+'</div></div>'
     +'<div class="reps-row">'+rh+'</div>'+hint+tipH+'</div>';
 }
@@ -445,6 +477,7 @@ function updRep(di,ei,i,v){
   S.data[k]={...cur,reps:r};save();
 }
 function addSet(di,ei){const k=mk(S.cy,S.week,di,ei);const cur=S.data[k]||{};S.data[k]={...cur,extraSets:(cur.extraSets||0)+1};save();renderT()}
+function removeSet(di,ei){const k=mk(S.cy,S.week,di,ei);const cur=S.data[k]||{};S.data[k]={...cur,extraSets:Math.max(0,(cur.extraSets||0)-1)};save();renderT()}
 function togTip(tk){S.tips[tk]=!S.tips[tk];if(!S.tips[tk])S.tipEdit[tk]=false;renderT()}
 function edTip(tk){S.tipEdit[tk]=true;renderT()}
 function canTip(tk){S.tipEdit[tk]=false;renderT()}
