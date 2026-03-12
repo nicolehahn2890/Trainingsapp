@@ -355,8 +355,9 @@ function autoExtraSets(di,ei,baseSets){
 
 function renderEx(ex,ei,di){
   const k=mk(S.cy,S.week,di,ei),pk=S.week>1?mk(S.cy,S.week-1,di,ei):null;
-  const tk=mkt(S.cy,S.week,di,ei);
   const cur=S.data[k]||{},prv=pk?S.data[pk]||{}:{};
+  // Tipp-Key: übungsbasiert – gilt für alle Wochen/Tage/Zyklen
+  const tk=cur.exercise?'tip__ex__'+cur.exercise:mkt(S.cy,S.week,di,ei);
   const xs=cur.extraSets||0;
   const autoX=autoExtraSets(di,ei,ex.s);
   const ms=Math.min(5,ex.s+xs+autoX);
@@ -382,17 +383,18 @@ function renderEx(ex,ei,di){
   }
 
   // tips
-  const tipOpen=S.tips[tk],tipEdit=S.tipEdit[tk];
+  const slotKey=mkt(S.cy,S.week,di,ei); // für open/edit-State (slot-spezifisch)
+  const tipOpen=S.tips[slotKey],tipEdit=S.tipEdit[slotKey];
   const stored=S.data[tk],defTip=TIPS[cur.exercise]||'',tip=stored!==undefined?stored:defTip,custom=stored!==undefined&&stored!==defTip;
   let tipH='';
   if(cur.exercise){
-    tipH='<button class="tip-toggle'+(tipOpen?' open':'')+'" onclick="togTip(\''+tk+'\')"><span class="tip-i">i</span> Ausführungstipps '+(custom?'<span class="tip-custom">● angepasst</span>':'')+' <span style="font-size:9px;opacity:.7">'+(tipOpen?'▲':'▼')+'</span></button>';
+    tipH='<button class="tip-toggle'+(tipOpen?' open':'')+'" onclick="togTip(\''+slotKey+'\')"><span class="tip-i">i</span> Ausführungstipps '+(custom?'<span class="tip-custom">● angepasst</span>':'')+' <span style="font-size:9px;opacity:.7">'+(tipOpen?'▲':'▼')+'</span></button>';
     if(tipOpen){
-      const tid='ta-'+tk.replace(/[^a-z0-9]/gi,'_');
+      const tid='ta-'+slotKey.replace(/[^a-z0-9]/gi,'_');
       if(tipEdit){
-        tipH+='<div class="tip-panel"><textarea class="tip-ta" rows="4" id="'+tid+'">'+esc(tip)+'</textarea><div class="tip-acts"><button class="tip-save" onclick="savTip(\''+tk+'\',\''+tid+'\')">Speichern</button><button class="tip-cancel" onclick="canTip(\''+tk+'\')">Abbrechen</button>'+(custom?'<button class="tip-reset" onclick="resTip(\''+tk+'\')">&#8634; Zurücksetzen</button>':'')+'</div></div>';
+        tipH+='<div class="tip-panel"><textarea class="tip-ta" rows="4" id="'+tid+'">'+esc(tip)+'</textarea><div class="tip-acts"><button class="tip-save" onclick="savTip(\''+tk+'\',\''+tid+'\',\''+slotKey+'\')">Speichern</button><button class="tip-cancel" onclick="canTip(\''+slotKey+'\')">Abbrechen</button>'+(custom?'<button class="tip-reset" onclick="resTip(\''+tk+'\',\''+slotKey+'\')">&#8634; Zurücksetzen</button>':'')+'</div></div>';
       }else{
-        tipH+='<div class="tip-panel"><p class="tip-text">'+(tip?esc(tip):'<span style="color:#555">Noch kein Tipp.</span>')+'</p><button class="tip-edit-btn" onclick="edTip(\''+tk+'\')">&#9998; Bearbeiten</button></div>';
+        tipH+='<div class="tip-panel"><p class="tip-text">'+(tip?esc(tip):'<span style="color:#555">Noch kein Tipp.</span>')+'</p><button class="tip-edit-btn" onclick="edTip(\''+slotKey+'\')">&#9998; Bearbeiten</button></div>';
       }
     }
   }
@@ -481,8 +483,8 @@ function removeSet(di,ei){const k=mk(S.cy,S.week,di,ei);const cur=S.data[k]||{};
 function togTip(tk){S.tips[tk]=!S.tips[tk];if(!S.tips[tk])S.tipEdit[tk]=false;renderT()}
 function edTip(tk){S.tipEdit[tk]=true;renderT()}
 function canTip(tk){S.tipEdit[tk]=false;renderT()}
-function savTip(tk,tid){const el=document.getElementById(tid);if(el){S.data[tk]=el.value;save()}S.tipEdit[tk]=false;renderT()}
-function resTip(tk){const k=S.drop;S.data[tk]=undefined;delete S.data[tk];save();S.tipEdit[tk]=false;renderT()}
+function savTip(tk,tid,sk){const el=document.getElementById(tid);if(el){S.data[tk]=el.value;save()}S.tipEdit[sk]=false;renderT()}
+function resTip(tk,sk){delete S.data[tk];save();S.tipEdit[sk]=false;renderT()}
 
 document.addEventListener('click',e=>{
   if(S.drop&&!e.target.closest('.picker-wrap')){S.drop=null;renderT()}
