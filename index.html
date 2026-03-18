@@ -127,15 +127,15 @@ button{cursor:pointer;}
 <script>
 const EXERCISES={
 "Glute Max":["Hip Thrusts Langhantel","Hip Thrust Kurzhantel","Hip Thrusts Multipresse","Hip Thrust Maschine","Glute Bridge Langhantel","Glute Bridge Kurzhantel","Glute Bridge Multipresse","Kabel Kickback Stehend","Kabel Kickback Flachbank","Kabel Kickback Schrägbank","Kabel Kickback Liegend","Kickback Multipresse","Kickback Maschine"],
-"Glute Med":["Kabel Abduktion Stehend","Kabel Abduktion Liegend","Kabel Abduktion Schrägbank","Abduktionsmaschine","Pelvic Drop","Standing Hip Abduction Maschine","Fire Hydrants Kabel"],
+"Glute Med":["Kabel Abduktion Stehend","Kabel Abduktion Liegend","Kabel Abduktion Schrägbank","Abduktionsmaschine","Pelvic Drop","Abduktionsmaschine stehend","Fire Hydrants Kabel"],
 "Glute & Quad":["Low Bar Squat","Beinpresse","Step Ups","Split Squat Kurzhantel","Split Squat Langhantel","Split Squat Multipresse","Hack Squat","Reverse Lunge"],
 "Glute & Hams":["RDL Langhantel","RDL Kurzhanteln","Glute Hyperextensions","Reverse Hack RDL","Good Mornings","Single-Leg RDL","Nordic Curls","Leg Curl (Maschine)"],
 "Rücken":["LH Rudern","KH Rudern","KH Rudern (breit)","Rudern Kabel (eng)","Rudern Kabel (breit)","Rudermaschine (neutral)","Rudermaschine (breit)","Latzug (eng)","Latzug (breit)","Überzug am Kabel","T Bar Rudern (neutral)","T Bar Rudern (breit)","Assistierter Klimmzug (eng)","Assistierter Klimmzug (breit)","Face Pull Kabel","Straight-Arm Pulldown","Einarmiger Latzug Kabel"],
 "Brust":["LH Bankdrücken","KH Bankdrücken","Bankdrücken Multipresse","LH Schrägbankdrücken","KH Schrägbankdrücken","Schrägbankdrücken Multipresse","Brustpresse","Butterfly Maschine","Flys von oben Kabel","Flys von unten Kabel","Flachbank KH Flys","Schrägbank KH Flys"],
-"Schultern":["KH Seitheben","Vorgebeugtes KH Seitheben","Seithebemaschine","Seitheben Kabel","Vorgebeugtes Seitheben Kabel","LH Überkopfdrücken","KH Überkopfdrücken","Überkopfmaschine","Butterfly Reverse Maschine","Upright Row Kabel","Arnold Press","Einarmiges Überkopfdrücken Kabel"],
+"Schultern":["KH Seitheben","Vorgebeugtes KH Seitheben","Seithebemaschine","Seitheben Kabel","Vorgebeugtes Seitheben Kabel","LH Überkopfdrücken","KH Überkopfdrücken","Überkopfmaschine","Butterfly Reverse Maschine","Butterfly Reverse Kabel","Upright Row Kabel","Arnold Press","Einarmiges Überkopfdrücken Kabel"],
 "Bizeps":["SZ Curls","LH Curls","KH Curls","Kabel Curls","KH Hammer Curls","SZ Preacher Curls","KH Preacher Curls","Bizeps Maschine","Konzentrations Curls","Spinne Curls","Kabel Curls einarmig","Reverse Curls"],
 "Trizeps":["SZ Skullcrusher","Enges Bankdrücken","Pushdown Kabel","Pushdown Kabel einarmig","SZ Überkopf Tri. Drücken","KH Überkopf Tri. Drücken","Kabel Überkopf Tri. Drücken","Dips Maschine","Trizeps Maschine","KH Kickback Trizeps"],
-"Bauch":["Crunches","Crunches am Kabelzug","Decline Crunches","Bauch Maschine","Beinheben (Liegend)","Beinheben (Hängend)","Reverse Crunch","Dead Bug","Ab Rollout","Pallof Press","Hollow Body Hold"]
+"Bauch":["Crunches","Crunches am Kabelzug","Bauch Maschine","Beinheben (Liegend)","Beinheben (Hängend)","Reverse Crunch","Dead Bug","Ab Rollout","Pallof Press","Hollow Body Hold"]
 };
 const TIPS={
 "Hip Thrusts Langhantel":"Stange auf Hüftbeugern auflegen, Schulterblätter auf Bank. Hüfte vollständig strecken, Gesäß oben kurz anspannen. Kinn zur Brust, Blick nach oben.",
@@ -156,7 +156,7 @@ const TIPS={
 "Kabel Abduktion Schrägbank":"Auf Schrägbank gestützt für stabilen Oberkörper. Bein seitlich führen.",
 "Abduktionsmaschine":"Sitzend, Knie nach außen drücken. Langsam zurück – exzentrische Phase nutzen.",
 "Pelvic Drop":"Einbeinig auf einer Stufe stehen. Hüfte der Hängeseite langsam absinken lassen, dann Glute Med anspannen und anheben.",
-"Standing Hip Abduction Maschine":"Stehend an der Maschine. Mehr Glute-Med-Aktivierung als sitzend. Standbein stabil, Oberkörper nicht wegkippen.",
+"Abduktionsmaschine stehend":"Stehend an der Maschine. Mehr Glute-Med-Aktivierung als sitzend. Standbein stabil, Oberkörper nicht wegkippen.",
 "Fire Hydrants Kabel":"Auf allen Vieren, Kabel am Knie/Fußgelenk. Bein seitlich-nach-oben führen wie ein Feuerhydrant. Hüfte nicht mitdrehen.",
 "Low Bar Squat":"⚠️ Für Po-Fokus: Füße weit auseinander, Zehen leicht nach außen, Fersen ggf. erhöht. Tief absenken, Knie über Zehen. Enger Stand + volle Tiefe = mehr Quad – bei Ziel schmale Beine vermeiden!",
 "Beinpresse":"⚠️ Für Po-Fokus: Füße hoch und weit auf der Plattform, Knie weit auseinander. Enge tiefe Fußstellung = mehr Quad. Bei Ziel schmale Beine: lieber Reverse Lunge oder Split Squat wählen.",
@@ -239,7 +239,6 @@ const TIPS={
 "KH Kickback Trizeps":"Oberkörper waagerecht, Oberarm parallel zum Boden fixiert. KH nach hinten strecken, kurz halten.",
 "Crunches":"Nur Schulterblätter vom Boden heben – kein komplettes Aufrichten. Langsam und kontrolliert.",
 "Crunches am Kabelzug":"Kniend am Kabel. Oberkörper nach vorne-unten runden. Gewicht skalieren.",
-"Decline Crunches":"Auf Schrägbank. Mehr Range of Motion als flache Crunches.",
 "Bauch Maschine":"Maschine auf Schulterhöhe einstellen. Oberkörper nach vorne runden, nicht mit Hüfte.",
 "Beinheben (Liegend)":"Beine gestreckt oder leicht gebeugt. Langsam senken ohne Boden zu berühren. Kein Hüfteinsatz – Becken kippen vermeiden.",
 "Beinheben (Hängend)":"An der Stange hängen. Hüfte runden am Endpunkt für mehr Bauch-Aktivierung. Nicht schwingen.",
@@ -252,8 +251,8 @@ const TIPS={
 const CC={"Glute Max":"#C8729A","Glute Med":"#B88CC0","Glute & Quad":"#C4A882","Glute & Hams":"#A8C4A0","Rücken":"#8AB4C4","Brust":"#C4A8A8","Schultern":"#B4C4A0","Bizeps":"#C4B8A0","Trizeps":"#A0B4C4","Bauch":"#C0BEA0"};
 const P3=[
 {l:"Tag A",e:[{c:"Glute Max",s:3,r:[4,8]},{c:"Glute Max",s:2,r:[8,12]},{c:"Glute Med",s:2,r:[6,10]},{c:"Glute & Hams",s:2,r:[4,8]},{c:"Glute & Quad",s:2,r:[4,8]},{c:"Bauch",s:2,r:[8,12]},{c:"Rücken",s:2,r:[6,10]},{c:"Brust",s:2,r:[6,10]}]},
-{l:"Tag B",e:[{c:"Glute & Hams",s:2,r:[4,8]},{c:"Glute & Hams",s:2,r:[6,10]},{c:"Glute Max",s:3,r:[6,10]},{c:"Glute & Quad",s:2,r:[6,10]},{c:"Glute Med",s:2,r:[8,12]},{c:"Bauch",s:2,r:[8,12]},{c:"Rücken",s:2,r:[8,12]},{c:"Schultern",s:2,r:[8,12]}]},
-{l:"Tag C",e:[{c:"Glute Max",s:3,r:[4,8]},{c:"Glute Max",s:2,r:[8,12]},{c:"Glute Med",s:3,r:[8,12]},{c:"Bauch",s:2,r:[8,12]},{c:"Brust",s:2,r:[8,12]},{c:"Schultern",s:2,r:[8,12]},{c:"Bizeps",s:2,r:[8,12]},{c:"Trizeps",s:2,r:[8,12]}]}
+{l:"Tag B",e:[{c:"Glute & Hams",s:2,r:[4,8]},{c:"Glute & Hams",s:2,r:[6,10]},{c:"Glute Max",s:3,r:[6,10]},{c:"Glute & Quad",s:2,r:[6,10]},{c:"Glute Med",s:2,r:[8,12]},{c:"Bauch",s:2,r:[8,12]},{c:"Rücken",s:2,r:[8,12]},{c:"Rücken",s:2,r:[6,10]},{c:"Schultern",s:2,r:[8,12]}]},
+{l:"Tag C",e:[{c:"Glute Max",s:3,r:[4,8]},{c:"Glute Max",s:2,r:[8,12]},{c:"Glute Med",s:3,r:[8,12]},{c:"Bauch",s:2,r:[8,12]},{c:"Brust",s:2,r:[8,12]},{c:"Schultern",s:2,r:[8,12]},{c:"Schultern",s:2,r:[6,10]},{c:"Bizeps",s:2,r:[8,12]},{c:"Trizeps",s:2,r:[8,12]}]}
 ];
 const P4=[
 {l:"Tag A – Unterkörper",e:[{c:"Glute Max",s:3,r:[4,8]},{c:"Glute Max",s:2,r:[8,12]},{c:"Glute Med",s:2,r:[6,10]},{c:"Glute & Hams",s:2,r:[4,8]},{c:"Glute & Quad",s:2,r:[6,10]},{c:"Bauch",s:2,r:[8,12]}]},
@@ -268,7 +267,7 @@ function load(){try{const r=localStorage.getItem('peach_v4');return r?JSON.parse
 function save(){try{localStorage.setItem('peach_v4',JSON.stringify(S.data))}catch{}}
 S.data=load();
 
-const REC=new Set(["Hip Thrusts Langhantel","Hip Thrusts Multipresse","Hip Thrust Maschine","Glute Bridge Langhantel","Kabel Kickback Liegend","Kickback Maschine","Abduktionsmaschine","Kabel Abduktion Liegend","Standing Hip Abduction Maschine","Reverse Lunge","Split Squat Kurzhantel","Split Squat Langhantel","Split Squat Multipresse","RDL Langhantel","Glute Hyperextensions","Single-Leg RDL","Leg Curl (Maschine)","Latzug (breit)","Assistierter Klimmzug (breit)","Straight-Arm Pulldown","Überzug am Kabel","KH Seitheben","Seitheben Kabel","Seithebemaschine","Pallof Press","Hollow Body Hold"]);
+const REC=new Set(["Hip Thrusts Langhantel","Hip Thrusts Multipresse","Hip Thrust Maschine","Glute Bridge Langhantel","Kabel Kickback Liegend","Kickback Maschine","Abduktionsmaschine","Kabel Abduktion Liegend","Abduktionsmaschine stehend","Reverse Lunge","Split Squat Kurzhantel","Split Squat Langhantel","Split Squat Multipresse","RDL Langhantel","Glute Hyperextensions","Single-Leg RDL","Leg Curl (Maschine)","Latzug (breit)","Assistierter Klimmzug (breit)","Straight-Arm Pulldown","Überzug am Kabel","KH Seitheben","Seitheben Kabel","Seithebemaschine","Pallof Press","Hollow Body Hold"]);
 
 function mk(c,w,d,e){return c+'__w'+w+'__d'+d+'__e'+e}
 function mkt(c,w,d,e){return 'tip__'+c+'__w'+w+'__d'+d+'__e'+e}
@@ -355,7 +354,13 @@ function autoExtraSets(di,ei,baseSets){
 
 function renderEx(ex,ei,di){
   const k=mk(S.cy,S.week,di,ei),pk=S.week>1?mk(S.cy,S.week-1,di,ei):null;
-  const cur=S.data[k]||{},prv=pk?S.data[pk]||{}:{};
+  const rawCur=S.data[k]||{},prv=pk?S.data[pk]||{}:{};
+  // Übung + extraSets aus Vorwoche übernehmen wenn aktuelle Woche noch leer
+  const cur={
+    ...rawCur,
+    exercise: rawCur.exercise!==undefined ? rawCur.exercise : (prv.exercise||''),
+    extraSets: rawCur.extraSets!==undefined ? rawCur.extraSets : (prv.extraSets||0),
+  };
   // Tipp-Key: übungsbasiert – gilt für alle Wochen/Tage/Zyklen
   const tk=cur.exercise?'tip__ex__'+cur.exercise:mkt(S.cy,S.week,di,ei);
   const xs=cur.extraSets||0;
