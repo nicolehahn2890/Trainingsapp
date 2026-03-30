@@ -415,7 +415,8 @@ function renderEx(ex,ei,di){
   let rh='';
   for(let i=0;i<ms;i++){
     const c=rcol(reps[i],ex.r),pr=(prv.reps||[])[i];
-    rh+='<div class="rep-col"><span class="rep-lbl">S'+(i+1)+'</span><input class="rep-inp" type="text" inputmode="numeric" value="'+esc(reps[i]||'')+'" placeholder="–" style="border:2px solid '+c+'" onchange="updRep('+di+','+ei+','+i+',this.value)"/>'+(pr!=null&&pr!==''?'<span class="rep-prev">'+pr+'</span>':'')+'</div>';
+    const prevLabel=S.week>1?(pr!=null&&pr!==''?pr:'0'):'';
+    rh+='<div class="rep-col"><span class="rep-lbl">S'+(i+1)+'</span><input class="rep-inp" type="text" inputmode="numeric" value="'+esc(reps[i]||'')+'" placeholder="–" style="border:2px solid '+c+'" onchange="updRep('+di+','+ei+','+i+',this.value)"/>'+(prevLabel!==''?'<span class="rep-prev" style="'+(pr==null||pr===''?'color:#444':'')+'">'+prevLabel+'</span>':'')+'</div>';
   }
   if(xs>0)rh+='<button class="add-set-btn" style="border-color:rgba(216,104,104,0.4);color:#d86868" onclick="removeSet('+di+','+ei+')">−</button>';
   if(ms<5)rh+='<button class="add-set-btn" onclick="addSet('+di+','+ei+')">+</button>';
