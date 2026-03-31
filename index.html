@@ -19,7 +19,7 @@ button{cursor:pointer;}
 #header{background:linear-gradient(160deg,#2e1a28 0%,#1a1418 100%);padding:22px 20px 18px;border-bottom:1px solid rgba(255,255,255,0.08);position:sticky;top:0;z-index:50;}
 .header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
 .logo{display:flex;align-items:center;gap:10px;}
-.logo-emoji{font-size:26px;}
+.logo-emoji{width:36px;height:36px;image-rendering:pixelated;}
 .logo-title{font-weight:800;font-size:20px;letter-spacing:-0.5px;}
 .logo-sub{color:#C8729A;font-size:12px;font-weight:500;}
 .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
@@ -98,7 +98,38 @@ button{cursor:pointer;}
 <div id="header">
   <div class="header-top">
     <div class="logo">
-      <span class="logo-emoji">🍑</span>
+      <svg class="logo-emoji" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+        <!-- Blatt -->
+        <rect x="7" y="0" width="1" height="1" fill="#4a9e3f"/>
+        <rect x="8" y="0" width="2" height="1" fill="#5cb85c"/>
+        <rect x="8" y="1" width="1" height="1" fill="#4a9e3f"/>
+        <rect x="9" y="1" width="1" height="1" fill="#5cb85c"/>
+        <!-- Stiel -->
+        <rect x="7" y="1" width="1" height="2" fill="#7a5230"/>
+        <!-- Pfirsich Körper -->
+        <rect x="4" y="3" width="8" height="1" fill="#f4a460"/>
+        <rect x="3" y="4" width="10" height="1" fill="#f4a460"/>
+        <rect x="2" y="5" width="12" height="1" fill="#ffb347"/>
+        <rect x="2" y="6" width="12" height="1" fill="#ffb347"/>
+        <rect x="2" y="7" width="6" height="1" fill="#ffb347"/>
+        <rect x="8" y="7" width="6" height="1" fill="#ff8c69"/>
+        <rect x="2" y="8" width="5" height="1" fill="#ffb347"/>
+        <rect x="7" y="8" width="7" height="1" fill="#ff8c69"/>
+        <rect x="2" y="9" width="4" height="1" fill="#ffb347"/>
+        <rect x="6" y="9" width="8" height="1" fill="#ff8c69"/>
+        <rect x="3" y="10" width="3" height="1" fill="#ffb347"/>
+        <rect x="6" y="10" width="7" height="1" fill="#ff8c69"/>
+        <rect x="4" y="11" width="2" height="1" fill="#ffb347"/>
+        <rect x="6" y="11" width="6" height="1" fill="#ff8c69"/>
+        <rect x="4" y="12" width="8" height="1" fill="#ff8c69"/>
+        <rect x="5" y="13" width="6" height="1" fill="#e8735a"/>
+        <!-- Kerbe oben -->
+        <rect x="7" y="3" width="2" height="1" fill="#e8735a"/>
+        <rect x="7" y="4" width="2" height="1" fill="#f4a460"/>
+        <!-- Highlight -->
+        <rect x="4" y="5" width="2" height="2" fill="#ffd59e"/>
+        <rect x="5" y="5" width="1" height="1" fill="#ffe8c8"/>
+      </svg>
       <div><div class="logo-title">Peach Project</div><div class="logo-sub">Trainings-App</div></div>
     </div>
     <div style="display:flex;gap:6px;">
@@ -416,7 +447,7 @@ function renderEx(ex,ei,di){
   for(let i=0;i<ms;i++){
     const c=rcol(reps[i],ex.r),pr=(prv.reps||[])[i];
     const prevLabel=S.week>1?(pr!=null&&pr!==''?pr:'0'):'';
-    rh+='<div class="rep-col"><span class="rep-lbl">S'+(i+1)+'</span><input class="rep-inp" type="text" inputmode="numeric" value="'+esc(reps[i]||'')+'" placeholder="–" style="border:2px solid '+c+'" onchange="updRep('+di+','+ei+','+i+',this.value)"/>'+(prevLabel!==''?'<span class="rep-prev" style="'+(pr==null||pr===''?'color:#444':'')+'">'+prevLabel+'</span>':'')+'</div>';
+    rh+='<div class="rep-col"><span class="rep-lbl">S'+(i+1)+'</span><input class="rep-inp" type="text" inputmode="numeric" value="'+esc(reps[i]||'')+'" placeholder="–" style="border:2px solid '+c+'" oninput="updRep('+di+','+ei+','+i+',this.value)" onchange="updRep('+di+','+ei+','+i+',this.value)"/>'+(prevLabel!==''?'<span class="rep-prev" style="'+(pr==null||pr===''?'color:#444':'')+'">'+prevLabel+'</span>':'')+'</div>';
   }
   if(xs>0)rh+='<button class="add-set-btn" style="border-color:rgba(216,104,104,0.4);color:#d86868" onclick="removeSet('+di+','+ei+')">−</button>';
   if(ms<5)rh+='<button class="add-set-btn" onclick="addSet('+di+','+ei+')">+</button>';
@@ -472,20 +503,28 @@ function togDrop(di,ei,ev){
 }
 function onDS(di,ei,v){S.dropSearch=v;renderT()}
 function selEx(di,ei,v){
-  // v comes from textContent so already decoded
-  const k=mk(S.cy,S.week,di,ei);
-  S.data[k]={...(S.data[k]||{}),exercise:v};save();
+  const k=initKey(di,ei);
+  S.data[k]={...S.data[k],exercise:v};save();
   S.drop=null;S.dropSearch='';renderT();
 }
-function updW(di,ei,v){const k=mk(S.cy,S.week,di,ei);S.data[k]={...(S.data[k]||{}),weight:v};save()}
+function initKey(di,ei){
+  const k=mk(S.cy,S.week,di,ei);
+  if(!S.data[k]){
+    const pk=S.week>1?mk(S.cy,S.week-1,di,ei):null;
+    const prv=pk?(S.data[pk]||{}):{};
+    S.data[k]={exercise:prv.exercise||'',extraSets:prv.extraSets||0};
+  }
+  return k;
+}
+function updW(di,ei,v){const k=initKey(di,ei);S.data[k]={...S.data[k],weight:v};save()}
 function updRep(di,ei,i,v){
-  const k=mk(S.cy,S.week,di,ei);const cur=S.data[k]||{};
+  const k=initKey(di,ei);const cur=S.data[k];
   const ms=Math.min(5,(cur.extraSets||0)+(plan()[di].e[ei].s));
   const r=[...(cur.reps||Array(ms).fill(''))];while(r.length<=i)r.push('');r[i]=v;
   S.data[k]={...cur,reps:r};save();
 }
-function addSet(di,ei){const k=mk(S.cy,S.week,di,ei);const cur=S.data[k]||{};S.data[k]={...cur,extraSets:(cur.extraSets||0)+1};save();renderT()}
-function removeSet(di,ei){const k=mk(S.cy,S.week,di,ei);const cur=S.data[k]||{};S.data[k]={...cur,extraSets:Math.max(0,(cur.extraSets||0)-1)};save();renderT()}
+function addSet(di,ei){const k=initKey(di,ei);S.data[k]={...S.data[k],extraSets:(S.data[k].extraSets||0)+1};save();renderT()}
+function removeSet(di,ei){const k=initKey(di,ei);S.data[k]={...S.data[k],extraSets:Math.max(0,(S.data[k].extraSets||0)-1)};save();renderT()}
 function togTip(tk){S.tips[tk]=!S.tips[tk];if(!S.tips[tk])S.tipEdit[tk]=false;renderT()}
 function edTip(tk){S.tipEdit[tk]=true;renderT()}
 function canTip(tk){S.tipEdit[tk]=false;renderT()}
