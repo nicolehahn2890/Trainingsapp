@@ -142,9 +142,6 @@ button{cursor:pointer;}
       <button class="cycle-btn active" id="cycle-cycle1" onclick="setCycle('cycle1')">Zyklus 1</button>
       <button class="cycle-btn" id="cycle-cycle2" onclick="setCycle('cycle2')">Zyklus 2</button>
       <button class="cycle-btn" id="cycle-cycle3" onclick="setCycle('cycle3')">Zyklus 3</button>
-      <div style="width:1px;height:18px;background:rgba(255,255,255,0.12);margin:0 4px;"></div>
-      <button id="btn-plan3" onclick="setPlan(3)" style="padding:5px 11px;border-radius:8px;border:1px solid #C8729A;background:#C8729A22;color:#C8729A;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">3-Tage</button>
-      <button id="btn-plan4" onclick="setPlan(4)" style="padding:5px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:#666;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">4-Tage</button>
     </div>
     <div class="week-nav">
       <button class="week-arrow" onclick="changeWeek(-1)">&#8249;</button>
@@ -164,8 +161,8 @@ const EXERCISES={
 "Glute Med":["Kabel Abduktion Stehend","Kabel Abduktion Liegend","Kabel Abduktion Schrägbank","Abduktionsmaschine","Pelvic Drop","Abduktionsmaschine stehend","Fire Hydrants Kabel","3D Abduktor Maschine"],
 "Glute & Quad":["Low Bar Squat","Beinpresse 45 Grad","Beinpresse","Step Ups","Split Squat Kurzhantel","Split Squat Langhantel","Split Squat Multipresse","Hack Squat","Reverse Lunge","Belt Squat","Super Squat"],
 "Glute & Hams":["RDL Langhantel","RDL Kurzhanteln","RDL Maschine","Glute Hyperextensions","Reverse Hack RDL","Good Mornings","Single-Leg RDL","Nordic Curls","Leg Curl (Maschine)"],
-"Rücken":["LH Rudern","KH Rudern","KH Rudern (breit)","Rudern Kabel (eng)","Rudern Kabel (breit)","Rudermaschine (neutral)","Rudermaschine (breit)","Latzug (eng)","Latzug (breit)","Überzug am Kabel","T Bar Rudern (neutral)","T Bar Rudern (breit)","Assistierter Klimmzug (eng)","Assistierter Klimmzug (breit)","Face Pull Kabel","Straight-Arm Pulldown","Einarmiger Latzug Kabel"],
-"Brust":["LH Bankdrücken","KH Bankdrücken","Bankdrücken Multipresse","Bankdrücken Maschine","LH Schrägbankdrücken","KH Schrägbankdrücken","Schrägbankdrücken Multipresse","Schrägbankdrücken Maschine","Brustpresse","Butterfly Maschine","Flys von oben Kabel","Flys von unten Kabel","Flachbank KH Flys","Schrägbank KH Flys"],
+"Rücken":["LH Rudern","KH Rudern","KH Rudern (breit)","Rudern Kabel (eng)","Rudern Kabel (breit)","Rudermaschine (Panatta)","Rudermaschine (Precor)","Latzug (eng)","Latzug (breit)","Latzug Maschine (Panatta)","Latzug Maschine (Precor)","Überzug am Kabel","T Bar Rudern (neutral)","T Bar Rudern (breit)","Assistierter Klimmzug (eng)","Assistierter Klimmzug (breit)","Face Pull Kabel","Straight-Arm Pulldown","Einarmiger Latzug Kabel"],
+"Brust":["LH Bankdrücken","KH Bankdrücken","Bankdrücken Multipresse","Bankdrücken Maschine","LH Schrägbankdrücken","KH Schrägbankdrücken","Schrägbankdrücken Multipresse","Schrägbankdrücken Maschine","Brustpresse (Panatta)","Brustpresse (Precor)","Butterfly Maschine","Flys von oben Kabel","Flys von unten Kabel","Flachbank KH Flys","Schrägbank KH Flys"],
 "Schultern":["KH Seitheben","Vorgebeugtes KH Seitheben","Seithebemaschine","Seitheben Kabel","Vorgebeugtes Seitheben Kabel","LH Überkopfdrücken","KH Überkopfdrücken","Überkopfmaschine","Butterfly Reverse Maschine","Butterfly Reverse Kabel","Upright Row Kabel","Arnold Press","Einarmiges Überkopfdrücken Kabel"],
 "Bizeps":["SZ Curls","LH Curls","KH Curls","Kabel Curls","KH Hammer Curls","SZ Preacher Curls","KH Preacher Curls","Bizeps Maschine","Konzentrations Curls","Spinne Curls","Kabel Curls einarmig","Reverse Curls"],
 "Trizeps":["SZ Skullcrusher","Enges Bankdrücken","Pushdown Kabel","Pushdown Kabel einarmig","SZ Überkopf Tri. Drücken","KH Überkopf Tri. Drücken","Kabel Überkopf Tri. Drücken","Dips Maschine","Trizeps Maschine","KH Kickback Trizeps"],
@@ -208,15 +205,17 @@ const TIPS={
 "Single-Leg RDL":"Einbeinig, hinteres Bein gestreckt nach hinten heben. Mehr Glute-Aktivierung als beidbeinig. Hüfte stabil halten – nicht rotieren.",
 "Leg Curl (Maschine)":"Liegend oder sitzend. Isolierter Hamstring-Fokus – gibt der Rückseite des Oberschenkels die runde Form direkt unterhalb des Pos. Langsam ablassen, volle Streckung unten nutzen. Fersen zur Gesäßgegend ziehen, kurz halten.",
 "Nordic Curls":"Knie auf gepolsterter Unterlage, Füße fixiert. Oberkörper langsam nach vorne fallen lassen – exzentrische Hamstring-Arbeit. Fortgeschrittene Übung.",
-"LH Rudern":"Oberkörper ca. 45° vorgebeugt. Stange zum Bauch ziehen, Ellbogen nah am Körper.",
+"LH Rudern":"Oberkörper ca. 45 Grad vorgebeugt. Stange zum Bauch ziehen, Ellbogen nah am Körper.",
 "KH Rudern":"Einarmig auf Bank gestützt. KH zum Hüftknochen ziehen, Schulterblatt einziehen.",
 "KH Rudern (breit)":"Ellbogen weiter außen – betont oberen Rücken und hintere Schulter.",
 "Rudern Kabel (eng)":"Sitzend, enges Griffstück. Zur Bauchgegend ziehen, Schulterblätter zusammenziehen.",
 "Rudern Kabel (breit)":"Breites Griffstück. Ellbogen seitlich – mehr Latissimus.",
-"Rudermaschine (neutral)":"Neutraler Griff. Rücken aufrecht, nicht mit dem Oberkörper schwingen.",
-"Rudermaschine (breit)":"Breiter Griff. Schulterblätter aktiv zusammenziehen am Ende.",
+"Rudermaschine (Panatta)":"Panatta Rudermaschine. Brust an Pad anlehnen, Schulterblätter am Ende zusammenziehen. Nicht mit dem Oberkörper schwingen.",
+"Rudermaschine (Precor)":"Precor Rudermaschine. Brust an Pad anlehnen, Schulterblätter am Ende zusammenziehen. Nicht mit dem Oberkörper schwingen.",
 "Latzug (eng)":"Enger Parallelgriff. Zur Brust ziehen, Ellbogen nach unten-hinten.",
 "Latzug (breit)":"Breiter Overhand-Griff. Zur Brust ziehen, Latissimus aktiv.",
+"Latzug Maschine (Panatta)":"Panatta Latzug-Maschine. Knie unter Polster fixieren. Zur Brust ziehen, Ellbogen nach unten-hinten führen, Latissimus aktiv anspannen. Kontrolliert zurück.",
+"Latzug Maschine (Precor)":"Precor Latzug-Maschine. Knie unter Polster fixieren. Zur Brust ziehen, Ellbogen nach unten-hinten führen, Latissimus aktiv anspannen. Kontrolliert zurück.",
 "Überzug am Kabel":"Liegend oder stehend vorgebeugt. Gerade Arme, Lat zieht den Arm nach unten.",
 "T Bar Rudern (neutral)":"Neutraler Griff. Brust auf Pad, Stange zum Bauch ziehen.",
 "T Bar Rudern (breit)":"Breiter Griff. Mehr oberer Rücken.",
@@ -225,20 +224,20 @@ const TIPS={
 "Face Pull Kabel":"Kabel auf Kopfhöhe, Seil-Aufsatz. Zur Stirn ziehen, Ellbogen hoch. Betont hintere Schulter und oberen Rücken – gut für Haltung.",
 "Straight-Arm Pulldown":"Kabel oben, Arme gestreckt. Lat nach unten ziehen bis Oberschenkel. Isolierter Lat ohne Bizeps.",
 "Einarmiger Latzug Kabel":"Einarmig am Kabel. Mehr Range und Rotation möglich. Lat gut einziehen am Ende.",
-"LH Bankdrücken":"Schulterbreiter Griff. Stange zur unteren Brust, Ellbogen ca. 75° vom Körper.",
+"LH Bankdrücken":"Schulterbreiter Griff. Stange zur unteren Brust, Ellbogen ca. 75 Grad vom Körper.",
 "KH Bankdrücken":"Ermöglicht mehr Bewegungsfreiheit. KH am Ende leicht zusammenführen.",
 "Bankdrücken Multipresse":"Geführte Bewegung. Griffposition anpassen – leicht schräg für natürlichere Bewegung.",
-"LH Schrägbankdrücken":"30–45° Neigung. Betont obere Brust. Griffbreite wie flaches Drücken.",
+"LH Schrägbankdrücken":"30–45 Grad Neigung. Betont obere Brust. Griffbreite wie flaches Drücken.",
 "KH Schrägbankdrücken":"Mehr Range als LH-Variante. KH am Ende zusammenführen.",
-"Schrägbankdrücken Multipresse":"Maschinen-Führung. Bank auf 30–45° einstellen.",
+"Schrägbankdrücken Multipresse":"Maschinen-Führung. Bank auf 30–45 Grad einstellen.",
 "Brustpresse":"Ellbogen in Linie mit Schultern oder leicht darunter. Volle Streckung oben.",
 "Butterfly Maschine":"Arme leicht gebeugt. Brust aktiv zusammendrücken, nicht mit Schwung.",
 "Flys von oben Kabel":"Kabel oben befestigt. Arme bogenmäßig nach unten-vorne führen – Brust komprimieren.",
 "Flys von unten Kabel":"Kabel unten befestigt. Arme bogenmäßig nach oben-vorne führen – betont obere Brust.",
 "Flachbank KH Flys":"Arme weit öffnen für maximale Dehnung. Leicht gebeugte Ellbogen, Brust zusammenziehen oben.",
-"Schrägbank KH Flys":"30–45° Bank. Mehr Stretch für obere Brust. Gleiche Technik wie Flachbank-Variante.",
+"Schrägbank KH Flys":"30–45 Grad Bank. Mehr Stretch für obere Brust. Gleiche Technik wie Flachbank-Variante.",
 "KH Seitheben":"Leichtes Gewicht, sauber ausführen. Arme leicht gebeugt, seitlich bis Schulterhöhe heben. Kleine Finger leicht oben.",
-"Vorgebeugtes KH Seitheben":"Oberkörper 45–90° vorgebeugt. Hintere Schulter. Arme seitlich heben.",
+"Vorgebeugtes KH Seitheben":"Oberkörper 45–90 Grad vorgebeugt. Hintere Schulter. Arme seitlich heben.",
 "Seithebemaschine":"Maschine einstellen, Ellbogenauflagen nutzen. Schultern aktiv heben.",
 "Seitheben Kabel":"Kabel unten befestigt, Arm seitlich heben. Konstante Spannung.",
 "Vorgebeugtes Seitheben Kabel":"Kabel oben befestigt, Oberkörper vorgebeugt. Hintere Schulter.",
@@ -289,29 +288,7 @@ const TIPS={
 "RDL Maschine":"Hüftgelenk-Scharnier – der Rücken bleibt neutral, nicht runden. Hüfte nach hinten schieben, langsam und kontrolliert absenken bis du eine starke Dehnung in den Hamstrings spürst – das ist der entscheidende Reiz für Po und Beinrückseite. Oben durch die Fersen drücken und Gesäß aktiv anspannen. Die Maschinenführung macht schwere Gewichte sicherer – nutze das bewusst für maximale Stretch-Hypertrophie."
 };
 const CC={"Glute Max":"#C8729A","Glute Med":"#B88CC0","Glute & Quad":"#C4A882","Glute & Hams":"#A8C4A0","Rücken":"#8AB4C4","Brust":"#C4A8A8","Schultern":"#B4C4A0","Bizeps":"#C4B8A0","Trizeps":"#A0B4C4","Bauch":"#C0BEA0"};
-const P3=[
-{l:"Tag A – Ganzkörper (Fokus Beine)",e:[
-  {c:"Glute Max",s:3,r:[4,8]},{c:"Glute Max",s:2,r:[8,12]},
-  {c:"Glute Med",s:2,r:[6,10]},{c:"Glute Med",s:2,r:[8,12]},
-  {c:"Glute & Hams",s:2,r:[4,8]},{c:"Glute & Hams",s:2,r:[6,10]},
-  {c:"Glute & Quad",s:2,r:[4,8]},
-  {c:"Bauch",s:2,r:[8,12]},{c:"Rücken",s:2,r:[6,10]},{c:"Brust",s:2,r:[6,10]}
-]},
-{l:"Tag B – Ganzkörper (Fokus Glute & Hams)",e:[
-  {c:"Glute & Hams",s:2,r:[4,8]},{c:"Glute & Hams",s:2,r:[6,10]},
-  {c:"Glute Max",s:3,r:[6,10]},
-  {c:"Glute Med",s:2,r:[8,12]},{c:"Glute Med",s:2,r:[6,10]},
-  {c:"Glute & Quad",s:2,r:[6,10]},
-  {c:"Bauch",s:2,r:[8,12]},{c:"Rücken",s:2,r:[8,12]},{c:"Rücken",s:2,r:[6,10]},{c:"Schultern",s:2,r:[8,12]}
-]},
-{l:"Tag C – Ganzkörper (Fokus Glute & Quad)",e:[
-  {c:"Glute Max",s:3,r:[4,8]},{c:"Glute Max",s:2,r:[8,12]},
-  {c:"Glute Med",s:3,r:[8,12]},{c:"Glute Med",s:2,r:[6,10]},
-  {c:"Glute & Quad",s:2,r:[4,8]},{c:"Glute & Quad",s:2,r:[6,10]},
-  {c:"Glute & Hams",s:2,r:[6,10]},
-  {c:"Bauch",s:2,r:[8,12]},{c:"Brust",s:2,r:[8,12]},{c:"Schultern",s:2,r:[8,12]},{c:"Bizeps",s:2,r:[8,12]},{c:"Trizeps",s:2,r:[8,12]}
-]}
-];
+const P3=[];
 const P4=[
 {l:"Tag A – Beine",e:[
   {c:"Glute Max",s:3,r:[4,8]},{c:"Glute Max",s:2,r:[8,12]},
@@ -348,7 +325,7 @@ const P4=[
 ];
 
 // STATE
-let S={view:'training',pt:3,week:1,cy:'cycle1',data:{},openDays:{},drop:null,dropSearch:'',tips:{},tipEdit:{}};
+let S={view:'training',pt:4,week:1,cy:'cycle1',data:{},openDays:{},drop:null,dropSearch:'',tips:{},tipEdit:{}};
 function load(){try{const r=localStorage.getItem('peach_v4');return r?JSON.parse(r):{}}catch{return{}}}
 function save(){try{localStorage.setItem('peach_v4',JSON.stringify(S.data))}catch{}}
 S.data=load();
@@ -357,7 +334,7 @@ const REC=new Set(["Hip Thrusts Langhantel","Hip Thrusts Multipresse","Hip Thrus
 
 function mk(c,w,d,e){return c+'__w'+w+'__d'+d+'__e'+e}
 function mkt(c,w,d,e){return 'tip__'+c+'__w'+w+'__d'+d+'__e'+e}
-function plan(){return S.pt===3?P3:P4}
+function plan(){return P4}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function rcol(v,r){if(v===''||v==null)return'#555';const n=parseInt(v);if(isNaN(n))return'#555';if(n>=r[1])return'#7bc47a';if(n>=r[0])return'#e8b860';return'#d86868'}
 function prog(cr,pr,cw,pw){
@@ -541,7 +518,7 @@ function renderOv(){
 // ACTIONS
 function setView(v){S.view=v;render()}
 function setPlan(pt){S.pt=pt;S.openDays={};updatePlanBtns();render()}
-function updatePlanBtns(){var is3=S.pt===3;var s3="padding:5px 11px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;border:1px solid ";document.getElementById("btn-plan3").style.cssText=s3+(is3?"#C8729A;background:#C8729A22;color:#C8729A":"rgba(255,255,255,0.15);background:transparent;color:#666");document.getElementById("btn-plan4").style.cssText=s3+(is3?"rgba(255,255,255,0.15);background:transparent;color:#666":"#C8729A;background:#C8729A22;color:#C8729A")}
+function updatePlanBtns(){}
 function setCycle(c){S.cy=c;render()}
 function changeWeek(d){S.week=Math.max(1,Math.min(12,S.week+d));render()}
 function toggleDay(di){S.openDays[di]=S.openDays[di]!==false?false:true;render()}
