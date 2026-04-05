@@ -165,11 +165,11 @@ const EXERCISES={
 "Glute & Quad":["Low Bar Squat","Beinpresse 45 Grad","Beinpresse","Step Ups","Split Squat Kurzhantel","Split Squat Langhantel","Split Squat Multipresse","Hack Squat","Reverse Lunge","Belt Squat","Super Squat"],
 "Glute & Hams":["RDL Langhantel","RDL Kurzhanteln","RDL Maschine","Glute Hyperextensions","Reverse Hack RDL","Good Mornings","Single-Leg RDL","Nordic Curls","Leg Curl (Maschine)"],
 "Rücken":["LH Rudern","KH Rudern","KH Rudern (breit)","Rudern Kabel (eng)","Rudern Kabel (breit)","Rudermaschine (neutral)","Rudermaschine (breit)","Latzug (eng)","Latzug (breit)","Überzug am Kabel","T Bar Rudern (neutral)","T Bar Rudern (breit)","Assistierter Klimmzug (eng)","Assistierter Klimmzug (breit)","Face Pull Kabel","Straight-Arm Pulldown","Einarmiger Latzug Kabel"],
-"Brust":["LH Bankdrücken","KH Bankdrücken","Bankdrücken Multipresse","Bankdrücken Maschine","LH Schrägbankdrücken","KH Schrägbankdrücken","Schrägbankdrücken Multipresse","Brustpresse","Butterfly Maschine","Flys von oben Kabel","Flys von unten Kabel","Flachbank KH Flys","Schrägbank KH Flys"],
+"Brust":["LH Bankdrücken","KH Bankdrücken","Bankdrücken Multipresse","Bankdrücken Maschine","LH Schrägbankdrücken","KH Schrägbankdrücken","Schrägbankdrücken Multipresse","Schrägbankdrücken Maschine","Brustpresse","Butterfly Maschine","Flys von oben Kabel","Flys von unten Kabel","Flachbank KH Flys","Schrägbank KH Flys"],
 "Schultern":["KH Seitheben","Vorgebeugtes KH Seitheben","Seithebemaschine","Seitheben Kabel","Vorgebeugtes Seitheben Kabel","LH Überkopfdrücken","KH Überkopfdrücken","Überkopfmaschine","Butterfly Reverse Maschine","Butterfly Reverse Kabel","Upright Row Kabel","Arnold Press","Einarmiges Überkopfdrücken Kabel"],
 "Bizeps":["SZ Curls","LH Curls","KH Curls","Kabel Curls","KH Hammer Curls","SZ Preacher Curls","KH Preacher Curls","Bizeps Maschine","Konzentrations Curls","Spinne Curls","Kabel Curls einarmig","Reverse Curls"],
 "Trizeps":["SZ Skullcrusher","Enges Bankdrücken","Pushdown Kabel","Pushdown Kabel einarmig","SZ Überkopf Tri. Drücken","KH Überkopf Tri. Drücken","Kabel Überkopf Tri. Drücken","Dips Maschine","Trizeps Maschine","KH Kickback Trizeps"],
-"Bauch":["Crunches","Crunches am Kabelzug","Bauch Maschine","Beinheben (Liegend)","Beinheben (Hängend)","Reverse Crunch","Dead Bug","Ab Rollout","Pallof Press","Hollow Body Hold"]
+"Bauch":["Crunches","Crunches am Kabelzug","Bauch Maschine (Panatta)","Bauch Maschine (Precor)","Beinheben (Liegend)","Beinheben (Hängend)","Reverse Crunch","Dead Bug","Ab Rollout","Pallof Press","Hollow Body Hold"]
 };
 const TIPS={
 "Hip Thrusts Langhantel":"Stange auf Hüftbeugern auflegen, Schulterblätter auf Bank. Hüfte vollständig strecken, Gesäß oben kurz anspannen. Kinn zur Brust, Blick nach oben.",
@@ -203,7 +203,7 @@ const TIPS={
 "RDL Langhantel":"Füße hüftbreit, Stange nah am Körper. Hüfte nach hinten schieben, Rücken gerade. Dehnung in den Hamstrings spüren, dann durch Gesäß nach oben.",
 "RDL Kurzhanteln":"Gleiche Technik wie LH-RDL. KH vor dem Körper, nah an den Beinen entlangführen.",
 "Glute Hyperextensions":"An der Hyperextensionsbank, Hüfte an der Auflagekante. Oberkörper absenken, dann durch Gesäß strecken – nicht mit dem Rücken.",
-"Reverse Hack RDL":"Rückwärts in der Hack-Squat-Maschine. Hüfte-Hinge-Bewegung – stark auf hintere Kette.",
+"Reverse Hack RDL":"✅ Ideal für Po und den Übergang zwischen Gesäß und Beinrückseite – ohne Quad-Belastung. Umdrehen: Gesicht zur Maschine, Schultern unter die Pads, Füße hüftbreit auf der Plattform. Bewegung wie ein RDL: Hüfte zuerst nach hinten schieben, dann erst leicht nach unten – nicht wie ein Squat einbeugen. Knie bleiben in einer fixen Position. Core angespannt, natürliche Lendenlordose halten. Oben durch die Fersen drücken und Gesäß bewusst anspannen.",
 "Good Mornings":"Stange auf den Schultern. Hüfte nach hinten schieben, Rücken neutral. Hamstring-Dehnung halten, dann zurück.",
 "Single-Leg RDL":"Einbeinig, hinteres Bein gestreckt nach hinten heben. Mehr Glute-Aktivierung als beidbeinig. Hüfte stabil halten – nicht rotieren.",
 "Leg Curl (Maschine)":"Liegend oder sitzend. Isolierter Hamstring-Fokus – gibt der Rückseite des Oberschenkels die runde Form direkt unterhalb des Pos. Langsam ablassen, volle Streckung unten nutzen. Fersen zur Gesäßgegend ziehen, kurz halten.",
@@ -273,7 +273,9 @@ const TIPS={
 "KH Kickback Trizeps":"Oberkörper waagerecht, Oberarm parallel zum Boden fixiert. KH nach hinten strecken, kurz halten.",
 "Crunches":"Nur Schulterblätter vom Boden heben – kein komplettes Aufrichten. Langsam und kontrolliert.",
 "Crunches am Kabelzug":"Kniend am Kabel. Oberkörper nach vorne-unten runden. Gewicht skalieren.",
-"Bauch Maschine":"Maschine auf Schulterhöhe einstellen. Oberkörper nach vorne runden, nicht mit Hüfte.",
+"Bauch Maschine (Panatta)":"Panatta Bauch-Maschine. Sitzhoehe und Widerstand einstellen. Oberkörper nach vorne runden, nicht mit Hüfte ziehen. Langsam zurueck.",
+"Bauch Maschine (Precor)":"Precor Bauch-Maschine. Sitzhoehe und Widerstand einstellen. Oberkörper nach vorne runden, nicht mit Hüfte ziehen. Langsam zurueck.",
+"Schrägbankdrücken Maschine":"Rückenlehne auf ca. 30-45 Grad einstellen. Griffe auf Brusthoehe positionieren. Kontrolliert druecken und langsam zurueck. Schulterblätter zusammenziehen.",
 "Beinheben (Liegend)":"Beine gestreckt oder leicht gebeugt. Langsam senken ohne Boden zu berühren. Kein Hüfteinsatz – Becken kippen vermeiden.",
 "Beinheben (Hängend)":"An der Stange hängen. Hüfte runden am Endpunkt für mehr Bauch-Aktivierung. Nicht schwingen.",
 "Reverse Crunch":"Auf dem Rücken liegend. Becken vom Boden heben, Knie zur Brust. Unterer Bauch, kein Hüftbeuger-Einsatz.",
@@ -283,8 +285,8 @@ const TIPS={
 "Hollow Body Hold":"Rücken flach, Arme und Beine gestreckt leicht über dem Boden halten. Isometrische Ganzkörperspannung – sehr effektiv für flachen Bauch.",
 "3D Abduktor Maschine":"Panatta-Highlight! Trainiert Abduktion + Streckung + Aussenrotation gleichzeitig - aktiviert posteriore Fasern des Gluteus Medius. 3 Rueckenlehnen-Positionen = verschiedene Muskelfasern. Aufrecht sitzen, Bewegung kontrolliert ausfuehren.",
 "Belt Squat":"Panatta Belt Squat: Gewicht haengt am Hueftgurt - kein Rueckenloading. Fuss-Platten weit VORNE = mehr Hueftbeugung = maximaler Glute-Fokus! Fuss mittig = mehr Quad. Tief absenken, durch Fersen druecken.",
-"Beinpresse 45 Grad":"Panatta 45 Grad Beinpresse. Fuss hoch und weit auf der Plattform fuer Po-Fokus. Knie weit auseinander. Enge Fussstellung = mehr Quad - bei Ziel schmale Beine immer Fuss hoch und weit!",
-"RDL Maschine":"Maschinengeführter RDL - mehr Sicherheit und hoehere Gewichte moeglich. Hueftgelenk-Scharnier-Bewegung, nicht Rücken! Langsam absenken fuer Stretch-Hypertrophie. Rücken neutral halten."
+"Beinpresse 45 Grad":"⚠️ Fußposition entscheidet, was wächst: Füße HOCH auf der Platte = Glutes und Hamstrings. Füße tief = Quads dominant – bei Ziel schmale Beine unbedingt vermeiden. Füße breit und leicht nach außen drehen = zusätzlich Adduktoren und Glutes. Für dein Ziel: Füße immer hoch, schulterbreit bis breit, Zehen leicht nach außen. Knie aktiv in Richtung der Zehen drücken während der Bewegung, Rücken bleibt durchgehend am Polster.",
+"RDL Maschine":"Hüftgelenk-Scharnier – der Rücken bleibt neutral, nicht runden. Hüfte nach hinten schieben, langsam und kontrolliert absenken bis du eine starke Dehnung in den Hamstrings spürst – das ist der entscheidende Reiz für Po und Beinrückseite. Oben durch die Fersen drücken und Gesäß aktiv anspannen. Die Maschinenführung macht schwere Gewichte sicherer – nutze das bewusst für maximale Stretch-Hypertrophie."
 };
 const CC={"Glute Max":"#C8729A","Glute Med":"#B88CC0","Glute & Quad":"#C4A882","Glute & Hams":"#A8C4A0","Rücken":"#8AB4C4","Brust":"#C4A8A8","Schultern":"#B4C4A0","Bizeps":"#C4B8A0","Trizeps":"#A0B4C4","Bauch":"#C0BEA0"};
 const P3=[
