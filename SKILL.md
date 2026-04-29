@@ -4,375 +4,240 @@ description: >
   Use this skill for EVERY request related to the Peach Project — a glute-focused
   fitness tracking app built in standalone HTML, deployed to GitHub Pages.
   Trigger on any mention of: "Trainingsapp", "Peach Project", "Peach App", "Glute",
-  "Übungen", "Exercise", "Deload", "Woche", "Trainingsplan", "fitness app",
+  "Uebungen", "Exercise", "Deload", "Woche", "Trainingsplan", "fitness app",
   "nicolehahn2890.github.io/Trainingsapp", or any request to add/fix/style features
   in the fitness app. Also trigger when the user uploads an HTML file related to the app.
-  Never skip this skill for fitness app work — it contains critical context about the
-  app's architecture, design system, exercise lists, and deployment workflow.
+  Never skip this skill for fitness app work.
 ---
 
 # Peach Project — Skill
 
 ## Wer ist die Nutzerin?
 
-**Rexi** — kein Coding-Hintergrund, kein Terminal. Arbeitet ausschließlich über **Claude.ai** (kein Claude Code für diese App). Alle Antworten auf **Deutsch, Du-Anrede**. Schrittweise Erklärungen mit "Was siehst du dann auf dem Bildschirm"-Hinweisen. Niemals Terminal-Befehle zumuten. Deployment immer über das **Browser-Interface von GitHub** (Pencil/Edit oder Upload), nie über Terminal.
+Rexi — kein Coding-Hintergrund, kein Terminal. Ausschliesslich Claude.ai. Deutsch, Du-Anrede.
+Deployment immer ueber GitHub Browser-Interface (Stift-Symbol, Strg+A, Inhalt ersetzen, Commit).
 
 ---
 
 ## Was ist die App?
 
-**Peach Project** ist eine persönliche Glute-Trainings-Tracking-App.
-
-- **Live-URL:** https://nicolehahn2890.github.io/Trainingsapp/
-- **Repository:** github.com/nicolehahn2890/Trainingsapp
-- **Technologie:** Eine einzige standalone HTML-Datei (kein Framework, kein Build-Schritt, kein npm)
-- **Dateiname auf GitHub:** `index.html`
-- **localStorage-Key:** `peach_v4` — NIEMALS umbenennen, sonst gehen alle Nutzerdaten verloren
+- Live-URL: https://nicolehahn2890.github.io/Trainingsapp/
+- Repository: github.com/nicolehahn2890/Trainingsapp
+- Technologie: Standalone HTML-Datei (kein Framework, kein Build-Schritt)
+- Dateiname: index.html
+- localStorage-Key: peach_v4 — NIEMALS umbenennen!
+- Gym: Workshop Fitness Barcelona, Carrer d'Avila 120, El Poblenou. Panatta, Precor, Rogue, Eleiko, TRX.
 
 ---
 
 ## Design-System
 
-| Element | Wert |
-|---|---|
-| Hintergrund | `#1a1418` (sehr dunkles Aubergine) |
-| Header-Gradient | `linear-gradient(160deg, #2e1a28, #1a1418)` |
-| Primärfarbe (Pink) | `#C8729A` — Buttons, aktive Tabs, Akzente |
-| Sekundärfarbe (Lila) | `#B88CC0` — Zyklus-Buttons, sekundäre Akzente |
-| Font | DM Sans (Google Fonts CDN), Gewichte 400/500/600/700/800 |
-| Scrollbar | 4px, `#3a2a35` |
-| Stil | Dark Mode, weich und feminin, motivierend |
+Hintergrund: #1a1418
+Header-Gradient: linear-gradient(160deg, #2e1a28, #1a1418)
+Primaerfarbe Pink: #C8729A
+Sekundaerfarbe Lila: #B88CC0
+Font: DM Sans (Google Fonts CDN)
+Logo: Pixel-Art-Pfirsich SVG 16x16, shape-rendering crispEdges
 
-### Logo
-Pixel-Art-Pfirsich als SVG (16×16, `shape-rendering: crispEdges`) — kein Emoji.
-Der SVG-Code ist in der App direkt im Header eingebettet.
+Kategorie-Farben:
+  Glute Max: #C8729A, Glute Med: #B88CC0, Glute & Quad: #C4A882, Glute & Hams: #A8C4A0
+  Ruecken: #8AB4C4, Brust: #C4A8A8, Schultern: #B4C4A0, Bizeps: #C4B8A0
+  Trizeps: #A0B4C4, Bauch: #C0BEA0
 
-### Kategorie-Farben (CC-Map)
-```
-Glute Max:    #C8729A  (Pink)
-Glute Med:    #B88CC0  (Lila)
-Glute & Quad: #C4A882  (Sand)
-Glute & Hams: #A8C4A0  (Salbei)
-Rücken:       #8AB4C4  (Hellblau)
-Brust:        #C4A8A8  (Altrosa)
-Schultern:    #B4C4A0  (Hellgrün)
-Bizeps:       #C4B8A0  (Beige)
-Trizeps:      #A0B4C4  (Blaugrau)
-Bauch:        #C0BEA0  (Olivgrün)
-```
-
-### Fortschritts-Farben
-```
-Grün  #7bc47a  — Gewicht gesteigert
-Blau  #7aafdf  — Mehr Reps
-Gelb  #e8b860  — Gleiche Leistung / Deload-Akzent
-Rot   #d86868  — Weniger als Vorwoche
-```
+Fortschritts-Farben:
+  Gruen #7bc47a = Gewicht gesteigert
+  Blau  #7aafdf = Mehr Reps
+  Gelb  #e8b860 = Gleiche Leistung / Deload
+  Rot   #d86868 = Weniger als Vorwoche
 
 ---
 
 ## App-Architektur
 
-### State-Objekt `S`
-```javascript
+### State-Objekt S
+```
 S = {
-  cy:         "cycle1",   // aktiver Zyklus: cycle1 / cycle2 / cycle3
-  week:       1,          // aktive Woche: 1–12
-  view:       "training", // "training" | "overview"
-  data:       {},         // alle localStorage-Daten
-  drop:       null,       // offenes Dropdown: {di, ei} oder null
-  dropSearch: "",         // Suchbegriff im Dropdown
-  tips:       {},         // welche Tipp-Panels offen sind (slotKey → bool)
-  tipEdit:    {},         // welche Tips im Edit-Modus (slotKey → bool)
-  openDays:   {},         // welche Day-Cards offen sind (dayIndex → bool)
+  cy: "cycle1",     // cycle1 / cycle2 / cycle3
+  week: 1,          // 1-12
+  pt: 4,            // immer 4 (3-Tage-Plan wurde entfernt)
+  view: "training", // "training" | "overview"
+  data: {},
+  drop: null,
+  dropSearch: "",
+  tips: {},
+  tipEdit: {},
+  openDays: {},
 }
 ```
 
 ### Key-Formate
 ```
-Workout-Daten:  [cycle]__w[week]__d[dayIndex]__e[exIndex]
-                z.B. "cycle1__w3__d0__e2"
-
-Tipp-Daten:     tip__ex__[Übungsname]
-                z.B. "tip__ex__Hip Thrusts Langhantel"
-                → gilt über alle Wochen, Tage und Zyklen!
-
-Slot-Key (nur für UI-State wie open/edit):
-                tip__[cycle]__w[week]__d[dayIndex]__e[exIndex]
+Workout:  [cycle]__w[week]__d[dayIdx]__e[exIdx]
+Tipp:     tip__ex__[Uebungsname]  (gilt ueber alle Wochen/Tage/Zyklen!)
+Slot:     tip__[cycle]__w[week]__d[dayIdx]__e[exIdx]  (nur UI-State)
 ```
 
-### Render-Flow
+### Wichtige Funktionen
 ```
-render()
-  ├── renderT()   — Training-Tab
-  │     ├── WeekProgress-Balken (ab Woche 2)
-  │     ├── Deload-Banner (nur Woche 12)
-  │     └── forEach Day → renderEx() pro Übung
-  └── renderOv()  — Übersicht-Tab (Gewichts-Charts)
+mk(cy,week,di,ei)       Workout-Key
+mkt(cy,week,di,ei)      Slot-Key
+initKey(di,ei)          Key mit Vorwoche-Daten init — IMMER statt mk() beim Schreiben!
+plan()                  gibt immer P4 zurueck (P3 wurde entfernt)
+parseWeight(w)          Parst "25-27" -> 27 (oberer Wert), "25" -> 25
+prog(cr,pr,cw,pw)       'w'|'r'|'s'|'d' Fortschritts-Status
+findLastExData(di,ei,ex) Sucht letzten gespeicherten Wert dieser Uebung (uebungsbasierter Vergleich)
+rcol(v,r)               Farbe fuer Rep-Eingabefeld
+esc(s)                  HTML-escape
+autoExtraSets(di,ei)    0 oder 1 (Auto-Satz nach 3 Wo. kein Fortschritt)
+updatePlanBtns()        leer — no-op, Buttons wurden entfernt
 ```
 
-### Wichtige Hilfsfunktionen
-```javascript
-mk(cy, week, di, ei)        // → Workout-Key
-mkt(cy, week, di, ei)       // → Slot-Key für Tips
-initKey(di, ei)             // Initialisiert Key mit Vorwoche-Daten falls noch leer
-                            // → IMMER verwenden statt mk() beim Schreiben!
-plan()                      // → gibt P3 zurück (aktuell immer 3-Tage-Plan)
-prog(reps, prevReps, w, pw) // → 'w' | 'r' | 's' | 'd' (Fortschritts-Status)
-rcol(value, repRange)       // → Farbe für Rep-Eingabefeld
-esc(s)                      // → HTML-escaped String
-autoExtraSets(di, ei, base) // → 0 oder 1 (Auto-Satz bei 3 Wo. kein Fortschritt)
-```
+### Vergleichslogik (wichtig!)
+- Fortschrittsvergleich nutzt findLastExData() — vergleicht mit letztem Wert DIESER Uebung, nicht einfach Vorwoche
+- Wenn Uebung gewechselt wird, startet Vergleich frisch (kein falscher Vergleich mit alter Uebung)
+- Gewicht: parseWeight() unterstuetzt Bereiche wie "25-27" (nimmt oberen Wert)
+- Fortschritt wird nur berechnet wenn aktuelle Woche tatsaechlich Reps eingetragen hat
+
+### Daten-Vererbung zwischen Wochen
+Vererbt: exercise, extraSets — NICHT: reps, weight
 
 ---
 
-## Daten-Vererbung zwischen Wochen
+## WICHTIGE CODING-REGELN
 
-**Kritisch:** Beim ersten Schreiben in eine neue Woche wird `initKey()` verwendet — nicht `mk()` direkt. `initKey` prüft ob der Key noch leer ist und befüllt ihn dann mit den Vorwoche-Daten:
-
-```javascript
-function initKey(di, ei) {
-  const k = mk(S.cy, S.week, di, ei);
-  if (!S.data[k]) {
-    const pk = S.week > 1 ? mk(S.cy, S.week-1, di, ei) : null;
-    const prv = pk ? (S.data[pk] || {}) : {};
-    S.data[k] = { exercise: prv.exercise || '', extraSets: prv.extraSets || 0 };
-  }
-  return k;
-}
-```
-
-**Was wird vererbt:** `exercise` (ausgewählte Übung) und `extraSets` (manuell hinzugefügte Sätze)
-**Was NICHT vererbt wird:** `reps`, `weight` — die werden jede Woche neu eingetragen
+1. initKey statt mk() beim Schreiben verwenden
+2. peach_v4 nie umbenennen
+3. Neue Uebungen in EXERCISES + TIPS eintragen
+4. KEIN Grad-Zeichen (°) in Strings im Script — zerstoert den JS-Parser! "Grad" ausschreiben
+5. Keine renderT() in updRep/updW
+6. updatePlanBtns() ist leer — nicht befuellen
+7. plan() gibt immer P4 zurueck — nicht aendern
+8. Bei groesseren Aenderungen: Python-Script verwenden, am Ende node --check ausfuehren
+9. Sonderzeichen generell meiden in JS-Strings
 
 ---
 
-## Trainingsplan (3-Tage, P3)
+## Trainingsplan 4-Tage (P4) — einziger aktiver Plan
 
-### Tag A
-| Kategorie | Sätze | Reps |
+### Tag A — Beine
+| Kategorie | Saetze | Reps |
 |---|---|---|
-| Glute Max | 3 | 4–8 |
-| Glute Max | 2 | 8–12 |
-| Glute Med | 2 | 6–10 |
-| Glute & Hams | 2 | 4–8 |
-| Glute & Quad | 2 | 4–8 |
-| Bauch | 2 | 8–12 |
-| Rücken | 2 | 6–10 |
-| Brust | 2 | 6–10 |
+| Glute Max | 3 | 4-8 |
+| Glute Max | 2 | 8-12 |
+| Glute Med | 3 | 8-12 |
+| Glute Med | 2 | 8-12 |
+| Glute & Hams | 2 | 8-12 |
+| Glute & Hams | 2 | 6-10 |
+| Glute & Quad | 2 | 6-10 |
+| Bauch | 2 | 8-12 |
 
-### Tag B
-| Kategorie | Sätze | Reps |
+### Tag B — Oberkörper
+| Kategorie | Saetze | Reps |
 |---|---|---|
-| Glute & Hams | 2 | 4–8 |
-| Glute & Hams | 2 | 6–10 |
-| Glute Max | 3 | 6–10 |
-| Glute & Quad | 2 | 6–10 |
-| Glute Med | 2 | 8–12 |
-| Bauch | 2 | 8–12 |
-| Rücken | 2 | 8–12 |
-| Rücken | 2 | 6–10 |
-| Schultern | 2 | 8–12 |
+| Ruecken | 3 | 4-8 |
+| Ruecken | 2 | 8-12 |
+| Schultern | 3 | 8-12 |
+| Schultern | 2 | 8-12 |
+| Brust | 2 | 8-12 |
+| Bizeps | 2 | 8-12 |
+| Trizeps | 2 | 8-12 |
+| Bauch | 2 | 8-12 |
+| Bauch | 2 | 8-12 |
 
-### Tag C
-| Kategorie | Sätze | Reps |
+### Tag C — Ganzkörper
+| Kategorie | Saetze | Reps |
 |---|---|---|
-| Glute Max | 3 | 4–8 |
-| Glute Max | 2 | 8–12 |
-| Glute Med | 3 | 8–12 |
-| Bauch | 2 | 8–12 |
-| Brust | 2 | 8–12 |
-| Schultern | 2 | 8–12 |
-| Schultern | 2 | 6–10 |
-| Bizeps | 2 | 8–12 |
-| Trizeps | 2 | 8–12 |
+| Glute & Hams | 3 | 4-8 |
+| Glute & Hams | 2 | 6-10 |
+| Glute Max | 3 | 6-10 |
+| Glute Med | 2 | 8-12 |
+| Glute Med | 2 | 6-10 |
+| Glute & Quad | 2 | 6-10 |
+| Ruecken | 2 | 8-12 |
+| Schultern | 2 | 8-12 |
+| Bauch | 2 | 8-12 |
+| Bauch | 2 | 8-12 |
+
+### Tag D — Ganzkörper
+| Kategorie | Saetze | Reps |
+|---|---|---|
+| Glute Max | 3 | 4-8 |
+| Glute Max | 2 | 8-12 |
+| Glute Med | 3 | 8-12 |
+| Glute Med | 2 | 8-12 |
+| Glute & Hams | 2 | 6-10 |
+| Glute & Quad | 2 | 6-10 |
+| Brust | 2 | 8-12 |
+| Schultern | 2 | 8-12 |
+| Bauch | 2 | 8-12 |
+
+---
+
+## Uebungslisten (vollstaendig, aktueller Stand)
+
+Glute Max (13): Hip Thrusts Langhantel, Hip Thrust Kurzhantel, Hip Thrusts Multipresse, Hip Thrust Maschine, Glute Bridge Langhantel, Glute Bridge Kurzhantel, Glute Bridge Multipresse, Kabel Kickback Stehend, Kabel Kickback Flachbank, Kabel Kickback Schraegbank, Kabel Kickback Liegend, Kickback Multipresse, Kickback Maschine
+
+Glute Med (8): Kabel Abduktion Stehend, Kabel Abduktion Liegend, Kabel Abduktion Schraegbank, Abduktionsmaschine, Pelvic Drop, Abduktionsmaschine stehend, Fire Hydrants Kabel, 3D Abduktor Maschine
+
+Glute & Quad (11): Low Bar Squat, Beinpresse 45 Grad, Beinpresse, Step Ups, Split Squat Kurzhantel, Split Squat Langhantel, Split Squat Multipresse, Hack Squat, Reverse Lunge, Belt Squat, Super Squat
+
+Glute & Hams (9): RDL Langhantel, RDL Kurzhaenteln, RDL Maschine, Glute Hyperextensions, Reverse Hack RDL, Good Mornings, Single-Leg RDL, Nordic Curls, Leg Curl (Maschine)
+
+Ruecken (20): LH Rudern, KH Rudern, KH Rudern (breit), Rudern Kabel (eng), Rudern Kabel (breit), Rudermaschine (Panatta), Rudermaschine (Precor), Latzug (eng), Latzug (breit), Latzug Maschine (Panatta), Latzug Maschine (Precor), Ueberzug am Kabel, T Bar Rudern (neutral), T Bar Rudern (breit), Assistierter Klimmzug (eng), Assistierter Klimmzug (breit), Face Pull Kabel, Straight-Arm Pulldown, Einarmiger Latzug Kabel, Diverging Low Row
+
+Brust (15): LH Bankdruecken, KH Bankdruecken, Bankdruecken Multipresse, Bankdruecken Maschine, LH Schraegbankdruecken, KH Schraegbankdruecken, Schraegbankdruecken Multipresse, Schraegbankdruecken Maschine, Brustpresse (Panatta), Brustpresse (Precor), Butterfly Maschine, Flys von oben Kabel, Flys von unten Kabel, Flachbank KH Flys, Schraegbank KH Flys
+
+Schultern (13): KH Seitheben, Vorgebeugtes KH Seitheben, Seithebemaschine, Seitheben Kabel, Vorgebeugtes Seitheben Kabel, LH Ueberkopfdruecken, KH Ueberkopfdruecken, Ueberkopfmaschine, Butterfly Reverse Maschine, Butterfly Reverse Kabel, Upright Row Kabel, Arnold Press, Einarmiges Ueberkopfdruecken Kabel
+
+Bizeps (12): SZ Curls, LH Curls, KH Curls, Kabel Curls, KH Hammer Curls, SZ Preacher Curls, KH Preacher Curls, Bizeps Maschine, Konzentrations Curls, Spinne Curls, Kabel Curls einarmig, Reverse Curls
+
+Trizeps (10): SZ Skullcrusher, Enges Bankdruecken, Pushdown Kabel, Pushdown Kabel einarmig, SZ Ueberkopf Tri. Druecken, KH Ueberkopf Tri. Druecken, Kabel Ueberkopf Tri. Druecken, Dips Maschine, Trizeps Maschine, KH Kickback Trizeps
+
+Bauch (12): Crunches, Crunches am Kabelzug, Panatta Super Crunch, Panatta Low Crunch, Panatta High Crunch, Bauch Maschine (Precor), Beinheben (Liegend), Beinheben (Haengend), Reverse Crunch, Dead Bug, Ab Rollout, Pallof Press, Hollow Body Hold
+
+---
+
+## Panatta/Precor Maschinen-Varianten
+
+Bauch: Panatta Super Crunch, Panatta Low Crunch, Panatta High Crunch, Bauch Maschine (Precor)
+Ruecken: Rudermaschine (Panatta), Rudermaschine (Precor), Latzug Maschine (Panatta), Latzug Maschine (Precor)
+Brust: Brustpresse (Panatta), Brustpresse (Precor)
+Spezial: 3D Abduktor Maschine, Belt Squat, Beinpresse 45 Grad, RDL Maschine, Diverging Low Row
 
 ---
 
 ## Progressionssystem
 
-### Manuell
-- **+ Button:** Satz hinzufügen (bis max. 5 Sätze gesamt)
-- **− Button:** Satz entfernen (nur sichtbar wenn `extraSets > 0`)
-- Satzanzahl wird in Folgewoche übertragen (via `initKey`)
-
-### Automatisch
-- Bei **3 Wochen in Folge** ohne Fortschritt (Status `'s'` oder `'d'`) → `autoExtraSets()` gibt 1 zurück
-- Zeigt ⚡-Label: "⚡ +1 Satz (3 Wo. kein Fortschritt)"
-- Gilt ab Woche 4
-
-### Fortschritts-Logik (`prog()`)
-```
-'w'  — Gewicht höher als Vorwoche          → grün
-'r'  — Reps höher (mind. eine Stelle)     → blau
-'s'  — Alles gleich                        → gelb
-'d'  — Irgendeine Rep-Stelle schlechter   → rot
-null — Keine Vorwoche-Daten               → kein Badge
-```
-
----
-
-## Übungslisten (vollständig, Stand aktuell)
-
-**Glute Max (13):**
-Hip Thrusts Langhantel, Hip Thrust Kurzhantel, Hip Thrusts Multipresse, Hip Thrust Maschine, Glute Bridge Langhantel, Glute Bridge Kurzhantel, Glute Bridge Multipresse, Kabel Kickback Stehend, Kabel Kickback Flachbank, Kabel Kickback Schrägbank, Kabel Kickback Liegend, Kickback Multipresse, Kickback Maschine
-
-**Glute Med (7):**
-Kabel Abduktion Stehend, Kabel Abduktion Liegend, Kabel Abduktion Schrägbank, Abduktionsmaschine, Pelvic Drop, Abduktionsmaschine stehend, Fire Hydrants Kabel
-
-**Glute & Quad (8):**
-Low Bar Squat, Beinpresse, Step Ups, Split Squat Kurzhantel, Split Squat Langhantel, Split Squat Multipresse, Hack Squat, Reverse Lunge
-
-**Glute & Hams (8):**
-RDL Langhantel, RDL Kurzhanteln, Glute Hyperextensions, Reverse Hack RDL, Good Mornings, Single-Leg RDL, Nordic Curls, Leg Curl (Maschine)
-
-**Rücken (17):**
-LH Rudern, KH Rudern, KH Rudern (breit), Rudern Kabel (eng), Rudern Kabel (breit), Rudermaschine (neutral), Rudermaschine (breit), Latzug (eng), Latzug (breit), Überzug am Kabel, T Bar Rudern (neutral), T Bar Rudern (breit), Assistierter Klimmzug (eng), Assistierter Klimmzug (breit), Face Pull Kabel, Straight-Arm Pulldown, Einarmiger Latzug Kabel
-
-**Brust (12):**
-LH Bankdrücken, KH Bankdrücken, Bankdrücken Multipresse, LH Schrägbankdrücken, KH Schrägbankdrücken, Schrägbankdrücken Multipresse, Brustpresse, Butterfly Maschine, Flys von oben Kabel, Flys von unten Kabel, Flachbank KH Flys, Schrägbank KH Flys
-
-**Schultern (13):**
-KH Seitheben, Vorgebeugtes KH Seitheben, Seithebemaschine, Seitheben Kabel, Vorgebeugtes Seitheben Kabel, LH Überkopfdrücken, KH Überkopfdrücken, Überkopfmaschine, Butterfly Reverse Maschine, Butterfly Reverse Kabel, Upright Row Kabel, Arnold Press, Einarmiges Überkopfdrücken Kabel
-
-**Bizeps (12):**
-SZ Curls, LH Curls, KH Curls, Kabel Curls, KH Hammer Curls, SZ Preacher Curls, KH Preacher Curls, Bizeps Maschine, Konzentrations Curls, Spinne Curls, Kabel Curls einarmig, Reverse Curls
-
-**Trizeps (10):**
-SZ Skullcrusher, Enges Bankdrücken, Pushdown Kabel, Pushdown Kabel einarmig, SZ Überkopf Tri. Drücken, KH Überkopf Tri. Drücken, Kabel Überkopf Tri. Drücken, Dips Maschine, Trizeps Maschine, KH Kickback Trizeps
-
-**Bauch (10):**
-Crunches, Crunches am Kabelzug, Bauch Maschine, Beinheben (Liegend), Beinheben (Hängend), Reverse Crunch, Dead Bug, Ab Rollout, Pallof Press, Hollow Body Hold
-
----
-
-## Empfohlene Übungen (REC-Set)
-
-Diese Übungen erscheinen im Dropdown **fett mit ★-Symbol** — sie passen am besten zum Ziel (Po aufbauen, Beine schmal, Taille schmal, Schultern breit):
-
-```javascript
-// Glute Max
-"Hip Thrusts Langhantel", "Hip Thrusts Multipresse", "Hip Thrust Maschine",
-"Glute Bridge Langhantel", "Kabel Kickback Liegend", "Kickback Maschine",
-// Glute Med
-"Abduktionsmaschine", "Kabel Abduktion Liegend", "Abduktionsmaschine stehend",
-// Glute & Quad (wenig Quad, viel Po)
-"Reverse Lunge", "Split Squat Kurzhantel", "Split Squat Langhantel", "Split Squat Multipresse",
-// Glute & Hams
-"RDL Langhantel", "Glute Hyperextensions", "Single-Leg RDL", "Leg Curl (Maschine)",
-// Rücken (Lat-Fokus → V-Form → optisch schmalere Taille)
-"Latzug (breit)", "Assistierter Klimmzug (breit)", "Straight-Arm Pulldown", "Überzug am Kabel",
-// Schultern (Seitenkopf → breite Schultern → optisch schmalere Taille)
-"KH Seitheben", "Seitheben Kabel", "Seithebemaschine",
-// Bauch (Transversus → echte Taillenverschmälerung)
-"Pallof Press", "Hollow Body Hold"
-```
-
----
-
-## Tipp-System
-
-- **Standard-Tipps:** ~80 Übungen mit Ausführungshinweisen, hardkodiert im `TIPS`-Objekt
-- **Custom-Tipps:** Nutzer kann eigene Tipps speichern → persistent via localStorage
-- **Tipp-Key:** `tip__ex__[Übungsname]` → gilt für **alle** Wochen, Tage und Zyklen
-- **Slot-Key:** Nur für Open/Edit-UI-State (pro Slot, nicht geteilt)
-- **Indikator:** "● angepasst" erscheint wenn Custom-Tipp vorhanden
-
-### Wichtige Tipp-Inhalte (Trainingsziel-relevant)
-- **Low Bar Squat, Beinpresse, Hack Squat:** ⚠️-Warnung über Fußstellung (weit = Po, eng = Quad)
-- **Split Squat, Reverse Lunge:** ✅-Empfehlung als beste Wahl für schmale Beine
-- **Pallof Press, Hollow Body Hold:** Transversus-Übungen für echte Taillenverschmälerung
-- **Latzug (breit), Assistierter Klimmzug (breit):** Lat-Fokus für V-Taper
+- + Button: Satz hinzufuegen (max. 5 gesamt)
+- - Button: Satz entfernen (nur wenn extraSets > 0)
+- Auto: 3 Wochen kein Fortschritt = +1 Satz automatisch (ab Woche 4)
+- Satzanzahl + Uebung werden in Folgewoche vererbt
+- Gewichtsbereiche ("25-27kg") werden korrekt ausgewertet (oberer Wert fuer Vergleich)
+- Vergleich basiert auf letztem Wert dieser Uebung, nicht einfach Vorwoche
 
 ---
 
 ## Deload-Banner (Woche 12)
 
-Erscheint automatisch am Ende der Trainingstage in Woche 12:
-- Goldene Umrahmung (`#e8b860`), dunkler Gradient-Hintergrund
-- Hinweis auf Deload-Woche mit allen Durchführungshinweisen:
-  - 50–60% des normalen Gewichts
-  - 2 Sätze pro Übung
-  - Gleiche Übungen, kein Experimentieren
-  - Kein Muskelabbau in 1 Woche
+Erscheint automatisch in Woche 12. Goldene Umrahmung (#e8b860).
+Hinweis: 50-60% Gewicht, 2 Saetze, gleiche Uebungen, kein Muskelabbau.
 
 ---
 
-## Dropdown-Verhalten
+## Trainingsziele
 
-- Öffnet sich per Klick auf das Übungsfeld
-- Suche filtert in Echtzeit (`oninput`)
-- Schließt sich beim Klick außerhalb (document click listener)
-- Smart-Positioning: öffnet nach oben wenn zu nah am unteren Rand
-- Empfohlene Übungen: fett + ★ in Kategoriefarbe
-- Bereits ausgewählte Übung: fett + Kategoriefarbe + Hintergrund-Highlight
-- `data-val` Attribut für korrekte Wertübergabe (verhindert dass ★ mitgenommen wird)
+1. Ausladender Po, breite Huefte (Glute Max 13 + Glute Med 14 Saetze/Woche, 3x Frequenz)
+2. Schlanke Taille (Anti-Rotation, Transversus, V-Taper durch Lats)
+3. Schlanke Beine (Glute & Quad max. 8 Saetze/Woche, nur beinschonende Varianten)
+4. Breite Schultern, gute Haltung (Schultern 9 Saetze vs. Brust 4 Saetze)
 
----
-
-## Rep-Eingabefelder
-
-- Jeder Satz hat eine eigene Eingabe (S1, S2, ...)
-- Farbe der Border: grün (im Zielbereich), gelb (unteres Ende), grau (leer), rot (zu wenig)
-- Darunter: Vorwoche-Wert — immer sichtbar, `"0"` wenn kein Vorwoche-Eintrag (für gleichmäßige Höhe)
-- Grauer „0"-Wert (`#444`) signalisiert: kein echter Vorwoche-Wert vorhanden
-- `oninput` UND `onchange` für sofortige Speicherung
+Glute & Quad: Weite Fussstellung + erhoehte Ferse = Po. Enge Fussstellung + Tiefe = Quad.
 
 ---
 
-## Häufige Fehler / Was zu beachten ist
+## Deployment
 
-### 1. initKey statt mk beim Schreiben
-```javascript
-// FALSCH — verliert Vorwoche-Daten:
-const k = mk(S.cy, S.week, di, ei);
-S.data[k] = { ...( S.data[k] || {}), weight: v };
-
-// RICHTIG:
-const k = initKey(di, ei);
-S.data[k] = { ...S.data[k], weight: v };
-```
-
-### 2. localStorage-Key nie ändern
-`peach_v4` ist der einzige Key — jede Änderung löscht alle Nutzerdaten.
-
-### 3. Neue Übungen immer in drei Stellen eintragen
-- `EXERCISES`-Objekt (Dropdown-Liste)
-- `TIPS`-Objekt (Ausführungshinweis, kann leer bleiben)
-- `REC`-Set (nur wenn empfohlen)
-
-### 4. Tipp-Key-Format beachten
-```javascript
-// Datenspeicherung (übungsbasiert):
-const tk = cur.exercise ? 'tip__ex__' + cur.exercise : mkt(S.cy, S.week, di, ei);
-
-// UI-State open/edit (slot-basiert):
-const slotKey = mkt(S.cy, S.week, di, ei);
-```
-
-### 5. Keine renderT() in Rep/Gewicht-Update-Funktionen
-`updRep()` und `updW()` rufen **kein** `renderT()` auf — das würde den Input-Fokus zerstören während man tippt.
-
----
-
-## Deployment-Workflow (für Rexi, kein Terminal)
-
-1. Neue `index.html` aus dem Chat herunterladen
-2. GitHub öffnen: github.com/nicolehahn2890/Trainingsapp
-3. Auf `index.html` klicken → Stift-Symbol (✏️) → „Edit this file"
-4. **Strg+A** → **Entf** → neuen Inhalt einfügen → **Strg+V**
-5. Oben rechts „Commit changes" → nochmal bestätigen
-6. ~1–2 Minuten warten → live unter https://nicolehahn2890.github.io/Trainingsapp/
-
-**URL beachten:** Großes „T" in `/Trainingsapp/`
-
----
-
-## Trainingsziele (für inhaltliche Entscheidungen)
-
-- **Priorität 1:** Maximale Glute-Entwicklung (Volumen, Formgebung)
-- **Priorität 2:** Schmale Taille (Anti-Rotation, Transversus, V-Taper durch Lats)
-- **Priorität 3:** Schmale Beine (wenig Quad-Hypertrophie — Übungswahl kritisch!)
-- **Priorität 4:** Breite Schultern (Seitheben-Varianten > Drücken)
-
-Bei **Glute & Quad**: Immer Fußstellung/Tiefe erwähnen. Enge Fußstellung + Tiefe = Quad. Weite Fußstellung + erhöhte Ferse = Po.
+1. index.html herunterladen
+2. github.com/nicolehahn2890/Trainingsapp > index.html > Stift-Symbol
+3. Strg+A > Entf > Strg+V > Commit changes
+4. ~2 Min warten > https://nicolehahn2890.github.io/Trainingsapp/
