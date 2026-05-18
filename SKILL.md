@@ -66,7 +66,7 @@ S = {
   dropSearch: "",
   tips: {},
   tipEdit: {},
-  openDays: {},
+  openDays: {},     // mobile-friendly: standardmaessig zu, Accordion-Stil
 }
 ```
 
@@ -83,20 +83,28 @@ mk(cy,week,di,ei)       Workout-Key
 mkt(cy,week,di,ei)      Slot-Key
 initKey(di,ei)          Key mit Vorwoche-Daten init — IMMER statt mk() beim Schreiben!
 plan()                  gibt immer P4 zurueck (P3 wurde entfernt)
-parseWeight(w)          Parst "25-27" -> 27 (oberer Wert), "25" -> 25
+parseWeight(w)          Parst "25-27" -> 27 (oberer Wert), "27,5" -> 27.5 (Komma -> Punkt)
 prog(cr,pr,cw,pw)       'w'|'r'|'s'|'d' Fortschritts-Status
 findLastExData(di,ei,ex) Sucht letzten gespeicherten Wert dieser Uebung (uebungsbasierter Vergleich)
 rcol(v,r)               Farbe fuer Rep-Eingabefeld
 esc(s)                  HTML-escape
-autoExtraSets(di,ei)    0 oder 1 (Auto-Satz nach 3 Wo. kein Fortschritt)
+autoExtraSets(di,ei)    0 oder 1 (Auto-Satz nach 3 Wo. kein Fortschritt, nur bei gleicher Uebung)
+toggleDay(di)           Accordion: andere Tage schliessen sich automatisch
 updatePlanBtns()        leer — no-op, Buttons wurden entfernt
 ```
 
 ### Vergleichslogik (wichtig!)
-- Fortschrittsvergleich nutzt findLastExData() — vergleicht mit letztem Wert DIESER Uebung, nicht einfach Vorwoche
-- Wenn Uebung gewechselt wird, startet Vergleich frisch (kein falscher Vergleich mit alter Uebung)
-- Gewicht: parseWeight() unterstuetzt Bereiche wie "25-27" (nimmt oberen Wert)
-- Fortschritt wird nur berechnet wenn aktuelle Woche tatsaechlich Reps eingetragen hat
+- Fortschrittsvergleich nutzt findLastExData() — vergleicht mit letztem Wert DIESER Uebung
+- Wenn Uebung gewechselt wird, startet Vergleich frisch
+- Gewicht: parseWeight() unterstuetzt Bereiche wie "25-27" und Komma wie "27,5"
+- Fortschritt wird nur berechnet wenn aktuelle Woche tatsaechlich Reps hat
+- WeekProgress-Balken nutzt ebenfalls findLastExData()
+- autoExtraSets bricht Streak ab wenn Uebung gewechselt wurde
+
+### Mobile-Optimierung
+- Tage standardmaessig ZUGEKLAPPT (`S.openDays[di]===true` zum Aufklappen)
+- Accordion-Verhalten: aufklappen eines Tages schliesst alle anderen
+- Spart Scrollen auf dem iPhone
 
 ### Daten-Vererbung zwischen Wochen
 Vererbt: exercise, extraSets — NICHT: reps, weight
@@ -181,13 +189,13 @@ Glute Med (8): Kabel Abduktion Stehend, Kabel Abduktion Liegend, Kabel Abduktion
 
 Glute & Quad (11): Low Bar Squat, Beinpresse 45 Grad, Beinpresse, Step Ups, Split Squat Kurzhantel, Split Squat Langhantel, Split Squat Multipresse, Hack Squat, Reverse Lunge, Belt Squat, Super Squat
 
-Glute & Hams (9): RDL Langhantel, RDL Kurzhaenteln, RDL Maschine, Glute Hyperextensions, Reverse Hack RDL, Good Mornings, Single-Leg RDL, Nordic Curls, Leg Curl (Maschine)
+Glute & Hams (10): RDL Langhantel, RDL Kurzhaenteln, RDL Maschine, Belt Squat RDL, Glute Hyperextensions, Reverse Hack RDL, Good Mornings, Single-Leg RDL, Nordic Curls, Leg Curl (Maschine)
 
 Ruecken (20): LH Rudern, KH Rudern, KH Rudern (breit), Rudern Kabel (eng), Rudern Kabel (breit), Rudermaschine (Panatta), Rudermaschine (Precor), Latzug (eng), Latzug (breit), Latzug Maschine (Panatta), Latzug Maschine (Precor), Ueberzug am Kabel, T Bar Rudern (neutral), T Bar Rudern (breit), Assistierter Klimmzug (eng), Assistierter Klimmzug (breit), Face Pull Kabel, Straight-Arm Pulldown, Einarmiger Latzug Kabel, Diverging Low Row
 
 Brust (15): LH Bankdruecken, KH Bankdruecken, Bankdruecken Multipresse, Bankdruecken Maschine, LH Schraegbankdruecken, KH Schraegbankdruecken, Schraegbankdruecken Multipresse, Schraegbankdruecken Maschine, Brustpresse (Panatta), Brustpresse (Precor), Butterfly Maschine, Flys von oben Kabel, Flys von unten Kabel, Flachbank KH Flys, Schraegbank KH Flys
 
-Schultern (13): KH Seitheben, Vorgebeugtes KH Seitheben, Seithebemaschine, Seitheben Kabel, Vorgebeugtes Seitheben Kabel, LH Ueberkopfdruecken, KH Ueberkopfdruecken, Ueberkopfmaschine, Butterfly Reverse Maschine, Butterfly Reverse Kabel, Upright Row Kabel, Arnold Press, Einarmiges Ueberkopfdruecken Kabel
+Schultern (14): KH Seitheben, Vorgebeugtes KH Seitheben, Seithebemaschine (sitzend), Seithebemaschine (stehend), Seitheben Kabel, Vorgebeugtes Seitheben Kabel, LH Ueberkopfdruecken, KH Ueberkopfdruecken, Ueberkopfmaschine, Butterfly Reverse Maschine, Butterfly Reverse Kabel, Upright Row Kabel, Arnold Press, Einarmiges Ueberkopfdruecken Kabel
 
 Bizeps (12): SZ Curls, LH Curls, KH Curls, Kabel Curls, KH Hammer Curls, SZ Preacher Curls, KH Preacher Curls, Bizeps Maschine, Konzentrations Curls, Spinne Curls, Kabel Curls einarmig, Reverse Curls
 
@@ -202,7 +210,8 @@ Bauch (12): Crunches, Crunches am Kabelzug, Panatta Super Crunch, Panatta Low Cr
 Bauch: Panatta Super Crunch, Panatta Low Crunch, Panatta High Crunch, Bauch Maschine (Precor)
 Ruecken: Rudermaschine (Panatta), Rudermaschine (Precor), Latzug Maschine (Panatta), Latzug Maschine (Precor)
 Brust: Brustpresse (Panatta), Brustpresse (Precor)
-Spezial: 3D Abduktor Maschine, Belt Squat, Beinpresse 45 Grad, RDL Maschine, Diverging Low Row
+Schultern: Seithebemaschine (sitzend), Seithebemaschine (stehend)
+Spezial: 3D Abduktor Maschine, Belt Squat, Belt Squat RDL, Beinpresse 45 Grad, RDL Maschine, Diverging Low Row
 
 ---
 
@@ -210,9 +219,9 @@ Spezial: 3D Abduktor Maschine, Belt Squat, Beinpresse 45 Grad, RDL Maschine, Div
 
 - + Button: Satz hinzufuegen (max. 5 gesamt)
 - - Button: Satz entfernen (nur wenn extraSets > 0)
-- Auto: 3 Wochen kein Fortschritt = +1 Satz automatisch (ab Woche 4)
+- Auto: 3 Wochen kein Fortschritt = +1 Satz automatisch (ab Woche 4, nur bei gleicher Uebung)
 - Satzanzahl + Uebung werden in Folgewoche vererbt
-- Gewichtsbereiche ("25-27kg") werden korrekt ausgewertet (oberer Wert fuer Vergleich)
+- Gewichtsbereiche ("25-27kg") und Komma ("27,5") werden korrekt ausgewertet
 - Vergleich basiert auf letztem Wert dieser Uebung, nicht einfach Vorwoche
 
 ---
