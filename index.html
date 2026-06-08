@@ -353,6 +353,12 @@ function parseWeight(w){
   const n=parseFloat(s);
   return isNaN(n)?0:n;
 }
+// true wenn echte Spanne ("42-45"), false bei Einzelwert ("45") oder "45-45"
+function isWeightRange(w){
+  if(!w&&w!==0)return false;
+  const parts=String(w).trim().split('-').map(p=>parseFloat(p)).filter(n=>!isNaN(n));
+  return parts.length>=2&&parts[0]!==parts[parts.length-1];
+}
 function prog(cr,pr,cw,pw){
   if(!pr||!pr.length)return null;
   // Keine Auswertung wenn aktuelle Woche noch keine Reps eingetragen
@@ -360,7 +366,12 @@ function prog(cr,pr,cw,pw){
   if(!crFilled||!crFilled.length)return null;
   const prFilled=pr&&pr.filter(v=>v!==''&&v!==undefined&&v!==null&&parseInt(v)>0);
   if(!prFilled||!prFilled.length)return null;
-  if(parseWeight(cw)>parseWeight(pw)&&parseWeight(pw)>0)return'w';
+  const cu=parseWeight(cw),pu=parseWeight(pw);
+  if(pu>0){
+    if(cu>pu)return'w';
+    // Glatter Einzelwert auf gleichem Top schlaegt eine Spanne: 45 > 42-45
+    if(cu===pu&&!isWeightRange(cw)&&isWeightRange(pw))return'w';
+  }
   // Reps als GESAMTSUMME vergleichen, nicht Satz-fuer-Satz.
   // So zaehlt 12/15 genauso viel wie 15/12 (gleiche Gesamtleistung),
   // statt faelschlich Weniger zu melden wenn nur ein Satz niedriger war.

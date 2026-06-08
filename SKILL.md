@@ -84,6 +84,7 @@ mkt(cy,week,di,ei)      Slot-Key
 initKey(di,ei)          Key mit Vorwoche-Daten init — IMMER statt mk() beim Schreiben!
 plan()                  gibt immer P4 zurueck (P3 wurde entfernt)
 parseWeight(w)          Parst "25-27" -> 27 (oberer Wert), "27,5" -> 27.5 (Komma -> Punkt)
+isWeightRange(w)        true bei echter Spanne ("42-45"), false bei Einzelwert oder "45-45"
 prog(cr,pr,cw,pw)       'w'|'r'|'s'|'d' Fortschritts-Status (Reps = Gesamtsumme!)
 findLastExData(di,ei,ex) Sucht letzten gespeicherten Wert dieser Uebung (uebungsbasierter Vergleich)
 rcol(v,r)               Farbe fuer Rep-Eingabefeld
@@ -97,6 +98,7 @@ updatePlanBtns()        leer — no-op, Buttons wurden entfernt
 - Fortschrittsvergleich nutzt findLastExData() — vergleicht mit letztem Wert DIESER Uebung
 - Wenn Uebung gewechselt wird, startet Vergleich frisch
 - Gewicht: parseWeight() unterstuetzt Bereiche wie "25-27" (nimmt oberen Wert 27) und Komma wie "27,5". Auch renderOv (Uebersicht) nutzt parseWeight() — nie parseFloat(), das gibt bei "42-45" nur 42 zurueck.
+- Spanne vs. Einzelwert: cu>pu -> 'w'. Zusaetzlich: glatter Einzelwert auf gleichem Top schlaegt eine Spanne (45 > 42-45 -> 'w'), via Helper isWeightRange(). Zwei gleiche Spannen oder Einzelwerte -> kein 'w'. Gelockerte Spanne (42-45 nach glattem 45) -> kein 'w'.
 - Reps: Vergleich ueber GESAMTSUMME aller Saetze, NICHT Satz-fuer-Satz. 12/15 (=27) zaehlt gleich wie 15/12 (=27) -> 's'. Mehr Summe -> 'r', weniger -> 'd'. (Frueher positionsweise -> meldete faelschlich 'd' sobald ein einzelner Satz niedriger war.)
 - Fortschritt wird nur berechnet wenn aktuelle Woche tatsaechlich Reps hat
 - WeekProgress-Balken nutzt ebenfalls findLastExData()
@@ -224,6 +226,7 @@ Spezial: 3D Abduktor Maschine, Belt Squat, Belt Squat RDL, Beinpresse 45 Grad, R
 - Auto: 3 Wochen kein Fortschritt = +1 Satz automatisch (ab Woche 4, nur bei gleicher Uebung)
 - Satzanzahl + Uebung werden in Folgewoche vererbt
 - Gewichtsbereiche ("25-27kg") und Komma ("27,5") werden korrekt ausgewertet (oberer Wert zaehlt)
+- Glatter Einzelwert schlaegt eine gleich hoch endende Spanne (45 > 42-45 = Steigerung)
 - Reps werden als Gesamtsumme verglichen, nicht satzweise (Reihenfolge der Saetze egal)
 - Vergleich basiert auf letztem Wert dieser Uebung, nicht einfach Vorwoche
 
