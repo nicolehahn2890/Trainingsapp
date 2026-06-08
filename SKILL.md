@@ -84,7 +84,7 @@ mkt(cy,week,di,ei)      Slot-Key
 initKey(di,ei)          Key mit Vorwoche-Daten init — IMMER statt mk() beim Schreiben!
 plan()                  gibt immer P4 zurueck (P3 wurde entfernt)
 parseWeight(w)          Parst "25-27" -> 27 (oberer Wert), "27,5" -> 27.5 (Komma -> Punkt)
-prog(cr,pr,cw,pw)       'w'|'r'|'s'|'d' Fortschritts-Status
+prog(cr,pr,cw,pw)       'w'|'r'|'s'|'d' Fortschritts-Status (Reps = Gesamtsumme!)
 findLastExData(di,ei,ex) Sucht letzten gespeicherten Wert dieser Uebung (uebungsbasierter Vergleich)
 rcol(v,r)               Farbe fuer Rep-Eingabefeld
 esc(s)                  HTML-escape
@@ -96,7 +96,8 @@ updatePlanBtns()        leer — no-op, Buttons wurden entfernt
 ### Vergleichslogik (wichtig!)
 - Fortschrittsvergleich nutzt findLastExData() — vergleicht mit letztem Wert DIESER Uebung
 - Wenn Uebung gewechselt wird, startet Vergleich frisch
-- Gewicht: parseWeight() unterstuetzt Bereiche wie "25-27" und Komma wie "27,5"
+- Gewicht: parseWeight() unterstuetzt Bereiche wie "25-27" (nimmt oberen Wert 27) und Komma wie "27,5". Auch renderOv (Uebersicht) nutzt parseWeight() — nie parseFloat(), das gibt bei "42-45" nur 42 zurueck.
+- Reps: Vergleich ueber GESAMTSUMME aller Saetze, NICHT Satz-fuer-Satz. 12/15 (=27) zaehlt gleich wie 15/12 (=27) -> 's'. Mehr Summe -> 'r', weniger -> 'd'. (Frueher positionsweise -> meldete faelschlich 'd' sobald ein einzelner Satz niedriger war.)
 - Fortschritt wird nur berechnet wenn aktuelle Woche tatsaechlich Reps hat
 - WeekProgress-Balken nutzt ebenfalls findLastExData()
 - autoExtraSets bricht Streak ab wenn Uebung gewechselt wurde
@@ -122,6 +123,7 @@ Vererbt: exercise, extraSets — NICHT: reps, weight
 7. plan() gibt immer P4 zurueck — nicht aendern
 8. Bei groesseren Aenderungen: Python-Script verwenden, am Ende node --check ausfuehren
 9. Sonderzeichen generell meiden in JS-Strings
+10. Gewicht IMMER mit parseWeight() parsen, nie parseFloat() — sonst geht der obere Bereichswert verloren ("42-45" -> 42)
 
 ---
 
@@ -221,7 +223,8 @@ Spezial: 3D Abduktor Maschine, Belt Squat, Belt Squat RDL, Beinpresse 45 Grad, R
 - - Button: Satz entfernen (nur wenn extraSets > 0)
 - Auto: 3 Wochen kein Fortschritt = +1 Satz automatisch (ab Woche 4, nur bei gleicher Uebung)
 - Satzanzahl + Uebung werden in Folgewoche vererbt
-- Gewichtsbereiche ("25-27kg") und Komma ("27,5") werden korrekt ausgewertet
+- Gewichtsbereiche ("25-27kg") und Komma ("27,5") werden korrekt ausgewertet (oberer Wert zaehlt)
+- Reps werden als Gesamtsumme verglichen, nicht satzweise (Reihenfolge der Saetze egal)
 - Vergleich basiert auf letztem Wert dieser Uebung, nicht einfach Vorwoche
 
 ---
