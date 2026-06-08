@@ -361,15 +361,14 @@ function prog(cr,pr,cw,pw){
   const prFilled=pr&&pr.filter(v=>v!==''&&v!==undefined&&v!==null&&parseInt(v)>0);
   if(!prFilled||!prFilled.length)return null;
   if(parseWeight(cw)>parseWeight(pw)&&parseWeight(pw)>0)return'w';
-  let imp=false,worse=false;
-  for(let i=0;i<Math.max(crFilled.length,prFilled.length);i++){
-    const c=parseInt(crFilled[i])||0,p=parseInt(prFilled[i])||0;
-    if(p===0)continue;
-    if(c>p)imp=true;
-    if(c<p)worse=true;
-  }
-  if(worse)return'd';
-  return imp?'r':'s';
+  // Reps als GESAMTSUMME vergleichen, nicht Satz-fuer-Satz.
+  // So zaehlt 12/15 genauso viel wie 15/12 (gleiche Gesamtleistung),
+  // statt faelschlich Weniger zu melden wenn nur ein Satz niedriger war.
+  const cSum=crFilled.reduce((a,v)=>a+(parseInt(v)||0),0);
+  const pSum=prFilled.reduce((a,v)=>a+(parseInt(v)||0),0);
+  if(cSum>pSum)return'r';
+  if(cSum<pSum)return'd';
+  return's';
 }
 function pbadge(p){
   if(!p)return'';
@@ -562,7 +561,7 @@ function renderOv(){
   pl.forEach((day,di)=>{
     h+='<div class="ov-day"><div class="ov-day-lbl">'+esc(day.l)+'</div>';
     day.e.forEach((ex,ei)=>{
-      const ws=Array.from({length:12},(_,i)=>{const d=S.data[mk(S.cy,i+1,di,ei)]||{};return{w:i+1,name:d.exercise,wt:parseFloat(d.weight)||0}});
+      const ws=Array.from({length:12},(_,i)=>{const d=S.data[mk(S.cy,i+1,di,ei)]||{};return{w:i+1,name:d.exercise,wt:parseWeight(d.weight)||0}});
       const filled=ws.filter(x=>x.wt>0),name=(ws.find(x=>x.name)||{}).name,nums=ws.map(x=>x.wt),mx=Math.max(...nums,1);
       const col=CC[ex.c]||'#aaa',gain=filled.length>=2?filled[filled.length-1].wt-filled[0].wt:null;
       const bars=nums.map((v,i)=>'<div class="ov-bar" title="W'+(i+1)+': '+(v||'–')+' kg" style="height:'+Math.max(2,v>0?(v/mx*36):2)+'px;background:'+(v>0?col:'rgba(255,255,255,0.08)')+'"></div>').join('');
