@@ -38,6 +38,8 @@ Primaerfarbe Pink: #C8729A
 Sekundaerfarbe Lila: #B88CC0
 Font: DM Sans (Google Fonts CDN)
 Logo: Pixel-Art-Pfirsich SVG 16x16, shape-rendering crispEdges
+Favicon: Pfirsich-Emoji als SVG-Data-URI im <head>
+Empfohlene Uebungen (REC-Set) erhalten im Dropdown einen goldenen Stern (★)
 
 Kategorie-Farben:
   Glute Max: #C8729A, Glute Med: #B88CC0, Glute & Quad: #C4A882, Glute & Hams: #A8C4A0
@@ -59,7 +61,6 @@ Fortschritts-Farben:
 S = {
   cy: "cycle1",     // cycle1 / cycle2 / cycle3
   week: 1,          // 1-12
-  pt: 4,            // immer 4 (3-Tage-Plan wurde entfernt)
   view: "training", // "training" | "overview"
   data: {},
   drop: null,
@@ -82,7 +83,7 @@ Slot:     tip__[cycle]__w[week]__d[dayIdx]__e[exIdx]  (nur UI-State)
 mk(cy,week,di,ei)       Workout-Key
 mkt(cy,week,di,ei)      Slot-Key
 initKey(di,ei)          Key mit Vorwoche-Daten init — IMMER statt mk() beim Schreiben!
-plan()                  gibt immer P4 zurueck (P3 wurde entfernt)
+plan()                  gibt immer P4 zurueck (P3, S.pt, setPlan, updatePlanBtns wurden komplett entfernt)
 parseWeight(w)          Parst "25-27" -> 27 (oberer Wert), "27,5" -> 27.5 (Komma -> Punkt)
 isWeightRange(w)        true bei echter Spanne ("42-45"), false bei Einzelwert oder "45-45"
 prog(cr,pr,cw,pw)       'w'|'r'|'s'|'d' Fortschritts-Status (Reps = Gesamtsumme!)
@@ -91,7 +92,7 @@ rcol(v,r)               Farbe fuer Rep-Eingabefeld
 esc(s)                  HTML-escape
 autoExtraSets(di,ei)    0 oder 1 (Auto-Satz nach 3 Wo. kein Fortschritt, nur bei gleicher Uebung)
 toggleDay(di)           Accordion: andere Tage schliessen sich automatisch
-updatePlanBtns()        leer — no-op, Buttons wurden entfernt
+onDS(di,ei,v)           Dropdown-Suche — stellt nach renderT() Fokus + Cursor im Suchfeld wieder her
 ```
 
 ### Vergleichslogik (wichtig!)
@@ -118,14 +119,13 @@ Vererbt: exercise, extraSets — NICHT: reps, weight
 
 1. initKey statt mk() beim Schreiben verwenden
 2. peach_v4 nie umbenennen
-3. Neue Uebungen in EXERCISES + TIPS eintragen
+3. Neue Uebungen in EXERCISES + TIPS eintragen (TIPS-Key muss EXAKT dem EXERCISES-Namen entsprechen!), optional in REC
 4. KEIN Grad-Zeichen (°) in Strings im Script — zerstoert den JS-Parser! "Grad" ausschreiben
 5. Keine renderT() in updRep/updW
-6. updatePlanBtns() ist leer — nicht befuellen
-7. plan() gibt immer P4 zurueck — nicht aendern
-8. Bei groesseren Aenderungen: Python-Script verwenden, am Ende node --check ausfuehren
-9. Sonderzeichen generell meiden in JS-Strings
-10. Gewicht IMMER mit parseWeight() parsen, nie parseFloat() — sonst geht der obere Bereichswert verloren ("42-45" -> 42)
+6. plan() gibt immer P4 zurueck — nicht aendern
+7. Bei groesseren Aenderungen: Python-Script verwenden, am Ende node --check ausfuehren
+8. Sonderzeichen generell meiden in JS-Strings
+9. Gewicht IMMER mit parseWeight() parsen, nie parseFloat() — sonst geht der obere Bereichswert verloren ("42-45" -> 42)
 
 ---
 
@@ -193,7 +193,7 @@ Glute Med (8): Kabel Abduktion Stehend, Kabel Abduktion Liegend, Kabel Abduktion
 
 Glute & Quad (11): Low Bar Squat, Beinpresse 45 Grad, Beinpresse, Step Ups, Split Squat Kurzhantel, Split Squat Langhantel, Split Squat Multipresse, Hack Squat, Reverse Lunge, Belt Squat, Super Squat
 
-Glute & Hams (10): RDL Langhantel, RDL Kurzhaenteln, RDL Maschine, Belt Squat RDL, Glute Hyperextensions, Reverse Hack RDL, Good Mornings, Single-Leg RDL, Nordic Curls, Leg Curl (Maschine)
+Glute & Hams (10): RDL Langhantel, RDL Kurzhanteln, RDL Maschine, Belt Squat RDL, Glute Hyperextensions, Reverse Hack RDL, Good Mornings, Single-Leg RDL, Nordic Curls, Leg Curl (Maschine)
 
 Ruecken (20): LH Rudern, KH Rudern, KH Rudern (breit), Rudern Kabel (eng), Rudern Kabel (breit), Rudermaschine (Panatta), Rudermaschine (Precor), Latzug (eng), Latzug (breit), Latzug Maschine (Panatta), Latzug Maschine (Precor), Ueberzug am Kabel, T Bar Rudern (neutral), T Bar Rudern (breit), Assistierter Klimmzug (eng), Assistierter Klimmzug (breit), Face Pull Kabel, Straight-Arm Pulldown, Einarmiger Latzug Kabel, Diverging Low Row
 
@@ -205,7 +205,7 @@ Bizeps (12): SZ Curls, LH Curls, KH Curls, Kabel Curls, KH Hammer Curls, SZ Prea
 
 Trizeps (10): SZ Skullcrusher, Enges Bankdruecken, Pushdown Kabel, Pushdown Kabel einarmig, SZ Ueberkopf Tri. Druecken, KH Ueberkopf Tri. Druecken, Kabel Ueberkopf Tri. Druecken, Dips Maschine, Trizeps Maschine, KH Kickback Trizeps
 
-Bauch (12): Crunches, Crunches am Kabelzug, Panatta Super Crunch, Panatta Low Crunch, Panatta High Crunch, Bauch Maschine (Precor), Beinheben (Liegend), Beinheben (Haengend), Reverse Crunch, Dead Bug, Ab Rollout, Pallof Press, Hollow Body Hold
+Bauch (13): Crunches, Crunches am Kabelzug, Panatta Super Crunch, Panatta Low Crunch, Panatta High Crunch, Bauch Maschine (Precor), Beinheben (Liegend), Beinheben (Haengend), Reverse Crunch, Dead Bug, Ab Rollout, Pallof Press, Hollow Body Hold
 
 ---
 
