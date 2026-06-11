@@ -89,6 +89,7 @@ S = {
   openDays: {},     // mobile-friendly: standardmaessig zu, Accordion-Stil
   animDay: null,    // Tag-Index der gerade aufgeklappt wurde (einmalige Einblend-Animation)
   dropAnim: false,  // true nur waehrend togDrop -> Dropdown-Einblend-Animation (nicht bei Suche)
+  theme: "dark",    // "dark" | "light" — wird beim Start aus peach_theme geladen
 }
 ```
 
@@ -116,7 +117,11 @@ prog(cr,pr,cw,pw)       'w'|'r'|'s'|'d' Fortschritts-Status (Reps = Gesamtsumme!
 findLastExData(di,ei,ex) Sucht letzten gespeicherten Wert dieser Uebung (uebungsbasierter Vergleich)
 rcol(v,r)               Farbe fuer Rep-Eingabefeld
 esc(s)                  HTML-escape
-autoExtraSets(di,ei)    0 oder 1 (Auto-Satz nach 3 Wo. kein Fortschritt, nur bei gleicher Uebung)
+autoExtraSets(di,ei)    0 oder 1. Braucht 3 stagnierende WOCHENVERGLEICHE ('s'/'d') in Folge bei
+                        gleicher Uebung -> greift fruehestens in WOCHE 5 (W2vsW1 + W3vsW2 + W4vsW3).
+                        Der Guard "if(S.week<4)return 0" ist nur ein Early-Out. Verifiziert per Test.
+applyTheme()            Setzt light-Klasse auf documentElement, Button-Icon (Sonne/Mond), theme-color-Meta
+toggleTheme()           Wechselt S.theme, speichert unter peach_theme, ruft applyTheme()
 toggleDay(di)           Accordion: andere Tage schliessen sich automatisch (setzt S.animDay fuer Animation)
 onDS(di,ei,v)           Dropdown-Suche — stellt nach renderT() Fokus + Cursor im Suchfeld wieder her
 updSetting(di,ei,v)     Speichert Maschinen-Einstellung unter set__ex__[Name] — KEIN renderT!
@@ -142,7 +147,7 @@ flashView()             Sanfter Einblend-Effekt der aktiven Ansicht (Tab-/Zyklus
 - Tage standardmaessig ZUGEKLAPPT (`S.openDays[di]===true` zum Aufklappen)
 - Accordion-Verhalten: aufklappen eines Tages schliesst alle anderen
 - Spart Scrollen auf dem iPhone
-- Alle Eingabefelder (w-input, rep-inp, drop-search input, tip-ta) haben font-size 16px —
+- Alle Eingabefelder (w-input, rep-inp, drop-search input, tip-ta, set-input) haben font-size 16px —
   verhindert Auto-Zoom auf iOS! Nicht verkleinern.
 - Touch-Ziele vergroessert: week-arrow 34px, add-set-btn 36px, pick-btn min-height 40px, rep-inp 46px breit
 
@@ -150,8 +155,13 @@ flashView()             Sanfter Einblend-Effekt der aktiven Ansicht (Tab-/Zyklus
 - Tages-Pill im day-header (`#dc-[di]`, Klasse day-count): "x/y Uebungen" — grau (0), pink (teilweise), gruen mit Haken (alle)
 - Erledigt-Haken pro Uebung (`#done-[di]-[ei]`, Klasse done-chip): sichtbar wenn exDone() — Toggle via hidden-Klasse
 - Beide werden bei Rep-Eingabe LIVE per refreshDone() aktualisiert (gezieltes DOM-Update, kein renderT)
-- Uebersicht: Balken mit Farbverlauf, aktuelle Woche (S.week) bekommt weissen Ring (box-shadow)
+- Uebersicht: Balken mit Farbverlauf, aktuelle Woche (S.week) bekommt Ring (box-shadow, var(--ring))
 - Animationen: fadeSlide (Ansicht/Tag aufklappen), dropIn (Dropdown nur beim Oeffnen, nicht bei Suche)
+- Einstellungs-Feld (Zahnrad + .set-input): erscheint sobald eine Uebung gewaehlt ist, zwischen
+  ex-meta und reps-row. Speichert uebungsbasiert (set__ex__Name) via updSetting() — ohne renderT
+- Theme-Button (.theme-btn, #theme-btn): rund, 34px, im header-right neben den Tabs
+- Tipp-Panel: Standard-Tipp (TIPS) immer sichtbar; eigene Notiz (tip__ex__) darunter mit
+  lila Label "Deine Notiz" (.tip-note, .tip-note-lbl); Editor bearbeitet NUR die Notiz
 
 ### Daten-Vererbung zwischen Wochen
 Vererbt: exercise, extraSets — NICHT: reps, weight
@@ -269,7 +279,7 @@ Spezial: 3D Abduktor Maschine, Belt Squat, Belt Squat RDL, Beinpresse 45 Grad, R
 
 - + Button: Satz hinzufuegen (max. 5 gesamt)
 - - Button: Satz entfernen (nur wenn extraSets > 0)
-- Auto: 3 Wochen kein Fortschritt = +1 Satz automatisch (ab Woche 4, nur bei gleicher Uebung)
+- Auto: 3 stagnierende Wochenvergleiche = +1 Satz automatisch (greift fruehestens Woche 5, nur bei gleicher Uebung)
 - Satzanzahl + Uebung werden in Folgewoche vererbt
 - Gewichtsbereiche ("25-27kg") und Komma ("27,5") werden korrekt ausgewertet (oberer Wert zaehlt)
 - Glatter Einzelwert schlaegt eine gleich hoch endende Spanne (45 > 42-45 = Steigerung)
@@ -280,7 +290,7 @@ Spezial: 3D Abduktor Maschine, Belt Squat, Belt Squat RDL, Beinpresse 45 Grad, R
 
 ## Deload-Banner (Woche 12)
 
-Erscheint automatisch in Woche 12. Goldene Umrahmung (#e8b860).
+Erscheint automatisch in Woche 12. Goldene Umrahmung (var(--gold)), Hintergrund var(--deload-bg).
 Hinweis: 50-60% Gewicht, 2 Saetze, gleiche Uebungen, kein Muskelabbau.
 
 ---
@@ -302,3 +312,26 @@ Glute & Quad: Weite Fussstellung + erhoehte Ferse = Po. Enge Fussstellung + Tief
 2. github.com/nicolehahn2890/Trainingsapp > index.html > Stift-Symbol
 3. Strg+A > Entf > Strg+V > Commit changes
 4. ~2 Min warten > https://nicolehahn2890.github.io/Trainingsapp/
+
+(Aus Claude-Code-Sessions: direkt auf main pushen — siehe Hinweis oben.)
+
+---
+
+## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+1. **Tipp-Notizen statt Override:** Standard-Tipp immer sichtbar, eigene Texte als
+   "Deine Notiz" zusaetzlich darunter. savTip loescht Key bei leerem Text.
+2. **Maschinen-Einstellungen:** 38 Maschinen-Tipps mit Einstell-Checkliste
+   (Zahnrad-Emoji + "Einstellung:" / "Ausfuehrung:"), zugeschnitten auf 169 cm / 56 kg /
+   Glute-Fokus. Neues Feld "Meine Einstellung" pro Uebung (set__ex__Name).
+3. **Heller Modus:** CSS-Variablen :root / :root.light, Sonne/Mond-Button im Header,
+   Key peach_theme, theme-color-Meta wechselt mit.
+4. **Design-Update:** Karten mit Verlauf/Schatten, Animationen (fadeSlide/dropIn),
+   Tages-Pill "x/y Uebungen", Erledigt-Haken pro Uebung (live via refreshDone),
+   groessere Touch-Ziele, 16px-Inputs gegen iOS-Zoom, kompakter Header.
+5. **Code-Review davor:** uebungsbasierter Vergleich (findLastExData), Reps als
+   Gesamtsumme, parseWeight fuer Spannen/Komma, P3/Plan-Umschalter entfernt.
+
+Konsistenz-Audit (zuletzt ausgefuehrt): alle 126 Uebungen haben Tipps, keine verwaisten
+Tipps/REC-Eintraege, keine Duplikate, Rep-Bereiche plausibel (4-8/6-10/8-12),
+prog()/rcol()/autoExtraSets() per Funktionstest verifiziert.
