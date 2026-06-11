@@ -68,6 +68,8 @@ S = {
   tips: {},
   tipEdit: {},
   openDays: {},     // mobile-friendly: standardmaessig zu, Accordion-Stil
+  animDay: null,    // Tag-Index der gerade aufgeklappt wurde (einmalige Einblend-Animation)
+  dropAnim: false,  // true nur waehrend togDrop -> Dropdown-Einblend-Animation (nicht bei Suche)
 }
 ```
 
@@ -91,8 +93,12 @@ findLastExData(di,ei,ex) Sucht letzten gespeicherten Wert dieser Uebung (uebungs
 rcol(v,r)               Farbe fuer Rep-Eingabefeld
 esc(s)                  HTML-escape
 autoExtraSets(di,ei)    0 oder 1 (Auto-Satz nach 3 Wo. kein Fortschritt, nur bei gleicher Uebung)
-toggleDay(di)           Accordion: andere Tage schliessen sich automatisch
+toggleDay(di)           Accordion: andere Tage schliessen sich automatisch (setzt S.animDay fuer Animation)
 onDS(di,ei,v)           Dropdown-Suche — stellt nach renderT() Fokus + Cursor im Suchfeld wieder her
+exDone(di,ei)           true wenn Uebung gewaehlt UND alle Saetze der aktuellen Woche Reps haben
+refreshDone(di,ei)      Aktualisiert Erledigt-Haken (#done-di-ei) + Tages-Pill (#dc-di) GEZIELT im DOM
+                        — wird von updRep aufgerufen, KEIN renderT (Fokus bleibt erhalten)!
+flashView()             Sanfter Einblend-Effekt der aktiven Ansicht (Tab-/Zyklus-/Wochen-Wechsel)
 ```
 
 ### Vergleichslogik (wichtig!)
@@ -109,6 +115,16 @@ onDS(di,ei,v)           Dropdown-Suche — stellt nach renderT() Fokus + Cursor 
 - Tage standardmaessig ZUGEKLAPPT (`S.openDays[di]===true` zum Aufklappen)
 - Accordion-Verhalten: aufklappen eines Tages schliesst alle anderen
 - Spart Scrollen auf dem iPhone
+- Alle Eingabefelder (w-input, rep-inp, drop-search input, tip-ta) haben font-size 16px —
+  verhindert Auto-Zoom auf iOS! Nicht verkleinern.
+- Touch-Ziele vergroessert: week-arrow 34px, add-set-btn 36px, pick-btn min-height 40px, rep-inp 46px breit
+
+### UI-Status-Elemente (Design-Update)
+- Tages-Pill im day-header (`#dc-[di]`, Klasse day-count): "x/y Uebungen" — grau (0), pink (teilweise), gruen mit Haken (alle)
+- Erledigt-Haken pro Uebung (`#done-[di]-[ei]`, Klasse done-chip): sichtbar wenn exDone() — Toggle via hidden-Klasse
+- Beide werden bei Rep-Eingabe LIVE per refreshDone() aktualisiert (gezieltes DOM-Update, kein renderT)
+- Uebersicht: Balken mit Farbverlauf, aktuelle Woche (S.week) bekommt weissen Ring (box-shadow)
+- Animationen: fadeSlide (Ansicht/Tag aufklappen), dropIn (Dropdown nur beim Oeffnen, nicht bei Suche)
 
 ### Daten-Vererbung zwischen Wochen
 Vererbt: exercise, extraSets — NICHT: reps, weight
