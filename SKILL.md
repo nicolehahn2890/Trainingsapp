@@ -58,6 +58,10 @@ Sekundaerfarbe Lila: #B88CC0
 Font: DM Sans (Google Fonts CDN)
 Logo: Pixel-Art-Pfirsich SVG 16x16, shape-rendering crispEdges
 Favicon: Pfirsich-Emoji als SVG-Data-URI im <head>
+Home-Screen-Icon: apple-touch-icon.png (180x180, Pixel-Pfirsich auf Header-Gradient)
+WICHTIG: NIEMALS apple-mobile-web-app-capable / Web-App-Manifest mit display:standalone
+hinzufuegen — Standalone-Modus bekommt auf iOS einen EIGENEN localStorage-Container,
+die Trainingsdaten waeren in der Home-Screen-Version scheinbar weg!
 Empfohlene Uebungen (REC-Set) erhalten im Dropdown einen goldenen Stern (★)
 
 Kategorie-Farben:
