@@ -150,6 +150,14 @@ button:active{transform:scale(0.96);}
 .tip-cancel{background:var(--chip-bg);border:none;border-radius:8px;color:var(--text-mid);font-size:12px;padding:8px 13px;}
 .tip-reset{background:none;border:none;color:var(--text-dim);font-size:12px;padding:8px;margin-left:auto;}
 .ov-title{font-size:18px;font-weight:700;margin-bottom:6px;color:var(--pink);}
+.bk-card{background:linear-gradient(180deg,var(--card-hi),var(--card-lo));border:1px solid var(--border);border-radius:16px;padding:16px;margin-top:24px;box-shadow:var(--sh-card);}
+.bk-title{font-weight:800;font-size:15px;margin-bottom:6px;}
+.bk-sub{color:var(--text-dim);font-size:12px;line-height:1.6;margin-bottom:12px;}
+.bk-btn{background:var(--pink);border:none;border-radius:10px;color:#fff;font-size:13px;font-weight:700;padding:10px 16px;}
+.bk-btn.bk-imp{background:var(--lilac);margin-top:10px;}
+.bk-status{display:block;margin-top:10px;font-size:12px;font-weight:600;color:var(--gold);min-height:16px;}
+.bk-ta{width:100%;margin-top:12px;background:var(--input-bg);border:1px solid var(--input-border);border-radius:8px;color:var(--text);font-size:16px;padding:8px 10px;outline:none;resize:vertical;}
+.bk-ta:focus{border-color:#C8729A!important;}
 .ov-sub{color:var(--text-dim);font-size:13px;margin-bottom:20px;line-height:1.6;}
 .ov-day{margin-bottom:24px;}
 .ov-day-lbl{font-weight:700;font-size:13px;color:var(--lilac);margin-bottom:10px;}
@@ -717,7 +725,41 @@ function renderOv(){
     });
     h+='</div>';
   });
+  // Daten-Backup: Export/Import der kompletten Trainingsdaten (Geraete-/Icon-Wechsel, Sicherung)
+  h+='<div class="bk-card">'
+    +'<div class="bk-title">💾 Daten-Backup</div>'
+    +'<p class="bk-sub">Sichere deine Trainingsdaten oder übertrage sie auf ein anderes Gerät oder Icon. <b>Kopieren</b> legt alles in die Zwischenablage – dann in der anderen Version unten einfügen und <b>einspielen</b>.</p>'
+    +'<button class="bk-btn" onclick="expBackup()">Backup kopieren</button>'
+    +'<span class="bk-status" id="bk-status"></span>'
+    +'<textarea class="bk-ta" id="bk-ta" rows="3" placeholder="Backup-Text hier einfügen (Feld gedrückt halten → Einfügen / Pegar) …"></textarea>'
+    +'<button class="bk-btn bk-imp" onclick="impBackup()">Backup einspielen</button>'
+    +'</div>';
   document.getElementById('view-overview').innerHTML=h;
+}
+
+// BACKUP
+function bkMsg(t){const s=document.getElementById('bk-status');if(s)s.textContent=t}
+function expBackup(){
+  const payload=JSON.stringify({app:'peach',v:1,date:new Date().toISOString().slice(0,10),theme:S.theme,data:S.data});
+  const fallback=()=>{const ta=document.getElementById('bk-ta');if(ta){ta.value=payload;ta.focus();ta.select()}bkMsg('Kopieren blockiert – Text unten ist markiert, bitte manuell kopieren.')};
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(payload).then(()=>bkMsg('✓ Kopiert ('+Object.keys(S.data).length+' Einträge)! Jetzt in der anderen Version einfügen.')).catch(fallback);
+  }else fallback();
+}
+function impBackup(){
+  const ta=document.getElementById('bk-ta');
+  if(!ta||!ta.value.trim()){bkMsg('Bitte zuerst den kopierten Backup-Text in das Feld einfügen.');return}
+  let p;
+  try{p=JSON.parse(ta.value.trim())}catch{bkMsg('Das sieht nicht wie ein Backup aus – bitte den kompletten kopierten Text einfügen.');return}
+  const data=p&&p.app==='peach'&&p.data?p.data:(p&&typeof p==='object'&&!Array.isArray(p)?p:null);
+  const looksValid=data&&Object.keys(data).some(k=>/__w\d+__d\d+__e\d+/.test(k)||k.indexOf('tip__')===0||k.indexOf('set__')===0);
+  if(!looksValid){bkMsg('Backup ist leer oder ungültig – bitte den Text aus "Backup kopieren" verwenden.');return}
+  const n=Object.keys(data).length,have=Object.keys(S.data).length;
+  if(have>0&&!confirm('Achtung: Hier sind bereits '+have+' Einträge gespeichert. Wirklich mit dem Backup ('+n+' Einträge) überschreiben?'))return;
+  S.data=data;save();
+  if(p.theme==='light'||p.theme==='dark'){S.theme=p.theme;try{localStorage.setItem('peach_theme',S.theme)}catch{}applyTheme()}
+  render();
+  bkMsg('✓ Backup eingespielt – '+n+' Einträge wiederhergestellt!');
 }
 
 // ACTIONS

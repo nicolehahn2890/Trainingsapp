@@ -144,6 +144,10 @@ exDone(di,ei)           true wenn Uebung gewaehlt UND alle Saetze der aktuellen 
 refreshDone(di,ei)      Aktualisiert Erledigt-Haken (#done-di-ei) + Tages-Pill (#dc-di) GEZIELT im DOM
                         — wird von updRep aufgerufen, KEIN renderT (Fokus bleibt erhalten)!
 flashView()             Sanfter Einblend-Effekt der aktiven Ansicht (Tab-/Zyklus-/Wochen-Wechsel)
+expBackup()             Backup: JSON {app:'peach',v:1,date,theme,data:S.data} in die Zwischenablage,
+                        Fallback: Text ins bk-ta-Feld + markieren. UI unten in der Uebersicht (bk-card).
+impBackup()             Import: akzeptiert das Wrapper-Format ODER rohes peach_v4-Objekt. Validiert
+                        Keys (__w_d_e / tip__ / set__), confirm() vor Ueberschreiben, setzt auch Theme.
 ```
 
 ### Vergleichslogik (wichtig!)
@@ -334,21 +338,25 @@ Fallback (manuell, ohne Session):
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
 
-1. **Home-Screen-Icon (iPhone):** apple-touch-icon.png (180x180, Pixel-Pfirsich auf
+1. **Daten-Backup:** Export/Import unten in der Uebersicht (bk-card). expBackup kopiert
+   JSON in die Zwischenablage, impBackup spielt es ein (Validierung + confirm).
+   Anlass: Trainingsdaten lagen im Container des ALTEN Home-Screen-Icons —
+   jede Oeffnungsart (Safari/Chrome/jedes Icon) hat auf iOS einen EIGENEN localStorage!
+2. **Home-Screen-Icon (iPhone):** apple-touch-icon.png (180x180, Pixel-Pfirsich auf
    Header-Gradient) + apple-mobile-web-app-title. Nachgebessert mit manifest.json
    ("display": "browser"), weil iOS 16.4+ Home-Screen-Links sonst als Web-App mit
    leerem localStorage oeffnet (siehe Warnung im Design-System).
-2. **Tipp-Notizen statt Override:** Standard-Tipp immer sichtbar, eigene Texte als
+3. **Tipp-Notizen statt Override:** Standard-Tipp immer sichtbar, eigene Texte als
    "Deine Notiz" zusaetzlich darunter. savTip loescht Key bei leerem Text.
-3. **Maschinen-Einstellungen:** 38 Maschinen-Tipps mit Einstell-Checkliste
+4. **Maschinen-Einstellungen:** 38 Maschinen-Tipps mit Einstell-Checkliste
    (Zahnrad-Emoji + "Einstellung:" / "Ausfuehrung:"), zugeschnitten auf 169 cm / 56 kg /
    Glute-Fokus. Neues Feld "Meine Einstellung" pro Uebung (set__ex__Name).
-4. **Heller Modus:** CSS-Variablen :root / :root.light, Sonne/Mond-Button im Header,
+5. **Heller Modus:** CSS-Variablen :root / :root.light, Sonne/Mond-Button im Header,
    Key peach_theme, theme-color-Meta wechselt mit.
-5. **Design-Update:** Karten mit Verlauf/Schatten, Animationen (fadeSlide/dropIn),
+6. **Design-Update:** Karten mit Verlauf/Schatten, Animationen (fadeSlide/dropIn),
    Tages-Pill "x/y Uebungen", Erledigt-Haken pro Uebung (live via refreshDone),
    groessere Touch-Ziele, 16px-Inputs gegen iOS-Zoom, kompakter Header.
-6. **Code-Review davor:** uebungsbasierter Vergleich (findLastExData), Reps als
+7. **Code-Review davor:** uebungsbasierter Vergleich (findLastExData), Reps als
    Gesamtsumme, parseWeight fuer Spannen/Komma, P3/Plan-Umschalter entfernt,
    Dropdown-Such-Fokus-Fix, REC-Stern im Dropdown, veraltete Duplikat-PDF geloescht.
 
