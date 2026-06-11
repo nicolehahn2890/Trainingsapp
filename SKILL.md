@@ -17,6 +17,10 @@ description: >
 Rexi — kein Coding-Hintergrund, kein Terminal. Ausschliesslich Claude.ai. Deutsch, Du-Anrede.
 Deployment immer ueber GitHub Browser-Interface (Stift-Symbol, Strg+A, Inhalt ersetzen, Commit).
 
+**WICHTIG: Aenderungen IMMER direkt auf `main` pushen — NIEMALS Feature-Branches oder Pull
+Requests anlegen!** GitHub Pages deployt von `main`; nur dort wird die App live. Rexi hat das
+mehrfach klargestellt.
+
 ---
 
 ## Was ist die App?
