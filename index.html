@@ -137,6 +137,9 @@ button:active{transform:scale(0.96);}
 .tip-custom{color:var(--lilac);font-size:10px;}
 .tip-panel{margin-top:6px;background:var(--surface);border-radius:10px;border:1px solid var(--border);padding:10px 12px;animation:fadeSlide .2s ease;}
 .tip-text{color:var(--text-soft);font-size:12px;line-height:1.7;white-space:pre-wrap;}
+.tip-note{margin-top:9px;padding-top:9px;border-top:1px dashed var(--border);}
+.tip-note-lbl{color:var(--lilac);font-size:11px;font-weight:700;margin-bottom:4px;}
+.tip-ta{margin-top:4px;}
 .tip-edit-btn{margin-top:8px;background:none;border:none;color:var(--text-dim);font-size:12px;padding:6px 0;}
 .tip-ta{width:100%;background:var(--input-bg);border:1px solid var(--input-border);border-radius:7px;color:var(--text-soft);font-size:16px;line-height:1.6;padding:8px 10px;resize:vertical;outline:none;}
 .tip-acts{display:flex;gap:8px;margin-top:7px;}
@@ -630,19 +633,23 @@ function renderEx(ex,ei,di){
     dh='<div class="dropdown'+(S.dropAnim?' anim':'')+'" id="dd-'+di+'-'+ei+'" style="border:1px solid '+col+'55"><div class="drop-search"><input id="ds-'+di+'-'+ei+'" type="text" placeholder="Suchen…" value="'+esc(S.dropSearch)+'" oninput="onDS('+di+','+ei+',this.value)"/></div><div class="drop-list">'+oh+'</div></div>';
   }
 
-  // tips
+  // tips: Standard-Tipp wird IMMER angezeigt, eigene Texte als Notiz zusaetzlich darunter
   const slotKey=mkt(S.cy,S.week,di,ei); // für open/edit-State (slot-spezifisch)
   const tipOpen=S.tips[slotKey],tipEdit=S.tipEdit[slotKey];
-  const stored=S.data[tk],defTip=TIPS[cur.exercise]||'',tip=stored!==undefined?stored:defTip,custom=stored!==undefined&&stored!==defTip;
+  const stored=S.data[tk],defTip=TIPS[cur.exercise]||'';
+  const hasNote=stored!==undefined&&String(stored).trim()!=='';
   let tipH='';
   if(cur.exercise){
-    tipH='<button class="tip-toggle'+(tipOpen?' open':'')+'" onclick="togTip(\''+slotKey+'\')"><span class="tip-i">i</span> Ausführungstipps '+(custom?'<span class="tip-custom">● angepasst</span>':'')+' <span style="font-size:9px;opacity:.7">'+(tipOpen?'▲':'▼')+'</span></button>';
+    tipH='<button class="tip-toggle'+(tipOpen?' open':'')+'" onclick="togTip(\''+slotKey+'\')"><span class="tip-i">i</span> Ausführungstipps '+(hasNote?'<span class="tip-custom">● eigene Notiz</span>':'')+' <span style="font-size:9px;opacity:.7">'+(tipOpen?'▲':'▼')+'</span></button>';
     if(tipOpen){
       const tid='ta-'+slotKey.replace(/[^a-z0-9]/gi,'_');
+      const defH=defTip?'<p class="tip-text">'+esc(defTip)+'</p>':'';
       if(tipEdit){
-        tipH+='<div class="tip-panel"><textarea class="tip-ta" rows="4" id="'+tid+'">'+esc(tip)+'</textarea><div class="tip-acts"><button class="tip-save" onclick="savTip(\''+tk+'\',\''+tid+'\',\''+slotKey+'\')">Speichern</button><button class="tip-cancel" onclick="canTip(\''+slotKey+'\')">Abbrechen</button>'+(custom?'<button class="tip-reset" onclick="resTip(\''+tk+'\',\''+slotKey+'\')">&#8634; Zurücksetzen</button>':'')+'</div></div>';
+        tipH+='<div class="tip-panel">'+defH+'<div class="tip-note-lbl">&#9998; Deine Notiz:</div><textarea class="tip-ta" rows="4" id="'+tid+'" placeholder="Eigene Notiz zu dieser Übung…">'+esc(hasNote?stored:'')+'</textarea><div class="tip-acts"><button class="tip-save" onclick="savTip(\''+tk+'\',\''+tid+'\',\''+slotKey+'\')">Speichern</button><button class="tip-cancel" onclick="canTip(\''+slotKey+'\')">Abbrechen</button>'+(hasNote?'<button class="tip-reset" onclick="resTip(\''+tk+'\',\''+slotKey+'\')">&#8634; Notiz löschen</button>':'')+'</div></div>';
       }else{
-        tipH+='<div class="tip-panel"><p class="tip-text">'+(tip?esc(tip):'<span style="color:var(--text-faint)">Noch kein Tipp.</span>')+'</p><button class="tip-edit-btn" onclick="edTip(\''+slotKey+'\')">&#9998; Bearbeiten</button></div>';
+        const noteH=hasNote?'<div class="tip-note"><div class="tip-note-lbl">&#9998; Deine Notiz:</div><p class="tip-text">'+esc(stored)+'</p></div>':'';
+        const emptyH=(!defTip&&!hasNote)?'<p class="tip-text"><span style="color:var(--text-faint)">Noch kein Tipp.</span></p>':'';
+        tipH+='<div class="tip-panel">'+defH+noteH+emptyH+'<button class="tip-edit-btn" onclick="edTip(\''+slotKey+'\')">&#9998; '+(hasNote?'Notiz bearbeiten':'Notiz hinzufügen')+'</button></div>';
       }
     }
   }
@@ -777,7 +784,7 @@ function removeSet(di,ei){const k=initKey(di,ei);S.data[k]={...S.data[k],extraSe
 function togTip(tk){S.tips[tk]=!S.tips[tk];if(!S.tips[tk])S.tipEdit[tk]=false;renderT()}
 function edTip(tk){S.tipEdit[tk]=true;renderT()}
 function canTip(tk){S.tipEdit[tk]=false;renderT()}
-function savTip(tk,tid,sk){const el=document.getElementById(tid);if(el){S.data[tk]=el.value;save()}S.tipEdit[sk]=false;renderT()}
+function savTip(tk,tid,sk){const el=document.getElementById(tid);if(el){if(el.value.trim()==='')delete S.data[tk];else S.data[tk]=el.value;save()}S.tipEdit[sk]=false;renderT()}
 function resTip(tk,sk){delete S.data[tk];save();S.tipEdit[sk]=false;renderT()}
 
 document.addEventListener('click',e=>{

@@ -95,7 +95,11 @@ S = {
 ### Key-Formate
 ```
 Workout:      [cycle]__w[week]__d[dayIdx]__e[exIdx]
-Tipp:         tip__ex__[Uebungsname]  (gilt ueber alle Wochen/Tage/Zyklen!)
+Tipp-Notiz:   tip__ex__[Uebungsname]  (gilt ueber alle Wochen/Tage/Zyklen!)
+              WICHTIG: Seit dem Notiz-Update ist das eine ZUSAETZLICHE eigene Notiz,
+              KEIN Override mehr! Der Standard-Tipp aus TIPS wird IMMER angezeigt,
+              die Notiz erscheint darunter ("Deine Notiz"). savTip loescht den Key
+              bei leerem Text. Vorteil: TIPS-Updates erreichen die Nutzerin immer.
 Einstellung:  set__ex__[Uebungsname]  (Maschinen-Einstellung, uebungsbasiert wie Tipps)
 Slot:         tip__[cycle]__w[week]__d[dayIdx]__e[exIdx]  (nur UI-State)
 ```
