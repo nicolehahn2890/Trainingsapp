@@ -15,7 +15,8 @@ description: >
 ## Wer ist die Nutzerin?
 
 Rexi — kein Coding-Hintergrund, kein Terminal. Ausschliesslich Claude.ai. Deutsch, Du-Anrede.
-Deployment immer ueber GitHub Browser-Interface (Stift-Symbol, Strg+A, Inhalt ersetzen, Commit).
+Deployment: Claude-Sessions pushen direkt auf main (GitHub Pages deployt automatisch).
+Fallback ohne Session: GitHub Browser-Interface (Stift-Symbol, Strg+A, Inhalt ersetzen, Commit).
 Koerperdaten: 169 cm, 56 kg — Tipps und Maschinen-Einstellungen darauf zuschneiden
 (mittlere Sitz-/Lehnenpositionen als Startpunkt, wenig Unterstuetzung beim assistierten Klimmzug).
 Trainingsziel: Glute-Fokus + schmale Beine (Quad-Betonung vermeiden).
@@ -31,8 +32,9 @@ mehrfach klargestellt.
 - Live-URL: https://nicolehahn2890.github.io/Trainingsapp/
 - Repository: github.com/nicolehahn2890/Trainingsapp
 - Technologie: Standalone HTML-Datei (kein Framework, kein Build-Schritt)
-- Dateiname: index.html
-- localStorage-Key: peach_v4 — NIEMALS umbenennen!
+- Repo-Dateien: index.html (App), apple-touch-icon.png (Home-Screen-Icon),
+  Peach_Project.pdf (Plan-Doku, 41 Seiten), SKILL.md (diese Datei)
+- localStorage-Keys: peach_v4 (Trainingsdaten — NIEMALS umbenennen!), peach_theme (Theme-Wahl)
 - Gym: Workshop Fitness Barcelona, Carrer d'Avila 120, El Poblenou. Panatta, Precor, Rogue, Eleiko, TRX.
 
 ---
@@ -58,7 +60,8 @@ Sekundaerfarbe Lila: #B88CC0
 Font: DM Sans (Google Fonts CDN)
 Logo: Pixel-Art-Pfirsich SVG 16x16, shape-rendering crispEdges
 Favicon: Pfirsich-Emoji als SVG-Data-URI im <head>
-Home-Screen-Icon: apple-touch-icon.png (180x180, Pixel-Pfirsich auf Header-Gradient)
+Home-Screen-Icon: apple-touch-icon.png (180x180, Pixel-Pfirsich auf Header-Gradient),
+verlinkt im <head> zusammen mit apple-mobile-web-app-title "Peach Project"
 WICHTIG: NIEMALS apple-mobile-web-app-capable / Web-App-Manifest mit display:standalone
 hinzufuegen — Standalone-Modus bekommt auf iOS einen EIGENEN localStorage-Container,
 die Trainingsdaten waeren in der Home-Screen-Version scheinbar weg!
@@ -312,29 +315,35 @@ Glute & Quad: Weite Fussstellung + erhoehte Ferse = Po. Enge Fussstellung + Tief
 
 ## Deployment
 
+Standard (Claude-Session): direkt auf main committen und pushen — GitHub Pages baut
+automatisch, nach ~2 Min live unter https://nicolehahn2890.github.io/Trainingsapp/
+
+Fallback (manuell, ohne Session):
 1. index.html herunterladen
 2. github.com/nicolehahn2890/Trainingsapp > index.html > Stift-Symbol
 3. Strg+A > Entf > Strg+V > Commit changes
-4. ~2 Min warten > https://nicolehahn2890.github.io/Trainingsapp/
-
-(Aus Claude-Code-Sessions: direkt auf main pushen — siehe Hinweis oben.)
+4. ~2 Min warten > Live-URL pruefen
 
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
 
-1. **Tipp-Notizen statt Override:** Standard-Tipp immer sichtbar, eigene Texte als
+1. **Home-Screen-Icon (iPhone):** apple-touch-icon.png (180x180, Pixel-Pfirsich auf
+   Header-Gradient) + apple-mobile-web-app-title. BEWUSST kein Standalone-Modus,
+   damit der localStorage erhalten bleibt (siehe Warnung im Design-System).
+2. **Tipp-Notizen statt Override:** Standard-Tipp immer sichtbar, eigene Texte als
    "Deine Notiz" zusaetzlich darunter. savTip loescht Key bei leerem Text.
-2. **Maschinen-Einstellungen:** 38 Maschinen-Tipps mit Einstell-Checkliste
+3. **Maschinen-Einstellungen:** 38 Maschinen-Tipps mit Einstell-Checkliste
    (Zahnrad-Emoji + "Einstellung:" / "Ausfuehrung:"), zugeschnitten auf 169 cm / 56 kg /
    Glute-Fokus. Neues Feld "Meine Einstellung" pro Uebung (set__ex__Name).
-3. **Heller Modus:** CSS-Variablen :root / :root.light, Sonne/Mond-Button im Header,
+4. **Heller Modus:** CSS-Variablen :root / :root.light, Sonne/Mond-Button im Header,
    Key peach_theme, theme-color-Meta wechselt mit.
-4. **Design-Update:** Karten mit Verlauf/Schatten, Animationen (fadeSlide/dropIn),
+5. **Design-Update:** Karten mit Verlauf/Schatten, Animationen (fadeSlide/dropIn),
    Tages-Pill "x/y Uebungen", Erledigt-Haken pro Uebung (live via refreshDone),
    groessere Touch-Ziele, 16px-Inputs gegen iOS-Zoom, kompakter Header.
-5. **Code-Review davor:** uebungsbasierter Vergleich (findLastExData), Reps als
-   Gesamtsumme, parseWeight fuer Spannen/Komma, P3/Plan-Umschalter entfernt.
+6. **Code-Review davor:** uebungsbasierter Vergleich (findLastExData), Reps als
+   Gesamtsumme, parseWeight fuer Spannen/Komma, P3/Plan-Umschalter entfernt,
+   Dropdown-Such-Fokus-Fix, REC-Stern im Dropdown, veraltete Duplikat-PDF geloescht.
 
 Konsistenz-Audit (zuletzt ausgefuehrt): alle 126 Uebungen haben Tipps, keine verwaisten
 Tipps/REC-Eintraege, keine Duplikate, Rep-Bereiche plausibel (4-8/6-10/8-12),
