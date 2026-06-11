@@ -36,6 +36,18 @@ mehrfach klargestellt.
 
 ## Design-System
 
+### Themes (Dark + Hell)
+- Dark Mode ist Standard, heller Modus umschaltbar ueber den runden Sonne/Mond-Button im Header
+- ALLE Farben liegen als CSS-Variablen in `:root` (dark) und `:root.light` (hell)
+- **NIEMALS Hex-Farben hart in CSS-Klassen oder JS-HTML-Strings schreiben — immer `var(--...)`!**
+  Ausnahmen (in beiden Themes identisch): Kategorie-Farben (CC), pbadge/rcol/wp-bar-Balkenfarben,
+  tab-btn.active und tip-save (pink mit weissem Text), Fokus-Rahmen #C8729A
+- Theme-Speicherung: localStorage-Key `peach_theme` ('light'|'dark') — separat von peach_v4!
+- applyTheme() setzt die light-Klasse auf documentElement, das Button-Icon und die theme-color-Meta
+- Light Mode: cat-badge und pbadge werden per CSS-filter (brightness/saturate) abgedunkelt fuer Kontrast
+- Eingabe-/Akzentfarben (--gold, --green, --blue, --red, --pink, --lilac) sind im hellen Modus dunkler definiert
+
+### Dark-Mode-Basisfarben
 Hintergrund: #1a1418
 Header-Gradient: linear-gradient(160deg, #2e1a28, #1a1418)
 Primaerfarbe Pink: #C8729A
