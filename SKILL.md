@@ -33,6 +33,7 @@ mehrfach klargestellt.
 - Repository: github.com/nicolehahn2890/Trainingsapp
 - Technologie: Standalone HTML-Datei (kein Framework, kein Build-Schritt)
 - Repo-Dateien: index.html (App), apple-touch-icon.png (Home-Screen-Icon),
+  manifest.json (display:browser — Icon oeffnet Safari, NICHT standalone!),
   Peach_Project.pdf (Plan-Doku, 41 Seiten), SKILL.md (diese Datei)
 - localStorage-Keys: peach_v4 (Trainingsdaten — NIEMALS umbenennen!), peach_theme (Theme-Wahl)
 - Gym: Workshop Fitness Barcelona, Carrer d'Avila 120, El Poblenou. Panatta, Precor, Rogue, Eleiko, TRX.
@@ -62,9 +63,14 @@ Logo: Pixel-Art-Pfirsich SVG 16x16, shape-rendering crispEdges
 Favicon: Pfirsich-Emoji als SVG-Data-URI im <head>
 Home-Screen-Icon: apple-touch-icon.png (180x180, Pixel-Pfirsich auf Header-Gradient),
 verlinkt im <head> zusammen mit apple-mobile-web-app-title "Peach Project"
-WICHTIG: NIEMALS apple-mobile-web-app-capable / Web-App-Manifest mit display:standalone
-hinzufuegen — Standalone-Modus bekommt auf iOS einen EIGENEN localStorage-Container,
-die Trainingsdaten waeren in der Home-Screen-Version scheinbar weg!
+WICHTIG (localStorage!): Seit iOS 16.4 oeffnet Apple JEDES Home-Screen-Lesezeichen
+standardmaessig als eigenstaendige Web-App mit EIGENEM (leerem) localStorage-Container —
+auch ohne apple-mobile-web-app-capable. Die Trainingsdaten liegen aber in Safari!
+Loesung (eingebaut): manifest.json mit "display": "browser" — damit oeffnet das Icon
+wieder Safari mit den vorhandenen Daten. NIEMALS auf display:standalone aendern und
+NIEMALS apple-mobile-web-app-capable hinzufuegen, sonst sind die Daten scheinbar weg.
+Nach Manifest-Aenderungen muss das Icon auf dem iPhone entfernt und neu hinzugefuegt
+werden (iOS liest das Manifest nur beim Hinzufuegen).
 Empfohlene Uebungen (REC-Set) erhalten im Dropdown einen goldenen Stern (★)
 
 Kategorie-Farben:
@@ -329,8 +335,9 @@ Fallback (manuell, ohne Session):
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
 
 1. **Home-Screen-Icon (iPhone):** apple-touch-icon.png (180x180, Pixel-Pfirsich auf
-   Header-Gradient) + apple-mobile-web-app-title. BEWUSST kein Standalone-Modus,
-   damit der localStorage erhalten bleibt (siehe Warnung im Design-System).
+   Header-Gradient) + apple-mobile-web-app-title. Nachgebessert mit manifest.json
+   ("display": "browser"), weil iOS 16.4+ Home-Screen-Links sonst als Web-App mit
+   leerem localStorage oeffnet (siehe Warnung im Design-System).
 2. **Tipp-Notizen statt Override:** Standard-Tipp immer sichtbar, eigene Texte als
    "Deine Notiz" zusaetzlich darunter. savTip loescht Key bei leerem Text.
 3. **Maschinen-Einstellungen:** 38 Maschinen-Tipps mit Einstell-Checkliste

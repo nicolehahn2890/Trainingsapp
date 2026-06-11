@@ -1,0 +1,11 @@
+{
+  "name": "Peach Project",
+  "short_name": "Peach Project",
+  "display": "browser",
+  "start_url": ".",
+  "background_color": "#1a1418",
+  "theme_color": "#1a1418",
+  "icons": [
+    { "src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}
