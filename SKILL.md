@@ -35,7 +35,8 @@ mehrfach klargestellt.
 - Repo-Dateien: index.html (App), apple-touch-icon.png (Home-Screen-Icon),
   manifest.json (display:browser — Icon oeffnet Safari, NICHT standalone!),
   Peach_Project.pdf (Plan-Doku, 41 Seiten), SKILL.md (diese Datei)
-- localStorage-Keys: peach_v4 (Trainingsdaten — NIEMALS umbenennen!), peach_theme (Theme-Wahl)
+- localStorage-Keys: peach_v4 (Trainingsdaten — NIEMALS umbenennen!), peach_theme (Theme-Wahl),
+  peach_ver (Auto-Update-Guard: Commit-SHA, fuer den bereits neu geladen wurde)
 - Gym: Workshop Fitness Barcelona, Carrer d'Avila 120, El Poblenou. Panatta, Precor, Rogue, Eleiko, TRX.
 
 ---
@@ -148,6 +149,10 @@ expBackup()             Backup: JSON {app:'peach',v:1,date,theme,data:S.data} in
                         Fallback: Text ins bk-ta-Feld + markieren. UI unten in der Uebersicht (bk-card).
 impBackup()             Import: akzeptiert das Wrapper-Format ODER rohes peach_v4-Objekt. Validiert
                         Keys (__w_d_e / tip__ / set__), confirm() vor Ueberschreiben, setzt auch Theme.
+checkUpdate()           Auto-Update gegen iOS-Webapp-Cache: GitHub-API (commits/main) liefert Datum+SHA;
+                        ist der Commit neuer als BUILD_TS, einmaliger location.replace mit ?v=sha
+                        (Cache-Buster). peach_ver verhindert Reload-Schleifen. Laeuft beim Start und
+                        bei visibilitychange (App aus Hintergrund), gedrosselt auf 1x/Minute.
 ```
 
 ### Vergleichslogik (wichtig!)
@@ -199,6 +204,8 @@ Vererbt: exercise, extraSets — NICHT: reps, weight
 7. Bei groesseren Aenderungen: Python-Script verwenden, am Ende node --check ausfuehren
 8. Sonderzeichen generell meiden in JS-Strings
 9. Gewicht IMMER mit parseWeight() parsen, nie parseFloat() — sonst geht der obere Bereichswert verloren ("42-45" -> 42)
+10. Bei JEDEM Deploy die Konstante BUILD_TS in index.html aktualisieren: auf Commit-Zeit
+    plus ca. 5 Minuten setzen (ISO-UTC). Sonst laden aktuelle Clients einmal unnoetig neu.
 
 ---
 
@@ -338,25 +345,28 @@ Fallback (manuell, ohne Session):
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
 
-1. **Daten-Backup:** Export/Import unten in der Uebersicht (bk-card). expBackup kopiert
+1. **Auto-Update:** checkUpdate() laedt die App einmal neu, wenn auf main ein neuerer
+   Commit liegt (GitHub-API, Cache-Buster ?v=sha, Guard peach_ver). Grund: iOS-Webapp-
+   Cache friert alte Staende ein. ACHTUNG: BUILD_TS bei jedem Deploy aktualisieren (Regel 10)!
+2. **Daten-Backup:** Export/Import unten in der Uebersicht (bk-card). expBackup kopiert
    JSON in die Zwischenablage, impBackup spielt es ein (Validierung + confirm).
    Anlass: Trainingsdaten lagen im Container des ALTEN Home-Screen-Icons —
    jede Oeffnungsart (Safari/Chrome/jedes Icon) hat auf iOS einen EIGENEN localStorage!
-2. **Home-Screen-Icon (iPhone):** apple-touch-icon.png (180x180, Pixel-Pfirsich auf
+3. **Home-Screen-Icon (iPhone):** apple-touch-icon.png (180x180, Pixel-Pfirsich auf
    Header-Gradient) + apple-mobile-web-app-title. Nachgebessert mit manifest.json
    ("display": "browser"), weil iOS 16.4+ Home-Screen-Links sonst als Web-App mit
    leerem localStorage oeffnet (siehe Warnung im Design-System).
-3. **Tipp-Notizen statt Override:** Standard-Tipp immer sichtbar, eigene Texte als
+4. **Tipp-Notizen statt Override:** Standard-Tipp immer sichtbar, eigene Texte als
    "Deine Notiz" zusaetzlich darunter. savTip loescht Key bei leerem Text.
-4. **Maschinen-Einstellungen:** 38 Maschinen-Tipps mit Einstell-Checkliste
+5. **Maschinen-Einstellungen:** 38 Maschinen-Tipps mit Einstell-Checkliste
    (Zahnrad-Emoji + "Einstellung:" / "Ausfuehrung:"), zugeschnitten auf 169 cm / 56 kg /
    Glute-Fokus. Neues Feld "Meine Einstellung" pro Uebung (set__ex__Name).
-5. **Heller Modus:** CSS-Variablen :root / :root.light, Sonne/Mond-Button im Header,
+6. **Heller Modus:** CSS-Variablen :root / :root.light, Sonne/Mond-Button im Header,
    Key peach_theme, theme-color-Meta wechselt mit.
-6. **Design-Update:** Karten mit Verlauf/Schatten, Animationen (fadeSlide/dropIn),
+7. **Design-Update:** Karten mit Verlauf/Schatten, Animationen (fadeSlide/dropIn),
    Tages-Pill "x/y Uebungen", Erledigt-Haken pro Uebung (live via refreshDone),
    groessere Touch-Ziele, 16px-Inputs gegen iOS-Zoom, kompakter Header.
-7. **Code-Review davor:** uebungsbasierter Vergleich (findLastExData), Reps als
+8. **Code-Review davor:** uebungsbasierter Vergleich (findLastExData), Reps als
    Gesamtsumme, parseWeight fuer Spannen/Komma, P3/Plan-Umschalter entfernt,
    Dropdown-Such-Fokus-Fix, REC-Stern im Dropdown, veraltete Duplikat-PDF geloescht.
 

@@ -836,8 +836,37 @@ document.addEventListener('click',e=>{
   if(S.drop&&!e.target.closest('.picker-wrap')){S.drop=null;renderT()}
 });
 
+// AUTO-UPDATE: iOS-Webapp-Cache-Problem. Beim Oeffnen wird per GitHub-API geprueft,
+// ob auf main ein neuerer Commit liegt als diese Datei (BUILD_TS). Wenn ja, laedt die
+// App sich EINMAL selbst neu - mit ?v=sha am Cache vorbei. peach_ver merkt sich den
+// Commit, fuer den schon neu geladen wurde (verhindert Reload-Schleifen). Daten in
+// peach_v4 sind davon voellig unberuehrt. BUILD_TS bei jedem Deploy aktualisieren!
+const BUILD_TS='2026-06-11T16:55:00Z';
+let verLastCheck=0;
+function checkUpdate(){
+  const now=Date.now();
+  if(now-verLastCheck<60000)return;
+  verLastCheck=now;
+  try{
+    fetch('https://api.github.com/repos/nicolehahn2890/Trainingsapp/commits/main',{cache:'no-store'})
+      .then(r=>r&&r.ok?r.json():null)
+      .then(j=>{
+        if(!j||!j.sha||!j.commit||!j.commit.committer)return;
+        const remoteDate=j.commit.committer.date;
+        if(!(remoteDate>BUILD_TS))return; // diese Version ist aktuell
+        let guard=null;
+        try{guard=localStorage.getItem('peach_ver')}catch{}
+        if(guard===j.sha)return; // fuer diesen Commit wurde schon neu geladen
+        try{localStorage.setItem('peach_ver',j.sha)}catch{}
+        location.replace(location.pathname+'?v='+j.sha.slice(0,8));
+      }).catch(()=>{});
+  }catch{}
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
+
 applyTheme();
 render();
+checkUpdate();
 </script>
 </body>
 </html>
