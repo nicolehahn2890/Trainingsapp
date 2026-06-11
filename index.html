@@ -119,7 +119,10 @@ button:active{transform:scale(0.96);}
 .w-wrap{display:flex;align-items:center;gap:6px;}
 .w-label{color:var(--text-dim);font-size:12px;}
 .w-input{width:78px;background:var(--input-bg);border:1px solid var(--input-border);border-radius:8px;color:var(--text);font-size:16px;font-weight:600;padding:7px 8px;outline:none;}
-.w-input:focus,.rep-inp:focus,.drop-search input:focus,.tip-ta:focus{border-color:#C8729A!important;}
+.w-input:focus,.rep-inp:focus,.drop-search input:focus,.tip-ta:focus,.set-input:focus{border-color:#C8729A!important;}
+.setting-row{display:flex;align-items:center;gap:7px;margin-bottom:8px;}
+.set-lbl{color:var(--text-dim);font-size:13px;flex-shrink:0;cursor:default;}
+.set-input{flex:1;min-width:0;background:var(--input-bg);border:1px solid var(--input-border);border-radius:8px;color:var(--text);font-size:16px;padding:7px 9px;outline:none;}
 .reps-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
 .rep-col{display:flex;flex-direction:column;align-items:center;gap:2px;}
 .rep-lbl{color:var(--text-faint);font-size:10px;}
@@ -230,7 +233,7 @@ const TIPS={
 "Hip Thrusts Langhantel":"Stange auf Hüftbeugern auflegen, Schulterblätter auf Bank. Hüfte vollständig strecken, Gesäß oben kurz anspannen. Kinn zur Brust, Blick nach oben.",
 "Hip Thrust Kurzhantel":"KH auf Hüfte halten. Gleicher Bewegungsablauf wie LH-Variante. Für isolierte Anspannung oben kurz halten.",
 "Hip Thrusts Multipresse":"Stange in Multipresse auf Hüfte. Fußposition ausprobieren – etwas weiter vorne betont mehr den Po.",
-"Hip Thrust Maschine":"Rücken fest an die Maschine. Hüfte vollständig durchstrecken, keine Hohlkreuz-Überkompensation.",
+"Hip Thrust Maschine":"⚙ Einstellung: Rückenpolster knapp unter die Schulterblätter, Hüftpolster mittig auf den Hüftknochen festziehen. Füße so stellen, dass die Knie oben im 90-Grad-Winkel stehen – bei 169 cm meist mittlere Fußposition. Fersen bleiben komplett am Boden.\nAusführung: Hüfte vollständig durchstrecken, oben 1 Sek. Po maximal anspannen, Kinn leicht zur Brust. Kein Hohlkreuz – Becken leicht einrollen.",
 "Glute Bridge Langhantel":"Wie Hip Thrust, aber flach auf dem Boden liegend. Schulterblätter am Boden. Hüfte vollständig strecken.",
 "Glute Bridge Kurzhantel":"KH auf Hüfte. Flach auf dem Boden, Hüfte hochdrücken bis volle Streckung.",
 "Glute Bridge Multipresse":"Boden-Variante in der Multipresse. Fußstellung leicht erhöht möglich für mehr Range.",
@@ -239,75 +242,75 @@ const TIPS={
 "Kabel Kickback Schrägbank":"Oberkörper auf Schrägbank gestützt. Gibt mehr Stabilität für isolierte Ausführung.",
 "Kabel Kickback Liegend":"Auf dem Bauch liegend, Kabel am Fußgelenk. Bein vom Boden abheben und nach oben-hinten strecken. Hüfte bleibt am Boden – isolierte Glute-Max-Kontraktion.",
 "Kickback Multipresse":"Multipresse ermöglicht geführte Bewegung. Auf alle vier stützen, Bein nach hinten durchstrecken.",
-"Kickback Maschine":"Maschinenführung nutzen. Bein nach hinten drücken, oben 1 Sek. halten, langsam zurück.",
+"Kickback Maschine":"⚙ Einstellung: Brust-/Unterarmauflage so einstellen, dass die Hüfte fest am Polster liegt und beim Treten nicht kippt. Fußplatte oder Rolle mittig unter der Fußsohle bzw. an der Ferse.\nAusführung: Ferse nach hinten-oben drücken, oben 1 Sek. halten, langsam zurück. Becken bleibt gerade – nicht mitdrehen, nicht schwingen.",
 "Kabel Abduktion Stehend":"Standbein leicht gebeugt. Bein seitlich hochführen, Hüfte nicht mitrotieren. Oberkörper stabil halten.",
 "Kabel Abduktion Liegend":"Auf der Seite liegend, Kabel am unteren Fußgelenk. Bein seitlich heben, kurz halten.",
 "Kabel Abduktion Schrägbank":"Auf Schrägbank gestützt für stabilen Oberkörper. Bein seitlich führen.",
-"Abduktionsmaschine":"Sitzend, Knie nach außen drücken. Langsam zurück – exzentrische Phase nutzen.",
+"Abduktionsmaschine":"⚙ Einstellung: Sitz so, dass Hüfte und Knie im 90-Grad-Winkel stehen und die Polster außen knapp über dem Knie anliegen. Startweite mit leichter Vordehnung wählen.\nAusführung: Knie nach außen drücken, 1 Sek. halten, langsam zurück – exzentrische Phase nutzen. Trick für mehr oberen Po: Oberkörper leicht nach vorne lehnen.",
 "Pelvic Drop":"Einbeinig auf einer Stufe stehen. Hüfte der Hängeseite langsam absinken lassen, dann Glute Med anspannen und anheben.",
-"Abduktionsmaschine stehend":"Stehend an der Maschine. Mehr Glute-Med-Aktivierung als sitzend. Standbein stabil, Oberkörper nicht wegkippen.",
+"Abduktionsmaschine stehend":"⚙ Einstellung: Beckenpolster bzw. Auflage auf Hüfthöhe, Standbein mittig und leicht gebeugt, Polster am Arbeitsbein außen knapp über dem Knie.\nAusführung: Bein seitlich heben ohne mit dem Oberkörper wegzukippen, oben kurz halten. Mehr Glute-Med-Aktivierung als sitzend.",
 "Fire Hydrants Kabel":"Auf allen Vieren, Kabel am Knie/Fußgelenk. Bein seitlich-nach-oben führen wie ein Feuerhydrant. Hüfte nicht mitdrehen.",
 "Low Bar Squat":"⚠️ Für Po-Fokus: Füße weit auseinander, Zehen leicht nach außen, Fersen ggf. erhöht. Tief absenken, Knie über Zehen. Enger Stand + volle Tiefe = mehr Quad – bei Ziel schmale Beine vermeiden!",
-"Beinpresse":"⚠️ Für Po-Fokus: Füße hoch und weit auf der Plattform, Knie weit auseinander. Enge tiefe Fußstellung = mehr Quad. Bei Ziel schmale Beine: lieber Reverse Lunge oder Split Squat wählen.",
+"Beinpresse":"⚙ Einstellung: Rückenlehne eher flach stellen, Sitz so, dass der untere Rücken unten NICHT vom Polster abrollt. Füße HOCH und breit auf der Plattform, Zehen leicht nach außen.\n⚠️ Für Po-Fokus: genau diese hohe, breite Fußstellung – enge tiefe Fußstellung = mehr Quad. Bei Ziel schmale Beine im Zweifel lieber Reverse Lunge oder Split Squat. Durch die Fersen drücken, Knie Richtung Zehen führen.",
 "Step Ups":"Hohe Box (mind. Kniehöhe) für maximale Glute-Aktivierung. Ferse fest aufstellen, durch die Ferse drücken.",
 "Split Squat Kurzhantel":"✅ Gute Wahl bei Ziel schmale Beine. Hinterer Fuß auf Bank oder am Boden. Oberkörper leicht vorgebeugt – mehr Po, weniger Quad.",
 "Split Squat Langhantel":"✅ Gute Wahl bei Ziel schmale Beine. Stange auf Schultern, Oberkörper leicht vorgebeugt – mehr Glute-Aktivierung als aufrecht.",
 "Split Squat Multipresse":"✅ Gute Wahl bei Ziel schmale Beine. Geführte Variante, mehr Stabilität. Oberkörper leicht vorgebeugt halten.",
-"Hack Squat":"⚠️ Für Po-Fokus: Füße weit oben auf der Plattform, weit auseinander, tief absenken. Enger Stand + flache Fußstellung = dominanter Quad – bei Ziel schmale Beine nur mit weitem Stand.",
+"Hack Squat":"⚙ Einstellung: Schulterpolster so hoch, dass du zum Entriegeln nur leicht aufrichten musst. Rücken und Becken fest an der Lehne.\n⚠️ Für Po-Fokus: Füße weit oben auf der Plattform, weit auseinander, tief absenken. Enger Stand + flache Fußstellung = dominanter Quad – bei Ziel schmale Beine nur mit weitem hohen Stand.",
 "Reverse Lunge":"✅ Beste Wahl bei Ziel schmale Beine. Weniger Quad-dominant als alle anderen Varianten. Schritt weit nach hinten, durch Ferse drücken.",
 "RDL Langhantel":"Füße hüftbreit, Stange nah am Körper. Hüfte nach hinten schieben, Rücken gerade. Dehnung in den Hamstrings spüren, dann durch Gesäß nach oben.",
 "RDL Kurzhanteln":"Gleiche Technik wie LH-RDL. KH vor dem Körper, nah an den Beinen entlangführen.",
-"Glute Hyperextensions":"An der Hyperextensionsbank, Hüfte an der Auflagekante. Oberkörper absenken, dann durch Gesäß strecken – nicht mit dem Rücken.",
-"Reverse Hack RDL":"✅ Ideal für Po und den Übergang zwischen Gesäß und Beinrückseite – ohne Quad-Belastung. Umdrehen: Gesicht zur Maschine, Schultern unter die Pads, Füße hüftbreit auf der Plattform. Bewegung wie ein RDL: Hüfte zuerst nach hinten schieben, dann erst leicht nach unten – nicht wie ein Squat einbeugen. Knie bleiben in einer fixen Position. Core angespannt, natürliche Lendenlordose halten. Oben durch die Fersen drücken und Gesäß bewusst anspannen.",
+"Glute Hyperextensions":"⚙ Einstellung: Polsterkante exakt auf den Hüftknochen – die Hüfte muss frei beugen können, sonst arbeitet der Rücken.\nAusführung: Oberkörper absenken, dann durch das Gesäß strecken – nicht mit dem Rücken aufschwingen. Oberen Rücken leicht rund lassen und Zehen leicht nach außen drehen = mehr Po, weniger unterer Rücken. Oben 1 Sek. Po anspannen.",
+"Reverse Hack RDL":"✅ Ideal für Po und den Übergang Gesäß/Beinrückseite – ohne Quad-Belastung.\n⚙ Einstellung: Umdrehen – Gesicht zur Maschine, Schultern unter die Pads. Schulterpolster so hoch, dass du fast gestreckt startest. Füße hüftbreit und etwas WEITER VORNE auf der Plattform als normal – mehr Hüftbeugung = mehr Po.\nAusführung: Wie ein RDL – Hüfte zuerst nach hinten schieben, nicht wie ein Squat einbeugen. Knie bleiben fix, Core fest, natürliche Lendenlordose. Oben durch die Fersen drücken und Po bewusst anspannen.",
 "Good Mornings":"Stange auf den Schultern. Hüfte nach hinten schieben, Rücken neutral. Hamstring-Dehnung halten, dann zurück.",
 "Single-Leg RDL":"Einbeinig, hinteres Bein gestreckt nach hinten heben. Mehr Glute-Aktivierung als beidbeinig. Hüfte stabil halten – nicht rotieren.",
-"Leg Curl (Maschine)":"Liegend oder sitzend. Isolierter Hamstring-Fokus – gibt der Rückseite des Oberschenkels die runde Form direkt unterhalb des Pos. Langsam ablassen, volle Streckung unten nutzen. Fersen zur Gesäßgegend ziehen, kurz halten.",
+"Leg Curl (Maschine)":"⚙ Einstellung: Kniegelenk EXAKT auf die Drehachse der Maschine ausrichten (oft markiert) – Sitz entsprechend vor/zurück schieben. Fußrolle ans untere Wadenende knapp über die Ferse, Schenkelpolster fest auf die Oberschenkel. Bei 169 cm: mittlere Sitzposition als Start.\nAusführung: Fersen kontrolliert Richtung Po ziehen, kurz halten, langsam in die volle Streckung zurück – gibt der Beinrückseite die runde Form direkt unterm Po.",
 "Nordic Curls":"Knie auf gepolsterter Unterlage, Füße fixiert. Oberkörper langsam nach vorne fallen lassen – exzentrische Hamstring-Arbeit. Fortgeschrittene Übung.",
 "LH Rudern":"Oberkörper ca. 45 Grad vorgebeugt. Stange zum Bauch ziehen, Ellbogen nah am Körper.",
 "KH Rudern":"Einarmig auf Bank gestützt. KH zum Hüftknochen ziehen, Schulterblatt einziehen.",
 "KH Rudern (breit)":"Ellbogen weiter außen – betont oberen Rücken und hintere Schulter.",
 "Rudern Kabel (eng)":"Sitzend, enges Griffstück. Zur Bauchgegend ziehen, Schulterblätter zusammenziehen.",
 "Rudern Kabel (breit)":"Breites Griffstück. Ellbogen seitlich – mehr Latissimus.",
-"Rudermaschine (Panatta)":"Panatta Rudermaschine. Brust an Pad anlehnen, Schulterblätter am Ende zusammenziehen. Nicht mit dem Oberkörper schwingen.",
-"Rudermaschine (Precor)":"Precor Rudermaschine. Brust an Pad anlehnen, Schulterblätter am Ende zusammenziehen. Nicht mit dem Oberkörper schwingen.",
+"Rudermaschine (Panatta)":"⚙ Einstellung: Sitzhöhe so, dass die Griffe auf Höhe der unteren Brust liegen. Brustpolster so weit weg, dass die Arme gestreckt starten und die Schulterblätter nach vorne können (volle Dehnung). Bei 169 cm: mittlere Sitzhöhe als Start.\nAusführung: Brust am Pad lassen, Schulterblätter am Ende zusammenziehen, nicht mit dem Oberkörper schwingen. Langsam zurück.",
+"Rudermaschine (Precor)":"⚙ Einstellung: Sitzhöhe so, dass die Griffe auf Höhe der unteren Brust liegen. Brustpolster so, dass die Arme gestreckt starten und die Schulterblätter nach vorne können. Bei 169 cm: mittlere Sitzhöhe als Start.\nAusführung: Brust am Pad lassen, Schulterblätter am Ende zusammenziehen, nicht mit dem Oberkörper schwingen. Langsam zurück.",
 "Latzug (eng)":"Enger Parallelgriff. Zur Brust ziehen, Ellbogen nach unten-hinten.",
 "Latzug (breit)":"Breiter Overhand-Griff. Zur Brust ziehen, Latissimus aktiv.",
-"Latzug Maschine (Panatta)":"Panatta Latzug-Maschine. Knie unter Polster fixieren. Zur Brust ziehen, Ellbogen nach unten-hinten führen, Latissimus aktiv anspannen. Kontrolliert zurück.",
-"Latzug Maschine (Precor)":"Precor Latzug-Maschine. Knie unter Polster fixieren. Zur Brust ziehen, Ellbogen nach unten-hinten führen, Latissimus aktiv anspannen. Kontrolliert zurück.",
+"Latzug Maschine (Panatta)":"⚙ Einstellung: Sitz so, dass die Füße flach stehen, Kniepolster fest auf die Oberschenkel. Griffe mit gestreckten Armen gerade so erreichbar.\nAusführung: Zur Brust ziehen, Ellbogen nach unten-hinten führen, Latissimus aktiv anspannen. Kontrolliert zurück und oben die Schultern lang werden lassen (Stretch).",
+"Latzug Maschine (Precor)":"⚙ Einstellung: Sitz so, dass die Füße flach stehen, Kniepolster fest auf die Oberschenkel. Griffe mit gestreckten Armen gerade so erreichbar.\nAusführung: Zur Brust ziehen, Ellbogen nach unten-hinten führen, Latissimus aktiv anspannen. Kontrolliert zurück und oben die Schultern lang werden lassen (Stretch).",
 "Überzug am Kabel":"Liegend oder stehend vorgebeugt. Gerade Arme, Lat zieht den Arm nach unten.",
 "T Bar Rudern (neutral)":"Neutraler Griff. Brust auf Pad, Stange zum Bauch ziehen.",
 "T Bar Rudern (breit)":"Breiter Griff. Mehr oberer Rücken.",
-"Assistierter Klimmzug (eng)":"Enger Parallelgriff. Maschine unterstützt. Schulterblätter zuerst einziehen, dann Ellbogen.",
-"Assistierter Klimmzug (breit)":"Breiter Griff. Lat-Fokus. Körper nicht schwingen.",
+"Assistierter Klimmzug (eng)":"⚙ Einstellung: Bei 56 kg Körpergewicht brauchst du meist wenig Hilfe – starte mit ca. 24–30 kg Unterstützung und reduziere, sobald 8 saubere Wdh. klappen. Knie mittig aufs Polster.\nAusführung: Enger Parallelgriff. Schulterblätter zuerst einziehen, dann Ellbogen nach unten. Körper nicht schwingen.",
+"Assistierter Klimmzug (breit)":"⚙ Einstellung: Bei 56 kg Körpergewicht brauchst du meist wenig Hilfe – starte mit ca. 24–30 kg Unterstützung und reduziere, sobald 8 saubere Wdh. klappen. Knie mittig aufs Polster.\nAusführung: Breiter Griff, Lat-Fokus. Schulterblätter zuerst einziehen, dann ziehen. Körper nicht schwingen.",
 "Face Pull Kabel":"Kabel auf Kopfhöhe, Seil-Aufsatz. Zur Stirn ziehen, Ellbogen hoch. Betont hintere Schulter und oberen Rücken – gut für Haltung.",
 "Straight-Arm Pulldown":"Kabel oben, Arme gestreckt. Lat nach unten ziehen bis Oberschenkel. Isolierter Lat ohne Bizeps.",
 "Einarmiger Latzug Kabel":"Einarmig am Kabel. Mehr Range und Rotation möglich. Lat gut einziehen am Ende.",
-"Diverging Low Row":"Maschine mit divergierendem Zugweg. Brust am Pad anlehnen, Griffe zur Hüfte ziehen, Schulterblätter am Ende zusammenziehen. Nicht mit dem Oberkörper schwingen.",
-"Super Squat":"⚠️ Für Po-Fokus: Füße weit vorne und breit positionieren, tief absenken, durch die Fersen drücken. Enge tiefe Fußstellung = mehr Quad – bei Ziel schmale Beine weite Stellung wählen.",
+"Diverging Low Row":"⚙ Einstellung: Sitzhöhe so, dass das Brustpolster auf Brustmitte liegt und die Griffe auf Bauchhöhe starten.\nAusführung: Griffe zur Hüfte ziehen – divergierender Zugweg. Schulterblätter am Ende zusammenziehen, nicht mit dem Oberkörper schwingen.",
+"Super Squat":"⚙ Einstellung: Schulterpolster so, dass du beim Einstieg fast gestreckt stehst, Rücken fest an der Lehne.\n⚠️ Für Po-Fokus: Füße weit vorne und breit positionieren, tief absenken, durch die Fersen drücken. Enge tiefe Fußstellung = mehr Quad – bei Ziel schmale Beine weite vordere Stellung wählen.",
 "LH Bankdrücken":"Schulterbreiter Griff. Stange zur unteren Brust, Ellbogen ca. 75 Grad vom Körper.",
 "KH Bankdrücken":"Ermöglicht mehr Bewegungsfreiheit. KH am Ende leicht zusammenführen.",
 "Bankdrücken Multipresse":"Geführte Bewegung. Griffposition anpassen – leicht schräg für natürlichere Bewegung.",
 "LH Schrägbankdrücken":"30–45 Grad Neigung. Betont obere Brust. Griffbreite wie flaches Drücken.",
 "KH Schrägbankdrücken":"Mehr Range als LH-Variante. KH am Ende zusammenführen.",
 "Schrägbankdrücken Multipresse":"Maschinen-Führung. Bank auf 30–45 Grad einstellen.",
-"Brustpresse (Panatta)":"Panatta Brustpresse. Ellbogen in Linie mit Schultern oder leicht darunter. Volle Streckung oben, langsam zurück.",
-"Brustpresse (Precor)":"Precor Brustpresse. Ellbogen in Linie mit Schultern oder leicht darunter. Volle Streckung oben, langsam zurück.",
-"Bankdrücken Maschine":"Sitz so einstellen, dass die Griffe auf Brusthöhe sind. Schulterblätter zusammenziehen, kontrolliert drücken und langsam zurück.",
-"Butterfly Maschine":"Arme leicht gebeugt. Brust aktiv zusammendrücken, nicht mit Schwung.",
+"Brustpresse (Panatta)":"⚙ Einstellung: Sitzhöhe so, dass die Griffe auf Brusthöhe liegen und die Ellbogen in Linie mit den Schultern oder leicht darunter sind.\nAusführung: Schulterblätter zusammenziehen, volle Streckung oben ohne die Ellbogen zu sperren, langsam zurück.",
+"Brustpresse (Precor)":"⚙ Einstellung: Sitzhöhe so, dass die Griffe auf Brusthöhe liegen und die Ellbogen in Linie mit den Schultern oder leicht darunter sind.\nAusführung: Schulterblätter zusammenziehen, volle Streckung oben ohne die Ellbogen zu sperren, langsam zurück.",
+"Bankdrücken Maschine":"⚙ Einstellung: Sitz so, dass die Griffe auf Brusthöhe sind, Schulterblätter zusammengezogen fest am Polster.\nAusführung: Kontrolliert drücken, langsam zurück, Spannung halten.",
+"Butterfly Maschine":"⚙ Einstellung: Sitz so, dass Hände und Ellbogen auf Brusthöhe sind. Startweite so wählen, dass du Dehnung ohne Schulterzwicken spürst.\nAusführung: Arme leicht gebeugt, Brust aktiv zusammendrücken, nicht mit Schwung. Langsam öffnen.",
 "Flys von oben Kabel":"Kabel oben befestigt. Arme bogenmäßig nach unten-vorne führen – Brust komprimieren.",
 "Flys von unten Kabel":"Kabel unten befestigt. Arme bogenmäßig nach oben-vorne führen – betont obere Brust.",
 "Flachbank KH Flys":"Arme weit öffnen für maximale Dehnung. Leicht gebeugte Ellbogen, Brust zusammenziehen oben.",
 "Schrägbank KH Flys":"30–45 Grad Bank. Mehr Stretch für obere Brust. Gleiche Technik wie Flachbank-Variante.",
 "KH Seitheben":"Leichtes Gewicht, sauber ausführen. Arme leicht gebeugt, seitlich bis Schulterhöhe heben. Kleine Finger leicht oben.",
 "Vorgebeugtes KH Seitheben":"Oberkörper 45–90 Grad vorgebeugt. Hintere Schulter. Arme seitlich heben.",
-"Seithebemaschine (sitzend)":"Sitzend an der Maschine, Ellbogenauflagen nutzen. Arme seitlich bis Schulterhöhe heben, langsam zurück.",
-"Seithebemaschine (stehend)":"Stehend an der Maschine, Oberkörper stabil halten. Arme seitlich bis Schulterhöhe heben – nicht mit Schwung arbeiten.",
+"Seithebemaschine (sitzend)":"⚙ Einstellung: Sitz so, dass die Schultern auf einer Linie mit der Drehachse liegen, Polster knapp über dem Ellbogen.\nAusführung: Arme seitlich bis Schulterhöhe heben, oben kurz halten, langsam zurück – nicht mit Schwung.",
+"Seithebemaschine (stehend)":"⚙ Einstellung: Polster so, dass sie knapp über dem Ellbogen anliegen, aufrecht und mittig stehen.\nAusführung: Arme seitlich bis Schulterhöhe heben, Oberkörper stabil – nicht wegkippen, kein Schwung.",
 "Seitheben Kabel":"Kabel unten befestigt, Arm seitlich heben. Konstante Spannung.",
 "Vorgebeugtes Seitheben Kabel":"Kabel oben befestigt, Oberkörper vorgebeugt. Hintere Schulter.",
 "LH Überkopfdrücken":"Stange vor oder hinter dem Kopf. Ellbogen leicht nach vorne für Schultergelenk.",
 "KH Überkopfdrücken":"Sitzend oder stehend. KH am Ende leicht zusammenführen.",
-"Überkopfmaschine":"Sitzend in der Maschine. Griffhöhe auf Schulterhöhe einstellen.",
-"Butterfly Reverse Maschine":"Rückseite Schulter. Arme gestreckt oder leicht gebeugt, nach hinten führen.",
+"Überkopfmaschine":"⚙ Einstellung: Sitz so, dass die Griffe auf Schulterhöhe starten, Rücken fest an der Lehne, Füße flach am Boden.\nAusführung: Nach oben drücken ohne die Ellbogen ganz zu sperren, langsam zurück bis Schulterhöhe – Spannung halten.",
+"Butterfly Reverse Maschine":"⚙ Einstellung: Sitz so, dass die Griffe auf Schulterhöhe sind, Brust fest am Polster.\nAusführung: Arme gestreckt oder leicht gebeugt nach hinten-außen führen, Schulterblätter zusammenziehen, langsam zurück. Hintere Schulter.",
 "Butterfly Reverse Kabel":"Kabel auf Schulterhöhe, Arme gekreuzt greifen. Arme nach hinten-außen führen – hintere Schulter, konstante Spannung durch das Kabel.",
 "Upright Row Kabel":"Kabel unten, schulterbreiter Griff. Stange nah am Körper hochziehen bis Kinnhöhe. Ellbogen führen die Bewegung.",
 "Arnold Press":"KH auf Schulterhöhe, Handflächen zu dir. Beim Drücken nach außen rotieren. Kombiniert Front- und Seite-Schulter.",
@@ -319,7 +322,7 @@ const TIPS={
 "KH Hammer Curls":"Neutraler Griff. Brachialis und Brachioradialis. Ellbogen stabil.",
 "SZ Preacher Curls":"Auflagekante auf Trizepsseite. Volle Streckung – gut für Dehnung.",
 "KH Preacher Curls":"Einarmig, gleiche Technik. Mehr Kontrolle als beidhändig.",
-"Bizeps Maschine":"Maschine einstellen, Ellbogen auf Pads. Volle Streckung und Kontraktion.",
+"Bizeps Maschine":"⚙ Einstellung: Sitz so, dass die Achseln fest auf dem Polster aufliegen und die Ellbogen auf der Drehachse der Maschine liegen.\nAusführung: Volle Streckung unten, volle Kontraktion oben, langsam ablassen.",
 "Konzentrations Curls":"Sitzend, Ellbogen am Innenknie gestützt. Sehr isoliert – maximale Kontraktion oben.",
 "Spinne Curls":"Auf Schrägbank liegend (Brust nach unten). Arme hängen frei – keine Möglichkeit zu schwingen.",
 "Kabel Curls einarmig":"Einarmig für symmetrische Entwicklung. Kabel unten, volle Streckung nutzen.",
@@ -331,16 +334,16 @@ const TIPS={
 "SZ Überkopf Tri. Drücken":"SZ-Stange hinter dem Kopf absenken. Ellbogen eng halten. Trizeps-Dehnung oben.",
 "KH Überkopf Tri. Drücken":"Einarmig oder beidhändig. KH hinter dem Kopf, Ellbogen stabil.",
 "Kabel Überkopf Tri. Drücken":"Kabel hinter dem Kopf. Konstante Spannung in der Dehnung.",
-"Dips Maschine":"Hände schulterbreit. Ellbogen eng am Körper für Trizeps-Fokus. Tief absenken.",
-"Trizeps Maschine":"Ellbogen auf Pads. Arme vollständig durchstrecken, langsam zurück.",
+"Dips Maschine":"⚙ Einstellung: Sitz so, dass die Griffe auf Höhe der unteren Brust starten, Hände schulterbreit.\nAusführung: Ellbogen eng am Körper für Trizeps-Fokus, tief absenken, Schultern weg von den Ohren.",
+"Trizeps Maschine":"⚙ Einstellung: Sitz so, dass die Ellbogen auf der Drehachse liegen und die Oberarme fest auf den Pads aufliegen.\nAusführung: Arme vollständig durchstrecken, kurz halten, langsam zurück.",
 "KH Kickback Trizeps":"Oberkörper waagerecht, Oberarm parallel zum Boden fixiert. KH nach hinten strecken, kurz halten.",
 "Crunches":"Nur Schulterblätter vom Boden heben – kein komplettes Aufrichten. Langsam und kontrolliert.",
 "Crunches am Kabelzug":"Kniend am Kabel. Oberkörper nach vorne-unten runden. Gewicht skalieren.",
-"Panatta Super Crunch":"Panatta Super Crunch – klassische Crunch-Bewegung an der Maschine. Sitzhoehe einstellen. Oberkörper nach vorne runden, nicht mit Hüfte ziehen. Langsam zurück.",
-"Panatta Low Crunch":"Panatta Low Crunch – Fokus auf unteren Bauch. Beinbewegung zur Brust. Core angespannt halten, Rücken bleibt am Polster.",
-"Panatta High Crunch":"Panatta High Crunch – Fokus auf oberen Bauch. Griffe hoch, Oberkörper nach vorne-unten runden. Langsam und kontrolliert.",
-"Bauch Maschine (Precor)":"Precor Bauch-Maschine. Sitzhoehe und Widerstand einstellen. Oberkörper nach vorne runden, nicht mit Hüfte ziehen. Langsam zurueck.",
-"Schrägbankdrücken Maschine":"Rückenlehne auf ca. 30-45 Grad einstellen. Griffe auf Brusthoehe positionieren. Kontrolliert druecken und langsam zurueck. Schulterblätter zusammenziehen.",
+"Panatta Super Crunch":"⚙ Einstellung: Sitzhöhe (Gasdruck-Hebel) so, dass die Drehachse auf Höhe des unteren Brustbeins liegt, Polster fest an Brust/Schultern.\nAusführung: Oberkörper nach vorne einrollen – der Bauch macht die Arbeit, nicht mit der Hüfte ziehen. Langsam zurück, Spannung halten.",
+"Panatta Low Crunch":"⚙ Einstellung: Rücken fest ans Polster, Beine sicher in den Auflagen fixieren.\nAusführung: Fokus unterer Bauch – Beine zur Brust einrollen und das Becken mit einrollen, Rücken bleibt am Polster. Langsam zurück.",
+"Panatta High Crunch":"⚙ Einstellung: Sitz so, dass du die Griffe oben bequem greifst, ohne die Schultern hochzuziehen.\nAusführung: Fokus oberer Bauch – Oberkörper nach vorne-unten einrollen, langsam und kontrolliert zurück.",
+"Bauch Maschine (Precor)":"⚙ Einstellung: Sitzhöhe so, dass die Drehachse auf Höhe des unteren Brustbeins liegt, Widerstand passend wählen.\nAusführung: Oberkörper nach vorne einrollen, nicht mit der Hüfte ziehen. Langsam zurück.",
+"Schrägbankdrücken Maschine":"⚙ Einstellung: Rückenlehne auf ca. 30–45 Grad, Sitz so, dass die Griffe auf Höhe der oberen Brust starten.\nAusführung: Schulterblätter zusammenziehen, kontrolliert drücken und langsam zurück.",
 "Beinheben (Liegend)":"Beine gestreckt oder leicht gebeugt. Langsam senken ohne Boden zu berühren. Kein Hüfteinsatz – Becken kippen vermeiden.",
 "Beinheben (Hängend)":"An der Stange hängen. Hüfte runden am Endpunkt für mehr Bauch-Aktivierung. Nicht schwingen.",
 "Reverse Crunch":"Auf dem Rücken liegend. Becken vom Boden heben, Knie zur Brust. Unterer Bauch, kein Hüftbeuger-Einsatz.",
@@ -348,11 +351,11 @@ const TIPS={
 "Ab Rollout":"Mit Rollrad oder Stange. Fortgeschrittene Übung. Rücken gerade halten – nicht durchhängen. Langsam zurückrollen.",
 "Pallof Press":"Kabel seitlich, in Bauchhöhe. Arme nach vorne drücken und halten – Anti-Rotation. Schmal und stabil, keine Hüftbewegung.",
 "Hollow Body Hold":"Rücken flach, Arme und Beine gestreckt leicht über dem Boden halten. Isometrische Ganzkörperspannung – sehr effektiv für flachen Bauch.",
-"3D Abduktor Maschine":"Panatta-Highlight! Trainiert Abduktion + Streckung + Aussenrotation gleichzeitig - aktiviert posteriore Fasern des Gluteus Medius. 3 Rueckenlehnen-Positionen = verschiedene Muskelfasern. Aufrecht sitzen, Bewegung kontrolliert ausfuehren.",
-"Belt Squat RDL":"✅ Belt Squat Maschine als RDL nutzen – Hüftgelenk-Scharnier, Hüfte nach hinten schieben (nicht in die Kniebeuge!). Stark auf Hamstrings und Po. Maschine schont den Rücken, schwere Gewichte möglich. Kontrolliert absenken für Stretch.",
-"Belt Squat":"Panatta Belt Squat: Gewicht haengt am Hueftgurt - kein Rueckenloading. Fuss-Platten weit VORNE = mehr Hueftbeugung = maximaler Glute-Fokus! Fuss mittig = mehr Quad. Tief absenken, durch Fersen druecken.",
-"Beinpresse 45 Grad":"⚠️ Fußposition entscheidet, was wächst: Füße HOCH auf der Platte = Glutes und Hamstrings. Füße tief = Quads dominant – bei Ziel schmale Beine unbedingt vermeiden. Füße breit und leicht nach außen drehen = zusätzlich Adduktoren und Glutes. Für dein Ziel: Füße immer hoch, schulterbreit bis breit, Zehen leicht nach außen. Knie aktiv in Richtung der Zehen drücken während der Bewegung, Rücken bleibt durchgehend am Polster.",
-"RDL Maschine":"Hüftgelenk-Scharnier – der Rücken bleibt neutral, nicht runden. Hüfte nach hinten schieben, langsam und kontrolliert absenken bis du eine starke Dehnung in den Hamstrings spürst – das ist der entscheidende Reiz für Po und Beinrückseite. Oben durch die Fersen drücken und Gesäß aktiv anspannen. Die Maschinenführung macht schwere Gewichte sicherer – nutze das bewusst für maximale Stretch-Hypertrophie."
+"3D Abduktor Maschine":"Panatta-Highlight! Trainiert Abduktion + Streckung + Außenrotation gleichzeitig – aktiviert die hinteren Fasern des Gluteus Medius.\n⚙ Einstellung: 3 Rückenlehnen-Positionen = verschiedene Muskelfasern. Aufrechte Lehne (wenig Hüftbeugung) = hintere Glute-Med-Fasern – dein Fokus! Flachere Lehne = mehr vordere Fasern. Starte mittig, arbeite dich zur aufrechten Position. Sitz so, dass die Hüfte auf Höhe der Drehachse liegt.\nAusführung: Bein im Bogen nach außen-hinten-oben führen, oben kurz halten, kontrolliert zurück. Aufrecht sitzen, Becken fest am Polster.",
+"Belt Squat RDL":"✅ Belt Squat Maschine als RDL nutzen – schont den Rücken, schwere Gewichte möglich.\n⚙ Einstellung: Gurt über die Hüftknochen, Füße mittig und hüftbreit (nicht weit vorne wie beim Belt Squat).\nAusführung: Hüftgelenk-Scharnier – Hüfte nach hinten schieben, nicht in die Kniebeuge! Stark auf Hamstrings und Po. Kontrolliert absenken für den Stretch, oben Po anspannen.",
+"Belt Squat":"Panatta Belt Squat: Gewicht hängt am Hüftgurt – kein Rückenloading.\n⚙ Einstellung: Gurt fest über die Hüftknochen, Karabiner mittig vor dem Körper einhängen. Füße weit VORNE auf den Fußplatten = mehr Hüftbeugung = maximaler Glute-Fokus! Füße mittig = mehr Quad. Griff vorne nur zur Balance nutzen, nicht hochziehen.\nAusführung: Tief absenken, durch die Fersen drücken, oben Po anspannen.",
+"Beinpresse 45 Grad":"⚙ Einstellung: Rückenlehne in die flachste angenehme Position, Sitz so, dass das Becken unten nicht abkippt.\n⚠️ Fußposition entscheidet, was wächst: Füße HOCH auf der Platte = Glutes und Hamstrings. Füße tief = Quads dominant – bei Ziel schmale Beine unbedingt vermeiden. Für dein Ziel: Füße immer hoch, schulterbreit bis breit, Zehen leicht nach außen. Knie aktiv Richtung Zehen drücken, Rücken bleibt durchgehend am Polster.",
+"RDL Maschine":"⚙ Einstellung: Starthöhe der Griffe etwa auf Mitte Schienbein – volle Hamstring-Dehnung ohne runden Rücken muss möglich sein.\nAusführung: Hüftgelenk-Scharnier – Rücken neutral, Hüfte nach hinten schieben, langsam absenken bis zur starken Dehnung in den Hamstrings – das ist der entscheidende Reiz für Po und Beinrückseite. Oben durch die Fersen drücken und Po aktiv anspannen. Die Maschinenführung macht schwere Gewichte sicher – nutze das für Stretch-Hypertrophie."
 };
 const CC={"Glute Max":"#C8729A","Glute Med":"#B88CC0","Glute & Quad":"#C4A882","Glute & Hams":"#A8C4A0","Rücken":"#8AB4C4","Brust":"#C4A8A8","Schultern":"#B4C4A0","Bizeps":"#C4B8A0","Trizeps":"#A0B4C4","Bauch":"#C0BEA0"};
 const P4=[
@@ -667,6 +670,13 @@ function renderEx(ex,ei,di){
   const doneAll=!!cur.exercise&&fil>=ms;
   const doneChip='<span class="done-chip'+(doneAll?'':' hidden')+'" id="done-'+di+'-'+ei+'" title="Alle Sätze eingetragen">✓</span>';
 
+  // Meine Einstellung: uebungsbasiert gespeichert (set__ex__Name), gilt fuer alle Wochen/Zyklen
+  let setH='';
+  if(cur.exercise){
+    const sv=S.data['set__ex__'+cur.exercise]||'';
+    setH='<div class="setting-row"><span class="set-lbl" title="Deine Maschinen-Einstellung – wird pro Übung gespeichert und jede Woche angezeigt">⚙</span><input class="set-input" type="text" value="'+esc(sv)+'" placeholder="Meine Einstellung (z. B. Sitz 4, Lehne 2)" onchange="updSetting('+di+','+ei+',this.value)"/></div>';
+  }
+
   return '<div class="ex-row" style="border-left:3px solid '+col+'">'
     +'<div class="ex-row-top"><span class="cat-badge" style="background:'+col+'28;color:'+col+'">'+esc(ex.c)+'</span>'
     +'<div class="picker-wrap" id="pw-'+di+'-'+ei+'">'
@@ -676,6 +686,7 @@ function renderEx(ex,ei,di){
     +pbadge(p)+doneChip+'</div>'
     +'<div class="ex-meta"><span class="sets-info">'+ms+' Sätze · <span style="color:'+col+'">'+ex.r[0]+'–'+ex.r[1]+' Reps</span>'+autoLabel+'</span>'
     +'<div class="w-wrap"><span class="w-label">Gewicht:</span><input class="w-input" type="text" value="'+esc(cur.weight||'')+'" placeholder="kg" onchange="updW('+di+','+ei+',this.value)"/>'+(prv.weight?'<span style="color:var(--text-faint);font-size:11px" title="Vergleich mit letztem Eintrag dieser Uebung">(VW: '+esc(prv.weight)+')</span>':'')+'</div></div>'
+    +setH
     +'<div class="reps-row">'+rh+'</div>'+hint+tipH+'</div>';
 }
 
@@ -744,6 +755,16 @@ function initKey(di,ei){
   return k;
 }
 function updW(di,ei,v){const k=initKey(di,ei);S.data[k]={...S.data[k],weight:v};save()}
+// Maschinen-Einstellung speichern — uebungsbasiert, KEIN renderT (Fokus bleibt erhalten)
+function updSetting(di,ei,v){
+  const k=mk(S.cy,S.week,di,ei),pk=S.week>1?mk(S.cy,S.week-1,di,ei):null;
+  const rawCur=S.data[k]||{},prevW=pk?(S.data[pk]||{}):{};
+  const ex=rawCur.exercise!==undefined?rawCur.exercise:(prevW.exercise||'');
+  if(!ex)return;
+  const key='set__ex__'+ex;
+  if(String(v).trim()==='')delete S.data[key];else S.data[key]=v;
+  save();
+}
 function updRep(di,ei,i,v){
   const k=initKey(di,ei);const cur=S.data[k];
   const ms=Math.min(5,(cur.extraSets||0)+(plan()[di].e[ei].s));

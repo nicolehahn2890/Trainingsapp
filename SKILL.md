@@ -16,6 +16,9 @@ description: >
 
 Rexi — kein Coding-Hintergrund, kein Terminal. Ausschliesslich Claude.ai. Deutsch, Du-Anrede.
 Deployment immer ueber GitHub Browser-Interface (Stift-Symbol, Strg+A, Inhalt ersetzen, Commit).
+Koerperdaten: 169 cm, 56 kg — Tipps und Maschinen-Einstellungen darauf zuschneiden
+(mittlere Sitz-/Lehnenpositionen als Startpunkt, wenig Unterstuetzung beim assistierten Klimmzug).
+Trainingsziel: Glute-Fokus + schmale Beine (Quad-Betonung vermeiden).
 
 **WICHTIG: Aenderungen IMMER direkt auf `main` pushen — NIEMALS Feature-Branches oder Pull
 Requests anlegen!** GitHub Pages deployt von `main`; nur dort wird die App live. Rexi hat das
@@ -91,9 +94,10 @@ S = {
 
 ### Key-Formate
 ```
-Workout:  [cycle]__w[week]__d[dayIdx]__e[exIdx]
-Tipp:     tip__ex__[Uebungsname]  (gilt ueber alle Wochen/Tage/Zyklen!)
-Slot:     tip__[cycle]__w[week]__d[dayIdx]__e[exIdx]  (nur UI-State)
+Workout:      [cycle]__w[week]__d[dayIdx]__e[exIdx]
+Tipp:         tip__ex__[Uebungsname]  (gilt ueber alle Wochen/Tage/Zyklen!)
+Einstellung:  set__ex__[Uebungsname]  (Maschinen-Einstellung, uebungsbasiert wie Tipps)
+Slot:         tip__[cycle]__w[week]__d[dayIdx]__e[exIdx]  (nur UI-State)
 ```
 
 ### Wichtige Funktionen
@@ -111,6 +115,9 @@ esc(s)                  HTML-escape
 autoExtraSets(di,ei)    0 oder 1 (Auto-Satz nach 3 Wo. kein Fortschritt, nur bei gleicher Uebung)
 toggleDay(di)           Accordion: andere Tage schliessen sich automatisch (setzt S.animDay fuer Animation)
 onDS(di,ei,v)           Dropdown-Suche — stellt nach renderT() Fokus + Cursor im Suchfeld wieder her
+updSetting(di,ei,v)     Speichert Maschinen-Einstellung unter set__ex__[Name] — KEIN renderT!
+                        Leerer Wert loescht den Key. Feld (.set-input, Zahnrad-Symbol) erscheint
+                        nur wenn eine Uebung gewaehlt ist, zwischen ex-meta und reps-row.
 exDone(di,ei)           true wenn Uebung gewaehlt UND alle Saetze der aktuellen Woche Reps haben
 refreshDone(di,ei)      Aktualisiert Erledigt-Haken (#done-di-ei) + Tages-Pill (#dc-di) GEZIELT im DOM
                         — wird von updRep aufgerufen, KEIN renderT (Fokus bleibt erhalten)!
@@ -152,6 +159,9 @@ Vererbt: exercise, extraSets — NICHT: reps, weight
 1. initKey statt mk() beim Schreiben verwenden
 2. peach_v4 nie umbenennen
 3. Neue Uebungen in EXERCISES + TIPS eintragen (TIPS-Key muss EXAKT dem EXERCISES-Namen entsprechen!), optional in REC
+   Maschinen-Tipps folgen dem Format: "Zahnrad-Emoji Einstellung: ...\nAusfuehrung: ..." —
+   Einstell-Checkliste (Gelenk auf Drehachse, Polster-Positionen, Startposition fuer 169 cm)
+   plus Ausfuehrungs-Cues, zugeschnitten auf Glute-Fokus / schmale Beine
 4. KEIN Grad-Zeichen (°) in Strings im Script — zerstoert den JS-Parser! "Grad" ausschreiben
 5. Keine renderT() in updRep/updW
 6. plan() gibt immer P4 zurueck — nicht aendern
