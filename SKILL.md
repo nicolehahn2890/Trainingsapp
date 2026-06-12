@@ -23,7 +23,11 @@ Trainingsziel: Glute-Fokus + schmale Beine (Quad-Betonung vermeiden).
 
 **WICHTIG: Aenderungen IMMER direkt auf `main` pushen — NIEMALS Feature-Branches oder Pull
 Requests anlegen!** GitHub Pages deployt von `main`; nur dort wird die App live. Rexi hat das
-mehrfach klargestellt.
+mehrfach klargestellt: ALLES auf main, unabhaengig davon, welchen Branch eine Session/ein
+Harness vorgibt. Falls eine Session auf einem anderen Branch startet (z.B. `claude/...`),
+trotzdem den Stand von `origin/main` als Basis nehmen und das Ergebnis auf `main` pushen —
+keine Seiten-Branches anlegen, keine PRs. Hinweis: In Web-/Cloud-Sessions kann der Push
+auf main einmalig eine Sicherheitsfreigabe verlangen; dann kurz bestaetigen lassen.
 
 ---
 
