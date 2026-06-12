@@ -414,6 +414,16 @@ function save(){try{localStorage.setItem('peach_v4',JSON.stringify(S.data))}catc
 S.data=load();
 // THEME (eigener Key — peach_v4 bleibt unangetastet)
 try{S.theme=localStorage.getItem('peach_theme')||'dark'}catch{S.theme='dark'}
+// POSITION MERKEN (eigener Key peach_ui — merkt sich Tab/Zyklus/Woche/aufgeklappten Tag,
+// damit die App nach App-Wechsel oder Schliessen genau dort weitermacht. peach_v4 unberuehrt!)
+function saveUI(){try{localStorage.setItem('peach_ui',JSON.stringify({view:S.view,week:S.week,cy:S.cy,openDays:S.openDays}))}catch{}}
+try{
+  const u=JSON.parse(localStorage.getItem('peach_ui')||'{}');
+  if(u.view==='training'||u.view==='overview')S.view=u.view;
+  if(typeof u.week==='number'&&u.week>=1&&u.week<=12)S.week=u.week;
+  if(u.cy==='cycle1'||u.cy==='cycle2'||u.cy==='cycle3')S.cy=u.cy;
+  if(u.openDays&&typeof u.openDays==='object'&&!Array.isArray(u.openDays))S.openDays=u.openDays;
+}catch{}
 function applyTheme(){
   const light=S.theme==='light';
   document.documentElement.classList.toggle('light',light);
@@ -768,10 +778,10 @@ function flashView(){
   const el=document.getElementById('view-'+S.view);
   if(el){el.classList.remove('fade-in');void el.offsetWidth;el.classList.add('fade-in')}
 }
-function setView(v){S.view=v;render();flashView()}
-function setCycle(c){S.cy=c;render();flashView()}
-function changeWeek(d){const old=S.week;S.week=Math.max(1,Math.min(12,S.week+d));render();if(S.week!==old)flashView()}
-function toggleDay(di){const wasOpen=S.openDays[di]===true;S.openDays={};if(!wasOpen){S.openDays[di]=true;S.animDay=di}render()}
+function setView(v){S.view=v;saveUI();render();flashView()}
+function setCycle(c){S.cy=c;saveUI();render();flashView()}
+function changeWeek(d){const old=S.week;S.week=Math.max(1,Math.min(12,S.week+d));saveUI();render();if(S.week!==old)flashView()}
+function toggleDay(di){const wasOpen=S.openDays[di]===true;S.openDays={};if(!wasOpen){S.openDays[di]=true;S.animDay=di}saveUI();render()}
 
 function togDrop(di,ei,ev){
   ev.stopPropagation();
@@ -841,7 +851,7 @@ document.addEventListener('click',e=>{
 // App sich EINMAL selbst neu - mit ?v=sha am Cache vorbei. peach_ver merkt sich den
 // Commit, fuer den schon neu geladen wurde (verhindert Reload-Schleifen). Daten in
 // peach_v4 sind davon voellig unberuehrt. BUILD_TS bei jedem Deploy aktualisieren!
-const BUILD_TS='2026-06-11T16:55:00Z';
+const BUILD_TS='2026-06-12T05:20:00Z';
 let verLastCheck=0;
 function checkUpdate(){
   const now=Date.now();
