@@ -36,7 +36,8 @@ mehrfach klargestellt.
   manifest.json (display:browser — Icon oeffnet Safari, NICHT standalone!),
   Peach_Project.pdf (Plan-Doku, 41 Seiten), SKILL.md (diese Datei)
 - localStorage-Keys: peach_v4 (Trainingsdaten — NIEMALS umbenennen!), peach_theme (Theme-Wahl),
-  peach_ver (Auto-Update-Guard: Commit-SHA, fuer den bereits neu geladen wurde)
+  peach_ver (Auto-Update-Guard: Commit-SHA, fuer den bereits neu geladen wurde),
+  peach_ui (zuletzt offene Position: view/week/cy/openDays — getrennt von peach_v4)
 - Gym: Workshop Fitness Barcelona, Carrer d'Avila 120, El Poblenou. Panatta, Precor, Rogue, Eleiko, TRX.
 
 ---
@@ -145,6 +146,9 @@ exDone(di,ei)           true wenn Uebung gewaehlt UND alle Saetze der aktuellen 
 refreshDone(di,ei)      Aktualisiert Erledigt-Haken (#done-di-ei) + Tages-Pill (#dc-di) GEZIELT im DOM
                         — wird von updRep aufgerufen, KEIN renderT (Fokus bleibt erhalten)!
 flashView()             Sanfter Einblend-Effekt der aktiven Ansicht (Tab-/Zyklus-/Wochen-Wechsel)
+saveUI()                Merkt die aktuelle Position (view/week/cy/openDays) im Key peach_ui. Wird in
+                        setView/setCycle/changeWeek/toggleDay aufgerufen; beim Start wird peach_ui
+                        validiert zurueck in S geladen, damit die App dort weitermacht. peach_v4 unberuehrt.
 expBackup()             Backup: JSON {app:'peach',v:1,date,theme,data:S.data} in die Zwischenablage,
                         Fallback: Text ins bk-ta-Feld + markieren. UI unten in der Uebersicht (bk-card).
 impBackup()             Import: akzeptiert das Wrapper-Format ODER rohes peach_v4-Objekt. Validiert
@@ -345,6 +349,9 @@ Fallback (manuell, ohne Session):
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
 
+0. **Position merken:** saveUI() speichert die zuletzt offene Position (view/week/cy/openDays)
+   im eigenen Key peach_ui; beim Start validiert zurueckgeladen. Grund: Beim App-Wechsel/
+   Schliessen ging alles zu und man startete wieder in Woche 1. peach_v4 bleibt unberuehrt.
 1. **Auto-Update:** checkUpdate() laedt die App einmal neu, wenn auf main ein neuerer
    Commit liegt (GitHub-API, Cache-Buster ?v=sha, Guard peach_ver). Grund: iOS-Webapp-
    Cache friert alte Staende ein. ACHTUNG: BUILD_TS bei jedem Deploy aktualisieren (Regel 10)!
