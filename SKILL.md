@@ -100,6 +100,10 @@ in der Uebersicht ist das Tages-Label eine Pille in der jeweiligen Tagesfarbe.
 Logo: Pixel-Art-Pfirsich SVG 16x16 (crispEdges), eingefasst in einen 40px Cream-Kreis-Block.
 Favicon: Pfirsich-Emoji als SVG-Data-URI im <head>.
 Home-Screen-Icon: apple-touch-icon.png (180x180), verlinkt mit apple-mobile-web-app-title.
+  Neues Neobrutalism-Motiv: Pixel-Pfirsich in einem Cream-Kreis mit 7px Ink-Rahmen + hartem
+  Schatten auf Lilac-Hintergrund (#B49DF2) — spiegelt den Header. Vollflaechig (kein
+  transparenter Rand), iOS rundet die Ecken selbst. Erzeugt durch Rendern eines kleinen
+  Icon-HTML mit Puppeteer (Viewport 180x180, dsf 1) -> Screenshot als PNG.
 theme-color-Meta + manifest sind jetzt hell (#B49DF2 / #E9DEF8).
 WICHTIG (localStorage!): Seit iOS 16.4 oeffnet Apple JEDES Home-Screen-Lesezeichen
 standardmaessig als eigenstaendige Web-App mit EIGENEM (leerem) localStorage-Container —
@@ -387,7 +391,10 @@ NEU. **Neobrutalism-Redesign + Dark Mode entfernt:** Komplettes Re-Skin auf das 
    farbig gefuellt. Dark Mode KOMPLETT raus: Sonne/Mond-Button, applyTheme/toggleTheme,
    theme-State, peach_theme-Key, theme-color-Wechsel und Backup-Theme entfernt; nur noch
    ein helles :root. manifest.json + theme-color auf helle Palette. Funktionen, Daten und
-   localStorage-Keys (peach_v4/peach_ui) unveraendert.
+   localStorage-Keys (peach_v4/peach_ui) unveraendert. Auch das Home-Screen-Icon
+   (apple-touch-icon.png) neu gestaltet: Pixel-Pfirsich im Cream-Kreis mit Ink-Rahmen auf
+   Lilac. WICHTIG fuer die Nutzerin: manifest blieb display:browser -> Icon-Wechsel kostet
+   KEINE Daten; auf dem iPhone nur altes Icon entfernen und neu zum Homescreen hinzufuegen.
 0. **Position merken:** saveUI() speichert die zuletzt offene Position (view/week/cy/openDays)
    im eigenen Key peach_ui; beim Start validiert zurueckgeladen. Grund: Beim App-Wechsel/
    Schliessen ging alles zu und man startete wieder in Woche 1. peach_v4 bleibt unberuehrt.
