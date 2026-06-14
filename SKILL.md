@@ -39,36 +39,68 @@ auf main einmalig eine Sicherheitsfreigabe verlangen; dann kurz bestaetigen lass
 - Repo-Dateien: index.html (App), apple-touch-icon.png (Home-Screen-Icon),
   manifest.json (display:browser — Icon oeffnet Safari, NICHT standalone!),
   Peach_Project.pdf (Plan-Doku, 41 Seiten), SKILL.md (diese Datei)
-- localStorage-Keys: peach_v4 (Trainingsdaten — NIEMALS umbenennen!), peach_theme (Theme-Wahl),
+- localStorage-Keys: peach_v4 (Trainingsdaten — NIEMALS umbenennen!),
   peach_ver (Auto-Update-Guard: Commit-SHA, fuer den bereits neu geladen wurde),
-  peach_ui (zuletzt offene Position: view/week/cy/openDays — getrennt von peach_v4)
+  peach_ui (zuletzt offene Position: view/week/cy/openDays — getrennt von peach_v4).
+  (peach_theme wurde entfernt — es gibt keinen Dark Mode mehr.)
 - Gym: Workshop Fitness Barcelona, Carrer d'Avila 120, El Poblenou. Panatta, Precor, Rogue, Eleiko, TRX.
 
 ---
 
 ## Design-System
 
-### Themes (Dark + Hell)
-- Dark Mode ist Standard, heller Modus umschaltbar ueber den runden Sonne/Mond-Button im Header
-- ALLE Farben liegen als CSS-Variablen in `:root` (dark) und `:root.light` (hell)
-- **NIEMALS Hex-Farben hart in CSS-Klassen oder JS-HTML-Strings schreiben — immer `var(--...)`!**
-  Ausnahmen (in beiden Themes identisch): Kategorie-Farben (CC), pbadge/rcol/wp-bar-Balkenfarben,
-  tab-btn.active und tip-save (pink mit weissem Text), Fokus-Rahmen #C8729A
-- Theme-Speicherung: localStorage-Key `peach_theme` ('light'|'dark') — separat von peach_v4!
-- applyTheme() setzt die light-Klasse auf documentElement, das Button-Icon und die theme-color-Meta
-- Light Mode: cat-badge und pbadge werden per CSS-filter (brightness/saturate) abgedunkelt fuer Kontrast
-- Eingabe-/Akzentfarben (--gold, --green, --blue, --red, --pink, --lilac) sind im hellen Modus dunkler definiert
+### Neobrutalism · NUR Hell (Dark Mode entfernt!)
+- Die App ist seit dem Redesign **dauerhaft hell** — es gibt KEINEN Dark Mode mehr.
+  Der runde Sonne/Mond-Button, applyTheme()/toggleTheme(), der Key peach_theme, der
+  theme-color-Wechsel und der theme-State wurden komplett entfernt. NIEMALS wieder einen
+  .light/.dark-Branch oder Theme-Umschalter einbauen.
+- Design-Sprache: flache, knallige Farb-BLOECKE auf hellem Lavendel-Hintergrund,
+  fast-schwarze INK-Rahmen ueberall, harte Offset-Schatten OHNE Blur, dicke 2,5px-Rahmen,
+  runde Pills. KEIN Verlauf (gradient), KEIN Glow, KEIN Blur.
+- ALLE Tokens liegen als CSS-Variablen in EINEM `:root` (kein :root.light/.dark mehr).
+- **NIEMALS Hex-Farben hart in CSS-Klassen schreiben — immer `var(--...)`.** In JS-HTML-
+  Strings Tokens als `var(--peach)` etc. nutzen; nur die datengetriebenen Farben (Kategorie
+  CC, Tagesfarbe DAYBG, pbadge/rcol-Performance) sind als Hex in JS hinterlegt.
+- "Press"-Interaktion: Buttons mit Klasse `nb-shadow` ruecken auf :active um translate(2px,2px)
+  und ihr Schatten kollabiert auf --sh-press (1px). Neue Schatten-Buttons brauchen diese Klasse.
 
-### Dark-Mode-Basisfarben
-Hintergrund: #1a1418
-Header-Gradient: linear-gradient(160deg, #2e1a28, #1a1418)
-Primaerfarbe Pink: #C8729A
-Sekundaerfarbe Lila: #B88CC0
-Font: DM Sans (Google Fonts CDN)
-Logo: Pixel-Art-Pfirsich SVG 16x16, shape-rendering crispEdges
-Favicon: Pfirsich-Emoji als SVG-Data-URI im <head>
-Home-Screen-Icon: apple-touch-icon.png (180x180, Pixel-Pfirsich auf Header-Gradient),
-verlinkt im <head> zusammen mit apple-mobile-web-app-title "Peach Project"
+### Fonts
+- Display (Logo, Screen-Titel, Tag-Titel, grosse Zahlen): **Archivo Black**, UPPERCASE,
+  letter-spacing -0.5 bis -1px → Token `--font-display`
+- Body / UI: **Space Grotesk** (Gewichte 400–700; NICHT 800 — sonst faux-bold) → `--font-sans`
+- Beide via Google Fonts CDN im <head>. Alle Inputs bleiben 16px (iOS-Anti-Zoom).
+
+### Farb-Tokens (Auszug — vollstaendige Liste im :root von index.html)
+Ink (Rahmen / Schatten / Text auf Bloecken): --ink #181016
+Bright-Palette: --peach #F4A45E (Primaer), --pink #F18FB6, --lilac #B49DF2 (Header),
+  --lime #B6DD57, --sky #8CCBE8, --yellow #F5CB44, --cream #FBF3E7
+Seite: --bg #E9DEF8 (Lavendel). Felder: weiss #FFF mit Ink-Rahmen.
+Text-Rampe: #181016 → #45343D → #5E4C55 → #7E6C76 → #A2929C
+Radien: --r-sm 10 / --r-md 12 / --r-lg 16 / --r-xl 20 / --r-pill 999. Rahmenbreite --bw 2,5px.
+Schatten (solid Ink, kein Blur): --sh-xs 2px / --sh-sm 3px / --sh-card 4px /
+  --sh-header 0 3px / --sh-drop 5px / --sh-press 1px.
+
+### Tagesfarben (DAYBG — je Tag-Card eine Farbe)
+Tag A Peach #F4A45E · Tag B Pink #F18FB6 · Tag C Lime #B6DD57 · Tag D Sky #8CCBE8
+Die Tages-Count-Pill ist ink mit der Tagesfarbe als Textfarbe (✓-Praefix wenn komplett);
+in der Uebersicht ist das Tages-Label eine Pille in der jeweiligen Tagesfarbe.
+
+### Kategorie-Farben (CC) — solide Pill, 2px Ink-Rahmen, schwarzer Uppercase-Text
+  Glute Max #EE8FB4, Glute Med #B49DF2, Glute & Quad #E8B86A, Glute & Hams #A7D98C
+  Ruecken #84C3E0, Brust #F0A0A0, Schultern #C2DB7E, Bizeps #E6C57E
+  Trizeps #93B6E0, Bauch #D6D080
+
+### Fortschritts-Farben (pbadge = solide Pill; rcol = ganzes Rep-Feld gefuellt)
+  Gruen #6FC36A = Gewicht gesteigert (--prog-up)
+  Blau  #5EA8E0 = Mehr Reps (--prog-reps)
+  Gelb  #F5CB44 = Gleiche Leistung / Deload (--prog-same)
+  Rot   #EC6A6A = Weniger als Vorwoche (--prog-down)
+
+### Marke / Assets
+Logo: Pixel-Art-Pfirsich SVG 16x16 (crispEdges), eingefasst in einen 40px Cream-Kreis-Block.
+Favicon: Pfirsich-Emoji als SVG-Data-URI im <head>.
+Home-Screen-Icon: apple-touch-icon.png (180x180), verlinkt mit apple-mobile-web-app-title.
+theme-color-Meta + manifest sind jetzt hell (#B49DF2 / #E9DEF8).
 WICHTIG (localStorage!): Seit iOS 16.4 oeffnet Apple JEDES Home-Screen-Lesezeichen
 standardmaessig als eigenstaendige Web-App mit EIGENEM (leerem) localStorage-Container —
 auch ohne apple-mobile-web-app-capable. Die Trainingsdaten liegen aber in Safari!
@@ -77,18 +109,7 @@ wieder Safari mit den vorhandenen Daten. NIEMALS auf display:standalone aendern 
 NIEMALS apple-mobile-web-app-capable hinzufuegen, sonst sind die Daten scheinbar weg.
 Nach Manifest-Aenderungen muss das Icon auf dem iPhone entfernt und neu hinzugefuegt
 werden (iOS liest das Manifest nur beim Hinzufuegen).
-Empfohlene Uebungen (REC-Set) erhalten im Dropdown einen goldenen Stern (★)
-
-Kategorie-Farben:
-  Glute Max: #C8729A, Glute Med: #B88CC0, Glute & Quad: #C4A882, Glute & Hams: #A8C4A0
-  Ruecken: #8AB4C4, Brust: #C4A8A8, Schultern: #B4C4A0, Bizeps: #C4B8A0
-  Trizeps: #A0B4C4, Bauch: #C0BEA0
-
-Fortschritts-Farben:
-  Gruen #7bc47a = Gewicht gesteigert
-  Blau  #7aafdf = Mehr Reps
-  Gelb  #e8b860 = Gleiche Leistung / Deload
-  Rot   #d86868 = Weniger als Vorwoche
+Empfohlene Uebungen (REC-Set) erhalten im Dropdown einen goldenen Stern (★).
 
 ---
 
@@ -108,8 +129,7 @@ S = {
   openDays: {},     // mobile-friendly: standardmaessig zu, Accordion-Stil
   animDay: null,    // Tag-Index der gerade aufgeklappt wurde (einmalige Einblend-Animation)
   dropAnim: false,  // true nur waehrend togDrop -> Dropdown-Einblend-Animation (nicht bei Suche)
-  theme: "dark",    // "dark" | "light" — wird beim Start aus peach_theme geladen
-}
+}                   // (kein theme mehr — Dark Mode entfernt)
 ```
 
 ### Key-Formate
@@ -134,13 +154,11 @@ parseWeight(w)          Parst "25-27" -> 27 (oberer Wert), "27,5" -> 27.5 (Komma
 isWeightRange(w)        true bei echter Spanne ("42-45"), false bei Einzelwert oder "45-45"
 prog(cr,pr,cw,pw)       'w'|'r'|'s'|'d' Fortschritts-Status (Reps = Gesamtsumme!)
 findLastExData(di,ei,ex) Sucht letzten gespeicherten Wert dieser Uebung (uebungsbasierter Vergleich)
-rcol(v,r)               Farbe fuer Rep-Eingabefeld
+rcol(v,r)               Performance-Farbe, mit der das ganze Rep-Feld gefuellt wird (leer -> weiss)
 esc(s)                  HTML-escape
 autoExtraSets(di,ei)    0 oder 1. Braucht 3 stagnierende WOCHENVERGLEICHE ('s'/'d') in Folge bei
                         gleicher Uebung -> greift fruehestens in WOCHE 5 (W2vsW1 + W3vsW2 + W4vsW3).
                         Der Guard "if(S.week<4)return 0" ist nur ein Early-Out. Verifiziert per Test.
-applyTheme()            Setzt light-Klasse auf documentElement, Button-Icon (Sonne/Mond), theme-color-Meta
-toggleTheme()           Wechselt S.theme, speichert unter peach_theme, ruft applyTheme()
 toggleDay(di)           Accordion: andere Tage schliessen sich automatisch (setzt S.animDay fuer Animation)
 onDS(di,ei,v)           Dropdown-Suche — stellt nach renderT() Fokus + Cursor im Suchfeld wieder her
 updSetting(di,ei,v)     Speichert Maschinen-Einstellung unter set__ex__[Name] — KEIN renderT!
@@ -153,10 +171,10 @@ flashView()             Sanfter Einblend-Effekt der aktiven Ansicht (Tab-/Zyklus
 saveUI()                Merkt die aktuelle Position (view/week/cy/openDays) im Key peach_ui. Wird in
                         setView/setCycle/changeWeek/toggleDay aufgerufen; beim Start wird peach_ui
                         validiert zurueck in S geladen, damit die App dort weitermacht. peach_v4 unberuehrt.
-expBackup()             Backup: JSON {app:'peach',v:1,date,theme,data:S.data} in die Zwischenablage,
+expBackup()             Backup: JSON {app:'peach',v:1,date,data:S.data} in die Zwischenablage,
                         Fallback: Text ins bk-ta-Feld + markieren. UI unten in der Uebersicht (bk-card).
 impBackup()             Import: akzeptiert das Wrapper-Format ODER rohes peach_v4-Objekt. Validiert
-                        Keys (__w_d_e / tip__ / set__), confirm() vor Ueberschreiben, setzt auch Theme.
+                        Keys (__w_d_e / tip__ / set__), confirm() vor Ueberschreiben.
 checkUpdate()           Auto-Update gegen iOS-Webapp-Cache: GitHub-API (commits/main) liefert Datum+SHA;
                         ist der Commit neuer als BUILD_TS, einmaliger location.replace mit ?v=sha
                         (Cache-Buster). peach_ver verhindert Reload-Schleifen. Laeuft beim Start und
@@ -179,19 +197,26 @@ checkUpdate()           Auto-Update gegen iOS-Webapp-Cache: GitHub-API (commits/
 - Spart Scrollen auf dem iPhone
 - Alle Eingabefelder (w-input, rep-inp, drop-search input, tip-ta, set-input) haben font-size 16px —
   verhindert Auto-Zoom auf iOS! Nicht verkleinern.
-- Touch-Ziele vergroessert: week-arrow 34px, add-set-btn 36px, pick-btn min-height 40px, rep-inp 46px breit
+- Touch-Ziele vergroessert: week-arrow 38px, add-set-btn 38px, pick-btn min-height 40px, rep-inp 46px breit
 
-### UI-Status-Elemente (Design-Update)
-- Tages-Pill im day-header (`#dc-[di]`, Klasse day-count): "x/y Uebungen" — grau (0), pink (teilweise), gruen mit Haken (alle)
-- Erledigt-Haken pro Uebung (`#done-[di]-[ei]`, Klasse done-chip): sichtbar wenn exDone() — Toggle via hidden-Klasse
+### UI-Status-Elemente (Neobrutalism)
+- Tages-Pill im day-header (`#dc-[di]`, Klasse day-count): "x/y Uebungen" — ink-Pille mit der
+  Tagesfarbe als Textfarbe; ✓-Praefix wenn alle Uebungen erledigt (refreshDone setzt nur den Text)
+- Erledigt-Haken pro Uebung (`#done-[di]-[ei]`, Klasse done-chip): gruener Kreis mit Ink-Rahmen,
+  sichtbar wenn exDone() — Toggle via hidden-Klasse
 - Beide werden bei Rep-Eingabe LIVE per refreshDone() aktualisiert (gezieltes DOM-Update, kein renderT)
-- Uebersicht: Balken mit Farbverlauf, aktuelle Woche (S.week) bekommt Ring (box-shadow, var(--ring))
+- Rep-Feld (.rep-inp): leer = weiss; ausgefuellt wird das GANZE Feld mit der Performance-Farbe
+  gefuellt (rcol: rot unter Bereich, gelb im Bereich, gruen am/ueber Top), Text bleibt ink
+- Fortschritt-Block (.week-progress): Cream-Block mit grosser %-Zahl (Archivo Black) + Kapsel-Bar
+  (Peach-Fuellung, gruen bei 100%)
+- Uebersicht: vertikale Kapsel-Balken (.ov-bar = Pill-Track, .ov-bar-fill von unten) —
+  aktuelle Woche (S.week) Peach, andere Wochen Lilac (kein Ring mehr)
 - Animationen: fadeSlide (Ansicht/Tag aufklappen), dropIn (Dropdown nur beim Oeffnen, nicht bei Suche)
-- Einstellungs-Feld (Zahnrad + .set-input): erscheint sobald eine Uebung gewaehlt ist, zwischen
-  ex-meta und reps-row. Speichert uebungsbasiert (set__ex__Name) via updSetting() — ohne renderT
-- Theme-Button (.theme-btn, #theme-btn): rund, 34px, im header-right neben den Tabs
+- Einstellungs-Feld (gelbes Zahnrad-Chip + .set-input): erscheint sobald eine Uebung gewaehlt ist,
+  zwischen ex-meta und reps-row. Speichert uebungsbasiert (set__ex__Name) via updSetting() — ohne renderT
+- KEIN Theme-Button mehr (Dark Mode entfernt) — der header-right enthaelt nur die beiden Tab-Pills
 - Tipp-Panel: Standard-Tipp (TIPS) immer sichtbar; eigene Notiz (tip__ex__) darunter mit
-  lila Label "Deine Notiz" (.tip-note, .tip-note-lbl); Editor bearbeitet NUR die Notiz
+  Label "Deine Notiz" (.tip-note, .tip-note-lbl); Editor bearbeitet NUR die Notiz
 
 ### Daten-Vererbung zwischen Wochen
 Vererbt: exercise, extraSets — NICHT: reps, weight
@@ -322,7 +347,8 @@ Spezial: 3D Abduktor Maschine, Belt Squat, Belt Squat RDL, Beinpresse 45 Grad, R
 
 ## Deload-Banner (Woche 12)
 
-Erscheint automatisch in Woche 12. Goldene Umrahmung (var(--gold)), Hintergrund var(--deload-bg).
+Erscheint automatisch in Woche 12. Gelber Block (var(--yellow)), 2,5px Ink-Rahmen, harte
+Schatten (--sh-card), Titel in Archivo Black, schwarzer (ink) Text.
 Hinweis: 50-60% Gewicht, 2 Saetze, gleiche Uebungen, kein Muskelabbau.
 
 ---
@@ -353,6 +379,15 @@ Fallback (manuell, ohne Session):
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
 
+NEU. **Neobrutalism-Redesign + Dark Mode entfernt:** Komplettes Re-Skin auf das neue
+   Peach-Designsystem — flache Farb-Bloecke, fast-schwarze Ink-Rahmen (2,5px), harte
+   Offset-Schatten ohne Blur, runde Pills, Fonts Archivo Black (Display) + Space Grotesk
+   (Body). Tagesfarben (A Peach / B Pink / C Lime / D Sky), neue Kategorie- & Fortschritts-
+   Farben, vertikale Kapsel-Balken in der Uebersicht, Rep-Felder werden voll performance-
+   farbig gefuellt. Dark Mode KOMPLETT raus: Sonne/Mond-Button, applyTheme/toggleTheme,
+   theme-State, peach_theme-Key, theme-color-Wechsel und Backup-Theme entfernt; nur noch
+   ein helles :root. manifest.json + theme-color auf helle Palette. Funktionen, Daten und
+   localStorage-Keys (peach_v4/peach_ui) unveraendert.
 0. **Position merken:** saveUI() speichert die zuletzt offene Position (view/week/cy/openDays)
    im eigenen Key peach_ui; beim Start validiert zurueckgeladen. Grund: Beim App-Wechsel/
    Schliessen ging alles zu und man startete wieder in Woche 1. peach_v4 bleibt unberuehrt.
