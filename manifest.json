@@ -3,8 +3,8 @@
   "short_name": "Peach Project",
   "display": "browser",
   "start_url": ".",
-  "background_color": "#1a1418",
-  "theme_color": "#1a1418",
+  "background_color": "#E9DEF8",
+  "theme_color": "#B49DF2",
   "icons": [
     { "src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
   ]
