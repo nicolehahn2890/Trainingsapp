@@ -41,7 +41,7 @@ auf main einmalig eine Sicherheitsfreigabe verlangen; dann kurz bestaetigen lass
   Peach_Project.pdf (Plan-Doku, 41 Seiten), SKILL.md (diese Datei)
 - localStorage-Keys: peach_v4 (Trainingsdaten — NIEMALS umbenennen!),
   peach_ver (Auto-Update-Guard: Commit-SHA, fuer den bereits neu geladen wurde),
-  peach_ui (zuletzt offene Position: view/week/cy/openDays — getrennt von peach_v4).
+  peach_ui (zuletzt offene Position: view/week/cy/pt/openDays — getrennt von peach_v4).
   (peach_theme wurde entfernt — es gibt keinen Dark Mode mehr.)
 - Gym: Workshop Fitness Barcelona, Carrer d'Avila 120, El Poblenou. Panatta, Precor, Rogue, Eleiko, TRX.
 
@@ -122,7 +122,8 @@ Empfohlene Uebungen (REC-Set) erhalten im Dropdown einen goldenen Stern (★).
 ### State-Objekt S
 ```
 S = {
-  cy: "cycle1",     // cycle1 / cycle2 / cycle3
+  cy: "cycle1",     // cycle1-3 (4-Tage-Plan) bzw. p3cycle1-3 (3-Tage-Plan)
+  pt: "p4",         // Plan-Typ: "p4" (4 Tage, Default) | "p3" (3 Tage)
   week: 1,          // 1-12
   view: "training", // "training" | "overview"
   data: {},
@@ -139,6 +140,8 @@ S = {
 ### Key-Formate
 ```
 Workout:      [cycle]__w[week]__d[dayIdx]__e[exIdx]
+              [cycle] = cycle1-3 (4-Tage-Plan) ODER p3cycle1-3 (3-Tage-Plan).
+              Die Plaene sind dadurch komplett getrennt — NIEMALS Keys mischen/migrieren!
 Tipp-Notiz:   tip__ex__[Uebungsname]  (gilt ueber alle Wochen/Tage/Zyklen!)
               WICHTIG: Seit dem Notiz-Update ist das eine ZUSAETZLICHE eigene Notiz,
               KEIN Override mehr! Der Standard-Tipp aus TIPS wird IMMER angezeigt,
@@ -153,7 +156,11 @@ Slot:         tip__[cycle]__w[week]__d[dayIdx]__e[exIdx]  (nur UI-State)
 mk(cy,week,di,ei)       Workout-Key
 mkt(cy,week,di,ei)      Slot-Key
 initKey(di,ei)          Key mit Vorwoche-Daten init — IMMER statt mk() beim Schreiben!
-plan()                  gibt immer P4 zurueck (P3, S.pt, setPlan, updatePlanBtns wurden komplett entfernt)
+plan()                  gibt P3 (S.pt==='p3') oder P4 (Default) zurueck
+cyBase()                Zyklus ohne Plan-Praefix ('p3cycle2' -> 'cycle2') — fuer Buttons + Deload-Text
+setPlan(pt)             Plan-Umschalter 'p3'/'p4' (Header-Pills "3 Tage"/"4 Tage", Klasse .plan-btn).
+                        Behaellt die Zyklus-Nummer (cycle2 <-> p3cycle2), schliesst offene Tage/Dropdown,
+                        speichert via saveUI(). Daten der Plaene bleiben strikt getrennt (p3-Key-Praefix).
 parseWeight(w)          Parst "25-27" -> 27 (oberer Wert), "27,5" -> 27.5 (Komma -> Punkt)
 isWeightRange(w)        true bei echter Spanne ("42-45"), false bei Einzelwert oder "45-45"
 prog(cr,pr,cw,pw)       'w'|'r'|'s'|'d' Fortschritts-Status (Reps = Gesamtsumme!)
@@ -237,7 +244,8 @@ Vererbt: exercise, extraSets — NICHT: reps, weight
    plus Ausfuehrungs-Cues, zugeschnitten auf Glute-Fokus / schmale Beine
 4. KEIN Grad-Zeichen (°) in Strings im Script — zerstoert den JS-Parser! "Grad" ausschreiben
 5. Keine renderT() in updRep/updW
-6. plan() gibt immer P4 zurueck — nicht aendern
+6. plan() gibt P3 oder P4 zurueck (je nach S.pt) — beide Plaene folgen denselben Regeln
+   (Steigerung, autoExtraSets, Vererbung, Deload); 3-Tage-Daten IMMER unter p3cycle-Keys
 7. Bei groesseren Aenderungen: Python-Script verwenden, am Ende node --check ausfuehren
 8. Sonderzeichen generell meiden in JS-Strings
 9. Gewicht IMMER mit parseWeight() parsen, nie parseFloat() — sonst geht der obere Bereichswert verloren ("42-45" -> 42)
@@ -246,7 +254,7 @@ Vererbt: exercise, extraSets — NICHT: reps, weight
 
 ---
 
-## Trainingsplan 4-Tage (P4) — einziger aktiver Plan
+## Trainingsplan 4-Tage (P4) — Standard-Plan
 
 ### Tag A — Beine
 | Kategorie | Saetze | Reps |
@@ -299,6 +307,53 @@ Vererbt: exercise, extraSets — NICHT: reps, weight
 | Brust | 2 | 8-12 |
 | Schultern | 2 | 8-12 |
 | Bauch | 2 | 8-12 |
+
+---
+
+## Trainingsplan 3-Tage (P3) — waehlbar ueber "3 Tage"-Pill im Header
+
+Eigene Zyklen 1-3 (Keys p3cycle1-3), gleiche Regeln wie P4 (Steigerung, Auto-Extra-Satz,
+Vererbung, Deload Woche 12). Tagesfarben: A Peach, B Pink, C Lime.
+
+### Tag A — Ganzkoerper
+| Kategorie | Saetze | Reps |
+|---|---|---|
+| Glute Max | 3 | 4-8 |
+| Glute Max | 2 | 8-12 |
+| Glute Med | 2 | 8-12 |
+| Glute Med | 2 | 8-12 |
+| Glute & Hams | 2 | 4-8 |
+| Glute & Quad | 2 | 4-8 |
+| Brust | 2 | 8-12 |
+| Schultern | 2 | 8-12 |
+| Bauch | 3 | 8-12 |
+
+### Tag B — Ganzkoerper
+| Kategorie | Saetze | Reps |
+|---|---|---|
+| Glute & Hams | 2 | 4-8 |
+| Glute & Hams | 2 | 6-10 |
+| Glute Max | 3 | 6-10 |
+| Glute Med | 2 | 8-12 |
+| Glute Med | 2 | 8-12 |
+| Glute & Quad | 2 | 6-10 |
+| Ruecken | 2 | 8-12 |
+| Ruecken | 2 | 8-12 |
+| Schultern | 2 | 8-12 |
+| Bauch | 3 | 8-12 |
+
+### Tag C — Ganzkoerper
+| Kategorie | Saetze | Reps |
+|---|---|---|
+| Glute Max | 3 | 4-8 |
+| Glute Max | 2 | 8-12 |
+| Glute Med | 2 | 8-12 |
+| Glute Med | 2 | 8-12 |
+| Glute & Hams | 3 | 4-8 |
+| Ruecken | 2 | 8-12 |
+| Brust | 2 | 8-12 |
+| Schultern | 2 | 8-12 |
+| Bauch | 3 | 8-12 |
 
 ---
 
@@ -383,7 +438,17 @@ Fallback (manuell, ohne Session):
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
 
-NEU. **Neobrutalism-Redesign + Dark Mode entfernt:** Komplettes Re-Skin auf das neue
+NEU. **3-Tage-Plan (P3) zurueckgebaut — waehlbar neben dem 4-Tage-Plan:** Neue Header-Pills
+   "3 Tage"/"4 Tage" (.plan-btn, aktive Pill Peach) ueber den Zyklus-Buttons. P3 exakt nach
+   Rexis Tabelle (Tag A 9 / Tag B 10 / Tag C 9 Uebungen, inkl. 4-8er-Bereiche und Bauch mit
+   3 Saetzen). Eigene Zyklen 1-3 mit Key-Praefix p3cycle1-3 in peach_v4 — bestehende
+   cycle1-3-Daten des 4-Tage-Plans bleiben zu 100% unangetastet (nur additiv!). Alle Regeln
+   laufen identisch, weil prog/findLastExData/autoExtraSets/initKey ueber S.cy arbeiten.
+   S.pt ('p4' Default) wird in peach_ui mitgespeichert; setPlan() mappt die Zyklus-Nummer
+   (cycle2 <-> p3cycle2). plan() gibt jetzt P3 oder P4 zurueck, cyBase() liefert den
+   Zyklus ohne Praefix (Buttons + Deload-Text). Verifiziert per Node-Funktionstest
+   (Key-Trennung, Steigerungserkennung im P3) und Playwright-Screenshots.
+1. **Neobrutalism-Redesign + Dark Mode entfernt:** Komplettes Re-Skin auf das neue
    Peach-Designsystem — flache Farb-Bloecke, fast-schwarze Ink-Rahmen (2,5px), harte
    Offset-Schatten ohne Blur, runde Pills, Fonts Archivo Black (Display) + Space Grotesk
    (Body). Tagesfarben (A Peach / B Pink / C Lime / D Sky), neue Kategorie- & Fortschritts-
@@ -395,31 +460,31 @@ NEU. **Neobrutalism-Redesign + Dark Mode entfernt:** Komplettes Re-Skin auf das 
    (apple-touch-icon.png) neu gestaltet: Pixel-Pfirsich im Cream-Kreis mit Ink-Rahmen auf
    Lilac. WICHTIG fuer die Nutzerin: manifest blieb display:browser -> Icon-Wechsel kostet
    KEINE Daten; auf dem iPhone nur altes Icon entfernen und neu zum Homescreen hinzufuegen.
-0. **Position merken:** saveUI() speichert die zuletzt offene Position (view/week/cy/openDays)
+2. **Position merken:** saveUI() speichert die zuletzt offene Position (view/week/cy/openDays)
    im eigenen Key peach_ui; beim Start validiert zurueckgeladen. Grund: Beim App-Wechsel/
    Schliessen ging alles zu und man startete wieder in Woche 1. peach_v4 bleibt unberuehrt.
-1. **Auto-Update:** checkUpdate() laedt die App einmal neu, wenn auf main ein neuerer
+3. **Auto-Update:** checkUpdate() laedt die App einmal neu, wenn auf main ein neuerer
    Commit liegt (GitHub-API, Cache-Buster ?v=sha, Guard peach_ver). Grund: iOS-Webapp-
    Cache friert alte Staende ein. ACHTUNG: BUILD_TS bei jedem Deploy aktualisieren (Regel 10)!
-2. **Daten-Backup:** Export/Import unten in der Uebersicht (bk-card). expBackup kopiert
+4. **Daten-Backup:** Export/Import unten in der Uebersicht (bk-card). expBackup kopiert
    JSON in die Zwischenablage, impBackup spielt es ein (Validierung + confirm).
    Anlass: Trainingsdaten lagen im Container des ALTEN Home-Screen-Icons —
    jede Oeffnungsart (Safari/Chrome/jedes Icon) hat auf iOS einen EIGENEN localStorage!
-3. **Home-Screen-Icon (iPhone):** apple-touch-icon.png (180x180, Pixel-Pfirsich auf
+5. **Home-Screen-Icon (iPhone):** apple-touch-icon.png (180x180, Pixel-Pfirsich auf
    Header-Gradient) + apple-mobile-web-app-title. Nachgebessert mit manifest.json
    ("display": "browser"), weil iOS 16.4+ Home-Screen-Links sonst als Web-App mit
    leerem localStorage oeffnet (siehe Warnung im Design-System).
-4. **Tipp-Notizen statt Override:** Standard-Tipp immer sichtbar, eigene Texte als
+6. **Tipp-Notizen statt Override:** Standard-Tipp immer sichtbar, eigene Texte als
    "Deine Notiz" zusaetzlich darunter. savTip loescht Key bei leerem Text.
-5. **Maschinen-Einstellungen:** 38 Maschinen-Tipps mit Einstell-Checkliste
+7. **Maschinen-Einstellungen:** 38 Maschinen-Tipps mit Einstell-Checkliste
    (Zahnrad-Emoji + "Einstellung:" / "Ausfuehrung:"), zugeschnitten auf 169 cm / 56 kg /
    Glute-Fokus. Neues Feld "Meine Einstellung" pro Uebung (set__ex__Name).
-6. **Heller Modus:** CSS-Variablen :root / :root.light, Sonne/Mond-Button im Header,
+8. **Heller Modus:** CSS-Variablen :root / :root.light, Sonne/Mond-Button im Header,
    Key peach_theme, theme-color-Meta wechselt mit.
-7. **Design-Update:** Karten mit Verlauf/Schatten, Animationen (fadeSlide/dropIn),
+9. **Design-Update:** Karten mit Verlauf/Schatten, Animationen (fadeSlide/dropIn),
    Tages-Pill "x/y Uebungen", Erledigt-Haken pro Uebung (live via refreshDone),
    groessere Touch-Ziele, 16px-Inputs gegen iOS-Zoom, kompakter Header.
-8. **Code-Review davor:** uebungsbasierter Vergleich (findLastExData), Reps als
+10. **Code-Review davor:** uebungsbasierter Vergleich (findLastExData), Reps als
    Gesamtsumme, parseWeight fuer Spannen/Komma, P3/Plan-Umschalter entfernt,
    Dropdown-Such-Fokus-Fix, REC-Stern im Dropdown, veraltete Duplikat-PDF geloescht.
 

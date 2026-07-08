@@ -78,6 +78,8 @@ button.nb-shadow:active{box-shadow:var(--sh-press)!important;}
 .tab-btn.inactive{background:var(--surface);color:var(--text);}
 .cycle-btn{padding:7px 13px;border-radius:999px;font-size:12px;font-weight:600;border:var(--bw) solid var(--ink);background:transparent;color:var(--ink);}
 .cycle-btn.active{background:var(--ink);color:var(--cream);box-shadow:var(--sh-xs);}
+.plan-btn{padding:7px 13px;border-radius:999px;font-size:12px;font-weight:700;border:var(--bw) solid var(--ink);background:var(--surface);color:var(--ink);}
+.plan-btn.active{background:var(--peach);color:var(--ink);box-shadow:var(--sh-xs);}
 .week-nav{margin-left:auto;display:flex;align-items:center;gap:6px;}
 .week-arrow{width:38px;height:38px;border-radius:50%;background:var(--sky);border:var(--bw) solid var(--ink);color:var(--ink);font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:var(--sh-xs);}
 .week-label{font-size:13px;font-weight:700;min-width:64px;text-align:center;background:var(--surface);color:var(--text);border:var(--bw) solid var(--ink);border-radius:999px;padding:6px 10px;}
@@ -224,6 +226,10 @@ button.nb-shadow:active{box-shadow:var(--sh-press)!important;}
     </div>
   </div>
   <div class="controls">
+    <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;">
+      <button class="plan-btn nb-shadow" id="plan-p3" onclick="setPlan('p3')">3 Tage</button>
+      <button class="plan-btn nb-shadow active" id="plan-p4" onclick="setPlan('p4')">4 Tage</button>
+    </div>
     <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;">
       <button class="cycle-btn nb-shadow active" id="cycle-cycle1" onclick="setCycle('cycle1')">Zyklus 1</button>
       <button class="cycle-btn nb-shadow" id="cycle-cycle2" onclick="setCycle('cycle2')">Zyklus 2</button>
@@ -419,20 +425,52 @@ const P4=[
   {c:"Bauch",s:2,r:[8,12]}
 ]}
 ];
+// 3-Tage-Plan: eigene Zyklen (Key-Praefix p3cycle1-3 in peach_v4) — voellig getrennt
+// vom 4-Tage-Plan, gleiche Regeln (Steigerung, Auto-Extra-Satz, Vererbung, Deload).
+const P3=[
+{l:"Tag A – Ganzkörper",e:[
+  {c:"Glute Max",s:3,r:[4,8]},{c:"Glute Max",s:2,r:[8,12]},
+  {c:"Glute Med",s:2,r:[8,12]},{c:"Glute Med",s:2,r:[8,12]},
+  {c:"Glute & Hams",s:2,r:[4,8]},
+  {c:"Glute & Quad",s:2,r:[4,8]},
+  {c:"Brust",s:2,r:[8,12]},
+  {c:"Schultern",s:2,r:[8,12]},
+  {c:"Bauch",s:3,r:[8,12]}
+]},
+{l:"Tag B – Ganzkörper",e:[
+  {c:"Glute & Hams",s:2,r:[4,8]},{c:"Glute & Hams",s:2,r:[6,10]},
+  {c:"Glute Max",s:3,r:[6,10]},
+  {c:"Glute Med",s:2,r:[8,12]},{c:"Glute Med",s:2,r:[8,12]},
+  {c:"Glute & Quad",s:2,r:[6,10]},
+  {c:"Rücken",s:2,r:[8,12]},{c:"Rücken",s:2,r:[8,12]},
+  {c:"Schultern",s:2,r:[8,12]},
+  {c:"Bauch",s:3,r:[8,12]}
+]},
+{l:"Tag C – Ganzkörper",e:[
+  {c:"Glute Max",s:3,r:[4,8]},{c:"Glute Max",s:2,r:[8,12]},
+  {c:"Glute Med",s:2,r:[8,12]},{c:"Glute Med",s:2,r:[8,12]},
+  {c:"Glute & Hams",s:3,r:[4,8]},
+  {c:"Rücken",s:2,r:[8,12]},
+  {c:"Brust",s:2,r:[8,12]},
+  {c:"Schultern",s:2,r:[8,12]},
+  {c:"Bauch",s:3,r:[8,12]}
+]}
+];
 
 // STATE
-let S={view:'training',week:1,cy:'cycle1',data:{},openDays:{},drop:null,dropSearch:'',tips:{},tipEdit:{},animDay:null,dropAnim:false};
+let S={view:'training',week:1,cy:'cycle1',pt:'p4',data:{},openDays:{},drop:null,dropSearch:'',tips:{},tipEdit:{},animDay:null,dropAnim:false};
 function load(){try{const r=localStorage.getItem('peach_v4');return r?JSON.parse(r):{}}catch{return{}}}
 function save(){try{localStorage.setItem('peach_v4',JSON.stringify(S.data))}catch{}}
 S.data=load();
 // POSITION MERKEN (eigener Key peach_ui — merkt sich Tab/Zyklus/Woche/aufgeklappten Tag,
 // damit die App nach App-Wechsel oder Schliessen genau dort weitermacht. peach_v4 unberuehrt!)
-function saveUI(){try{localStorage.setItem('peach_ui',JSON.stringify({view:S.view,week:S.week,cy:S.cy,openDays:S.openDays}))}catch{}}
+function saveUI(){try{localStorage.setItem('peach_ui',JSON.stringify({view:S.view,week:S.week,cy:S.cy,pt:S.pt,openDays:S.openDays}))}catch{}}
 try{
   const u=JSON.parse(localStorage.getItem('peach_ui')||'{}');
   if(u.view==='training'||u.view==='overview')S.view=u.view;
   if(typeof u.week==='number'&&u.week>=1&&u.week<=12)S.week=u.week;
-  if(u.cy==='cycle1'||u.cy==='cycle2'||u.cy==='cycle3')S.cy=u.cy;
+  if(u.pt==='p3'||u.pt==='p4')S.pt=u.pt;
+  if(['cycle1','cycle2','cycle3','p3cycle1','p3cycle2','p3cycle3'].includes(u.cy))S.cy=(S.pt==='p3'?'p3':'')+String(u.cy).replace(/^p3/,'');
   if(u.openDays&&typeof u.openDays==='object'&&!Array.isArray(u.openDays))S.openDays=u.openDays;
 }catch{}
 
@@ -440,7 +478,9 @@ const REC=new Set(["Hip Thrusts Langhantel","Hip Thrusts Multipresse","Hip Thrus
 
 function mk(c,w,d,e){return c+'__w'+w+'__d'+d+'__e'+e}
 function mkt(c,w,d,e){return 'tip__'+c+'__w'+w+'__d'+d+'__e'+e}
-function plan(){return P4}
+function plan(){return S.pt==='p3'?P3:P4}
+// Zyklus ohne Plan-Praefix ('p3cycle2' -> 'cycle2') — fuer Button-Markierung & Deload-Text
+function cyBase(){return String(S.cy).replace(/^p3/,'')}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
 // Performance-Farbe fuer ausgefuelltes Rep-Feld (leer -> '' = weisses Feld)
 function rcol(v,r){if(v===''||v==null)return'';const n=parseInt(v);if(isNaN(n))return'';if(n>=r[1])return'#6FC36A';if(n>=r[0])return'#F5CB44';return'#EC6A6A'}
@@ -495,7 +535,8 @@ function pbadge(p){
 // RENDER
 function render(){
   document.getElementById('week-label').textContent='W '+S.week+' / 12';
-  ['cycle1','cycle2','cycle3'].forEach(c=>document.getElementById('cycle-'+c).className='cycle-btn nb-shadow'+(S.cy===c?' active':''));
+  ['p3','p4'].forEach(p=>document.getElementById('plan-'+p).className='plan-btn nb-shadow'+(S.pt===p?' active':''));
+  ['cycle1','cycle2','cycle3'].forEach(c=>document.getElementById('cycle-'+c).className='cycle-btn nb-shadow'+(cyBase()===c?' active':''));
   document.getElementById('btn-training').className='tab-btn nb-shadow'+(S.view==='training'?' active':' inactive');
   document.getElementById('btn-overview').className='tab-btn nb-shadow'+(S.view==='overview'?' active':' inactive');
   document.getElementById('view-training').classList.toggle('hidden',S.view!=='training');
@@ -540,7 +581,7 @@ function renderT(){
   });
   S.animDay=null;
   if(S.week===12){
-    const nextCy=S.cy==='cycle1'?'2':S.cy==='cycle2'?'3':'1 (neu)';
+    const nextCy=cyBase()==='cycle1'?'2':cyBase()==='cycle2'?'3':'1 (neu)';
     h+='<div style="background:var(--yellow);border:var(--bw) solid var(--ink);border-radius:var(--r-xl);padding:16px 18px;margin-top:8px;box-shadow:var(--sh-card)">'
       +'<div style="font-family:var(--font-display);text-transform:uppercase;font-size:15px;letter-spacing:-0.5px;color:var(--ink);margin-bottom:6px">🏁 Woche 12 – Zyklus fast abgeschlossen!</div>'
       +'<p style="color:var(--ink);font-size:13px;line-height:1.7;margin:0 0 10px">Nach dieser Woche folgt eine <b>Deload-Woche</b> – danach startest du Zyklus '+nextCy+' mit neuem Gewicht.</p>'
@@ -779,7 +820,9 @@ function flashView(){
   if(el){el.classList.remove('fade-in');void el.offsetWidth;el.classList.add('fade-in')}
 }
 function setView(v){S.view=v;saveUI();render();flashView()}
-function setCycle(c){S.cy=c;saveUI();render();flashView()}
+// Plan-Wechsel 3/4 Tage: Zyklus-Nummer bleibt, Daten-Keys sind pro Plan getrennt (p3-Praefix)
+function setPlan(pt){if(S.pt===pt)return;S.pt=pt;S.cy=(pt==='p3'?'p3':'')+cyBase();S.openDays={};S.drop=null;saveUI();render();flashView()}
+function setCycle(c){S.cy=(S.pt==='p3'?'p3':'')+c;saveUI();render();flashView()}
 function changeWeek(d){const old=S.week;S.week=Math.max(1,Math.min(12,S.week+d));saveUI();render();if(S.week!==old)flashView()}
 function toggleDay(di){const wasOpen=S.openDays[di]===true;S.openDays={};if(!wasOpen){S.openDays[di]=true;S.animDay=di}saveUI();render()}
 
@@ -851,7 +894,7 @@ document.addEventListener('click',e=>{
 // App sich EINMAL selbst neu - mit ?v=sha am Cache vorbei. peach_ver merkt sich den
 // Commit, fuer den schon neu geladen wurde (verhindert Reload-Schleifen). Daten in
 // peach_v4 sind davon voellig unberuehrt. BUILD_TS bei jedem Deploy aktualisieren!
-const BUILD_TS='2026-06-14T07:30:00Z';
+const BUILD_TS='2026-07-08T08:37:00Z';
 let verLastCheck=0;
 function checkUpdate(){
   const now=Date.now();
