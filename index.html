@@ -57,6 +57,12 @@ input,textarea,button{font-family:inherit;}
 button{cursor:pointer;transition:transform var(--dur-fast) var(--ease),box-shadow var(--dur-fast) var(--ease),background var(--dur-base),color var(--dur-base),border-color var(--dur-base);}
 button:active{transform:translate(2px,2px);}
 button.nb-shadow:active{box-shadow:var(--sh-press)!important;}
+/* Disabled buttons: flat & cream — no shadow, no press */
+button:disabled{background:var(--cream)!important;color:var(--text-dim)!important;border-color:var(--text-dim)!important;box-shadow:none!important;cursor:not-allowed;}
+button:disabled:active{transform:none;}
+/* Keyboard focus — hard peach ring on every focusable element (a11y).
+   !important so it also wins over outline:none in component styles. */
+:focus-visible{outline:3px solid var(--focus)!important;outline-offset:2px;}
 @keyframes fadeSlide{from{transform:translateY(8px)}to{transform:translateY(0)}}
 @keyframes dropIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 .fade-in{animation:fadeSlide var(--dur-anim) var(--ease);}
@@ -108,7 +114,7 @@ button.nb-shadow:active{box-shadow:var(--sh-press)!important;}
 /* ===== Exercise rows (cream blocks) ===== */
 .ex-row{background:var(--cream);border:var(--bw) solid var(--ink);border-radius:var(--r-lg);padding:12px 14px;margin-bottom:10px;box-shadow:var(--sh-xs);}
 .ex-row-top{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
-.cat-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;border:2px solid var(--ink);color:var(--ink);white-space:nowrap;letter-spacing:0.4px;text-transform:uppercase;}
+.cat-badge{font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;border:2px solid var(--ink);color:var(--ink);white-space:nowrap;letter-spacing:0.4px;text-transform:uppercase;}
 .done-chip{width:22px;height:22px;border-radius:50%;background:var(--green);border:2px solid var(--ink);color:var(--ink);font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
 .picker-wrap{flex:1;min-width:140px;position:relative;}
 .pick-btn{width:100%;min-height:40px;background:var(--field-bg);border:var(--bw) solid var(--ink);border-radius:var(--r-sm);color:var(--text-dim);font-size:14px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:6px;text-align:left;}
@@ -122,11 +128,11 @@ button.nb-shadow:active{box-shadow:var(--sh-press)!important;}
 .drop-list{max-height:240px;overflow-y:auto;}
 .drop-opt{padding:11px 12px;font-size:14px;color:var(--text);cursor:pointer;border-bottom:1.5px solid var(--ink);}
 .drop-opt:last-child{border-bottom:none;}
-.drop-opt:hover{background:rgba(24,16,22,0.06);}
+.drop-opt:hover,.drop-opt.hl{background:var(--peach);color:var(--ink);}
 .drop-opt.sel{font-weight:700;background:var(--peach);color:var(--ink);}
 .drop-empty-opt{color:var(--text-dim);}
 .drop-no-results{padding:10px 12px;color:var(--text-faint);font-size:12px;}
-.pbadge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;border:2px solid var(--ink);color:var(--ink);white-space:nowrap;}
+.pbadge{font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;border:2px solid var(--ink);color:var(--ink);white-space:nowrap;}
 .ex-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
 .sets-info{color:var(--text-mid);font-size:12px;}
 .w-wrap{display:flex;align-items:center;gap:6px;}
@@ -690,7 +696,7 @@ function renderEx(ex,ei,di){
       oh+='<div class="drop-opt'+(s?' sel':'')+'" onclick="selEx('+di+','+ei+',this.getAttribute(\'data-val\'))" data-val="'+esc(o)+'">'+esc(o)+(rec?' <span style="color:var(--gold);font-size:11px" title="Empfohlen für deine Ziele">★</span>':'')+'</div>';
     });
     if(!filt.length)oh+='<div class="drop-no-results">Keine Treffer</div>';
-    dh='<div class="dropdown'+(S.dropAnim?' anim':'')+'" id="dd-'+di+'-'+ei+'"><div class="drop-search"><input id="ds-'+di+'-'+ei+'" type="text" placeholder="Suchen…" value="'+esc(S.dropSearch)+'" oninput="onDS('+di+','+ei+',this.value)"/></div><div class="drop-list">'+oh+'</div></div>';
+    dh='<div class="dropdown'+(S.dropAnim?' anim':'')+'" id="dd-'+di+'-'+ei+'"><div class="drop-search"><input id="ds-'+di+'-'+ei+'" type="text" placeholder="Suchen…" value="'+esc(S.dropSearch)+'" oninput="onDS('+di+','+ei+',this.value)" onkeydown="dsKey('+di+','+ei+',event)"/></div><div class="drop-list">'+oh+'</div></div>';
   }
 
   // tips: Standard-Tipp wird IMMER angezeigt, eigene Texte als Notiz zusaetzlich darunter
@@ -845,6 +851,29 @@ function onDS(di,ei,v){
   const el=document.getElementById('ds-'+di+'-'+ei);
   if(el){el.focus();const n=el.value.length;el.setSelectionRange(n,n)}
 }
+// Tastatur-Navigation im Picker-Suchfeld: Pfeile bewegen das Highlight (.hl),
+// Enter waehlt die markierte Option, Esc schliesst. Suche setzt das Highlight zurueck (renderT).
+function dsKey(di,ei,e){
+  const dd=document.getElementById('dd-'+di+'-'+ei);
+  if(!dd)return;
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+    e.preventDefault();
+    const opts=[...dd.querySelectorAll('.drop-opt')];
+    if(!opts.length)return;
+    let i=opts.findIndex(o=>o.classList.contains('hl'));
+    i=e.key==='ArrowDown'?Math.min(i+1,opts.length-1):Math.max(i-1,0);
+    opts.forEach(o=>o.classList.remove('hl'));
+    opts[i].classList.add('hl');
+    opts[i].scrollIntoView({block:'nearest'});
+  }else if(e.key==='Enter'){
+    e.preventDefault();
+    const cur=dd.querySelector('.drop-opt.hl');
+    if(cur)cur.click();
+  }else if(e.key==='Escape'){
+    e.preventDefault();
+    S.drop=null;S.dropSearch='';renderT();
+  }
+}
 function selEx(di,ei,v){
   const k=initKey(di,ei);
   S.data[k]={...S.data[k],exercise:v};save();
@@ -894,7 +923,7 @@ document.addEventListener('click',e=>{
 // App sich EINMAL selbst neu - mit ?v=sha am Cache vorbei. peach_ver merkt sich den
 // Commit, fuer den schon neu geladen wurde (verhindert Reload-Schleifen). Daten in
 // peach_v4 sind davon voellig unberuehrt. BUILD_TS bei jedem Deploy aktualisieren!
-const BUILD_TS='2026-07-08T08:37:00Z';
+const BUILD_TS='2026-07-20T14:29:00Z';
 let verLastCheck=0;
 function checkUpdate(){
   const now=Date.now();
