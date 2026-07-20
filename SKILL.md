@@ -63,6 +63,11 @@ auf main einmalig eine Sicherheitsfreigabe verlangen; dann kurz bestaetigen lass
   CC, Tagesfarbe DAYBG, pbadge/rcol-Performance) sind als Hex in JS hinterlegt.
 - "Press"-Interaktion: Buttons mit Klasse `nb-shadow` ruecken auf :active um translate(2px,2px)
   und ihr Schatten kollabiert auf --sh-press (1px). Neue Schatten-Buttons brauchen diese Klasse.
+- Fokus-Ring (a11y): globales `:focus-visible` = 3px solid var(--focus) (Peach) + 2px Offset,
+  mit !important — NICHT durch outline:none uebersteuern, der Ring soll ueberall erscheinen.
+- Disabled-Buttons: globales `button:disabled` = flach & cream (var(--cream)-Hintergrund,
+  var(--text-dim) Text+Rahmen, kein Schatten, kein Press-Transform, cursor not-allowed).
+- Badges (.cat-badge Kategorie, .pbadge Fortschritt): 12px (von 10px erhoeht — Lesbarkeit).
 
 ### Fonts
 - Display (Logo, Screen-Titel, Tag-Titel, grosse Zahlen): **Archivo Black**, UPPERCASE,
@@ -172,6 +177,8 @@ autoExtraSets(di,ei)    0 oder 1. Braucht 3 stagnierende WOCHENVERGLEICHE ('s'/'
                         Der Guard "if(S.week<4)return 0" ist nur ein Early-Out. Verifiziert per Test.
 toggleDay(di)           Accordion: andere Tage schliessen sich automatisch (setzt S.animDay fuer Animation)
 onDS(di,ei,v)           Dropdown-Suche — stellt nach renderT() Fokus + Cursor im Suchfeld wieder her
+dsKey(di,ei,e)          Tastatur im Dropdown-Suchfeld: Pfeile bewegen .hl-Highlight (Peach), Enter
+                        waehlt, Esc schliesst — reines DOM-Update, kein renderT
 updSetting(di,ei,v)     Speichert Maschinen-Einstellung unter set__ex__[Name] — KEIN renderT!
                         Leerer Wert loescht den Key. Feld (.set-input, Zahnrad-Symbol) erscheint
                         nur wenn eine Uebung gewaehlt ist, zwischen ex-meta und reps-row.
@@ -438,7 +445,17 @@ Fallback (manuell, ohne Session):
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
 
-NEU. **3-Tage-Plan (P3) zurueckgebaut — waehlbar neben dem 4-Tage-Plan:** Neue Header-Pills
+NEU. **Design-Feinschliff aus Claude Design (Umsetzungs-Check):** Vier Aenderungen aus der
+   Design-Uebergabe uebernommen: (1) Peach-Fokus-Ring auf ALLEN fokussierbaren Elementen —
+   `:focus-visible{outline:3px solid var(--focus)!important;outline-offset:2px}` (a11y,
+   gewinnt auch gegen outline:none). (2) Picker-Tastatur-Navigation: im Dropdown-Suchfeld
+   bewegen Pfeil hoch/runter ein Highlight (.hl, Peach-Fuellung wie Hover), Enter waehlt,
+   Esc schliesst — Funktion dsKey(), reines DOM-Update ohne renderT; Hover der Optionen
+   jetzt ebenfalls Peach statt grau. (3) Kategorie- (.cat-badge) und Fortschritts-Badges
+   (.pbadge) von 10px auf 12px fuer Lesbarkeit. (4) Globaler Disabled-Stil fuer Buttons:
+   flach & cream (cream-Hintergrund, text-dim Text+Rahmen, kein Schatten, kein
+   Press-Effekt, cursor not-allowed). Verifiziert per Playwright-Funktionstest.
+1. **3-Tage-Plan (P3) zurueckgebaut — waehlbar neben dem 4-Tage-Plan:** Neue Header-Pills
    "3 Tage"/"4 Tage" (.plan-btn, aktive Pill Peach) ueber den Zyklus-Buttons. P3 exakt nach
    Rexis Tabelle (Tag A 9 / Tag B 10 / Tag C 9 Uebungen, inkl. 4-8er-Bereiche und Bauch mit
    3 Saetzen). Eigene Zyklen 1-3 mit Key-Praefix p3cycle1-3 in peach_v4 — bestehende
@@ -448,7 +465,7 @@ NEU. **3-Tage-Plan (P3) zurueckgebaut — waehlbar neben dem 4-Tage-Plan:** Neue
    (cycle2 <-> p3cycle2). plan() gibt jetzt P3 oder P4 zurueck, cyBase() liefert den
    Zyklus ohne Praefix (Buttons + Deload-Text). Verifiziert per Node-Funktionstest
    (Key-Trennung, Steigerungserkennung im P3) und Playwright-Screenshots.
-1. **Neobrutalism-Redesign + Dark Mode entfernt:** Komplettes Re-Skin auf das neue
+2. **Neobrutalism-Redesign + Dark Mode entfernt:** Komplettes Re-Skin auf das neue
    Peach-Designsystem — flache Farb-Bloecke, fast-schwarze Ink-Rahmen (2,5px), harte
    Offset-Schatten ohne Blur, runde Pills, Fonts Archivo Black (Display) + Space Grotesk
    (Body). Tagesfarben (A Peach / B Pink / C Lime / D Sky), neue Kategorie- & Fortschritts-
@@ -460,31 +477,31 @@ NEU. **3-Tage-Plan (P3) zurueckgebaut — waehlbar neben dem 4-Tage-Plan:** Neue
    (apple-touch-icon.png) neu gestaltet: Pixel-Pfirsich im Cream-Kreis mit Ink-Rahmen auf
    Lilac. WICHTIG fuer die Nutzerin: manifest blieb display:browser -> Icon-Wechsel kostet
    KEINE Daten; auf dem iPhone nur altes Icon entfernen und neu zum Homescreen hinzufuegen.
-2. **Position merken:** saveUI() speichert die zuletzt offene Position (view/week/cy/openDays)
+3. **Position merken:** saveUI() speichert die zuletzt offene Position (view/week/cy/openDays)
    im eigenen Key peach_ui; beim Start validiert zurueckgeladen. Grund: Beim App-Wechsel/
    Schliessen ging alles zu und man startete wieder in Woche 1. peach_v4 bleibt unberuehrt.
-3. **Auto-Update:** checkUpdate() laedt die App einmal neu, wenn auf main ein neuerer
+4. **Auto-Update:** checkUpdate() laedt die App einmal neu, wenn auf main ein neuerer
    Commit liegt (GitHub-API, Cache-Buster ?v=sha, Guard peach_ver). Grund: iOS-Webapp-
    Cache friert alte Staende ein. ACHTUNG: BUILD_TS bei jedem Deploy aktualisieren (Regel 10)!
-4. **Daten-Backup:** Export/Import unten in der Uebersicht (bk-card). expBackup kopiert
+5. **Daten-Backup:** Export/Import unten in der Uebersicht (bk-card). expBackup kopiert
    JSON in die Zwischenablage, impBackup spielt es ein (Validierung + confirm).
    Anlass: Trainingsdaten lagen im Container des ALTEN Home-Screen-Icons —
    jede Oeffnungsart (Safari/Chrome/jedes Icon) hat auf iOS einen EIGENEN localStorage!
-5. **Home-Screen-Icon (iPhone):** apple-touch-icon.png (180x180, Pixel-Pfirsich auf
+6. **Home-Screen-Icon (iPhone):** apple-touch-icon.png (180x180, Pixel-Pfirsich auf
    Header-Gradient) + apple-mobile-web-app-title. Nachgebessert mit manifest.json
    ("display": "browser"), weil iOS 16.4+ Home-Screen-Links sonst als Web-App mit
    leerem localStorage oeffnet (siehe Warnung im Design-System).
-6. **Tipp-Notizen statt Override:** Standard-Tipp immer sichtbar, eigene Texte als
+7. **Tipp-Notizen statt Override:** Standard-Tipp immer sichtbar, eigene Texte als
    "Deine Notiz" zusaetzlich darunter. savTip loescht Key bei leerem Text.
-7. **Maschinen-Einstellungen:** 38 Maschinen-Tipps mit Einstell-Checkliste
+8. **Maschinen-Einstellungen:** 38 Maschinen-Tipps mit Einstell-Checkliste
    (Zahnrad-Emoji + "Einstellung:" / "Ausfuehrung:"), zugeschnitten auf 169 cm / 56 kg /
    Glute-Fokus. Neues Feld "Meine Einstellung" pro Uebung (set__ex__Name).
-8. **Heller Modus:** CSS-Variablen :root / :root.light, Sonne/Mond-Button im Header,
+9. **Heller Modus:** CSS-Variablen :root / :root.light, Sonne/Mond-Button im Header,
    Key peach_theme, theme-color-Meta wechselt mit.
-9. **Design-Update:** Karten mit Verlauf/Schatten, Animationen (fadeSlide/dropIn),
+10. **Design-Update:** Karten mit Verlauf/Schatten, Animationen (fadeSlide/dropIn),
    Tages-Pill "x/y Uebungen", Erledigt-Haken pro Uebung (live via refreshDone),
    groessere Touch-Ziele, 16px-Inputs gegen iOS-Zoom, kompakter Header.
-10. **Code-Review davor:** uebungsbasierter Vergleich (findLastExData), Reps als
+11. **Code-Review davor:** uebungsbasierter Vergleich (findLastExData), Reps als
    Gesamtsumme, parseWeight fuer Spannen/Komma, P3/Plan-Umschalter entfernt,
    Dropdown-Such-Fokus-Fix, REC-Stern im Dropdown, veraltete Duplikat-PDF geloescht.
 
