@@ -623,15 +623,25 @@ function autoExtraSets(di,ei){
 
 
 // UEBUNGS-HISTORIE
-// Vorwerte haengen an der UEBUNG, nicht am Platz im Plan: egal ob die Uebung letzte Woche
-// an derselben Stelle stand, an einem anderen Tag, in einem anderen Zyklus oder erst vor
-// drei Wochen zuletzt trainiert wurde — es zaehlt immer der letzte Eintrag DIESER Uebung.
+// Vorwerte haengen an UEBUNG + WIEDERHOLUNGSBEREICH, nicht am Platz im Plan: egal ob die
+// Uebung letzte Woche an derselben Stelle stand, an einem anderen Tag, in einem anderen
+// Zyklus oder erst vor drei Wochen zuletzt trainiert wurde — es zaehlt immer der letzte
+// Eintrag DIESER Uebung IM SELBEN Rep-Bereich. Dieselbe Uebung mit 4-8 und mit 8-12 Reps
+// laeuft mit unterschiedlichem Gewicht und wird deshalb strikt getrennt gefuehrt.
 // Reihenfolge-Wert eines Eintrags: Zyklus > Woche > Tag > Position am Tag.
 function exOrd(cy,w,di,ei){
   const c=parseInt(String(cy).replace(/^p3/,'').replace('cycle',''))||1;
   return c*1e7+w*1e4+di*100+ei;
 }
-let _exIdx=null; // Cache: Uebungsname -> Eintraege (aufsteigend sortiert); save() verwirft ihn
+// Rep-Bereich eines Plan-Platzes als String ("4-8"); '' wenn der Platz im Plan nicht existiert
+function repRange(pt,di,ei){
+  const day=(pt==='p3'?P3:P4)[di];
+  const slot=day&&day.e&&day.e[ei];
+  return slot&&slot.r?slot.r[0]+'-'+slot.r[1]:'';
+}
+// Index-Schluessel: Uebung + Rep-Bereich
+function exKey(ex,rr){return ex+'||'+rr}
+let _exIdx=null; // Cache: Schluessel -> Eintraege (aufsteigend sortiert); save() verwirft ihn
 function exIndex(){
   if(_exIdx)return _exIdx;
   const idx={};
@@ -642,20 +652,25 @@ function exIndex(){
     if(!d||typeof d!=='object'||!d.exercise)continue;
     // Nur Eintraege mit echtem Inhalt (Gewicht oder mindestens eine Wiederholung)
     if(!d.weight&&!((d.reps||[]).some(r=>r!==''&&r!=null)))continue;
-    const cy=(m[1]||'')+'cycle'+m[2],w=+m[3],di=+m[4],ei=+m[5];
-    const e={pt:m[1]?'p3':'p4',cy:cy,w:w,di:di,ei:ei,d:d,ord:exOrd(cy,w,di,ei)};
-    (idx[d.exercise]=idx[d.exercise]||[]).push(e);
+    const cy=(m[1]||'')+'cycle'+m[2],w=+m[3],di=+m[4],ei=+m[5],pt=m[1]?'p3':'p4';
+    const rr=repRange(pt,di,ei);
+    if(!rr)continue; // Platz gibt es im Plan nicht mehr -> kein sinnvoller Vergleich
+    const e={pt:pt,cy:cy,w:w,di:di,ei:ei,rr:rr,d:d,ord:exOrd(cy,w,di,ei)};
+    const key=exKey(d.exercise,rr);
+    (idx[key]=idx[key]||[]).push(e);
   }
   for(const n in idx)idx[n].sort((a,b)=>a.ord-b.ord);
   _exIdx=idx;return idx;
 }
-// Letzter gespeicherter Wert dieser Uebung VOR der aktuellen Position (uebungsbasierter Vergleich).
+// Letzter gespeicherter Wert dieser Uebung im SELBEN Rep-Bereich, VOR der aktuellen Position.
 // Sucht im aktuellen Plan ueber alle Zyklen/Wochen/Tage; findet sich dort nichts, wird als
 // Rueckfall der letzte Eintrag aus dem anderen Plan (3- bzw. 4-Tage) genommen — nur lesend,
 // gespeichert wird weiterhin strikt getrennt.
 function findLastExData(di,ei,currentExercise){
   if(!currentExercise)return{};
-  const list=exIndex()[currentExercise];
+  const rr=repRange(S.pt,di,ei);
+  if(!rr)return{};
+  const list=exIndex()[exKey(currentExercise,rr)];
   if(!list||!list.length)return{};
   const cur=exOrd(S.cy,S.week,di,ei);
   let same=null,other=null;
@@ -969,7 +984,7 @@ document.addEventListener('click',e=>{
 // App sich EINMAL selbst neu - mit ?v=sha am Cache vorbei. peach_ver merkt sich den
 // Commit, fuer den schon neu geladen wurde (verhindert Reload-Schleifen). Daten in
 // peach_v4 sind davon voellig unberuehrt. BUILD_TS bei jedem Deploy aktualisieren!
-const BUILD_TS='2026-07-27T06:39:00Z';
+const BUILD_TS='2026-07-27T07:09:00Z';
 let verLastCheck=0;
 function checkUpdate(){
   const now=Date.now();

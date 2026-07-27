@@ -169,13 +169,16 @@ setPlan(pt)             Plan-Umschalter 'p3'/'p4' (Header-Pills "3 Tage"/"4 Tage
 parseWeight(w)          Parst "25-27" -> 27 (oberer Wert), "27,5" -> 27.5 (Komma -> Punkt)
 isWeightRange(w)        true bei echter Spanne ("42-45"), false bei Einzelwert oder "45-45"
 prog(cr,pr,cw,pw)       'w'|'r'|'s'|'d' Fortschritts-Status (Reps = Gesamtsumme!)
-findLastExData(di,ei,ex) Sucht den letzten gespeicherten Wert dieser Uebung UEBERALL in der
-                        Historie (alle Zyklen, Wochen, Tage, Positionen) — nicht mehr nur an
-                        derselben Plan-Position in Vorwochen. Liefert zusaetzlich _src
-                        {pt,cy,w,di} als Herkunft. Rueckfall auf den anderen Plan (nur lesend),
-                        wenn im aktuellen Plan noch nichts zu der Uebung steht.
+findLastExData(di,ei,ex) Sucht den letzten gespeicherten Wert dieser Uebung IM SELBEN
+                        REP-BEREICH UEBERALL in der Historie (alle Zyklen, Wochen, Tage,
+                        Positionen) — nicht mehr nur an derselben Plan-Position in Vorwochen.
+                        Liefert zusaetzlich _src {pt,cy,w,di} als Herkunft. Rueckfall auf den
+                        anderen Plan (nur lesend), wenn im aktuellen Plan noch nichts steht.
 exOrd(cy,w,di,ei)       Reihenfolge-Wert eines Eintrags: Zyklus > Woche > Tag > Position
-exIndex()               Baut/cached den Index Uebungsname -> Eintraege (aufsteigend). Cache
+repRange(pt,di,ei)      Rep-Bereich eines Plan-Platzes als String ("4-8"); '' wenn es den Platz
+                        im Plan nicht (mehr) gibt — solche Eintraege bleiben aus dem Index raus.
+exKey(ex,rr)            Index-Schluessel "Uebung||4-8"
+exIndex()               Baut/cached den Index exKey -> Eintraege (aufsteigend). Cache
                         _exIdx wird in save() verworfen — jede Datenaenderung geht durch save().
 srcLabel(src)           "Z1 W5 · Tag A" (bei Plan-Rueckfall zusaetzlich "3-Tage"/"4-Tage")
 rcol(v,r)               Performance-Farbe, mit der das ganze Rep-Feld gefuellt wird (leer -> weiss)
@@ -209,11 +212,18 @@ checkUpdate()           Auto-Update gegen iOS-Webapp-Cache: GitHub-API (commits/
 
 ### Vergleichslogik (wichtig!)
 - Fortschrittsvergleich nutzt findLastExData() — vergleicht mit letztem Wert DIESER Uebung
-- Der Vorwert haengt an der UEBUNG, NICHT am Platz im Plan: gesucht wird ueber alle Zyklen,
-  Wochen, Tage und Positionen. Eine Uebung, die von Tag A nach Tag D wandert, vier Wochen
-  pausiert oder erst im neuen Zyklus wiederkommt, behaelt ihren Vorwert. Beruecksichtigt
+- Der Vorwert haengt an UEBUNG + REP-BEREICH, NICHT am Platz im Plan: gesucht wird ueber alle
+  Zyklen, Wochen, Tage und Positionen. Eine Uebung, die von Tag A nach Tag D wandert, vier
+  Wochen pausiert oder erst im neuen Zyklus wiederkommt, behaelt ihren Vorwert. Beruecksichtigt
   werden nur Eintraege VOR der aktuellen Position (exOrd: Zyklus > Woche > Tag > Position),
   spaetere Wochen/Tage werden nie als "Vorwert" angezeigt.
+- WICHTIG: Der Rep-Bereich gehoert ZWINGEND zum Vergleichsschluessel (exKey "Uebung||4-8").
+  Dieselbe Uebung laeuft im 4-8er Slot mit deutlich mehr Gewicht als im 8-12er Slot (z. B.
+  Hip Thrusts 134 kg vs. 115 kg) — ohne diese Trennung zieht der 8-12er Slot den viel zu
+  hohen 4-8er Vorwert und meldet dauerhaft "weniger". Gibt es zu einer Uebung im aktuellen
+  Rep-Bereich noch keinen Wert, wird BEWUSST gar kein Vorwert gezeigt (kein Rueckfall auf
+  einen anderen Rep-Bereich). Der Bereich kommt aus dem Plan via repRange(), nicht aus den
+  gespeicherten Daten — Eintraege an Plan-Positionen, die es nicht mehr gibt, fallen raus.
 - Deshalb kann es auch in Woche 1 (und im neuen Zyklus) Vorwerte + Fortschritts-Badges geben.
   Die frueheren Guards `if(S.week>1)` in renderT/renderEx sind durch `hasPrev` ersetzt.
 - Herkunft wird transparent angezeigt: hinter dem VW-Hinweis steht "(Z1 W5 · Tag A)".
@@ -464,7 +474,20 @@ Fallback (manuell, ohne Session):
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
 
-NEU. **Vorwerte haengen an der Uebung, nicht am Platz im Plan:** findLastExData() suchte
+NEU. **Nachtrag: Rep-Bereich gehoert in den Vergleichsschluessel:** Der erste Wurf (siehe
+   naechster Eintrag) verglich nur ueber den Uebungsnamen — dadurch bekam der 8-12er Slot
+   den Vorwert des 4-8er Slots derselben Uebung (Hip Thrusts: 115 kg-Slot zeigte VW 134 kg
+   und meldete dauerhaft "weniger"). Rexi trainiert dieselbe Uebung je nach Rep-Bereich mit
+   deutlich unterschiedlichem Gewicht, also gehoert der Bereich zwingend dazu. Der Index
+   laeuft jetzt ueber exKey() = "Uebung||4-8"; der Bereich kommt via repRange() aus dem PLAN
+   (P3/P4 je nach Key-Praefix), nicht aus den Daten. Eintraege an Plan-Positionen, die es
+   nicht mehr gibt, bleiben aussen vor. Gibt es im aktuellen Rep-Bereich noch keinen Wert,
+   wird bewusst gar kein Vorwert gezeigt — kein Rueckfall auf einen anderen Bereich, das
+   wuerde den Fortschritts-Badge verfaelschen. Der Plan-Rueckfall (3-/4-Tage) gilt weiterhin,
+   aber ebenfalls nur bei identischem Rep-Bereich. Verifiziert per Node-Funktionstest
+   (27 Faelle) und Chromium-Render der Situation aus Rexis Screenshot.
+
+1. **Vorwerte haengen an der Uebung, nicht am Platz im Plan:** findLastExData() suchte
    bisher nur rueckwaerts durch die Wochen an DERSELBEN Position (gleicher Zyklus, Tag,
    Slot) — wer eine Uebung austauschte, an einen anderen Tag schob oder eine Woche
    ausliess, sah keinen Vorwert mehr und startete den Vergleich bei Null. Jetzt gibt es
@@ -481,7 +504,7 @@ NEU. **Vorwerte haengen an der Uebung, nicht am Platz im Plan:** findLastExData(
    Node-Funktionstest (16 Faelle: anderer Tag, Wochen-Luecke, Zyklus-Wechsel, Zukunft
    ausgeschlossen, Plan-Rueckfall, leere/Tipp-Keys, Cache-Invalidierung) und Chromium-Render.
 
-1. **Design-Feinschliff aus Claude Design (Umsetzungs-Check):** Vier Aenderungen aus der
+2. **Design-Feinschliff aus Claude Design (Umsetzungs-Check):** Vier Aenderungen aus der
    Design-Uebergabe uebernommen: (1) Peach-Fokus-Ring auf ALLEN fokussierbaren Elementen —
    `:focus-visible{outline:3px solid var(--focus)!important;outline-offset:2px}` (a11y,
    gewinnt auch gegen outline:none). (2) Picker-Tastatur-Navigation: im Dropdown-Suchfeld
@@ -491,7 +514,7 @@ NEU. **Vorwerte haengen an der Uebung, nicht am Platz im Plan:** findLastExData(
    (.pbadge) von 10px auf 12px fuer Lesbarkeit. (4) Globaler Disabled-Stil fuer Buttons:
    flach & cream (cream-Hintergrund, text-dim Text+Rahmen, kein Schatten, kein
    Press-Effekt, cursor not-allowed). Verifiziert per Playwright-Funktionstest.
-2. **3-Tage-Plan (P3) zurueckgebaut — waehlbar neben dem 4-Tage-Plan:** Neue Header-Pills
+3. **3-Tage-Plan (P3) zurueckgebaut — waehlbar neben dem 4-Tage-Plan:** Neue Header-Pills
    "3 Tage"/"4 Tage" (.plan-btn, aktive Pill Peach) ueber den Zyklus-Buttons. P3 exakt nach
    Rexis Tabelle (Tag A 9 / Tag B 10 / Tag C 9 Uebungen, inkl. 4-8er-Bereiche und Bauch mit
    3 Saetzen). Eigene Zyklen 1-3 mit Key-Praefix p3cycle1-3 in peach_v4 — bestehende
@@ -501,7 +524,7 @@ NEU. **Vorwerte haengen an der Uebung, nicht am Platz im Plan:** findLastExData(
    (cycle2 <-> p3cycle2). plan() gibt jetzt P3 oder P4 zurueck, cyBase() liefert den
    Zyklus ohne Praefix (Buttons + Deload-Text). Verifiziert per Node-Funktionstest
    (Key-Trennung, Steigerungserkennung im P3) und Playwright-Screenshots.
-3. **Neobrutalism-Redesign + Dark Mode entfernt:** Komplettes Re-Skin auf das neue
+4. **Neobrutalism-Redesign + Dark Mode entfernt:** Komplettes Re-Skin auf das neue
    Peach-Designsystem — flache Farb-Bloecke, fast-schwarze Ink-Rahmen (2,5px), harte
    Offset-Schatten ohne Blur, runde Pills, Fonts Archivo Black (Display) + Space Grotesk
    (Body). Tagesfarben (A Peach / B Pink / C Lime / D Sky), neue Kategorie- & Fortschritts-
@@ -513,31 +536,31 @@ NEU. **Vorwerte haengen an der Uebung, nicht am Platz im Plan:** findLastExData(
    (apple-touch-icon.png) neu gestaltet: Pixel-Pfirsich im Cream-Kreis mit Ink-Rahmen auf
    Lilac. WICHTIG fuer die Nutzerin: manifest blieb display:browser -> Icon-Wechsel kostet
    KEINE Daten; auf dem iPhone nur altes Icon entfernen und neu zum Homescreen hinzufuegen.
-4. **Position merken:** saveUI() speichert die zuletzt offene Position (view/week/cy/openDays)
+5. **Position merken:** saveUI() speichert die zuletzt offene Position (view/week/cy/openDays)
    im eigenen Key peach_ui; beim Start validiert zurueckgeladen. Grund: Beim App-Wechsel/
    Schliessen ging alles zu und man startete wieder in Woche 1. peach_v4 bleibt unberuehrt.
-5. **Auto-Update:** checkUpdate() laedt die App einmal neu, wenn auf main ein neuerer
+6. **Auto-Update:** checkUpdate() laedt die App einmal neu, wenn auf main ein neuerer
    Commit liegt (GitHub-API, Cache-Buster ?v=sha, Guard peach_ver). Grund: iOS-Webapp-
    Cache friert alte Staende ein. ACHTUNG: BUILD_TS bei jedem Deploy aktualisieren (Regel 10)!
-6. **Daten-Backup:** Export/Import unten in der Uebersicht (bk-card). expBackup kopiert
+7. **Daten-Backup:** Export/Import unten in der Uebersicht (bk-card). expBackup kopiert
    JSON in die Zwischenablage, impBackup spielt es ein (Validierung + confirm).
    Anlass: Trainingsdaten lagen im Container des ALTEN Home-Screen-Icons —
    jede Oeffnungsart (Safari/Chrome/jedes Icon) hat auf iOS einen EIGENEN localStorage!
-7. **Home-Screen-Icon (iPhone):** apple-touch-icon.png (180x180, Pixel-Pfirsich auf
+8. **Home-Screen-Icon (iPhone):** apple-touch-icon.png (180x180, Pixel-Pfirsich auf
    Header-Gradient) + apple-mobile-web-app-title. Nachgebessert mit manifest.json
    ("display": "browser"), weil iOS 16.4+ Home-Screen-Links sonst als Web-App mit
    leerem localStorage oeffnet (siehe Warnung im Design-System).
-8. **Tipp-Notizen statt Override:** Standard-Tipp immer sichtbar, eigene Texte als
+9. **Tipp-Notizen statt Override:** Standard-Tipp immer sichtbar, eigene Texte als
    "Deine Notiz" zusaetzlich darunter. savTip loescht Key bei leerem Text.
-9. **Maschinen-Einstellungen:** 38 Maschinen-Tipps mit Einstell-Checkliste
+10. **Maschinen-Einstellungen:** 38 Maschinen-Tipps mit Einstell-Checkliste
    (Zahnrad-Emoji + "Einstellung:" / "Ausfuehrung:"), zugeschnitten auf 169 cm / 56 kg /
    Glute-Fokus. Neues Feld "Meine Einstellung" pro Uebung (set__ex__Name).
-10. **Heller Modus:** CSS-Variablen :root / :root.light, Sonne/Mond-Button im Header,
+11. **Heller Modus:** CSS-Variablen :root / :root.light, Sonne/Mond-Button im Header,
    Key peach_theme, theme-color-Meta wechselt mit.
-11. **Design-Update:** Karten mit Verlauf/Schatten, Animationen (fadeSlide/dropIn),
+12. **Design-Update:** Karten mit Verlauf/Schatten, Animationen (fadeSlide/dropIn),
    Tages-Pill "x/y Uebungen", Erledigt-Haken pro Uebung (live via refreshDone),
    groessere Touch-Ziele, 16px-Inputs gegen iOS-Zoom, kompakter Header.
-12. **Code-Review davor:** uebungsbasierter Vergleich (findLastExData), Reps als
+13. **Code-Review davor:** uebungsbasierter Vergleich (findLastExData), Reps als
    Gesamtsumme, parseWeight fuer Spannen/Komma, P3/Plan-Umschalter entfernt,
    Dropdown-Such-Fokus-Fix, REC-Stern im Dropdown, veraltete Duplikat-PDF geloescht.
 
