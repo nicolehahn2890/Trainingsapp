@@ -466,7 +466,7 @@ const P3=[
 // STATE
 let S={view:'training',week:1,cy:'cycle1',pt:'p4',data:{},openDays:{},drop:null,dropSearch:'',tips:{},tipEdit:{},animDay:null,dropAnim:false};
 function load(){try{const r=localStorage.getItem('peach_v4');return r?JSON.parse(r):{}}catch{return{}}}
-function save(){try{localStorage.setItem('peach_v4',JSON.stringify(S.data))}catch{}}
+function save(){_exIdx=null;try{localStorage.setItem('peach_v4',JSON.stringify(S.data))}catch{}}
 S.data=load();
 // POSITION MERKEN (eigener Key peach_ui — merkt sich Tab/Zyklus/Woche/aufgeklappten Tag,
 // damit die App nach App-Wechsel oder Schliessen genau dort weitermacht. peach_v4 unberuehrt!)
@@ -552,8 +552,8 @@ function render(){
 
 function renderT(){
   const pl=plan();let h='';
-  // week bar
-  if(S.week>1){
+  // week bar — zaehlt jede Uebung mit, fuer die es irgendwo einen frueheren Wert gibt
+  {
     let tot=0,imp=0;
     pl.forEach((d,di)=>d.e.forEach((ex,ei)=>{
       const k=mk(S.cy,S.week,di,ei);
@@ -622,18 +622,60 @@ function autoExtraSets(di,ei){
 }
 
 
-// Sucht den letzten gespeicherten Wert fuer eine bestimmte Uebung (uebungsbasierter Vergleich)
+// UEBUNGS-HISTORIE
+// Vorwerte haengen an der UEBUNG, nicht am Platz im Plan: egal ob die Uebung letzte Woche
+// an derselben Stelle stand, an einem anderen Tag, in einem anderen Zyklus oder erst vor
+// drei Wochen zuletzt trainiert wurde — es zaehlt immer der letzte Eintrag DIESER Uebung.
+// Reihenfolge-Wert eines Eintrags: Zyklus > Woche > Tag > Position am Tag.
+function exOrd(cy,w,di,ei){
+  const c=parseInt(String(cy).replace(/^p3/,'').replace('cycle',''))||1;
+  return c*1e7+w*1e4+di*100+ei;
+}
+let _exIdx=null; // Cache: Uebungsname -> Eintraege (aufsteigend sortiert); save() verwirft ihn
+function exIndex(){
+  if(_exIdx)return _exIdx;
+  const idx={};
+  for(const k in S.data){
+    const m=/^(p3)?cycle([123])__w(\d+)__d(\d+)__e(\d+)$/.exec(k);
+    if(!m)continue;
+    const d=S.data[k];
+    if(!d||typeof d!=='object'||!d.exercise)continue;
+    // Nur Eintraege mit echtem Inhalt (Gewicht oder mindestens eine Wiederholung)
+    if(!d.weight&&!((d.reps||[]).some(r=>r!==''&&r!=null)))continue;
+    const cy=(m[1]||'')+'cycle'+m[2],w=+m[3],di=+m[4],ei=+m[5];
+    const e={pt:m[1]?'p3':'p4',cy:cy,w:w,di:di,ei:ei,d:d,ord:exOrd(cy,w,di,ei)};
+    (idx[d.exercise]=idx[d.exercise]||[]).push(e);
+  }
+  for(const n in idx)idx[n].sort((a,b)=>a.ord-b.ord);
+  _exIdx=idx;return idx;
+}
+// Letzter gespeicherter Wert dieser Uebung VOR der aktuellen Position (uebungsbasierter Vergleich).
+// Sucht im aktuellen Plan ueber alle Zyklen/Wochen/Tage; findet sich dort nichts, wird als
+// Rueckfall der letzte Eintrag aus dem anderen Plan (3- bzw. 4-Tage) genommen — nur lesend,
+// gespeichert wird weiterhin strikt getrennt.
 function findLastExData(di,ei,currentExercise){
   if(!currentExercise)return{};
-  // Suche rueckwaerts durch alle Wochen des aktuellen Zyklus
-  for(let w=S.week-1;w>=1;w--){
-    const k=mk(S.cy,w,di,ei);
-    const d=S.data[k];
-    if(d&&d.exercise===currentExercise&&(d.weight||( d.reps&&d.reps.some(r=>r!=='')))){
-      return d;
-    }
+  const list=exIndex()[currentExercise];
+  if(!list||!list.length)return{};
+  const cur=exOrd(S.cy,S.week,di,ei);
+  let same=null,other=null;
+  for(const e of list){
+    if(e.pt===S.pt){if(e.ord<cur)same=e}
+    else other=e;
   }
-  return{};
+  const hit=same||other;
+  if(!hit)return{};
+  return{...hit.d,_src:{pt:hit.pt,cy:hit.cy,w:hit.w,di:hit.di}};
+}
+// Kurzlabel woher der Vorwert stammt, z. B. "Z1 W5 · Tag A" (bei anderem Plan zusaetzlich "3-Tage")
+function srcLabel(src){
+  if(!src)return'';
+  const cyN=String(src.cy).replace(/^p3/,'').replace('cycle','');
+  const day=((src.pt==='p3'?P3:P4)[src.di]||{}).l||'';
+  const dm=/^Tag [A-D]/.exec(day);
+  let t='Z'+cyN+' W'+src.w+(dm?' · '+dm[0]:'');
+  if(src.pt!==S.pt)t+=' · '+(src.pt==='p3'?'3-Tage':'4-Tage');
+  return t;
 }
 // true wenn Uebung gewaehlt UND alle Saetze der aktuellen Woche Reps haben
 function exDone(di,ei){
@@ -681,7 +723,10 @@ function renderEx(ex,ei,di){
   const autoTriggered=autoX>0&&xs===0;
   const reps=cur.reps||Array(ms).fill('');
   const col=CC[ex.c]||'#aaa';
-  const p=S.week>1?prog(reps,prv.reps||[],cur.weight,prv.weight):null;
+  // Vorwert kann auch in Woche 1 / im neuen Zyklus existieren (uebungsbasierte Historie)
+  const hasPrev=!!(prv.weight||(prv.reps||[]).some(r=>r!==''&&r!=null));
+  const p=prog(reps,prv.reps||[],cur.weight,prv.weight);
+  const srcL=hasPrev?srcLabel(prv._src):'';
   const dropOpen=S.drop&&S.drop.di===di&&S.drop.ei===ei;
   const opts=EXERCISES[ex.c]||[];
   const filt=S.dropSearch?opts.filter(o=>o.toLowerCase().includes(S.dropSearch.toLowerCase())):opts;
@@ -722,16 +767,17 @@ function renderEx(ex,ei,di){
 
   // hint
   let hint='';
-  if(S.week>1&&prv.weight){
+  if(hasPrev&&prv.weight){
     const pm=p==='w'?' <span style="color:var(--green)">→ Gewicht gesteigert! ✓</span>':p==='r'?' <span style="color:var(--blue)">→ Mehr Wiederholungen! ✓</span>':p==='s'?' <span style="color:var(--gold)">→ Gleiche Leistung!</span>':p==='d'?' <span style="color:var(--red)">→ Kein Problem!</span>':'';
-    hint='<div class="phint">VW: '+esc(prv.weight)+' kg · '+esc((prv.reps||[]).filter(Boolean).join(' / '))+' Wdh'+pm+'</div>';
+    const sl=srcL?' <span style="opacity:.75">('+esc(srcL)+')</span>':'';
+    hint='<div class="phint">VW: '+esc(prv.weight)+' kg · '+esc((prv.reps||[]).filter(Boolean).join(' / '))+' Wdh'+sl+pm+'</div>';
   }
 
   // reps + +/- buttons
   let rh='';
   for(let i=0;i<ms;i++){
     const c=rcol(reps[i],ex.r),pr=(prv.reps||[])[i];
-    const prevLabel=S.week>1?(pr!=null&&pr!==''?pr:'0'):'';
+    const prevLabel=hasPrev?(pr!=null&&pr!==''?pr:'0'):'';
     const repBg=c?c:'var(--field-bg)';
     rh+='<div class="rep-col"><span class="rep-lbl">S'+(i+1)+'</span><input class="rep-inp" type="text" inputmode="numeric" value="'+esc(reps[i]||'')+'" placeholder="–" style="background:'+repBg+'" oninput="updRep('+di+','+ei+','+i+',this.value)" onchange="updRep('+di+','+ei+','+i+',this.value)"/>'+(prevLabel!==''?'<span class="rep-prev" style="'+(pr==null||pr===''?'color:var(--text-ghost)':'')+'">'+prevLabel+'</span>':'')+'</div>';
   }
@@ -759,7 +805,7 @@ function renderEx(ex,ei,di){
     +'<span class="pick-btn-arr">'+(dropOpen?'▲':'▼')+'</span></button>'+dh+'</div>'
     +pbadge(p)+doneChip+'</div>'
     +'<div class="ex-meta"><span class="sets-info">'+ms+' Sätze · <span style="color:var(--text)">'+ex.r[0]+'–'+ex.r[1]+' Reps</span>'+autoLabel+'</span>'
-    +'<div class="w-wrap"><span class="w-label">Gewicht:</span><input class="w-input" type="text" value="'+esc(cur.weight||'')+'" placeholder="kg" onchange="updW('+di+','+ei+',this.value)"/>'+(prv.weight?'<span style="color:var(--text-faint);font-size:11px" title="Vergleich mit letztem Eintrag dieser Uebung">(VW: '+esc(prv.weight)+')</span>':'')+'</div></div>'
+    +'<div class="w-wrap"><span class="w-label">Gewicht:</span><input class="w-input" type="text" value="'+esc(cur.weight||'')+'" placeholder="kg" onchange="updW('+di+','+ei+',this.value)"/>'+(prv.weight?'<span style="color:var(--text-faint);font-size:11px" title="Letzter Eintrag dieser Übung'+(srcL?': '+esc(srcL):'')+'">(VW: '+esc(prv.weight)+')</span>':'')+'</div></div>'
     +setH
     +'<div class="reps-row">'+rh+'</div>'+hint+tipH+'</div>';
 }
@@ -923,7 +969,7 @@ document.addEventListener('click',e=>{
 // App sich EINMAL selbst neu - mit ?v=sha am Cache vorbei. peach_ver merkt sich den
 // Commit, fuer den schon neu geladen wurde (verhindert Reload-Schleifen). Daten in
 // peach_v4 sind davon voellig unberuehrt. BUILD_TS bei jedem Deploy aktualisieren!
-const BUILD_TS='2026-07-20T14:29:00Z';
+const BUILD_TS='2026-07-27T06:39:00Z';
 let verLastCheck=0;
 function checkUpdate(){
   const now=Date.now();
