@@ -517,18 +517,24 @@ function prog(cr,pr,cw,pw){
   const prFilled=pr&&pr.filter(v=>v!==''&&v!==undefined&&v!==null&&parseInt(v)>0);
   if(!prFilled||!prFilled.length)return null;
   const cu=parseWeight(cw),pu=parseWeight(pw);
-  if(pu>0){
+  // Gewicht schlaegt Reps: es wird IMMER zuerst das Gewicht verglichen.
+  // (cu>0 noetig, damit ein noch leeres Gewichtsfeld nicht faelschlich als Abstieg gilt.)
+  if(pu>0&&cu>0){
     if(cu>pu)return'w';
-    // Glatter Einzelwert auf gleichem Top schlaegt eine Spanne: 45 > 42-45
-    if(cu===pu&&!isWeightRange(cw)&&isWeightRange(pw))return'w';
+    // Weniger Gewicht ist weniger Leistung — auch wenn dabei mehr Reps geschafft wurden.
+    if(cu<pu)return'd';
+    // Gleiches Top-Gewicht: glatter Einzelwert schlaegt eine Spanne (45 > 42-45)
+    if(!isWeightRange(cw)&&isWeightRange(pw))return'w';
+    // Gelockerte Spanne (42-45 nach glattem 45) -> kein 'w', weiter zum Rep-Vergleich
   }
-  // Reps als GESAMTSUMME vergleichen, nicht Satz-fuer-Satz.
-  // So zaehlt 12/15 genauso viel wie 15/12 (gleiche Gesamtleistung),
-  // statt faelschlich Weniger zu melden wenn nur ein Satz niedriger war.
-  const cSum=crFilled.reduce((a,v)=>a+(parseInt(v)||0),0);
-  const pSum=prFilled.reduce((a,v)=>a+(parseInt(v)||0),0);
-  if(cSum>pSum)return'r';
-  if(cSum<pSum)return'd';
+  // Reps als DURCHSCHNITT pro ausgefuelltem Satz vergleichen (nicht als Gesamtsumme).
+  // So zaehlt 12/15 genauso viel wie 15/12 (Reihenfolge egal) UND unterschiedliche
+  // Satz-Anzahlen verfaelschen das Ergebnis nicht mehr: ein zusaetzlicher Satz meldete
+  // frueher faelschlich "Mehr Reps", eine erst halb ausgefuellte Woche faelschlich "Weniger".
+  const cAvg=crFilled.reduce((a,v)=>a+(parseInt(v)||0),0)/crFilled.length;
+  const pAvg=prFilled.reduce((a,v)=>a+(parseInt(v)||0),0)/prFilled.length;
+  if(cAvg>pAvg+1e-9)return'r';
+  if(cAvg<pAvg-1e-9)return'd';
   return's';
 }
 function pbadge(p){
@@ -783,7 +789,10 @@ function renderEx(ex,ei,di){
   // hint
   let hint='';
   if(hasPrev&&prv.weight){
-    const pm=p==='w'?' <span style="color:var(--green)">→ Gewicht gesteigert! ✓</span>':p==='r'?' <span style="color:var(--blue)">→ Mehr Wiederholungen! ✓</span>':p==='s'?' <span style="color:var(--gold)">→ Gleiche Leistung!</span>':p==='d'?' <span style="color:var(--red)">→ Kein Problem!</span>':'';
+    // Bei 'd' unterscheiden, ob das Gewicht runter ging — sonst bleibt unklar warum
+    const wDown=parseWeight(cur.weight)>0&&parseWeight(prv.weight)>0&&parseWeight(cur.weight)<parseWeight(prv.weight);
+    const dTxt=wDown?'→ Weniger Gewicht – kein Problem!':'→ Kein Problem!';
+    const pm=p==='w'?' <span style="color:var(--green)">→ Gewicht gesteigert! ✓</span>':p==='r'?' <span style="color:var(--blue)">→ Mehr Wiederholungen! ✓</span>':p==='s'?' <span style="color:var(--gold)">→ Gleiche Leistung!</span>':p==='d'?' <span style="color:var(--red)">'+dTxt+'</span>':'';
     const sl=srcL?' <span style="opacity:.75">('+esc(srcL)+')</span>':'';
     hint='<div class="phint">VW: '+esc(prv.weight)+' kg · '+esc((prv.reps||[]).filter(Boolean).join(' / '))+' Wdh'+sl+pm+'</div>';
   }
@@ -984,7 +993,7 @@ document.addEventListener('click',e=>{
 // App sich EINMAL selbst neu - mit ?v=sha am Cache vorbei. peach_ver merkt sich den
 // Commit, fuer den schon neu geladen wurde (verhindert Reload-Schleifen). Daten in
 // peach_v4 sind davon voellig unberuehrt. BUILD_TS bei jedem Deploy aktualisieren!
-const BUILD_TS='2026-07-27T07:09:00Z';
+const BUILD_TS='2026-08-05T06:58:00Z';
 let verLastCheck=0;
 function checkUpdate(){
   const now=Date.now();
