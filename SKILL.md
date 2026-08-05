@@ -168,7 +168,8 @@ setPlan(pt)             Plan-Umschalter 'p3'/'p4' (Header-Pills "3 Tage"/"4 Tage
                         speichert via saveUI(). Daten der Plaene bleiben strikt getrennt (p3-Key-Praefix).
 parseWeight(w)          Parst "25-27" -> 27 (oberer Wert), "27,5" -> 27.5 (Komma -> Punkt)
 isWeightRange(w)        true bei echter Spanne ("42-45"), false bei Einzelwert oder "45-45"
-prog(cr,pr,cw,pw)       'w'|'r'|'s'|'d' Fortschritts-Status (Reps = Gesamtsumme!)
+prog(cr,pr,cw,pw)       'w'|'r'|'s'|'d' Fortschritts-Status. Gewicht schlaegt Reps (weniger
+                        Gewicht -> immer 'd'); Reps als DURCHSCHNITT pro ausgefuelltem Satz.
 findLastExData(di,ei,ex) Sucht den letzten gespeicherten Wert dieser Uebung IM SELBEN
                         REP-BEREICH UEBERALL in der Historie (alle Zyklen, Wochen, Tage,
                         Positionen) — nicht mehr nur an derselben Plan-Position in Vorwochen.
@@ -232,8 +233,17 @@ checkUpdate()           Auto-Update gegen iOS-Webapp-Cache: GitHub-API (commits/
   das Label nennt dann "3-Tage"/"4-Tage".
 - Wenn Uebung gewechselt wird, startet Vergleich frisch
 - Gewicht: parseWeight() unterstuetzt Bereiche wie "25-27" (nimmt oberen Wert 27) und Komma wie "27,5". Auch renderOv (Uebersicht) nutzt parseWeight() — nie parseFloat(), das gibt bei "42-45" nur 42 zurueck.
-- Spanne vs. Einzelwert: cu>pu -> 'w'. Zusaetzlich: glatter Einzelwert auf gleichem Top schlaegt eine Spanne (45 > 42-45 -> 'w'), via Helper isWeightRange(). Zwei gleiche Spannen oder Einzelwerte -> kein 'w'. Gelockerte Spanne (42-45 nach glattem 45) -> kein 'w'.
-- Reps: Vergleich ueber GESAMTSUMME aller Saetze, NICHT Satz-fuer-Satz. 12/15 (=27) zaehlt gleich wie 15/12 (=27) -> 's'. Mehr Summe -> 'r', weniger -> 'd'. (Frueher positionsweise -> meldete faelschlich 'd' sobald ein einzelner Satz niedriger war.)
+- GEWICHT SCHLAEGT REPS: das Gewicht wird IMMER zuerst geprueft. cu>pu -> 'w', cu<pu -> 'd'
+  (auch wenn dabei mehr Reps geschafft wurden — weniger Gewicht ist weniger Leistung).
+  Erst bei gleichem Gewicht (oder fehlendem Vorgewicht) entscheiden die Reps.
+  Ein noch LEERES Gewichtsfeld (cu=0) zaehlt NICHT als Abstieg — sonst waere jede Uebung
+  waehrend der Eingabe rot.
+- Spanne vs. Einzelwert: glatter Einzelwert auf gleichem Top schlaegt eine Spanne (45 > 42-45 -> 'w'), via Helper isWeightRange(). Zwei gleiche Spannen oder Einzelwerte -> kein 'w'. Gelockerte Spanne (42-45 nach glattem 45) -> kein 'w', faellt auf den Rep-Vergleich durch.
+- Reps: Vergleich ueber den DURCHSCHNITT pro ausgefuelltem Satz, NICHT Satz-fuer-Satz und
+  NICHT als Gesamtsumme. 12/15 zaehlt gleich wie 15/12 -> 's'. Hoeherer Schnitt -> 'r',
+  niedriger -> 'd'. (Positionsweise meldete faelschlich 'd' sobald ein einzelner Satz
+  niedriger war; die Gesamtsumme meldete faelschlich 'r' bei einem zusaetzlichen Satz und
+  faelschlich 'd' solange die Woche erst halb ausgefuellt war.)
 - Fortschritt wird nur berechnet wenn aktuelle Woche tatsaechlich Reps hat
 - WeekProgress-Balken nutzt ebenfalls findLastExData()
 - autoExtraSets bricht Streak ab wenn Uebung gewechselt wurde
@@ -435,7 +445,9 @@ Spezial: 3D Abduktor Maschine, Belt Squat, Belt Squat RDL, Beinpresse 45 Grad, R
 - Satzanzahl + Uebung werden in Folgewoche vererbt
 - Gewichtsbereiche ("25-27kg") und Komma ("27,5") werden korrekt ausgewertet (oberer Wert zaehlt)
 - Glatter Einzelwert schlaegt eine gleich hoch endende Spanne (45 > 42-45 = Steigerung)
-- Reps werden als Gesamtsumme verglichen, nicht satzweise (Reihenfolge der Saetze egal)
+- Weniger Gewicht = 'Weniger', auch bei mehr Reps (Gewicht wird zuerst verglichen)
+- Reps werden als Durchschnitt pro Satz verglichen, nicht satzweise und nicht als Summe
+  (Reihenfolge der Saetze egal, zusaetzliche oder noch leere Saetze verfaelschen nichts)
 - Vergleich basiert auf letztem Wert dieser Uebung, nicht einfach Vorwoche
 
 ---
@@ -473,6 +485,15 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Fortschritts-Vergleich korrigiert (2 Bugs):** (1) Ein REDUZIERTES Gewicht wurde gar
+   nicht als Abstieg gewertet — 17 kg -> 15 kg bei gleichen Reps meldete "Gleiche Leistung!",
+   bei mehr Reps sogar "Mehr Wiederholungen!". prog() prueft jetzt das Gewicht zuerst:
+   cu<pu -> immer 'd'. (2) Reps wurden als GESAMTSUMME verglichen, dadurch meldete ein
+   zusaetzlicher Satz faelschlich "Mehr Wiederholungen" und eine erst halb ausgefuellte
+   Woche faelschlich "Weniger" — jetzt Durchschnitt pro ausgefuelltem Satz. Ausserdem gilt
+   ein noch leeres Gewichtsfeld nicht mehr als Abstieg, und der Hinweistext nennt den Grund
+   ("Weniger Gewicht - kein Problem!"). Verifiziert per Node-Funktionstest (16 Faelle).
 
 NEU. **Nachtrag: Rep-Bereich gehoert in den Vergleichsschluessel:** Der erste Wurf (siehe
    naechster Eintrag) verglich nur ueber den Uebungsnamen — dadurch bekam der 8-12er Slot
