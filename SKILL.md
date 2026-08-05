@@ -166,9 +166,14 @@ cyBase()                Zyklus ohne Plan-Praefix ('p3cycle2' -> 'cycle2') — fu
 setPlan(pt)             Plan-Umschalter 'p3'/'p4' (Header-Pills "3 Tage"/"4 Tage", Klasse .plan-btn).
                         Behaellt die Zyklus-Nummer (cycle2 <-> p3cycle2), schliesst offene Tage/Dropdown,
                         speichert via saveUI(). Daten der Plaene bleiben strikt getrennt (p3-Key-Praefix).
-parseWeight(w)          Parst "25-27" -> 27 (oberer Wert), "27,5" -> 27.5 (Komma -> Punkt)
+parseWeight(w,inv)      Parst "25-27" -> 27 (oberer Wert), "27,5" -> 27.5 (Komma -> Punkt).
+                        inv=true (assistierte Uebung): aus einer Spanne zaehlt der KLEINERE
+                        Wert ("20-25" -> 20), weil weniger Hilfe die bessere Leistung ist.
+isAssist(ex)            true fuer Uebungen aus ASSIST (Gegengewichts-Maschinen)
 isWeightRange(w)        true bei echter Spanne ("42-45"), false bei Einzelwert oder "45-45"
-prog(cr,pr,cw,pw)       'w'|'r'|'s'|'d' Fortschritts-Status. Gewicht schlaegt Reps (weniger
+prog(cr,pr,cw,pw,ex)    'w'|'r'|'s'|'d' Fortschritts-Status. ex nur noetig um assistierte
+                        Uebungen zu erkennen (dort dreht sich die Gewichtsrichtung um).
+                        Gewicht schlaegt Reps (weniger
                         Gewicht -> immer 'd'); Reps als DURCHSCHNITT pro ausgefuelltem Satz.
 findLastExData(di,ei,ex) Sucht den letzten gespeicherten Wert dieser Uebung IM SELBEN
                         REP-BEREICH UEBERALL in der Historie (alle Zyklen, Wochen, Tage,
@@ -244,6 +249,14 @@ checkUpdate()           Auto-Update gegen iOS-Webapp-Cache: GitHub-API (commits/
   das Label nennt dann "3-Tage"/"4-Tage".
 - Wenn Uebung gewechselt wird, startet Vergleich frisch
 - Gewicht: parseWeight() unterstuetzt Bereiche wie "25-27" (nimmt oberen Wert 27) und Komma wie "27,5". Auch renderOv (Uebersicht) nutzt parseWeight() — nie parseFloat(), das gibt bei "42-45" nur 42 zurueck.
+- ASSISTIERTE UEBUNGEN (Set ASSIST, aktuell die beiden "Assistierter Klimmzug"-Varianten):
+  Das eingetragene Gewicht ist das GEGENGEWICHT der Maschine — WENIGER ist mehr Leistung.
+  Fuer diese Uebungen dreht sich alles um: prog() ('w' bei cu<pu), parseWeight nimmt aus einer
+  Spanne den kleineren Wert, das Badge heisst "↓ Hilfe"/"↑ Hilfe", das Eingabefeld heisst
+  "Hilfe:" statt "Gewicht:", der Hinweis sagt "Weniger Gegengewicht – staerker geworden!",
+  und in der Uebersicht wird die Balkenhoehe gespiegelt (weniger Hilfe = hoeherer Balken)
+  plus Bilanz als "−X kg Hilfe". Neue Maschinen dieser Art NUR in ASSIST eintragen — der
+  Rest folgt automatisch.
 - GEWICHT SCHLAEGT REPS: das Gewicht wird IMMER zuerst geprueft. cu>pu -> 'w', cu<pu -> 'd'
   (auch wenn dabei mehr Reps geschafft wurden — weniger Gewicht ist weniger Leistung).
   Erst bei gleichem Gewicht (oder fehlendem Vorgewicht) entscheiden die Reps.
@@ -303,7 +316,9 @@ Vererbt: exercise, extraSets — NICHT: reps, weight
 
 1. initKey statt mk() beim Schreiben verwenden
 2. peach_v4 nie umbenennen
-3. Neue Uebungen in EXERCISES + TIPS eintragen (TIPS-Key muss EXAKT dem EXERCISES-Namen entsprechen!), optional in REC
+3. Neue Uebungen in EXERCISES + TIPS eintragen (TIPS-Key muss EXAKT dem EXERCISES-Namen entsprechen!), optional in REC.
+   Gegengewichts-Maschinen (assistierte Klimmzuege o. ae.) ZUSAETZLICH in ASSIST eintragen —
+   sonst wird ihr Fortschritt falsch herum gerechnet.
    Maschinen-Tipps folgen dem Format: "Zahnrad-Emoji Einstellung: ...\nAusfuehrung: ..." —
    Einstell-Checkliste (Gelenk auf Drehachse, Polster-Positionen, Startposition fuer 169 cm)
    plus Ausfuehrungs-Cues, zugeschnitten auf Glute-Fokus / schmale Beine
@@ -432,7 +447,7 @@ Glute & Quad (11): Low Bar Squat, Beinpresse 45 Grad, Beinpresse, Step Ups, Spli
 
 Glute & Hams (10): RDL Langhantel, RDL Kurzhanteln, RDL Maschine, Belt Squat RDL, Glute Hyperextensions, Reverse Hack RDL, Good Mornings, Single-Leg RDL, Nordic Curls, Leg Curl (Maschine)
 
-Ruecken (20): LH Rudern, KH Rudern, KH Rudern (breit), Rudern Kabel (eng), Rudern Kabel (breit), Rudermaschine (Panatta), Rudermaschine (Precor), Latzug (eng), Latzug (breit), Latzug Maschine (Panatta), Latzug Maschine (Precor), Ueberzug am Kabel, T Bar Rudern (neutral), T Bar Rudern (breit), Assistierter Klimmzug (eng), Assistierter Klimmzug (breit), Face Pull Kabel, Straight-Arm Pulldown, Einarmiger Latzug Kabel, Diverging Low Row
+Ruecken (21): LH Rudern, KH Rudern, KH Rudern (breit), Rudern Kabel (eng), Rudern Kabel (breit), Rudermaschine (Panatta), Rudermaschine (Precor), High Row Maschine, Latzug (eng), Latzug (breit), Latzug Maschine (Panatta), Latzug Maschine (Precor), Ueberzug am Kabel, T Bar Rudern (neutral), T Bar Rudern (breit), Assistierter Klimmzug (eng), Assistierter Klimmzug (breit), Face Pull Kabel, Straight-Arm Pulldown, Einarmiger Latzug Kabel, Diverging Low Row
 
 Brust (15): LH Bankdruecken, KH Bankdruecken, Bankdruecken Multipresse, Bankdruecken Maschine, LH Schraegbankdruecken, KH Schraegbankdruecken, Schraegbankdruecken Multipresse, Schraegbankdruecken Maschine, Brustpresse (Panatta), Brustpresse (Precor), Butterfly Maschine, Flys von oben Kabel, Flys von unten Kabel, Flachbank KH Flys, Schraegbank KH Flys
 
@@ -449,7 +464,7 @@ Bauch (13): Crunches, Crunches am Kabelzug, Panatta Super Crunch, Panatta Low Cr
 ## Panatta/Precor Maschinen-Varianten
 
 Bauch: Panatta Super Crunch, Panatta Low Crunch, Panatta High Crunch, Bauch Maschine (Precor)
-Ruecken: Rudermaschine (Panatta), Rudermaschine (Precor), Latzug Maschine (Panatta), Latzug Maschine (Precor)
+Ruecken: Rudermaschine (Panatta), Rudermaschine (Precor), High Row Maschine, Latzug Maschine (Panatta), Latzug Maschine (Precor)
 Brust: Brustpresse (Panatta), Brustpresse (Precor)
 Schultern: Seithebemaschine (sitzend), Seithebemaschine (stehend)
 Spezial: 3D Abduktor Maschine, Belt Squat, Belt Squat RDL, Beinpresse 45 Grad, RDL Maschine, Diverging Low Row
@@ -504,6 +519,16 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Assistierte Uebungen rechnen umgekehrt + neue Uebung "High Row Maschine":**
+   Beim assistierten Klimmzug ist das eingetragene Gewicht das Gegengewicht der Maschine —
+   weniger Hilfe bedeutet MEHR Kraft. Bisher wurde eine Reduktion von 30 auf 24 kg als
+   Rueckschritt gewertet. Neu: Set ASSIST + isAssist(); prog() dreht dort die Richtung um,
+   parseWeight nimmt aus einer Spanne den kleineren Wert, Badge ("↓ Hilfe"/"↑ Hilfe"),
+   Feldbeschriftung ("Hilfe:"), Hinweistext und die Uebersicht (gespiegelte Balkenhoehe,
+   Bilanz als "−X kg Hilfe") folgen automatisch. Ausserdem neu im Ruecken: "High Row
+   Maschine" (mit Maschinen-Tipp, REC-Stern; 127 Uebungen gesamt). Verifiziert per
+   Playwright-Suite (34 UI-Tests) und Einheitstests fuer beide Richtungen.
 
 NEU. **Bug-Suche: 4 weitere Fehler gefunden und behoben.**
    (1) **Badge/Hinweis/Rep-Farben aktualisierten sich nicht** waehrend der Eingabe — updRep rief
@@ -620,6 +645,6 @@ NEU. **Nachtrag: Rep-Bereich gehoert in den Vergleichsschluessel:** Der erste Wu
    Gesamtsumme, parseWeight fuer Spannen/Komma, P3/Plan-Umschalter entfernt,
    Dropdown-Such-Fokus-Fix, REC-Stern im Dropdown, veraltete Duplikat-PDF geloescht.
 
-Konsistenz-Audit (zuletzt ausgefuehrt): alle 126 Uebungen haben Tipps, keine verwaisten
+Konsistenz-Audit (zuletzt ausgefuehrt): alle 127 Uebungen haben Tipps, keine verwaisten
 Tipps/REC-Eintraege, keine Duplikate, Rep-Bereiche plausibel (4-8/6-10/8-12),
 prog()/rcol()/autoExtraSets() per Funktionstest verifiziert.

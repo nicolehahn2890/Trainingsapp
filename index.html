@@ -259,7 +259,7 @@ const EXERCISES={
 "Glute Med":["Kabel Abduktion Stehend","Kabel Abduktion Liegend","Kabel Abduktion Schrägbank","Abduktionsmaschine","Pelvic Drop","Abduktionsmaschine stehend","Fire Hydrants Kabel","3D Abduktor Maschine"],
 "Glute & Quad":["Low Bar Squat","Beinpresse 45 Grad","Beinpresse","Step Ups","Split Squat Kurzhantel","Split Squat Langhantel","Split Squat Multipresse","Hack Squat","Reverse Lunge","Belt Squat","Super Squat"],
 "Glute & Hams":["RDL Langhantel","RDL Kurzhanteln","RDL Maschine","Belt Squat RDL","Glute Hyperextensions","Reverse Hack RDL","Good Mornings","Single-Leg RDL","Nordic Curls","Leg Curl (Maschine)"],
-"Rücken":["LH Rudern","KH Rudern","KH Rudern (breit)","Rudern Kabel (eng)","Rudern Kabel (breit)","Rudermaschine (Panatta)","Rudermaschine (Precor)","Latzug (eng)","Latzug (breit)","Latzug Maschine (Panatta)","Latzug Maschine (Precor)","Überzug am Kabel","T Bar Rudern (neutral)","T Bar Rudern (breit)","Assistierter Klimmzug (eng)","Assistierter Klimmzug (breit)","Face Pull Kabel","Straight-Arm Pulldown","Einarmiger Latzug Kabel","Diverging Low Row"],
+"Rücken":["LH Rudern","KH Rudern","KH Rudern (breit)","Rudern Kabel (eng)","Rudern Kabel (breit)","Rudermaschine (Panatta)","Rudermaschine (Precor)","High Row Maschine","Latzug (eng)","Latzug (breit)","Latzug Maschine (Panatta)","Latzug Maschine (Precor)","Überzug am Kabel","T Bar Rudern (neutral)","T Bar Rudern (breit)","Assistierter Klimmzug (eng)","Assistierter Klimmzug (breit)","Face Pull Kabel","Straight-Arm Pulldown","Einarmiger Latzug Kabel","Diverging Low Row"],
 "Brust":["LH Bankdrücken","KH Bankdrücken","Bankdrücken Multipresse","Bankdrücken Maschine","LH Schrägbankdrücken","KH Schrägbankdrücken","Schrägbankdrücken Multipresse","Schrägbankdrücken Maschine","Brustpresse (Panatta)","Brustpresse (Precor)","Butterfly Maschine","Flys von oben Kabel","Flys von unten Kabel","Flachbank KH Flys","Schrägbank KH Flys"],
 "Schultern":["KH Seitheben","Vorgebeugtes KH Seitheben","Seithebemaschine (sitzend)","Seithebemaschine (stehend)","Seitheben Kabel","Vorgebeugtes Seitheben Kabel","LH Überkopfdrücken","KH Überkopfdrücken","Überkopfmaschine","Butterfly Reverse Maschine","Butterfly Reverse Kabel","Upright Row Kabel","Arnold Press","Einarmiges Überkopfdrücken Kabel"],
 "Bizeps":["SZ Curls","LH Curls","KH Curls","Kabel Curls","KH Hammer Curls","SZ Preacher Curls","KH Preacher Curls","Bizeps Maschine","Konzentrations Curls","Spinne Curls","Kabel Curls einarmig","Reverse Curls"],
@@ -310,6 +310,7 @@ const TIPS={
 "Rudern Kabel (breit)":"Breites Griffstück. Ellbogen seitlich – mehr Latissimus.",
 "Rudermaschine (Panatta)":"⚙ Einstellung: Sitzhöhe so, dass die Griffe auf Höhe der unteren Brust liegen. Brustpolster so weit weg, dass die Arme gestreckt starten und die Schulterblätter nach vorne können (volle Dehnung). Bei 169 cm: mittlere Sitzhöhe als Start.\nAusführung: Brust am Pad lassen, Schulterblätter am Ende zusammenziehen, nicht mit dem Oberkörper schwingen. Langsam zurück.",
 "Rudermaschine (Precor)":"⚙ Einstellung: Sitzhöhe so, dass die Griffe auf Höhe der unteren Brust liegen. Brustpolster so, dass die Arme gestreckt starten und die Schulterblätter nach vorne können. Bei 169 cm: mittlere Sitzhöhe als Start.\nAusführung: Brust am Pad lassen, Schulterblätter am Ende zusammenziehen, nicht mit dem Oberkörper schwingen. Langsam zurück.",
+"High Row Maschine":"⚙ Einstellung: Sitz so hoch, dass die Griffe SCHRAEG VON OBEN kommen – bei 169 cm meist eine Stufe tiefer als beim normalen Rudern. Brust-/Bauchpolster so weit weg, dass die Arme oben komplett gestreckt starten und die Schulterblaetter nach vorne wandern koennen. Knie- bzw. Fussstuetze fest, damit du nicht vom Sitz gezogen wirst.\nAusführung: Griffe schraeg nach unten-hinten zur unteren Brust ziehen, Ellbogen dabei nah am Koerper vorbei. Unten 1 Sek. die Schulterblaetter zusammenziehen, dann kontrolliert in die volle Dehnung zurueck. Oberkoerper bleibt aufrecht – nicht mit dem Ruecken schwingen. Trifft oberen Ruecken und Lat und arbeitet damit direkt am V-Taper (breite Schultern, optisch schmalere Taille).",
 "Latzug (eng)":"Enger Parallelgriff. Zur Brust ziehen, Ellbogen nach unten-hinten.",
 "Latzug (breit)":"Breiter Overhand-Griff. Zur Brust ziehen, Latissimus aktiv.",
 "Latzug Maschine (Panatta)":"⚙ Einstellung: Sitz so, dass die Füße flach stehen, Kniepolster fest auf die Oberschenkel. Griffe mit gestreckten Armen gerade so erreichbar.\nAusführung: Zur Brust ziehen, Ellbogen nach unten-hinten führen, Latissimus aktiv anspannen. Kontrolliert zurück und oben die Schultern lang werden lassen (Stretch).",
@@ -480,8 +481,14 @@ try{
   if(u.openDays&&typeof u.openDays==='object'&&!Array.isArray(u.openDays))S.openDays=u.openDays;
 }catch{}
 
-const REC=new Set(["Hip Thrusts Langhantel","Hip Thrusts Multipresse","Hip Thrust Maschine","Glute Bridge Langhantel","Kabel Kickback Liegend","Kickback Maschine","Abduktionsmaschine","Kabel Abduktion Liegend","Abduktionsmaschine stehend","3D Abduktor Maschine","Reverse Lunge","Split Squat Kurzhantel","Split Squat Langhantel","Split Squat Multipresse","Belt Squat","RDL Langhantel","RDL Maschine","Glute Hyperextensions","Single-Leg RDL","Leg Curl (Maschine)","Latzug (breit)","Assistierter Klimmzug (breit)","Straight-Arm Pulldown","Überzug am Kabel","KH Seitheben","Seitheben Kabel","Seithebemaschine (sitzend)","Seithebemaschine (stehend)","Pallof Press","Hollow Body Hold"]);
+const REC=new Set(["Hip Thrusts Langhantel","Hip Thrusts Multipresse","Hip Thrust Maschine","Glute Bridge Langhantel","Kabel Kickback Liegend","Kickback Maschine","Abduktionsmaschine","Kabel Abduktion Liegend","Abduktionsmaschine stehend","3D Abduktor Maschine","Reverse Lunge","Split Squat Kurzhantel","Split Squat Langhantel","Split Squat Multipresse","Belt Squat","RDL Langhantel","RDL Maschine","Glute Hyperextensions","Single-Leg RDL","Leg Curl (Maschine)","Latzug (breit)","High Row Maschine","Assistierter Klimmzug (breit)","Straight-Arm Pulldown","Überzug am Kabel","KH Seitheben","Seitheben Kabel","Seithebemaschine (sitzend)","Seithebemaschine (stehend)","Pallof Press","Hollow Body Hold"]);
 
+// ASSISTIERTE UEBUNGEN: hier ist das eingetragene Gewicht das GEGENGEWICHT der Maschine —
+// WENIGER Gewicht bedeutet MEHR eigene Kraft. Fuer diese Uebungen dreht sich der komplette
+// Gewichtsvergleich um (prog, Badge, Hinweis, Uebersicht). Neue Maschinen dieser Art hier
+// eintragen — der Name muss EXAKT dem Eintrag in EXERCISES entsprechen.
+const ASSIST=new Set(["Assistierter Klimmzug (eng)","Assistierter Klimmzug (breit)"]);
+function isAssist(ex){return ASSIST.has(ex)}
 function mk(c,w,d,e){return c+'__w'+w+'__d'+d+'__e'+e}
 function mkt(c,w,d,e){return 'tip__'+c+'__w'+w+'__d'+d+'__e'+e}
 function plan(){return S.pt==='p3'?P3:P4}
@@ -491,14 +498,15 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 // Performance-Farbe fuer ausgefuelltes Rep-Feld (leer -> '' = weisses Feld)
 function rcol(v,r){if(v===''||v==null)return'';const n=parseInt(v);if(isNaN(n))return'';if(n>=r[1])return'#6FC36A';if(n>=r[0])return'#F5CB44';return'#EC6A6A'}
 // Parst Gewichtsangaben: "25-27" -> 27 (oberer Wert), "25" -> 25, "27,5" -> 27.5
-function parseWeight(w){
+// inv=true (assistierte Uebung): aus einer Spanne zaehlt der KLEINERE Wert,
+// weil dort weniger Gegengewicht die bessere Leistung ist ("20-25" -> 20).
+function parseWeight(w,inv){
   if(!w&&w!==0)return 0;
   const s=String(w).trim().replace(/,/g,'.');
   if(s.includes('-')){
-    const parts=s.split('-');
-    // letzten Teil nehmen (oberer Wert)
-    const upper=parseFloat(parts[parts.length-1]);
-    return isNaN(upper)?0:upper;
+    const parts=s.split('-').map(x=>parseFloat(x)).filter(n=>!isNaN(n));
+    if(!parts.length)return 0;
+    return inv?Math.min(...parts):parts[parts.length-1];
   }
   const n=parseFloat(s);
   return isNaN(n)?0:n;
@@ -509,23 +517,27 @@ function isWeightRange(w){
   const parts=String(w).trim().replace(/,/g,'.').split('-').map(p=>parseFloat(p)).filter(n=>!isNaN(n));
   return parts.length>=2&&parts[0]!==parts[parts.length-1];
 }
-function prog(cr,pr,cw,pw){
+// exName wird nur gebraucht um assistierte Uebungen zu erkennen (umgekehrte Richtung).
+function prog(cr,pr,cw,pw,exName){
   if(!pr||!pr.length)return null;
   // Keine Auswertung wenn aktuelle Woche noch keine Reps eingetragen
   const crFilled=cr&&cr.filter(v=>v!==''&&v!==undefined&&v!==null&&parseInt(v)>0);
   if(!crFilled||!crFilled.length)return null;
   const prFilled=pr&&pr.filter(v=>v!==''&&v!==undefined&&v!==null&&parseInt(v)>0);
   if(!prFilled||!prFilled.length)return null;
-  const cu=parseWeight(cw),pu=parseWeight(pw);
+  const inv=isAssist(exName);
+  const cu=parseWeight(cw,inv),pu=parseWeight(pw,inv);
   // Gewicht schlaegt Reps: es wird IMMER zuerst das Gewicht verglichen.
   // (cu>0 noetig, damit ein noch leeres Gewichtsfeld nicht faelschlich als Abstieg gilt.)
+  // Bei assistierten Uebungen ist die Richtung umgedreht: weniger Gegengewicht = besser.
   if(pu>0&&cu>0){
-    if(cu>pu)return'w';
-    // Weniger Gewicht ist weniger Leistung — auch wenn dabei mehr Reps geschafft wurden.
-    if(cu<pu)return'd';
-    // Gleiches Top-Gewicht: glatter Einzelwert schlaegt eine Spanne (45 > 42-45)
+    const better=inv?(cu<pu):(cu>pu), worse=inv?(cu>pu):(cu<pu);
+    if(better)return'w';
+    // Die falsche Richtung ist weniger Leistung — auch wenn dabei mehr Reps geschafft wurden.
+    if(worse)return'd';
+    // Gleicher Bestwert: glatter Einzelwert schlaegt eine Spanne (45 > 42-45, bzw. 20 > 20-25)
     if(!isWeightRange(cw)&&isWeightRange(pw))return'w';
-    // Gelockerte Spanne (42-45 nach glattem 45) -> kein 'w', weiter zum Rep-Vergleich
+    // Gelockerte Spanne -> kein 'w', weiter zum Rep-Vergleich
   }
   // Reps als DURCHSCHNITT pro ausgefuelltem Satz vergleichen (nicht als Gesamtsumme).
   // So zaehlt 12/15 genauso viel wie 15/12 (Reihenfolge egal) UND unterschiedliche
@@ -537,11 +549,14 @@ function prog(cr,pr,cw,pw){
   if(cAvg<pAvg-1e-9)return'd';
   return's';
 }
-function pbadge(p){
+function pbadge(p,inv){
   if(!p)return'';
-  const m={w:['↑ Gewicht','var(--prog-up)'],r:['↑ Reps','var(--prog-reps)'],s:['= Gleich','var(--prog-same)'],d:['↓ Weniger','var(--prog-down)']};
+  // Bei assistierten Uebungen heisst Fortschritt WENIGER Gegengewicht — deshalb eigene Labels.
+  const m=inv
+    ?{w:['↓ Hilfe','var(--prog-up)'],r:['↑ Reps','var(--prog-reps)'],s:['= Gleich','var(--prog-same)'],d:['↑ Hilfe','var(--prog-down)']}
+    :{w:['↑ Gewicht','var(--prog-up)'],r:['↑ Reps','var(--prog-reps)'],s:['= Gleich','var(--prog-same)'],d:['↓ Weniger','var(--prog-down)']};
   const[l,c]=m[p]||[];if(!l)return'';
-  return'<span class="pbadge" style="background:'+c+'">'+l+'</span>'
+  return'<span class="pbadge" style="background:'+c+'" title="'+(inv?'Gegengewicht der Maschine – weniger ist mehr Leistung':'')+'">'+l+'</span>'
 }
 
 // RENDER
@@ -602,7 +617,7 @@ function autoExtraSets(di,ei){
     if(!prv.weight&&!(prv.reps||[]).some(Boolean))break;
     // Aktuelle Woche muss Reps haben
     if(!cur.reps||!cur.reps.some(v=>v!==''&&parseInt(v)>0))break;
-    const st=prog(cur.reps||[],prv.reps||[],cur.weight,prv.weight);
+    const st=prog(cur.reps||[],prv.reps||[],cur.weight,prv.weight,cur.exercise);
     if(st==='s'||st==='d')streak++;else break;
   }
   return streak>=3?1:0;
@@ -723,7 +738,7 @@ function refreshWeekBar(){
 function refreshProg(di,ei){
   const st=exState(di,ei);
   const b=document.getElementById('pb-'+di+'-'+ei);
-  if(b)b.innerHTML=pbadge(st.p);
+  if(b)b.innerHTML=pbadge(st.p,st.inv);
   const hb=document.getElementById('ph-'+di+'-'+ei);
   if(hb)hb.innerHTML=hintHTML(st);
   for(let i=0;i<st.ms;i++){
@@ -764,20 +779,22 @@ function exState(di,ei){
   // als Rest im Vergleich haengen bleiben (sonst zaehlt eine geloeschte Zahl weiter mit).
   const reps=(cur.reps||[]).slice(0,ms);
   const hasPrev=!!(prv.weight||(prv.reps||[]).some(r=>r!==''&&r!=null));
-  return {ex,cur,prv,ms,autoX,reps,hasPrev,
-    p:prog(reps,prv.reps||[],cur.weight,prv.weight),
+  return {ex,cur,prv,ms,autoX,reps,hasPrev,inv:isAssist(cur.exercise),
+    p:prog(reps,prv.reps||[],cur.weight,prv.weight,cur.exercise),
     srcL:hasPrev?srcLabel(prv._src):''};
 }
 // Vorwochen-Hinweis ("VW: 17 kg · 12 / 12 Wdh … → Gleiche Leistung!")
 function hintHTML(st){
   if(!(st.hasPrev&&st.prv.weight))return'';
-  // Bei 'd' unterscheiden, ob das Gewicht runter ging — sonst bleibt unklar warum
-  const wDown=parseWeight(st.cur.weight)>0&&parseWeight(st.prv.weight)>0&&parseWeight(st.cur.weight)<parseWeight(st.prv.weight);
-  const dTxt=wDown?'→ Weniger Gewicht – kein Problem!':'→ Kein Problem!';
-  const p=st.p;
-  const pm=p==='w'?' <span style="color:var(--green)">→ Gewicht gesteigert! ✓</span>':p==='r'?' <span style="color:var(--blue)">→ Mehr Wiederholungen! ✓</span>':p==='s'?' <span style="color:var(--gold)">→ Gleiche Leistung!</span>':p==='d'?' <span style="color:var(--red)">'+dTxt+'</span>':'';
+  const inv=st.inv,p=st.p;
+  const cu=parseWeight(st.cur.weight,inv),pu=parseWeight(st.prv.weight,inv);
+  // Bei 'd' unterscheiden, ob das Gewicht die falsche Richtung ging — sonst bleibt unklar warum
+  const wWorse=cu>0&&pu>0&&(inv?cu>pu:cu<pu);
+  const dTxt=wWorse?(inv?'→ Mehr Gegengewicht – kein Problem!':'→ Weniger Gewicht – kein Problem!'):'→ Kein Problem!';
+  const wTxt=inv?'→ Weniger Gegengewicht – stärker geworden! ✓':'→ Gewicht gesteigert! ✓';
+  const pm=p==='w'?' <span style="color:var(--green)">'+wTxt+'</span>':p==='r'?' <span style="color:var(--blue)">→ Mehr Wiederholungen! ✓</span>':p==='s'?' <span style="color:var(--gold)">→ Gleiche Leistung!</span>':p==='d'?' <span style="color:var(--red)">'+dTxt+'</span>':'';
   const sl=st.srcL?' <span style="opacity:.75">('+esc(st.srcL)+')</span>':'';
-  return '<div class="phint">VW: '+esc(st.prv.weight)+' kg · '+esc((st.prv.reps||[]).filter(Boolean).join(' / '))+' Wdh'+sl+pm+'</div>';
+  return '<div class="phint">VW: '+esc(st.prv.weight)+' kg '+(inv?'Hilfe ':'')+'· '+esc((st.prv.reps||[]).filter(Boolean).join(' / '))+' Wdh'+sl+pm+'</div>';
 }
 function renderEx(ex,ei,di){
   const st=exState(di,ei);
@@ -858,9 +875,9 @@ function renderEx(ex,ei,di){
     +'<button class="pick-btn'+(cur.exercise?' has-val':'')+'" onclick="togDrop('+di+','+ei+',event)">'
     +'<span class="pick-btn-txt">'+esc(cur.exercise||'– Übung wählen –')+'</span>'
     +'<span class="pick-btn-arr">'+(dropOpen?'▲':'▼')+'</span></button>'+dh+'</div>'
-    +'<span id="pb-'+di+'-'+ei+'" style="display:contents">'+pbadge(p)+'</span>'+doneChip+'</div>'
+    +'<span id="pb-'+di+'-'+ei+'" style="display:contents">'+pbadge(p,st.inv)+'</span>'+doneChip+'</div>'
     +'<div class="ex-meta"><span class="sets-info">'+ms+' Sätze · <span style="color:var(--text)">'+ex.r[0]+'–'+ex.r[1]+' Reps</span>'+autoLabel+'</span>'
-    +'<div class="w-wrap"><span class="w-label">Gewicht:</span><input class="w-input" type="text" value="'+esc(cur.weight||'')+'" placeholder="kg" onchange="updW('+di+','+ei+',this.value)"/>'+(prv.weight?'<span style="color:var(--text-faint);font-size:11px" title="Letzter Eintrag dieser Übung'+(srcL?': '+esc(srcL):'')+'">(VW: '+esc(prv.weight)+')</span>':'')+'</div></div>'
+    +'<div class="w-wrap"><span class="w-label"'+(st.inv?' title="Gegengewicht der Maschine – weniger Hilfe bedeutet mehr eigene Kraft"':'')+'>'+(st.inv?'Hilfe:':'Gewicht:')+'</span><input class="w-input" type="text" value="'+esc(cur.weight||'')+'" placeholder="kg" onchange="updW('+di+','+ei+',this.value)"/>'+(prv.weight?'<span style="color:var(--text-faint);font-size:11px" title="Letzter Eintrag dieser Übung'+(srcL?': '+esc(srcL):'')+'">(VW: '+esc(prv.weight)+')</span>':'')+'</div></div>'
     +setH
     +'<div class="reps-row">'+rh+'</div>'+hint+tipH+'</div>';
 }
@@ -871,7 +888,7 @@ function renderOv(){
     const dcol=DAYBG[di%4];
     h+='<div class="ov-day"><div class="ov-day-lbl" style="background:'+dcol+'">'+esc(day.l)+'</div>';
     day.e.forEach((ex,ei)=>{
-      const ws=Array.from({length:12},(_,i)=>{const d=S.data[mk(S.cy,i+1,di,ei)]||{};return{w:i+1,name:d.exercise||'',wt:parseWeight(d.weight)||0}});
+      const ws=Array.from({length:12},(_,i)=>{const d=S.data[mk(S.cy,i+1,di,ei)]||{};return{w:i+1,name:d.exercise||'',wt:parseWeight(d.weight,isAssist(d.exercise))||0}});
       const filled=ws.filter(x=>x.wt>0),nums=ws.map(x=>x.wt),mx=Math.max(...nums,1);
       // Angezeigt wird die ZULETZT trainierte Uebung dieses Platzes. Wurde die Uebung
       // im Zyklus gewechselt, darf der kg-Zugewinn NICHT ueber beide Uebungen gerechnet
@@ -879,18 +896,26 @@ function renderOv(){
       const name=filled.length?filled[filled.length-1].name:((ws.find(x=>x.name)||{}).name||'');
       const usedNames=[...new Set(filled.map(x=>x.name).filter(Boolean))];
       const sameEx=name?filled.filter(x=>x.name===name):filled;
-      const col=CC[ex.c]||'#aaa',gain=sameEx.length>=2?sameEx[sameEx.length-1].wt-sameEx[0].wt:null;
+      // Assistierte Uebung: Fortschritt heisst WENIGER Gegengewicht, also dreht sich
+      // sowohl die kg-Bilanz als auch die Balkenhoehe um (niedrige Hilfe = hoher Balken).
+      const inv=isAssist(name);
+      const mn=filled.length?Math.min(...filled.map(x=>x.wt)):0;
+      const score=v=>inv?(mx+mn-v):v;
+      const col=CC[ex.c]||'#aaa';
+      const gain=sameEx.length>=2?(inv?sameEx[0].wt-sameEx[sameEx.length-1].wt:sameEx[sameEx.length-1].wt-sameEx[0].wt):null;
+      const gainTxt=gain&&gain>0?(inv?'−'+gain.toFixed(1)+' kg Hilfe':'+'+gain.toFixed(1)+' kg'):'';
       // Hinweiszeile UNTER den Balken (auf dem iPhone gibt es keinen Hover-Tooltip)
       const prevNames=usedNames.filter(n=>n!==name);
-      const swapNote=prevNames.length?'<div style="font-size:10px;color:var(--text-faint);margin-top:3px">Davor hier: '+esc(prevNames.join(', '))+' (grau) – nicht mit eingerechnet</div>':'';
+      const swapNote=(prevNames.length?'<div style="font-size:10px;color:var(--text-faint);margin-top:3px">Davor hier: '+esc(prevNames.join(', '))+' (grau) – nicht mit eingerechnet</div>':'')
+        +(inv&&filled.length?'<div style="font-size:10px;color:var(--text-faint);margin-top:3px">Gegengewicht der Maschine – weniger Hilfe = mehr Kraft (höherer Balken)</div>':'');
       const bars=nums.map((v,i)=>{
         const isCur=(i+1)===S.week;
         const other=!!(ws[i].name&&name&&ws[i].name!==name);
         const fillCol=other?'var(--text-ghost)':(isCur?'var(--peach)':'var(--lilac)');
-        const hPct=v>0?Math.max(8,Math.round(v/mx*100)):0;
-        return '<div class="ov-bar" title="W'+(i+1)+': '+(v||'–')+' kg'+(ws[i].name?' · '+ws[i].name:'')+'"><div class="ov-bar-fill" style="height:'+hPct+'%;background:'+(v>0?fillCol:'transparent')+'"></div></div>';
+        const hPct=v>0?Math.max(8,Math.round(score(v)/mx*100)):0;
+        return '<div class="ov-bar" title="W'+(i+1)+': '+(v||'–')+(inv?' kg Hilfe':' kg')+(ws[i].name?' · '+ws[i].name:'')+'"><div class="ov-bar-fill" style="height:'+hPct+'%;background:'+(v>0?fillCol:'transparent')+'"></div></div>';
       }).join('');
-      h+='<div class="ov-ex"><div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px"><span style="font-weight:700;color:var(--text)">'+(name?esc(name):'<span style="color:var(--text-faint)">—</span>')+'</span><div style="display:flex;gap:12px;align-items:center"><span style="color:var(--text-mid);font-size:11px">'+esc(ex.c)+'</span>'+(gain&&gain>0?'<span style="color:var(--green);font-weight:700">+'+gain.toFixed(1)+' kg</span>':'')+'</div></div><div class="ov-bars">'+bars+'</div><div style="display:flex;justify-content:space-between;margin-top:4px"><span style="font-size:10px;color:var(--text-faint)">W1</span><span style="font-size:10px;color:var(--text-faint)">W12</span></div>'+(sameEx.length?'<div style="font-size:11px;color:var(--text-dim);margin-top:4px">Start: <b style="color:var(--text)">'+sameEx[0].wt+' kg</b>'+(sameEx.length>1?' · Aktuell: <b style="color:var(--green)">'+sameEx[sameEx.length-1].wt+' kg</b>':'')+'</div>':'')+swapNote+'</div>';
+      h+='<div class="ov-ex"><div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px"><span style="font-weight:700;color:var(--text)">'+(name?esc(name):'<span style="color:var(--text-faint)">—</span>')+'</span><div style="display:flex;gap:12px;align-items:center"><span style="color:var(--text-mid);font-size:11px">'+esc(ex.c)+'</span>'+(gainTxt?'<span style="color:var(--green);font-weight:700">'+gainTxt+'</span>':'')+'</div></div><div class="ov-bars">'+bars+'</div><div style="display:flex;justify-content:space-between;margin-top:4px"><span style="font-size:10px;color:var(--text-faint)">W1</span><span style="font-size:10px;color:var(--text-faint)">W12</span></div>'+(sameEx.length?'<div style="font-size:11px;color:var(--text-dim);margin-top:4px">Start: <b style="color:var(--text)">'+sameEx[0].wt+' kg</b>'+(sameEx.length>1?' · Aktuell: <b style="color:var(--green)">'+sameEx[sameEx.length-1].wt+' kg</b>':'')+'</div>':'')+swapNote+'</div>';
     });
     h+='</div>';
   });
@@ -1036,7 +1061,7 @@ document.addEventListener('click',e=>{
 // App sich EINMAL selbst neu - mit ?v=sha am Cache vorbei. peach_ver merkt sich den
 // Commit, fuer den schon neu geladen wurde (verhindert Reload-Schleifen). Daten in
 // peach_v4 sind davon voellig unberuehrt. BUILD_TS bei jedem Deploy aktualisieren!
-const BUILD_TS='2026-08-05T07:24:00Z';
+const BUILD_TS='2026-08-05T07:30:00Z';
 let verLastCheck=0;
 function checkUpdate(){
   const now=Date.now();
