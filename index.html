@@ -558,30 +558,11 @@ function render(){
 
 function renderT(){
   const pl=plan();let h='';
-  // week bar — zaehlt jede Uebung mit, fuer die es irgendwo einen frueheren Wert gibt
+  // Wochen-Balken: Block wird IMMER gebaut (bei tot=0 nur versteckt), damit
+  // refreshWeekBar ihn live nachziehen kann, ohne neu zu rendern.
   {
-    let tot=0,imp=0;
-    pl.forEach((d,di)=>d.e.forEach((ex,ei)=>{
-      const k=mk(S.cy,S.week,di,ei);
-      const rawCur=S.data[k]||{};
-      // Vorwoche fuer exercise-Vererbung
-      const pkPrev=mk(S.cy,S.week-1,di,ei);
-      const prevW=S.data[pkPrev]||{};
-      const exName=rawCur.exercise!==undefined?rawCur.exercise:(prevW.exercise||'');
-      if(!exName)return;
-      // Uebungsbasierter Vergleichswert (nicht einfach Vorwoche)
-      const prv=findLastExData(di,ei,exName);
-      if(!prv.weight&&!(prv.reps||[]).some(Boolean))return;
-      // Aktuelle Woche muss Reps haben damit es zaehlt
-      const cur={...rawCur};
-      const hasReps=cur.reps&&cur.reps.some(v=>v!==''&&v!==undefined&&v!==null&&parseInt(v)>0);
-      if(!hasReps)return;
-      tot++;const p=prog(cur.reps||[],prv.reps||[],cur.weight,prv.weight);
-      if(p==='w'||p==='r')imp++;
-    }));
-    if(tot>0){const pct=Math.round(imp/tot*100),bc=pct>=100?'var(--green)':'var(--peach)';
-      h+='<div class="week-progress"><div class="wp-top"><span class="wp-title">Woche '+S.week+'</span><span class="wp-pct">'+pct+'%</span></div><div class="wp-bar-wrap"><div class="wp-bar" style="width:'+pct+'%;background:'+bc+(pct>0&&pct<100?';border-right:2px solid var(--ink)':'')+'"></div></div><div class="wp-sub">'+imp+'/'+tot+' Übungen gesteigert</div></div>';
-    }
+    const w=weekStats();
+    h+='<div class="week-progress'+(w.tot?'':' hidden')+'" id="wp-box"><div class="wp-top"><span class="wp-title">Woche '+S.week+'</span><span class="wp-pct" id="wp-pct">'+w.pct+'%</span></div><div class="wp-bar-wrap"><div class="wp-bar" id="wp-bar" style="width:'+w.pct+'%;background:'+(w.pct>=100?'var(--green)':'var(--peach)')+(w.pct>0&&w.pct<100?';border-right:2px solid var(--ink)':'')+'"></div></div><div class="wp-sub" id="wp-sub">'+w.imp+'/'+w.tot+' Übungen gesteigert</div></div>';
   }
   pl.forEach((day,di)=>{
     const op=S.openDays[di]===true;
@@ -714,6 +695,43 @@ function exDone(di,ei){
   for(let i=0;i<ms;i++){const v=reps[i];if(v!==''&&v!=null&&parseInt(v)>0)filled++}
   return filled>=ms;
 }
+// Zaehlt die Uebungen der aktuellen Woche, die einen Vorwert UND eingetragene Reps haben,
+// und davon die gesteigerten. Nutzt exState — identische Logik wie Badge und Hinweis.
+function weekStats(){
+  let tot=0,imp=0;
+  plan().forEach((d,di)=>d.e.forEach((ex,ei)=>{
+    const st=exState(di,ei);
+    if(!st.cur.exercise||!st.hasPrev)return;
+    if(!st.reps.some(v=>v!==''&&v!=null&&parseInt(v)>0))return;
+    tot++;if(st.p==='w'||st.p==='r')imp++;
+  }));
+  return{tot,imp,pct:tot?Math.round(imp/tot*100):0};
+}
+// Fortschrittsbalken gezielt im DOM nachziehen (KEIN renderT)
+function refreshWeekBar(){
+  const box=document.getElementById('wp-box');if(!box)return;
+  const w=weekStats();
+  box.classList.toggle('hidden',!w.tot);
+  const pct=document.getElementById('wp-pct'),bar=document.getElementById('wp-bar'),sub=document.getElementById('wp-sub');
+  if(pct)pct.textContent=w.pct+'%';
+  if(bar){bar.style.width=w.pct+'%';bar.style.background=w.pct>=100?'var(--green)':'var(--peach)';bar.style.borderRight=(w.pct>0&&w.pct<100)?'2px solid var(--ink)':'none'}
+  if(sub)sub.textContent=w.imp+'/'+w.tot+' Übungen gesteigert';
+}
+// Badge, Vorwochen-Hinweis, Rep-Feld-Farben und Wochen-Balken LIVE nachziehen.
+// Ohne das zeigten sie waehrend der Eingabe noch den Stand von vor der letzten
+// Aenderung — z. B. "Gleiche Leistung", obwohl das Gewicht gerade reduziert wurde.
+function refreshProg(di,ei){
+  const st=exState(di,ei);
+  const b=document.getElementById('pb-'+di+'-'+ei);
+  if(b)b.innerHTML=pbadge(st.p);
+  const hb=document.getElementById('ph-'+di+'-'+ei);
+  if(hb)hb.innerHTML=hintHTML(st);
+  for(let i=0;i<st.ms;i++){
+    const el=document.getElementById('rp-'+di+'-'+ei+'-'+i);
+    if(el)el.style.background=rcol(st.reps[i],st.ex.r)||'var(--field-bg)';
+  }
+  refreshWeekBar();
+}
 // Aktualisiert Tages-Pill + Erledigt-Haken gezielt im DOM (KEIN renderT — Fokus bleibt erhalten)
 function refreshDone(di,ei){
   const chip=document.getElementById('done-'+di+'-'+ei);
@@ -725,9 +743,13 @@ function refreshDone(di,ei){
     el.textContent=(done===total?'✓ ':'')+done+'/'+total+' Übungen';
   }
 }
-function renderEx(ex,ei,di){
+// Zustand einer Uebungszeile an EINER Stelle berechnet — genutzt von renderEx (Aufbau),
+// refreshProg (Live-Update ohne renderT) und weekStats (Fortschrittsbalken). So koennen
+// Badge, Hinweis und Balken nicht mehr auseinanderlaufen.
+function exState(di,ei){
+  const ex=plan()[di].e[ei];
   const k=mk(S.cy,S.week,di,ei),pk=S.week>1?mk(S.cy,S.week-1,di,ei):null;
-  const rawCur=S.data[k]||{},prevWeekData=pk?S.data[pk]||{}:{};
+  const rawCur=S.data[k]||{},prevWeekData=pk?(S.data[pk]||{}):{};
   // Übung + extraSets aus Vorwoche übernehmen wenn aktuelle Woche noch leer
   const cur={
     ...rawCur,
@@ -736,18 +758,35 @@ function renderEx(ex,ei,di){
   };
   // Vergleichswert: letzter gespeicherter Wert DIESER Uebung (nicht einfach Vorwoche)
   const prv=findLastExData(di,ei,cur.exercise);
+  const autoX=autoExtraSets(di,ei);
+  const ms=Math.min(5,ex.s+(cur.extraSets||0)+autoX);
+  // NUR die Saetze der aktuellen Woche: ein spaeter entfernter Zusatzsatz darf nicht
+  // als Rest im Vergleich haengen bleiben (sonst zaehlt eine geloeschte Zahl weiter mit).
+  const reps=(cur.reps||[]).slice(0,ms);
+  const hasPrev=!!(prv.weight||(prv.reps||[]).some(r=>r!==''&&r!=null));
+  return {ex,cur,prv,ms,autoX,reps,hasPrev,
+    p:prog(reps,prv.reps||[],cur.weight,prv.weight),
+    srcL:hasPrev?srcLabel(prv._src):''};
+}
+// Vorwochen-Hinweis ("VW: 17 kg · 12 / 12 Wdh … → Gleiche Leistung!")
+function hintHTML(st){
+  if(!(st.hasPrev&&st.prv.weight))return'';
+  // Bei 'd' unterscheiden, ob das Gewicht runter ging — sonst bleibt unklar warum
+  const wDown=parseWeight(st.cur.weight)>0&&parseWeight(st.prv.weight)>0&&parseWeight(st.cur.weight)<parseWeight(st.prv.weight);
+  const dTxt=wDown?'→ Weniger Gewicht – kein Problem!':'→ Kein Problem!';
+  const p=st.p;
+  const pm=p==='w'?' <span style="color:var(--green)">→ Gewicht gesteigert! ✓</span>':p==='r'?' <span style="color:var(--blue)">→ Mehr Wiederholungen! ✓</span>':p==='s'?' <span style="color:var(--gold)">→ Gleiche Leistung!</span>':p==='d'?' <span style="color:var(--red)">'+dTxt+'</span>':'';
+  const sl=st.srcL?' <span style="opacity:.75">('+esc(st.srcL)+')</span>':'';
+  return '<div class="phint">VW: '+esc(st.prv.weight)+' kg · '+esc((st.prv.reps||[]).filter(Boolean).join(' / '))+' Wdh'+sl+pm+'</div>';
+}
+function renderEx(ex,ei,di){
+  const st=exState(di,ei);
+  const {cur,prv,ms,reps,hasPrev,p,srcL}=st;
   // Tipp-Key: übungsbasiert – gilt für alle Wochen/Tage/Zyklen
   const tk=cur.exercise?'tip__ex__'+cur.exercise:mkt(S.cy,S.week,di,ei);
   const xs=cur.extraSets||0;
-  const autoX=autoExtraSets(di,ei);
-  const ms=Math.min(5,ex.s+xs+autoX);
-  const autoTriggered=autoX>0&&xs===0;
-  const reps=cur.reps||Array(ms).fill('');
+  const autoTriggered=st.autoX>0&&xs===0;
   const col=CC[ex.c]||'#aaa';
-  // Vorwert kann auch in Woche 1 / im neuen Zyklus existieren (uebungsbasierte Historie)
-  const hasPrev=!!(prv.weight||(prv.reps||[]).some(r=>r!==''&&r!=null));
-  const p=prog(reps,prv.reps||[],cur.weight,prv.weight);
-  const srcL=hasPrev?srcLabel(prv._src):'';
   const dropOpen=S.drop&&S.drop.di===di&&S.drop.ei===ei;
   const opts=EXERCISES[ex.c]||[];
   const filt=S.dropSearch?opts.filter(o=>o.toLowerCase().includes(S.dropSearch.toLowerCase())):opts;
@@ -786,16 +825,8 @@ function renderEx(ex,ei,di){
     }
   }
 
-  // hint
-  let hint='';
-  if(hasPrev&&prv.weight){
-    // Bei 'd' unterscheiden, ob das Gewicht runter ging — sonst bleibt unklar warum
-    const wDown=parseWeight(cur.weight)>0&&parseWeight(prv.weight)>0&&parseWeight(cur.weight)<parseWeight(prv.weight);
-    const dTxt=wDown?'→ Weniger Gewicht – kein Problem!':'→ Kein Problem!';
-    const pm=p==='w'?' <span style="color:var(--green)">→ Gewicht gesteigert! ✓</span>':p==='r'?' <span style="color:var(--blue)">→ Mehr Wiederholungen! ✓</span>':p==='s'?' <span style="color:var(--gold)">→ Gleiche Leistung!</span>':p==='d'?' <span style="color:var(--red)">'+dTxt+'</span>':'';
-    const sl=srcL?' <span style="opacity:.75">('+esc(srcL)+')</span>':'';
-    hint='<div class="phint">VW: '+esc(prv.weight)+' kg · '+esc((prv.reps||[]).filter(Boolean).join(' / '))+' Wdh'+sl+pm+'</div>';
-  }
+  // hint — Container hat eine feste ID, damit refreshProg ihn ohne renderT neu fuellen kann
+  const hint='<div id="ph-'+di+'-'+ei+'">'+hintHTML(st)+'</div>';
 
   // reps + +/- buttons
   let rh='';
@@ -803,7 +834,7 @@ function renderEx(ex,ei,di){
     const c=rcol(reps[i],ex.r),pr=(prv.reps||[])[i];
     const prevLabel=hasPrev?(pr!=null&&pr!==''?pr:'0'):'';
     const repBg=c?c:'var(--field-bg)';
-    rh+='<div class="rep-col"><span class="rep-lbl">S'+(i+1)+'</span><input class="rep-inp" type="text" inputmode="numeric" value="'+esc(reps[i]||'')+'" placeholder="–" style="background:'+repBg+'" oninput="updRep('+di+','+ei+','+i+',this.value)" onchange="updRep('+di+','+ei+','+i+',this.value)"/>'+(prevLabel!==''?'<span class="rep-prev" style="'+(pr==null||pr===''?'color:var(--text-ghost)':'')+'">'+prevLabel+'</span>':'')+'</div>';
+    rh+='<div class="rep-col"><span class="rep-lbl">S'+(i+1)+'</span><input class="rep-inp" id="rp-'+di+'-'+ei+'-'+i+'" type="text" inputmode="numeric" value="'+esc(reps[i]||'')+'" placeholder="–" style="background:'+repBg+'" oninput="updRep('+di+','+ei+','+i+',this.value)" onchange="updRep('+di+','+ei+','+i+',this.value)"/>'+(prevLabel!==''?'<span class="rep-prev" style="'+(pr==null||pr===''?'color:var(--text-ghost)':'')+'">'+prevLabel+'</span>':'')+'</div>';
   }
   if(xs>0)rh+='<button class="add-set-btn nb-shadow" style="background:var(--surface)" onclick="removeSet('+di+','+ei+')">−</button>';
   if(ms<5)rh+='<button class="add-set-btn nb-shadow" onclick="addSet('+di+','+ei+')">+</button>';
@@ -827,7 +858,7 @@ function renderEx(ex,ei,di){
     +'<button class="pick-btn'+(cur.exercise?' has-val':'')+'" onclick="togDrop('+di+','+ei+',event)">'
     +'<span class="pick-btn-txt">'+esc(cur.exercise||'– Übung wählen –')+'</span>'
     +'<span class="pick-btn-arr">'+(dropOpen?'▲':'▼')+'</span></button>'+dh+'</div>'
-    +pbadge(p)+doneChip+'</div>'
+    +'<span id="pb-'+di+'-'+ei+'" style="display:contents">'+pbadge(p)+'</span>'+doneChip+'</div>'
     +'<div class="ex-meta"><span class="sets-info">'+ms+' Sätze · <span style="color:var(--text)">'+ex.r[0]+'–'+ex.r[1]+' Reps</span>'+autoLabel+'</span>'
     +'<div class="w-wrap"><span class="w-label">Gewicht:</span><input class="w-input" type="text" value="'+esc(cur.weight||'')+'" placeholder="kg" onchange="updW('+di+','+ei+',this.value)"/>'+(prv.weight?'<span style="color:var(--text-faint);font-size:11px" title="Letzter Eintrag dieser Übung'+(srcL?': '+esc(srcL):'')+'">(VW: '+esc(prv.weight)+')</span>':'')+'</div></div>'
     +setH
@@ -840,16 +871,26 @@ function renderOv(){
     const dcol=DAYBG[di%4];
     h+='<div class="ov-day"><div class="ov-day-lbl" style="background:'+dcol+'">'+esc(day.l)+'</div>';
     day.e.forEach((ex,ei)=>{
-      const ws=Array.from({length:12},(_,i)=>{const d=S.data[mk(S.cy,i+1,di,ei)]||{};return{w:i+1,name:d.exercise,wt:parseWeight(d.weight)||0}});
-      const filled=ws.filter(x=>x.wt>0),name=(ws.find(x=>x.name)||{}).name,nums=ws.map(x=>x.wt),mx=Math.max(...nums,1);
-      const col=CC[ex.c]||'#aaa',gain=filled.length>=2?filled[filled.length-1].wt-filled[0].wt:null;
+      const ws=Array.from({length:12},(_,i)=>{const d=S.data[mk(S.cy,i+1,di,ei)]||{};return{w:i+1,name:d.exercise||'',wt:parseWeight(d.weight)||0}});
+      const filled=ws.filter(x=>x.wt>0),nums=ws.map(x=>x.wt),mx=Math.max(...nums,1);
+      // Angezeigt wird die ZULETZT trainierte Uebung dieses Platzes. Wurde die Uebung
+      // im Zyklus gewechselt, darf der kg-Zugewinn NICHT ueber beide Uebungen gerechnet
+      // werden (60 kg Langhantel -> 100 kg Maschine sind keine +40 kg Fortschritt).
+      const name=filled.length?filled[filled.length-1].name:((ws.find(x=>x.name)||{}).name||'');
+      const usedNames=[...new Set(filled.map(x=>x.name).filter(Boolean))];
+      const sameEx=name?filled.filter(x=>x.name===name):filled;
+      const col=CC[ex.c]||'#aaa',gain=sameEx.length>=2?sameEx[sameEx.length-1].wt-sameEx[0].wt:null;
+      // Hinweiszeile UNTER den Balken (auf dem iPhone gibt es keinen Hover-Tooltip)
+      const prevNames=usedNames.filter(n=>n!==name);
+      const swapNote=prevNames.length?'<div style="font-size:10px;color:var(--text-faint);margin-top:3px">Davor hier: '+esc(prevNames.join(', '))+' (grau) – nicht mit eingerechnet</div>':'';
       const bars=nums.map((v,i)=>{
         const isCur=(i+1)===S.week;
-        const fillCol=isCur?'var(--peach)':'var(--lilac)';
+        const other=!!(ws[i].name&&name&&ws[i].name!==name);
+        const fillCol=other?'var(--text-ghost)':(isCur?'var(--peach)':'var(--lilac)');
         const hPct=v>0?Math.max(8,Math.round(v/mx*100)):0;
-        return '<div class="ov-bar" title="W'+(i+1)+': '+(v||'–')+' kg"><div class="ov-bar-fill" style="height:'+hPct+'%;background:'+(v>0?fillCol:'transparent')+'"></div></div>';
+        return '<div class="ov-bar" title="W'+(i+1)+': '+(v||'–')+' kg'+(ws[i].name?' · '+ws[i].name:'')+'"><div class="ov-bar-fill" style="height:'+hPct+'%;background:'+(v>0?fillCol:'transparent')+'"></div></div>';
       }).join('');
-      h+='<div class="ov-ex"><div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px"><span style="font-weight:700;color:var(--text)">'+(name||'<span style="color:var(--text-faint)">—</span>')+'</span><div style="display:flex;gap:12px;align-items:center"><span style="color:var(--text-mid);font-size:11px">'+esc(ex.c)+'</span>'+(gain&&gain>0?'<span style="color:var(--green);font-weight:700">+'+gain.toFixed(1)+' kg</span>':'')+'</div></div><div class="ov-bars">'+bars+'</div><div style="display:flex;justify-content:space-between;margin-top:4px"><span style="font-size:10px;color:var(--text-faint)">W1</span><span style="font-size:10px;color:var(--text-faint)">W12</span></div>'+(filled.length?'<div style="font-size:11px;color:var(--text-dim);margin-top:4px">Start: <b style="color:var(--text)">'+filled[0].wt+' kg</b>'+(filled.length>1?' · Aktuell: <b style="color:var(--green)">'+filled[filled.length-1].wt+' kg</b>':'')+'</div>':'')+'</div>';
+      h+='<div class="ov-ex"><div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px"><span style="font-weight:700;color:var(--text)">'+(name?esc(name):'<span style="color:var(--text-faint)">—</span>')+'</span><div style="display:flex;gap:12px;align-items:center"><span style="color:var(--text-mid);font-size:11px">'+esc(ex.c)+'</span>'+(gain&&gain>0?'<span style="color:var(--green);font-weight:700">+'+gain.toFixed(1)+' kg</span>':'')+'</div></div><div class="ov-bars">'+bars+'</div><div style="display:flex;justify-content:space-between;margin-top:4px"><span style="font-size:10px;color:var(--text-faint)">W1</span><span style="font-size:10px;color:var(--text-faint)">W12</span></div>'+(sameEx.length?'<div style="font-size:11px;color:var(--text-dim);margin-top:4px">Start: <b style="color:var(--text)">'+sameEx[0].wt+' kg</b>'+(sameEx.length>1?' · Aktuell: <b style="color:var(--green)">'+sameEx[sameEx.length-1].wt+' kg</b>':'')+'</div>':'')+swapNote+'</div>';
     });
     h+='</div>';
   });
@@ -926,9 +967,11 @@ function onDS(di,ei,v){
 function dsKey(di,ei,e){
   const dd=document.getElementById('dd-'+di+'-'+ei);
   if(!dd)return;
+  // Die Zeile "– Übung wählen –" ist bewusst NICHT Teil der Pfeil-Navigation: sonst
+  // landete der erste Pfeil-runter darauf und Enter LOESCHTE die Uebung statt zu waehlen.
+  const opts=[...dd.querySelectorAll('.drop-opt:not(.drop-empty-opt)')];
   if(e.key==='ArrowDown'||e.key==='ArrowUp'){
     e.preventDefault();
-    const opts=[...dd.querySelectorAll('.drop-opt')];
     if(!opts.length)return;
     let i=opts.findIndex(o=>o.classList.contains('hl'));
     i=e.key==='ArrowDown'?Math.min(i+1,opts.length-1):Math.max(i-1,0);
@@ -937,7 +980,8 @@ function dsKey(di,ei,e){
     opts[i].scrollIntoView({block:'nearest'});
   }else if(e.key==='Enter'){
     e.preventDefault();
-    const cur=dd.querySelector('.drop-opt.hl');
+    // Ohne Markierung: bei genau einem Treffer diesen nehmen
+    const cur=dd.querySelector('.drop-opt.hl:not(.drop-empty-opt)')||(opts.length===1?opts[0]:null);
     if(cur)cur.click();
   }else if(e.key==='Escape'){
     e.preventDefault();
@@ -958,7 +1002,7 @@ function initKey(di,ei){
   }
   return k;
 }
-function updW(di,ei,v){const k=initKey(di,ei);S.data[k]={...S.data[k],weight:v};save()}
+function updW(di,ei,v){const k=initKey(di,ei);S.data[k]={...S.data[k],weight:v};save();refreshProg(di,ei)}
 // Maschinen-Einstellung speichern — uebungsbasiert, KEIN renderT (Fokus bleibt erhalten)
 function updSetting(di,ei,v){
   const k=mk(S.cy,S.week,di,ei),pk=S.week>1?mk(S.cy,S.week-1,di,ei):null;
@@ -971,10 +1015,9 @@ function updSetting(di,ei,v){
 }
 function updRep(di,ei,i,v){
   const k=initKey(di,ei);const cur=S.data[k];
-  const ms=Math.min(5,(cur.extraSets||0)+(plan()[di].e[ei].s));
-  const r=[...(cur.reps||Array(ms).fill(''))];while(r.length<=i)r.push('');r[i]=v;
+  const r=[...(cur.reps||[])];while(r.length<=i)r.push('');r[i]=v;
   S.data[k]={...cur,reps:r};save();
-  refreshDone(di,ei);
+  refreshDone(di,ei);refreshProg(di,ei);
 }
 function addSet(di,ei){const k=initKey(di,ei);S.data[k]={...S.data[k],extraSets:(S.data[k].extraSets||0)+1};save();renderT()}
 function removeSet(di,ei){const k=initKey(di,ei);S.data[k]={...S.data[k],extraSets:Math.max(0,(S.data[k].extraSets||0)-1)};save();renderT()}
@@ -993,7 +1036,7 @@ document.addEventListener('click',e=>{
 // App sich EINMAL selbst neu - mit ?v=sha am Cache vorbei. peach_ver merkt sich den
 // Commit, fuer den schon neu geladen wurde (verhindert Reload-Schleifen). Daten in
 // peach_v4 sind davon voellig unberuehrt. BUILD_TS bei jedem Deploy aktualisieren!
-const BUILD_TS='2026-08-05T06:58:00Z';
+const BUILD_TS='2026-08-05T07:24:00Z';
 let verLastCheck=0;
 function checkUpdate(){
   const now=Date.now();

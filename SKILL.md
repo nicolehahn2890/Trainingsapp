@@ -197,6 +197,17 @@ updSetting(di,ei,v)     Speichert Maschinen-Einstellung unter set__ex__[Name] �
 exDone(di,ei)           true wenn Uebung gewaehlt UND alle Saetze der aktuellen Woche Reps haben
 refreshDone(di,ei)      Aktualisiert Erledigt-Haken (#done-di-ei) + Tages-Pill (#dc-di) GEZIELT im DOM
                         — wird von updRep aufgerufen, KEIN renderT (Fokus bleibt erhalten)!
+exState(di,ei)          EINE Quelle fuer den Zustand einer Uebungszeile: {ex,cur,prv,ms,autoX,reps,
+                        hasPrev,p,srcL}. Genutzt von renderEx, refreshProg und weekStats — dadurch
+                        koennen Badge, Hinweis und Fortschrittsbalken nicht auseinanderlaufen.
+                        reps ist auf ms GESCHNITTEN (entfernte Zusatzsaetze zaehlen nicht mehr mit).
+hintHTML(st)            Baut die VW-Zeile ("VW: 17 kg · 12 / 12 Wdh … → Gleiche Leistung!")
+refreshProg(di,ei)      Zieht Badge (#pb-di-ei), VW-Hinweis (#ph-di-ei), Rep-Feld-Farben
+                        (#rp-di-ei-i) und den Wochenbalken LIVE nach — KEIN renderT.
+                        Wird von updRep UND updW aufgerufen.
+weekStats()             {tot,imp,pct} der aktuellen Woche, auf Basis von exState
+refreshWeekBar()        Schreibt weekStats() in #wp-box/#wp-pct/#wp-bar/#wp-sub (Block existiert
+                        immer, ist bei tot=0 nur .hidden)
 flashView()             Sanfter Einblend-Effekt der aktiven Ansicht (Tab-/Zyklus-/Wochen-Wechsel)
 saveUI()                Merkt die aktuelle Position (view/week/cy/openDays) im Key peach_ui. Wird in
                         setView/setCycle/changeWeek/toggleDay aufgerufen; beim Start wird peach_ui
@@ -245,6 +256,12 @@ checkUpdate()           Auto-Update gegen iOS-Webapp-Cache: GitHub-API (commits/
   niedriger war; die Gesamtsumme meldete faelschlich 'r' bei einem zusaetzlichen Satz und
   faelschlich 'd' solange die Woche erst halb ausgefuellt war.)
 - Fortschritt wird nur berechnet wenn aktuelle Woche tatsaechlich Reps hat
+- LIVE-AKTUALISIERUNG: Badge, VW-Hinweis, Rep-Feld-Farben und Wochenbalken werden bei jeder
+  Rep- und Gewichts-Eingabe per refreshProg() nachgezogen. Ohne das zeigten sie den Stand von
+  VOR der letzten Aenderung (z. B. noch "Gleiche Leistung", obwohl das Gewicht gerade reduziert
+  wurde) — es sah aus, als wuerde sich die App irren. NIEMALS renderT() daraus aufrufen!
+- Nur die Saetze der AKTUELLEN Satzanzahl (ms) zaehlen. Wird ein Zusatzsatz entfernt, bleibt
+  seine Zahl in S.data stehen — exState schneidet reps deshalb auf ms.
 - WeekProgress-Balken nutzt ebenfalls findLastExData()
 - autoExtraSets bricht Streak ab wenn Uebung gewechselt wurde
 
@@ -267,7 +284,9 @@ checkUpdate()           Auto-Update gegen iOS-Webapp-Cache: GitHub-API (commits/
 - Fortschritt-Block (.week-progress): Cream-Block mit grosser %-Zahl (Archivo Black) + Kapsel-Bar
   (Peach-Fuellung, gruen bei 100%)
 - Uebersicht: vertikale Kapsel-Balken (.ov-bar = Pill-Track, .ov-bar-fill von unten) —
-  aktuelle Woche (S.week) Peach, andere Wochen Lilac (kein Ring mehr)
+  aktuelle Woche (S.week) Peach, andere Wochen Lilac, Wochen mit einer ANDEREN Uebung grau
+  (--text-ghost). Titel = zuletzt trainierte Uebung; kg-Zugewinn und Start/Aktuell zaehlen nur
+  Wochen MIT DIESER Uebung, darunter die Zeile "Davor hier: … (grau) – nicht mit eingerechnet"
 - Animationen: fadeSlide (Ansicht/Tag aufklappen), dropIn (Dropdown nur beim Oeffnen, nicht bei Suche)
 - Einstellungs-Feld (gelbes Zahnrad-Chip + .set-input): erscheint sobald eine Uebung gewaehlt ist,
   zwischen ex-meta und reps-row. Speichert uebungsbasiert (set__ex__Name) via updSetting() — ohne renderT
@@ -485,6 +504,22 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Bug-Suche: 4 weitere Fehler gefunden und behoben.**
+   (1) **Badge/Hinweis/Rep-Farben aktualisierten sich nicht** waehrend der Eingabe — updRep rief
+   nur refreshDone, updW gar nichts. Waehrend des ganzen Trainings stand dort der Stand von vor
+   der letzten Aenderung (z. B. "Gleiche Leistung", obwohl das Gewicht gerade reduziert wurde);
+   erst ein Wochenwechsel korrigierte es. Neu: exState() als einzige Zustandsquelle plus
+   refreshProg()/refreshWeekBar() fuer gezielte DOM-Updates ohne renderT.
+   (2) **Entfernte Zusatzsaetze zaehlten weiter mit** — die geloeschte Zahl blieb in S.data und
+   floss in den Vergleich ein. exState schneidet reps jetzt auf die aktuelle Satzanzahl.
+   (3) **Uebersicht rechnete ueber einen Uebungswechsel hinweg** — 60 kg Langhantel gefolgt von
+   100 kg Maschine ergab "+40 kg Fortschritt". Jetzt zaehlen nur Wochen mit derselben (zuletzt
+   trainierten) Uebung, fremde Wochen sind graue Balken mit Hinweiszeile darunter.
+   (4) **Pfeiltaste + Enter im Uebungs-Suchfeld LOESCHTE die Uebung**, weil die Zeile
+   "– Uebung waehlen –" Teil der Pfeil-Navigation war. Sie ist jetzt ausgenommen; Enter ohne
+   Markierung waehlt bei genau einem Treffer diesen aus.
+   Verifiziert per Playwright-Suite (23 UI-Tests) + 16 prog()-Einheitstests, beide gruen.
 
 NEU. **Fortschritts-Vergleich korrigiert (2 Bugs):** (1) Ein REDUZIERTES Gewicht wurde gar
    nicht als Abstieg gewertet — 17 kg -> 15 kg bei gleichen Reps meldete "Gleiche Leistung!",
