@@ -257,6 +257,7 @@ button:disabled:active{transform:none;}
 const EXERCISES={
 "Glute Max":["Hip Thrusts Langhantel","Hip Thrust Kurzhantel","Hip Thrusts Multipresse","Hip Thrust Maschine","Glute Bridge Langhantel","Glute Bridge Kurzhantel","Glute Bridge Multipresse","Kabel Kickback Stehend","Kabel Kickback Flachbank","Kabel Kickback Schrägbank","Kabel Kickback Liegend","Kickback Multipresse","Kickback Maschine"],
 "Glute Med":["Kabel Abduktion Stehend","Kabel Abduktion Liegend","Kabel Abduktion Schrägbank","Abduktionsmaschine","Pelvic Drop","Abduktionsmaschine stehend","Fire Hydrants Kabel","3D Abduktor Maschine"],
+"Adduktoren":["Adduktionsmaschine","Adduktion Kabel Stehend","Adduktion Kabel Liegend","Copenhagen Plank","Sumo Squat Kurzhantel","Sumo RDL Langhantel","Cossack Squat","Lateral Lunge"],
 "Glute & Quad":["Low Bar Squat","Beinpresse 45 Grad","Beinpresse","Step Ups","Split Squat Kurzhantel","Split Squat Langhantel","Split Squat Multipresse","Hack Squat","Reverse Lunge","Belt Squat","Super Squat"],
 "Glute & Hams":["RDL Langhantel","RDL Kurzhanteln","RDL Maschine","Belt Squat RDL","Glute Hyperextensions","Reverse Hack RDL","Good Mornings","Single-Leg RDL","Nordic Curls","Leg Curl (Maschine)"],
 "Rücken":["LH Rudern","KH Rudern","KH Rudern (breit)","Rudern Kabel (eng)","Rudern Kabel (breit)","Rudermaschine (Panatta)","Rudermaschine (Precor)","High Row Maschine","Latzug (eng)","Latzug (breit)","Latzug Maschine (Panatta)","Latzug Maschine (Precor)","Überzug am Kabel","T Bar Rudern (neutral)","T Bar Rudern (breit)","Assistierter Klimmzug (eng)","Assistierter Klimmzug (breit)","Face Pull Kabel","Straight-Arm Pulldown","Einarmiger Latzug Kabel","Diverging Low Row"],
@@ -393,9 +394,17 @@ const TIPS={
 "Belt Squat RDL":"✅ Belt Squat Maschine als RDL nutzen – schont den Rücken, schwere Gewichte möglich.\n⚙ Einstellung: Gurt über die Hüftknochen, Füße mittig und hüftbreit (nicht weit vorne wie beim Belt Squat).\nAusführung: Hüftgelenk-Scharnier – Hüfte nach hinten schieben, nicht in die Kniebeuge! Stark auf Hamstrings und Po. Kontrolliert absenken für den Stretch, oben Po anspannen.",
 "Belt Squat":"Panatta Belt Squat: Gewicht hängt am Hüftgurt – kein Rückenloading.\n⚙ Einstellung: Gurt fest über die Hüftknochen, Karabiner mittig vor dem Körper einhängen. Füße weit VORNE auf den Fußplatten = mehr Hüftbeugung = maximaler Glute-Fokus! Füße mittig = mehr Quad. Griff vorne nur zur Balance nutzen, nicht hochziehen.\nAusführung: Tief absenken, durch die Fersen drücken, oben Po anspannen.",
 "Beinpresse 45 Grad":"⚙ Einstellung: Rückenlehne in die flachste angenehme Position, Sitz so, dass das Becken unten nicht abkippt.\n⚠️ Fußposition entscheidet, was wächst: Füße HOCH auf der Platte = Glutes und Hamstrings. Füße tief = Quads dominant – bei Ziel schmale Beine unbedingt vermeiden. Für dein Ziel: Füße immer hoch, schulterbreit bis breit, Zehen leicht nach außen. Knie aktiv Richtung Zehen drücken, Rücken bleibt durchgehend am Polster.",
+"Adduktionsmaschine":"\u2699 Einstellung: Sitz so, dass Hüfte und Knie im 90-Grad-Winkel stehen, die Polster liegen innen knapp über dem Knie. Startweite so weit öffnen, dass du innen eine deutliche Dehnung spürst – genau da entsteht der Reiz.\nAusführung: Beine kontrolliert zusammenführen, 1 Sek. halten, dann LANGSAM (ca. 3 Sek.) in die volle Dehnung zurück. Rücken bleibt am Polster. Der Adduktor magnus ist gleichzeitig ein Hüftstrecker – er arbeitet mit dem Po und füllt die Innenseite, ohne die Oberschenkel-Vorderseite dicker zu machen.",
+"Adduktion Kabel Stehend":"Kabel unten, Manschette ans INNERE Fußgelenk, seitlich zur Maschine stellen und festhalten. Standbein leicht gebeugt.\nAusführung: Arbeitsbein vor dem Standbein vorbei zur Mitte und leicht darüber hinaus ziehen, kurz halten, dann langsam gegen den Zug zurück in die Dehnung. Becken bleibt gerade – nicht mit dem Oberkörper wegkippen.",
+"Adduktion Kabel Liegend":"Auf der Seite liegend, Kabel am UNTEREN Fußgelenk, oberes Bein angewinkelt vor dem Körper abgelegt.\nAusführung: Unteres Bein gestreckt nach oben zur Mitte führen, oben kurz halten, langsam ablassen. Sehr isoliert – gute zweite Übung nach der Maschine, wenn die Innenseite schon vorermüdet ist.",
+"Copenhagen Plank":"Seitstütz auf dem Unterarm, oberes Bein auf einer Bank abgelegt, unteres Bein frei in der Luft.\nAusführung: Hüfte hochdrücken und Position halten – das obere Bein zieht dich aktiv nach oben. Start: KNIE auf der Bank, 15–20 Sek. pro Seite. Steigerung: gestrecktes Bein auf der Bank. Ins Wdh.-Feld einfach die gehaltenen SEKUNDEN eintragen. Kräftigt Adduktoren und stabilisiert das Becken – ideale Ergänzung zur vielen Abduktions-Arbeit.",
+"Sumo Squat Kurzhantel":"✅ Adduktoren + Po ohne Quad-Betonung – passt zum Ziel schmale Beine. Füße deutlich weiter als schulterbreit, Zehen 30–45 Grad nach außen, KH senkrecht zwischen den Beinen.\nAusführung: Hüfte gerade nach UNTEN senken (nicht nach hinten wie beim RDL), Knie aktiv nach außen Richtung Zehen drücken, unten die Innenseite dehnen spüren. Oben Hüfte durchstrecken und Po anspannen, Oberkörper bleibt aufrecht.",
+"Sumo RDL Langhantel":"Weiter Sumo-Stand, Zehen nach außen, Stange nah am Körper.\nAusführung: Hüftgelenk-Scharnier – Hüfte nach hinten schieben, Rücken neutral, absenken bis Innenseite und Beinrückseite deutlich ziehen. Der weite Stand verlagert die Arbeit stark auf den Adduktor magnus (ein Hüftstrecker) – sehr po-freundlich und nicht quad-lastig. Oben durch die Fersen drücken.",
+"Cossack Squat":"Sehr weiter Stand. Gewicht auf ein Bein verlagern und darauf tief absinken, das andere Bein bleibt gestreckt, Zehen hochgezogen.\nAusführung: Langsam absenken bis zur Dehnung der Innenseite, kurz halten, kontrolliert wieder hoch. Erst mit Körpergewicht sauber lernen, dann leichte KH oder Kettlebell vor der Brust. Bringt Adduktoren-Kraft in voller Dehnung plus Hüftbeweglichkeit.",
+"Lateral Lunge":"Seitlicher Ausfallschritt: großer Schritt zur Seite, Gewicht auf das Schrittbein, das andere Bein bleibt gestreckt.\nAusführung: Hüfte nach hinten-unten schieben, der Fuß des gestreckten Beins bleibt flach am Boden – die Innenseite zieht deutlich. Über die Ferse zurückdrücken. Freie Variante des Cossack Squat, gut mit KH oder Kettlebell vor der Brust.",
 "RDL Maschine":"⚙ Einstellung: Starthöhe der Griffe etwa auf Mitte Schienbein – volle Hamstring-Dehnung ohne runden Rücken muss möglich sein.\nAusführung: Hüftgelenk-Scharnier – Rücken neutral, Hüfte nach hinten schieben, langsam absenken bis zur starken Dehnung in den Hamstrings – das ist der entscheidende Reiz für Po und Beinrückseite. Oben durch die Fersen drücken und Po aktiv anspannen. Die Maschinenführung macht schwere Gewichte sicher – nutze das für Stretch-Hypertrophie."
 };
-const CC={"Glute Max":"#EE8FB4","Glute Med":"#B49DF2","Glute & Quad":"#E8B86A","Glute & Hams":"#A7D98C","Rücken":"#84C3E0","Brust":"#F0A0A0","Schultern":"#C2DB7E","Bizeps":"#E6C57E","Trizeps":"#93B6E0","Bauch":"#D6D080"};
+const CC={"Glute Max":"#EE8FB4","Glute Med":"#B49DF2","Adduktoren":"#7FD1C1","Glute & Quad":"#E8B86A","Glute & Hams":"#A7D98C","Rücken":"#84C3E0","Brust":"#F0A0A0","Schultern":"#C2DB7E","Bizeps":"#E6C57E","Trizeps":"#93B6E0","Bauch":"#D6D080"};
 // Tagesfarbe pro Tag-Card (Tag A peach, B pink, C lime, D sky)
 const DAYBG=["#F4A45E","#F18FB6","#B6DD57","#8CCBE8"];
 const P4=[
@@ -404,6 +413,7 @@ const P4=[
   {c:"Glute Med",s:3,r:[8,12]},{c:"Glute Med",s:2,r:[8,12]},
   {c:"Glute & Hams",s:2,r:[8,12]},{c:"Glute & Hams",s:2,r:[6,10]},
   {c:"Glute & Quad",s:2,r:[6,10]},
+  {c:"Adduktoren",s:2,r:[8,12]},
   {c:"Bauch",s:2,r:[8,12]}
 ]},
 {l:"Tag B – Oberkörper",e:[
@@ -427,6 +437,7 @@ const P4=[
   {c:"Glute Med",s:3,r:[8,12]},{c:"Glute Med",s:2,r:[8,12]},
   {c:"Glute & Hams",s:2,r:[6,10]},
   {c:"Glute & Quad",s:2,r:[6,10]},
+  {c:"Adduktoren",s:2,r:[8,12]},
   {c:"Brust",s:2,r:[8,12]},
   {c:"Schultern",s:2,r:[8,12]},
   {c:"Bauch",s:2,r:[8,12]}
@@ -440,6 +451,7 @@ const P3=[
   {c:"Glute Med",s:2,r:[8,12]},{c:"Glute Med",s:2,r:[8,12]},
   {c:"Glute & Hams",s:2,r:[4,8]},
   {c:"Glute & Quad",s:2,r:[4,8]},
+  {c:"Adduktoren",s:2,r:[8,12]},
   {c:"Brust",s:2,r:[8,12]},
   {c:"Schultern",s:2,r:[8,12]},
   {c:"Bauch",s:3,r:[8,12]}
@@ -457,6 +469,7 @@ const P3=[
   {c:"Glute Max",s:3,r:[4,8]},{c:"Glute Max",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},{c:"Glute Med",s:2,r:[8,12]},
   {c:"Glute & Hams",s:3,r:[4,8]},
+  {c:"Adduktoren",s:2,r:[8,12]},
   {c:"Rücken",s:2,r:[8,12]},
   {c:"Brust",s:2,r:[8,12]},
   {c:"Schultern",s:2,r:[8,12]},
@@ -481,7 +494,7 @@ try{
   if(u.openDays&&typeof u.openDays==='object'&&!Array.isArray(u.openDays))S.openDays=u.openDays;
 }catch{}
 
-const REC=new Set(["Hip Thrusts Langhantel","Hip Thrusts Multipresse","Hip Thrust Maschine","Glute Bridge Langhantel","Kabel Kickback Liegend","Kickback Maschine","Abduktionsmaschine","Kabel Abduktion Liegend","Abduktionsmaschine stehend","3D Abduktor Maschine","Reverse Lunge","Split Squat Kurzhantel","Split Squat Langhantel","Split Squat Multipresse","Belt Squat","RDL Langhantel","RDL Maschine","Glute Hyperextensions","Single-Leg RDL","Leg Curl (Maschine)","Latzug (breit)","High Row Maschine","Assistierter Klimmzug (breit)","Straight-Arm Pulldown","Überzug am Kabel","KH Seitheben","Seitheben Kabel","Seithebemaschine (sitzend)","Seithebemaschine (stehend)","Pallof Press","Hollow Body Hold"]);
+const REC=new Set(["Hip Thrusts Langhantel","Hip Thrusts Multipresse","Hip Thrust Maschine","Glute Bridge Langhantel","Kabel Kickback Liegend","Kickback Maschine","Abduktionsmaschine","Kabel Abduktion Liegend","Adduktionsmaschine","Adduktion Kabel Stehend","Copenhagen Plank","Sumo Squat Kurzhantel","Abduktionsmaschine stehend","3D Abduktor Maschine","Reverse Lunge","Split Squat Kurzhantel","Split Squat Langhantel","Split Squat Multipresse","Belt Squat","RDL Langhantel","RDL Maschine","Glute Hyperextensions","Single-Leg RDL","Leg Curl (Maschine)","Latzug (breit)","High Row Maschine","Assistierter Klimmzug (breit)","Straight-Arm Pulldown","Überzug am Kabel","KH Seitheben","Seitheben Kabel","Seithebemaschine (sitzend)","Seithebemaschine (stehend)","Pallof Press","Hollow Body Hold"]);
 
 // ASSISTIERTE UEBUNGEN: hier ist das eingetragene Gewicht das GEGENGEWICHT der Maschine —
 // WENIGER Gewicht bedeutet MEHR eigene Kraft. Fuer diese Uebungen dreht sich der komplette
@@ -1061,7 +1074,7 @@ document.addEventListener('click',e=>{
 // App sich EINMAL selbst neu - mit ?v=sha am Cache vorbei. peach_ver merkt sich den
 // Commit, fuer den schon neu geladen wurde (verhindert Reload-Schleifen). Daten in
 // peach_v4 sind davon voellig unberuehrt. BUILD_TS bei jedem Deploy aktualisieren!
-const BUILD_TS='2026-08-05T07:30:00Z';
+const BUILD_TS='2026-08-15T07:15:00Z';
 let verLastCheck=0;
 function checkUpdate(){
   const now=Date.now();

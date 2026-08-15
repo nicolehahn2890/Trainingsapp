@@ -91,7 +91,7 @@ Die Tages-Count-Pill ist ink mit der Tagesfarbe als Textfarbe (✓-Praefix wenn 
 in der Uebersicht ist das Tages-Label eine Pille in der jeweiligen Tagesfarbe.
 
 ### Kategorie-Farben (CC) — solide Pill, 2px Ink-Rahmen, schwarzer Uppercase-Text
-  Glute Max #EE8FB4, Glute Med #B49DF2, Glute & Quad #E8B86A, Glute & Hams #A7D98C
+  Glute Max #EE8FB4, Glute Med #B49DF2, Adduktoren #7FD1C1, Glute & Quad #E8B86A, Glute & Hams #A7D98C
   Ruecken #84C3E0, Brust #F0A0A0, Schultern #C2DB7E, Bizeps #E6C57E
   Trizeps #93B6E0, Bauch #D6D080
 
@@ -346,6 +346,7 @@ Vererbt: exercise, extraSets — NICHT: reps, weight
 | Glute & Hams | 2 | 8-12 |
 | Glute & Hams | 2 | 6-10 |
 | Glute & Quad | 2 | 6-10 |
+| Adduktoren | 2 | 8-12 |
 | Bauch | 2 | 8-12 |
 
 ### Tag B — Oberkörper
@@ -384,6 +385,7 @@ Vererbt: exercise, extraSets — NICHT: reps, weight
 | Glute Med | 2 | 8-12 |
 | Glute & Hams | 2 | 6-10 |
 | Glute & Quad | 2 | 6-10 |
+| Adduktoren | 2 | 8-12 |
 | Brust | 2 | 8-12 |
 | Schultern | 2 | 8-12 |
 | Bauch | 2 | 8-12 |
@@ -404,6 +406,7 @@ Vererbung, Deload Woche 12). Tagesfarben: A Peach, B Pink, C Lime.
 | Glute Med | 2 | 8-12 |
 | Glute & Hams | 2 | 4-8 |
 | Glute & Quad | 2 | 4-8 |
+| Adduktoren | 2 | 8-12 |
 | Brust | 2 | 8-12 |
 | Schultern | 2 | 8-12 |
 | Bauch | 3 | 8-12 |
@@ -430,6 +433,7 @@ Vererbung, Deload Woche 12). Tagesfarben: A Peach, B Pink, C Lime.
 | Glute Med | 2 | 8-12 |
 | Glute Med | 2 | 8-12 |
 | Glute & Hams | 3 | 4-8 |
+| Adduktoren | 2 | 8-12 |
 | Ruecken | 2 | 8-12 |
 | Brust | 2 | 8-12 |
 | Schultern | 2 | 8-12 |
@@ -442,6 +446,8 @@ Vererbung, Deload Woche 12). Tagesfarben: A Peach, B Pink, C Lime.
 Glute Max (13): Hip Thrusts Langhantel, Hip Thrust Kurzhantel, Hip Thrusts Multipresse, Hip Thrust Maschine, Glute Bridge Langhantel, Glute Bridge Kurzhantel, Glute Bridge Multipresse, Kabel Kickback Stehend, Kabel Kickback Flachbank, Kabel Kickback Schraegbank, Kabel Kickback Liegend, Kickback Multipresse, Kickback Maschine
 
 Glute Med (8): Kabel Abduktion Stehend, Kabel Abduktion Liegend, Kabel Abduktion Schraegbank, Abduktionsmaschine, Pelvic Drop, Abduktionsmaschine stehend, Fire Hydrants Kabel, 3D Abduktor Maschine
+
+Adduktoren (8): Adduktionsmaschine, Adduktion Kabel Stehend, Adduktion Kabel Liegend, Copenhagen Plank, Sumo Squat Kurzhantel, Sumo RDL Langhantel, Cossack Squat, Lateral Lunge
 
 Glute & Quad (11): Low Bar Squat, Beinpresse 45 Grad, Beinpresse, Step Ups, Split Squat Kurzhantel, Split Squat Langhantel, Split Squat Multipresse, Hack Squat, Reverse Lunge, Belt Squat, Super Squat
 
@@ -501,6 +507,11 @@ Hinweis: 50-60% Gewicht, 2 Saetze, gleiche Uebungen, kein Muskelabbau.
 3. Schlanke Beine (Glute & Quad max. 8 Saetze/Woche, nur beinschonende Varianten)
 4. Breite Schultern, gute Haltung (Schultern 9 Saetze vs. Brust 4 Saetze)
 
+5. Volle Innenseite / runde Huefte von vorne (Adduktoren 4 Saetze/Woche, 2x Frequenz).
+   Der Adduktor magnus ist zugleich ein HUEFTSTRECKER — er arbeitet mit dem Po zusammen
+   und fuellt die Innenseite, ohne die Oberschenkel-Vorderseite dicker zu machen.
+   Deshalb eigene Kategorie und NICHT unter Glute Med (das ist die Gegenbewegung).
+
 Glute & Quad: Weite Fussstellung + erhoehte Ferse = Po. Enge Fussstellung + Tiefe = Quad.
 
 ---
@@ -519,6 +530,15 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Adduktoren als eigene Kategorie, 2x pro Woche:** Neues Ueberthema "Adduktoren"
+   (Farbe Mint #7FD1C1) mit 8 Uebungen (Adduktionsmaschine, Adduktion Kabel Stehend/Liegend,
+   Copenhagen Plank, Sumo Squat Kurzhantel, Sumo RDL Langhantel, Cossack Squat, Lateral Lunge)
+   inkl. Tipps und REC-Sternen. Eingeplant mit je 2 Saetzen 8-12 Wdh.: P4 an Tag A + Tag D,
+   P3 an Tag A + Tag C — jeweils die Tage mit der besten Verteilung ueber die Woche und
+   dem geringsten Volumen. Bewusst KEINE Unterbringung in Glute Med: Adduktion ist die
+   Gegenbewegung zur Abduktion, sonst schlaegt das Dropdown die falschen Uebungen vor.
+   Rein additiv — bestehende Keys und Daten in peach_v4 bleiben unberuehrt.
 
 NEU. **Assistierte Uebungen rechnen umgekehrt + neue Uebung "High Row Maschine":**
    Beim assistierten Klimmzug ist das eingetragene Gewicht das Gegengewicht der Maschine —
