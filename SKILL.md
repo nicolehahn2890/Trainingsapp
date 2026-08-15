@@ -331,6 +331,14 @@ Vererbt: exercise, extraSets — NICHT: reps, weight
 9. Gewicht IMMER mit parseWeight() parsen, nie parseFloat() — sonst geht der obere Bereichswert verloren ("42-45" -> 42)
 10. Bei JEDEM Deploy die Konstante BUILD_TS in index.html aktualisieren: auf Commit-Zeit
     plus ca. 5 Minuten setzen (ISO-UTC). Sonst laden aktuelle Clients einmal unnoetig neu.
+11. **Workout-Keys sind POSITIONSBASIERT (..__d[Tag]__e[Slot]).** Wer eine Zeile MITTEN in
+    einen Tag einfuegt, entfernt oder verschiebt, verschiebt damit die Daten aller Slots
+    dahinter — die Uebung, das Gewicht und die Historie landen in der falschen Kategorie
+    (real passiert: Butterfly Maschine tauchte im neuen Adduktoren-Slot auf).
+    Also IMMER eine einmalige Migration mitliefern, die die betroffenen Keys um die
+    Differenz verschiebt (Muster: MIG_ADD / migAdduktoren() in index.html — absteigend
+    laufen, Guard-Key setzen, Sicherheitskopie unter peach_v4_pre_* ablegen).
+    Anhaengen am ENDE eines Tages ist der einzige Fall, der ohne Migration auskommt.
 
 ---
 
@@ -530,6 +538,19 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Nachtrag zur Adduktoren-Aenderung: Daten-Migration war noetig.** Die Adduktoren-
+   Zeilen wurden MITTEN in die Tage einsortiert — dadurch rutschte jeder Slot dahinter eine
+   Position weiter, und weil die Workout-Keys positionsbasiert sind (..__d0__e6), zeigte der
+   neue Adduktoren-Slot die Daten der alten Uebung an dieser Stelle (bei Rexi: "Butterfly
+   Maschine" samt Vorwert und Einstellungs-Notiz unter der Kategorie Adduktoren). Behoben
+   durch die einmalige Migration migAdduktoren(): verschiebt in P4 Tag A (ab e7), P4 Tag D
+   (ab e6), P3 Tag A (ab e6) und P3 Tag C (ab e5) alle Keys ueber alle Zyklen und Wochen um
+   +1 — absteigend, damit nichts ueberschrieben wird. Guard peach_mig_add, Sicherheitskopie
+   des Standes davor unter peach_v4_pre_add. Uebungsbasierte Keys (tip__ex__, set__ex__)
+   bleiben unberuehrt. Verifiziert per Node-Test (1152 Workout-Keys, Idempotenz, kein
+   Datenverlust, Backup identisch) und Chromium-Render mit echten Vor-Migrations-Daten.
+   Daraus die neue Coding-Regel 11.
 
 NEU. **Adduktoren als eigene Kategorie, 2x pro Woche:** Neues Ueberthema "Adduktoren"
    (Farbe Mint #7FD1C1) mit 8 Uebungen (Adduktionsmaschine, Adduktion Kabel Stehend/Liegend,
