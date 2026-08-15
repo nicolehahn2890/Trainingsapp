@@ -221,10 +221,13 @@ expBackup()             Backup: JSON {app:'peach',v:1,date,data:S.data} in die Z
                         Fallback: Text ins bk-ta-Feld + markieren. UI unten in der Uebersicht (bk-card).
 impBackup()             Import: akzeptiert das Wrapper-Format ODER rohes peach_v4-Objekt. Validiert
                         Keys (__w_d_e / tip__ / set__), confirm() vor Ueberschreiben.
-checkUpdate()           Auto-Update gegen iOS-Webapp-Cache: GitHub-API (commits/main) liefert Datum+SHA;
-                        ist der Commit neuer als BUILD_TS, einmaliger location.replace mit ?v=sha
-                        (Cache-Buster). peach_ver verhindert Reload-Schleifen. Laeuft beim Start und
-                        bei visibilitychange (App aus Hintergrund), gedrosselt auf 1x/Minute.
+checkUpdate()           Auto-Update gegen iOS-Webapp-Cache: GitHub-API (commits/main) liefert den
+                        aktuellen SHA. Weicht er von peach_ver ab (reiner GLEICH/UNGLEICH-Vergleich,
+                        KEIN Datum!), einmaliger location.replace mit ?v=sha (Cache-Buster); peach_ver
+                        wird VOR dem Reload gesetzt und verhindert Schleifen. Laesst sich peach_ver
+                        nicht speichern, wird bewusst NICHT neu geladen. Laeuft beim Start und bei
+                        visibilitychange (App aus Hintergrund), gedrosselt auf 1x/Minute.
+                        Am Deploy gibt es dafuer NICHTS mehr zu pflegen (siehe Regel 10).
 ```
 
 ### Vergleichslogik (wichtig!)
@@ -329,8 +332,13 @@ Vererbt: exercise, extraSets — NICHT: reps, weight
 7. Bei groesseren Aenderungen: Python-Script verwenden, am Ende node --check ausfuehren
 8. Sonderzeichen generell meiden in JS-Strings
 9. Gewicht IMMER mit parseWeight() parsen, nie parseFloat() — sonst geht der obere Bereichswert verloren ("42-45" -> 42)
-10. Bei JEDEM Deploy die Konstante BUILD_TS in index.html aktualisieren: auf Commit-Zeit
-    plus ca. 5 Minuten setzen (ISO-UTC). Sonst laden aktuelle Clients einmal unnoetig neu.
+10. **Am Auto-Update gibt es beim Deploy nichts mehr einzustellen.** Frueher stand hier die
+    Pflicht, die Konstante BUILD_TS zu aktualisieren — die ist ersatzlos entfallen.
+    NIEMALS wieder einen von Hand gepflegten Zeitstempel oder eine Versionsnummer als
+    Update-Kriterium einbauen: stand BUILD_TS versehentlich in der Zukunft, hielt sich eine
+    fehlerhafte Version fuer aktueller als ihre eigene Reparatur und aktualisierte sich NIE
+    mehr — der Fix war live, kam auf dem iPhone aber nicht an (real passiert am 15.08.2026).
+    checkUpdate() vergleicht jetzt nur noch den Commit-SHA auf Gleichheit.
 11. **Workout-Keys sind POSITIONSBASIERT (..__d[Tag]__e[Slot]).** Wer eine Zeile MITTEN in
     einen Tag einfuegt, entfernt oder verschiebt, verschiebt damit die Daten aller Slots
     dahinter — die Uebung, das Gewicht und die Historie landen in der falschen Kategorie
@@ -539,6 +547,19 @@ Fallback (manuell, ohne Session):
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
 
+NEU. **Auto-Update haengt nicht mehr an einem Datum — BUILD_TS ersatzlos entfernt.**
+   Die Migration aus dem naechsten Eintrag war live, kam auf dem iPhone aber nicht an: die
+   fehlerhafte Version trug BUILD_TS 07:15Z bei Commit-Zeit 06:55Z (20 Minuten zu weit in
+   der Zukunft), der Fix-Commit lag auf 07:05Z. Die Bedingung `remoteDate>BUILD_TS` war
+   damit dauerhaft falsch — die kaputte Version hielt sich fuer aktueller als ihre eigene
+   Reparatur und haette sich NIE aktualisiert (erst manuelles Neuladen half). checkUpdate()
+   vergleicht jetzt nur noch, ob der Commit-SHA von main von peach_ver abweicht: jede
+   Abweichung aktualisiert, in beide Richtungen (auch ein Rollback), und es gibt am Deploy
+   nichts mehr zu pflegen. Zusaetzlich: verReloading-Flag gegen Mehrfach-Reloads und kein
+   Reload, wenn sich peach_ver nicht speichern laesst (Privatmodus -> sonst Endlosschleife).
+   Verifiziert per Playwright-Test (5 Faelle: Erstladung, gleicher Commit, neuer Commit,
+   blockierter localStorage, Rollback). Daraus die neu gefasste Regel 10.
+
 NEU. **Nachtrag zur Adduktoren-Aenderung: Daten-Migration war noetig.** Die Adduktoren-
    Zeilen wurden MITTEN in die Tage einsortiert — dadurch rutschte jeder Slot dahinter eine
    Position weiter, und weil die Workout-Keys positionsbasiert sind (..__d0__e6), zeigte der
@@ -661,9 +682,9 @@ NEU. **Nachtrag: Rep-Bereich gehoert in den Vergleichsschluessel:** Der erste Wu
 5. **Position merken:** saveUI() speichert die zuletzt offene Position (view/week/cy/openDays)
    im eigenen Key peach_ui; beim Start validiert zurueckgeladen. Grund: Beim App-Wechsel/
    Schliessen ging alles zu und man startete wieder in Woche 1. peach_v4 bleibt unberuehrt.
-6. **Auto-Update:** checkUpdate() laedt die App einmal neu, wenn auf main ein neuerer
-   Commit liegt (GitHub-API, Cache-Buster ?v=sha, Guard peach_ver). Grund: iOS-Webapp-
-   Cache friert alte Staende ein. ACHTUNG: BUILD_TS bei jedem Deploy aktualisieren (Regel 10)!
+6. **Auto-Update:** checkUpdate() laedt die App einmal neu, wenn der Commit-SHA von main
+   von peach_ver abweicht (GitHub-API, Cache-Buster ?v=sha). Grund: iOS-Webapp-Cache
+   friert alte Staende ein. (Urspruenglich datumsbasiert ueber BUILD_TS — siehe Regel 10.)
 7. **Daten-Backup:** Export/Import unten in der Uebersicht (bk-card). expBackup kopiert
    JSON in die Zwischenablage, impBackup spielt es ein (Validierung + confirm).
    Anlass: Trainingsdaten lagen im Container des ALTEN Home-Screen-Icons —

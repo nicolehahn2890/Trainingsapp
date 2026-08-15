@@ -1105,28 +1105,34 @@ document.addEventListener('click',e=>{
   if(S.drop&&!e.target.closest('.picker-wrap')){S.drop=null;renderT()}
 });
 
-// AUTO-UPDATE: iOS-Webapp-Cache-Problem. Beim Oeffnen wird per GitHub-API geprueft,
-// ob auf main ein neuerer Commit liegt als diese Datei (BUILD_TS). Wenn ja, laedt die
-// App sich EINMAL selbst neu - mit ?v=sha am Cache vorbei. peach_ver merkt sich den
-// Commit, fuer den schon neu geladen wurde (verhindert Reload-Schleifen). Daten in
-// peach_v4 sind davon voellig unberuehrt. BUILD_TS bei jedem Deploy aktualisieren!
-const BUILD_TS='2026-08-15T07:12:00Z';
-let verLastCheck=0;
+// AUTO-UPDATE: iOS-Webapp-Cache-Problem. Beim Oeffnen wird per GitHub-API der aktuelle
+// Commit von main geholt und mit dem verglichen, fuer den diese App zuletzt geladen hat
+// (peach_ver). Sind sie verschieden, laedt die App sich EINMAL selbst neu — mit ?v=sha
+// am Cache vorbei. Danach steht peach_ver auf diesem Commit, also passiert nichts mehr,
+// bis der naechste Commit kommt. Daten in peach_v4 sind davon voellig unberuehrt.
+//
+// BEWUSST ein reiner GLEICH/UNGLEICH-Vergleich auf die Commit-Kennung — KEIN Datum:
+// vorher lag hier eine von Hand gepflegte Konstante BUILD_TS, die mit dem Commit-Datum
+// verglichen wurde. Stand sie versehentlich in der Zukunft, hielt sich eine fehlerhafte
+// Version fuer aktueller als ihre eigene Reparatur und aktualisierte sich NIE mehr
+// (real passiert am 15.08.2026). Der SHA-Vergleich kann das nicht: jede Abweichung
+// aktualisiert, in beide Richtungen. Es gibt daher nichts mehr am Deploy zu pflegen.
+let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();
-  if(now-verLastCheck<60000)return;
+  if(verReloading||now-verLastCheck<60000)return;
   verLastCheck=now;
+  let guard=null;
+  try{guard=localStorage.getItem('peach_ver')}catch{return}
   try{
     fetch('https://api.github.com/repos/nicolehahn2890/Trainingsapp/commits/main',{cache:'no-store'})
       .then(r=>r&&r.ok?r.json():null)
       .then(j=>{
-        if(!j||!j.sha||!j.commit||!j.commit.committer)return;
-        const remoteDate=j.commit.committer.date;
-        if(!(remoteDate>BUILD_TS))return; // diese Version ist aktuell
-        let guard=null;
-        try{guard=localStorage.getItem('peach_ver')}catch{}
+        if(!j||!j.sha)return;
         if(guard===j.sha)return; // fuer diesen Commit wurde schon neu geladen
-        try{localStorage.setItem('peach_ver',j.sha)}catch{}
+        // Laesst sich der Merker nicht speichern, NICHT neu laden — sonst Reload-Schleife.
+        try{localStorage.setItem('peach_ver',j.sha)}catch{return}
+        verReloading=true;
         location.replace(location.pathname+'?v='+j.sha.slice(0,8));
       }).catch(()=>{});
   }catch{}
