@@ -554,51 +554,53 @@ migAdduktoren();
 // aendert nichts mehr. Guard: peach_fix_slots, Sicherheitskopie: peach_v4_pre_fix.
 const CATOF={};
 for(const c in EXERCISES)for(const ex of EXERCISES[c])CATOF[ex]=c;
-// Wie gut passen die gespeicherten Uebungen zum Plan, wenn man sie um off verschiebt?
-function alignScore(cy,w,di,slots,off,from){
-  let sc=0;
-  for(let e=from;e<=from+slots.length;e++){
-    const d=S.data[mk(cy,w,di,e)];
-    if(!d||!d.exercise)continue;
-    const cat=CATOF[d.exercise];
-    if(!cat)continue;                       // unbekannte Uebung: neutral
-    const t=e+off;
-    sc+=(t>=from&&slots[t]&&slots[t].c===cat)?1:-1;
-  }
-  return sc;
-}
-// Laeuft BEI JEDEM START, bewusst ohne Guard-Key: die Funktion ist idempotent (nach dem
-// Zurechtruecken gewinnt der Versatz 0, ein zweiter Lauf aendert nichts) und heilt so auch
-// dann noch, wenn diese Version erst spaeter auf dem Geraet ankommt. Ein einmaliger Guard
-// haette genau das verhindert. Sicherheitskopie nur beim ERSTEN Mal: peach_v4_pre_fix.
+// Ordnet jeden gespeicherten Eintrag der Zeile zu, in die er GEHOERT — anhand der
+// Kategorie seiner Uebung (Butterfly Maschine ist Brust, also in die Brust-Zeile).
+// Der Versatz ist dabei egal: bei Rexi lagen Eintraege 4-5 Positionen zu weit hinten,
+// teils ausserhalb des Plans und damit unsichtbar. Ein Vorgaenger korrigierte nur genau
+// eine Position und griff deshalb nicht. Laeuft BEI JEDEM START und ohne Guard-Key:
+// bei korrekt sitzenden Daten aendert die Zuordnung nichts (idempotent), und so heilt
+// sie auch dann noch, wenn diese Version erst spaeter auf dem Geraet ankommt.
+// Sicherheitskopie des Standes davor: peach_v4_pre_fix (nur beim ersten Eingriff).
+function hasVals(v){return !!(v&&((v.weight&&String(v.weight).trim()!=='')||(v.reps||[]).some(function(r){return r!==''&&r!=null})))}
 function repairSlots(){
   try{
-    let moved=0;
-    for(const m of MIG_ADD){
-      const slots=(m.p==='p3'?P3:P4)[m.d].e;
-      for(let c=1;c<=3;c++){
-        const cy=m.p+'cycle'+c;
-        for(let w=1;w<=12;w++){
-          // Der eingefuegte Slot muss LEER sein — genau das ist die Signatur des doppelten
-          // Verschiebens. Liegt dort etwas, wird nicht angefasst; sonst wuerde das
-          // Zurueckschieben in die Zeile DAVOR laufen und die ueberschreiben.
-          if(S.data[mk(cy,w,m.d,m.from)]!==undefined)continue;
-          // Nur zurueckschieben, wenn das die Zuordnung ECHT verbessert
-          if(!(alignScore(cy,w,m.d,slots,-1,m.from)>alignScore(cy,w,m.d,slots,0,m.from)))continue;
-          // AUFSTEIGEND ab from+1 laufen: der Zielplatz ist dann schon frei
-          for(let e=m.from+1;e<=m.from+slots.length;e++){
-            const ok=mk(cy,w,m.d,e);
-            if(S.data[ok]===undefined)continue;
-            S.data[mk(cy,w,m.d,e-1)]=S.data[ok];
-            delete S.data[ok];
-            moved++;
-          }
-        }
-      }
+    const before=JSON.stringify(S.data);
+    // nach Zyklus/Woche/Tag gruppieren
+    const grp={};
+    for(const k in S.data){
+      const m=k.match(/^(p3)?cycle(\d)__w(\d+)__d(\d+)__e(\d+)$/);
+      if(!m)continue;
+      const g=[(m[1]||'')+'cycle'+m[2],+m[3],+m[4]].join('|');
+      (grp[g]=grp[g]||[]).push({slot:+m[5],val:S.data[k]});
+      delete S.data[k];
     }
-    if(moved){
+    for(const g in grp){
+      const parts=g.split('|'),cy=parts[0],w=parts[1],di=+parts[2];
+      const day=(cy.indexOf('p3')===0?P3:P4)[di];
+      if(!day){grp[g].forEach(function(it){S.data[cy+'__w'+w+'__d'+di+'__e'+it.slot]=it.val});continue}
+      const slots=day.e, items=grp[g].sort(function(a,b){return a.slot-b.slot}), taken=[], rest=[];
+      // 1. Durchgang: was schon auf einer passenden Zeile sitzt, bleibt liegen
+      for(const it of items){
+        const cat=CATOF[it.val.exercise||''];
+        if(cat&&it.slot<slots.length&&slots[it.slot].c===cat&&!taken[it.slot])taken[it.slot]=it;
+        else rest.push(it);
+      }
+      // 2. Durchgang: der Rest der Reihe nach in die naechste freie Zeile seiner Kategorie
+      for(const it of rest){
+        const ex=it.val.exercise||'';
+        if(!ex)continue;                       // leerer Platzhalter faellt weg
+        const cat=CATOF[ex];
+        let t=-1;
+        for(let i=0;i<slots.length;i++)if(slots[i].c===cat&&!taken[i]){t=i;break}
+        if(t<0){ if(hasVals(it.val))taken.push(it); continue }  // mit Werten: nie wegwerfen
+        taken[t]=it;
+      }
+      taken.forEach(function(it,i){if(it)S.data[cy+'__w'+w+'__d'+di+'__e'+i]=it.val});
+    }
+    if(JSON.stringify(S.data)!==before){
       if(!localStorage.getItem('peach_v4_pre_fix')){
-        try{localStorage.setItem('peach_v4_pre_fix',localStorage.getItem('peach_v4')||'{}')}catch{}
+        try{localStorage.setItem('peach_v4_pre_fix',before)}catch{}
       }
       save();
     }
@@ -1187,7 +1189,7 @@ document.addEventListener('click',e=>{
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-08-16-01';
+const BUILD_ID='2026-08-17-01';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();

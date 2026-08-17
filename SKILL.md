@@ -230,9 +230,12 @@ checkUpdate()           Auto-Update gegen iOS-Webapp-Cache: holt die AUSGELIEFER
                         (max. 2 Versuche pro Version) verhindert eine Endlosschleife bei
                         hartnaeckigem Cache. Start + visibilitychange, gedrosselt 1x/Minute.
 repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START (bewusst ohne
-                        Guard). Vergleicht per alignScore()/CATOF, ob die gespeicherten Uebungen
-                        besser zum Plan passen, wenn man sie um eins zurueckschiebt; schiebt nur
-                        dann. Voraussetzung: der eingefuegte Slot ist LEER. Idempotent.
+                        Guard). Ordnet jeden Eintrag ueber CATOF der Zeile zu, in die seine
+                        Uebung KATEGORISCH gehoert — unabhaengig vom Versatz. 1. Durchgang:
+                        was schon passend sitzt, bleibt liegen; 2. Durchgang: der Rest der
+                        Reihe nach in die naechste freie Zeile seiner Kategorie. Leere
+                        Platzhalter fallen weg, Eintraege MIT Werten werden nie verworfen.
+                        Idempotent (korrekte Daten bleiben unveraendert).
 ```
 
 ### Vergleichslogik (wichtig!)
@@ -348,6 +351,13 @@ Vererbt: exercise, extraSets — NICHT: reps, weight
     darum die BUILD_ID der TATSAECHLICH ausgelieferten Datei mit der eigenen.
     Wird BUILD_ID vergessen, kommt das Update nicht an — die Version steht unten in der
     Uebersicht ("Version …"), damit sich das in Sekunden pruefen laesst.
+11b. Reparaturen NICHT als Versatz denken. Ein Vorgaenger von repairSlots() korrigierte
+    genau eine Position — bei Rexi lagen die Eintraege aber 4-5 Positionen zu weit hinten
+    (die Verschiebung war mehrfach angewendet worden), teils ausserhalb des Plans und damit
+    unsichtbar. Die Korrektur griff deshalb nicht, obwohl die richtige Version drauf war.
+    Robust ist nur die KATEGORISCHE Zuordnung ueber CATOF: eine Brust-Uebung gehoert in die
+    Brust-Zeile, egal wo sie vorher stand. Verifiziert gegen Rexis echten Datenexport
+    (48 Eintraege zurechtgerueckt, 250 Werte erhalten).
 11a. Eine Migration darf NICHT stur alle Wochen verschieben. Wer trainiert, waehrend die
     neue Zeile schon im Plan steht, traegt diese Woche bereits in der NEUEN Aufteilung ein —
     ein pauschaler Shift verschiebt sie ein zweites Mal (real passiert am 15.08.2026:
@@ -563,6 +573,19 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Nachtrag 4: Reparatur ueber die Kategorie statt ueber den Versatz.** Rexis echter
+   Datenexport zeigte, dass die Verschiebung MEHRFACH angewendet worden war: Brust-,
+   Schulter- und Bauch-Eintraege lagen 4-5 Positionen zu weit hinten, teilweise ausserhalb
+   des Plans und damit unsichtbar. Der bisherige repairSlots() korrigierte nur genau eine
+   Position und griff deshalb nicht, obwohl die richtige Version auf dem Geraet war.
+   Neu ordnet repairSlots() jeden Eintrag ueber CATOF der Zeile zu, in die seine Uebung
+   kategorisch gehoert — versatzunabhaengig, in zwei Durchgaengen (passend sitzende bleiben
+   liegen, der Rest wandert in die naechste freie Zeile seiner Kategorie). Leere
+   Platzhalter fallen weg, Eintraege mit Werten werden nie verworfen. Verifiziert gegen
+   Rexis echten Export: die App erzeugt exakt das offline gepruefte Ergebnis (48 Eintraege
+   gerueckt, alle 250 Werte und 26 Notizen erhalten), ist idempotent und laesst korrekte
+   Daten unangetastet. Daraus die neue Regel 11b.
 
 NEU. **Nachtrag 3: Die Reparatur kam gar nicht erst an — Auto-Update jetzt inhaltsbasiert.**
    Nachtrag 2 war live, auf dem iPhone aber weiter der alte Stand. Ursache: checkUpdate()
