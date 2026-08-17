@@ -174,6 +174,7 @@ button:disabled:active{transform:none;}
 .bk-btn{background:var(--peach);border:var(--bw) solid var(--ink);border-radius:999px;color:var(--ink);font-size:13px;font-weight:700;padding:10px 16px;box-shadow:var(--sh-sm);}
 .bk-btn.bk-imp{background:var(--cream);margin-top:10px;}
 .bk-status{display:block;margin-top:10px;font-size:12px;font-weight:600;color:var(--ink);min-height:16px;}
+.ver-line{text-align:center;margin:14px 0 4px;font-size:12px;color:var(--text-dim);letter-spacing:0.3px;}
 .bk-ta{width:100%;margin-top:12px;background:var(--field-bg);border:var(--bw) solid var(--ink);border-radius:var(--r-sm);color:var(--text);font-size:16px;padding:8px 10px;outline:none;resize:vertical;}
 .ov-sub{color:var(--text);font-size:13px;margin-bottom:20px;line-height:1.6;}
 .ov-day{margin-bottom:24px;}
@@ -566,20 +567,26 @@ function alignScore(cy,w,di,slots,off,from){
   }
   return sc;
 }
+// Laeuft BEI JEDEM START, bewusst ohne Guard-Key: die Funktion ist idempotent (nach dem
+// Zurechtruecken gewinnt der Versatz 0, ein zweiter Lauf aendert nichts) und heilt so auch
+// dann noch, wenn diese Version erst spaeter auf dem Geraet ankommt. Ein einmaliger Guard
+// haette genau das verhindert. Sicherheitskopie nur beim ERSTEN Mal: peach_v4_pre_fix.
 function repairSlots(){
   try{
-    if(localStorage.getItem('peach_fix_slots')==='1')return;
-    try{localStorage.setItem('peach_v4_pre_fix',JSON.stringify(S.data))}catch{}
     let moved=0;
     for(const m of MIG_ADD){
       const slots=(m.p==='p3'?P3:P4)[m.d].e;
       for(let c=1;c<=3;c++){
         const cy=m.p+'cycle'+c;
         for(let w=1;w<=12;w++){
+          // Der eingefuegte Slot muss LEER sein — genau das ist die Signatur des doppelten
+          // Verschiebens. Liegt dort etwas, wird nicht angefasst; sonst wuerde das
+          // Zurueckschieben in die Zeile DAVOR laufen und die ueberschreiben.
+          if(S.data[mk(cy,w,m.d,m.from)]!==undefined)continue;
           // Nur zurueckschieben, wenn das die Zuordnung ECHT verbessert
           if(!(alignScore(cy,w,m.d,slots,-1,m.from)>alignScore(cy,w,m.d,slots,0,m.from)))continue;
-          // AUFSTEIGEND laufen: der Zielplatz ist dann schon frei
-          for(let e=m.from;e<=m.from+slots.length;e++){
+          // AUFSTEIGEND ab from+1 laufen: der Zielplatz ist dann schon frei
+          for(let e=m.from+1;e<=m.from+slots.length;e++){
             const ok=mk(cy,w,m.d,e);
             if(S.data[ok]===undefined)continue;
             S.data[mk(cy,w,m.d,e-1)]=S.data[ok];
@@ -589,8 +596,12 @@ function repairSlots(){
         }
       }
     }
-    if(moved)save();
-    localStorage.setItem('peach_fix_slots','1');
+    if(moved){
+      if(!localStorage.getItem('peach_v4_pre_fix')){
+        try{localStorage.setItem('peach_v4_pre_fix',localStorage.getItem('peach_v4')||'{}')}catch{}
+      }
+      save();
+    }
   }catch{}
 }
 repairSlots();
@@ -1030,7 +1041,9 @@ function renderOv(){
     +'<span class="bk-status" id="bk-status"></span>'
     +'<textarea class="bk-ta" id="bk-ta" rows="3" placeholder="Backup-Text hier einfügen (Feld gedrückt halten → Einfügen / Pegar) …"></textarea>'
     +'<button class="bk-btn bk-imp nb-shadow" onclick="impBackup()">Backup einspielen</button>'
-    +'</div>';
+    +'</div>'
+    // Versionsanzeige: damit auf einen Blick pruefbar ist, ob ein Update angekommen ist
+    +'<div class="ver-line">Version '+esc(BUILD_ID)+'</div>';
   document.getElementById('view-overview').innerHTML=h;
 }
 
@@ -1159,35 +1172,40 @@ document.addEventListener('click',e=>{
   if(S.drop&&!e.target.closest('.picker-wrap')){S.drop=null;renderT()}
 });
 
-// AUTO-UPDATE: iOS-Webapp-Cache-Problem. Beim Oeffnen wird per GitHub-API der aktuelle
-// Commit von main geholt und mit dem verglichen, fuer den diese App zuletzt geladen hat
-// (peach_ver). Sind sie verschieden, laedt die App sich EINMAL selbst neu — mit ?v=sha
-// am Cache vorbei. Danach steht peach_ver auf diesem Commit, also passiert nichts mehr,
-// bis der naechste Commit kommt. Daten in peach_v4 sind davon voellig unberuehrt.
+// AUTO-UPDATE gegen den iOS-Webapp-Cache. BUILD_ID bei JEDEM Deploy hochzaehlen (Regel 10).
 //
-// BEWUSST ein reiner GLEICH/UNGLEICH-Vergleich auf die Commit-Kennung — KEIN Datum:
-// vorher lag hier eine von Hand gepflegte Konstante BUILD_TS, die mit dem Commit-Datum
-// verglichen wurde. Stand sie versehentlich in der Zukunft, hielt sich eine fehlerhafte
-// Version fuer aktueller als ihre eigene Reparatur und aktualisierte sich NIE mehr
-// (real passiert am 15.08.2026). Der SHA-Vergleich kann das nicht: jede Abweichung
-// aktualisiert, in beide Richtungen. Es gibt daher nichts mehr am Deploy zu pflegen.
+// Warum ausgerechnet so — zwei Anlaeufe sind vorher gescheitert:
+// 1. Datumsvergleich (BUILD_TS): stand der Stempel versehentlich in der Zukunft, hielt sich
+//    eine fehlerhafte Version fuer aktueller als ihre eigene Reparatur. Deshalb NIE wieder
+//    groesser/kleiner, sondern ausschliesslich GLEICH/UNGLEICH.
+// 2. Commit-SHA ueber die GitHub-API: der Merker wurde gesetzt, BEVOR feststand, dass der
+//    neue Inhalt auch wirklich ankommt. Lieferte GitHub Pages waehrend des Deploys noch die
+//    alte Datei aus, galt die Version als geholt und es wurde nie erneut versucht — die App
+//    blieb dauerhaft auf dem alten Stand haengen (real passiert am 15./16.08.2026).
+// Jetzt wird die AUSGELIEFERTE Datei selbst geholt (gleiche Domain, kein API-Limit) und ihre
+// BUILD_ID mit der eigenen verglichen. Damit zaehlt, was tatsaechlich geladen wurde: kommt
+// weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
+// Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
+// der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
+const BUILD_ID='2026-08-16-01';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();
   if(verReloading||now-verLastCheck<60000)return;
   verLastCheck=now;
-  let guard=null;
-  try{guard=localStorage.getItem('peach_ver')}catch{return}
   try{
-    fetch('https://api.github.com/repos/nicolehahn2890/Trainingsapp/commits/main',{cache:'no-store'})
-      .then(r=>r&&r.ok?r.json():null)
-      .then(j=>{
-        if(!j||!j.sha)return;
-        if(guard===j.sha)return; // fuer diesen Commit wurde schon neu geladen
-        // Laesst sich der Merker nicht speichern, NICHT neu laden — sonst Reload-Schleife.
-        try{localStorage.setItem('peach_ver',j.sha)}catch{return}
+    fetch(location.pathname+'?_='+now,{cache:'no-store'})
+      .then(r=>r&&r.ok?r.text():null)
+      .then(t=>{
+        if(!t)return;
+        const m=t.match(/const BUILD_ID='([^']+)'/);
+        if(!m||m[1]===BUILD_ID)return;      // nichts Neues ausgeliefert
+        let tries=0;
+        try{tries=parseInt(sessionStorage.getItem('peach_try_'+m[1])||'0')||0}catch{}
+        if(tries>=2)return;                 // Cache gibt nicht nach — beim naechsten Start neu
+        try{sessionStorage.setItem('peach_try_'+m[1],String(tries+1))}catch{}
         verReloading=true;
-        location.replace(location.pathname+'?v='+j.sha.slice(0,8));
+        location.replace(location.pathname+'?v='+m[1]);
       }).catch(()=>{});
   }catch{}
 }

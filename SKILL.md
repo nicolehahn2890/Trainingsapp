@@ -221,13 +221,18 @@ expBackup()             Backup: JSON {app:'peach',v:1,date,data:S.data} in die Z
                         Fallback: Text ins bk-ta-Feld + markieren. UI unten in der Uebersicht (bk-card).
 impBackup()             Import: akzeptiert das Wrapper-Format ODER rohes peach_v4-Objekt. Validiert
                         Keys (__w_d_e / tip__ / set__), confirm() vor Ueberschreiben.
-checkUpdate()           Auto-Update gegen iOS-Webapp-Cache: GitHub-API (commits/main) liefert den
-                        aktuellen SHA. Weicht er von peach_ver ab (reiner GLEICH/UNGLEICH-Vergleich,
-                        KEIN Datum!), einmaliger location.replace mit ?v=sha (Cache-Buster); peach_ver
-                        wird VOR dem Reload gesetzt und verhindert Schleifen. Laesst sich peach_ver
-                        nicht speichern, wird bewusst NICHT neu geladen. Laeuft beim Start und bei
-                        visibilitychange (App aus Hintergrund), gedrosselt auf 1x/Minute.
-                        Am Deploy gibt es dafuer NICHTS mehr zu pflegen (siehe Regel 10).
+checkUpdate()           Auto-Update gegen iOS-Webapp-Cache: holt die AUSGELIEFERTE index.html von
+                        der eigenen Domain (kein API-Limit) und vergleicht deren BUILD_ID mit der
+                        eigenen — GLEICH/UNGLEICH, NIE groesser/kleiner. Bei Abweichung
+                        location.replace mit ?v=BUILD_ID. Entscheidend: verglichen wird, was
+                        TATSAECHLICH geladen wurde — liefert Pages weiter die alte Datei aus,
+                        versucht es der naechste Start erneut. Zaehler in sessionStorage
+                        (max. 2 Versuche pro Version) verhindert eine Endlosschleife bei
+                        hartnaeckigem Cache. Start + visibilitychange, gedrosselt 1x/Minute.
+repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START (bewusst ohne
+                        Guard). Vergleicht per alignScore()/CATOF, ob die gespeicherten Uebungen
+                        besser zum Plan passen, wenn man sie um eins zurueckschiebt; schiebt nur
+                        dann. Voraussetzung: der eingefuegte Slot ist LEER. Idempotent.
 ```
 
 ### Vergleichslogik (wichtig!)
@@ -332,13 +337,17 @@ Vererbt: exercise, extraSets — NICHT: reps, weight
 7. Bei groesseren Aenderungen: Python-Script verwenden, am Ende node --check ausfuehren
 8. Sonderzeichen generell meiden in JS-Strings
 9. Gewicht IMMER mit parseWeight() parsen, nie parseFloat() — sonst geht der obere Bereichswert verloren ("42-45" -> 42)
-10. **Am Auto-Update gibt es beim Deploy nichts mehr einzustellen.** Frueher stand hier die
-    Pflicht, die Konstante BUILD_TS zu aktualisieren — die ist ersatzlos entfallen.
-    NIEMALS wieder einen von Hand gepflegten Zeitstempel oder eine Versionsnummer als
-    Update-Kriterium einbauen: stand BUILD_TS versehentlich in der Zukunft, hielt sich eine
-    fehlerhafte Version fuer aktueller als ihre eigene Reparatur und aktualisierte sich NIE
-    mehr — der Fix war live, kam auf dem iPhone aber nicht an (real passiert am 15.08.2026).
-    checkUpdate() vergleicht jetzt nur noch den Commit-SHA auf Gleichheit.
+10. **Bei JEDEM Deploy die Konstante BUILD_ID in index.html hochzaehlen** (Format
+    JJJJ-MM-TT-NN). Sie wird NUR auf GLEICH/UNGLEICH geprueft — niemals groesser/kleiner,
+    und niemals gegen ein Datum: ein Stempel, der versehentlich in der Zukunft lag, liess
+    eine fehlerhafte Version sich fuer aktueller halten als ihre eigene Reparatur, und sie
+    aktualisierte sich NIE mehr (15.08.2026). Ebenso wenig darf der Merker gesetzt werden,
+    BEVOR der neue Inhalt bestaetigt ist — genau daran scheiterte der SHA-Ansatz ueber die
+    GitHub-API (16.08.2026): waehrend des Pages-Deploys kam die alte Datei, sie galt
+    trotzdem als geholt, und die App blieb dauerhaft haengen. checkUpdate() vergleicht
+    darum die BUILD_ID der TATSAECHLICH ausgelieferten Datei mit der eigenen.
+    Wird BUILD_ID vergessen, kommt das Update nicht an — die Version steht unten in der
+    Uebersicht ("Version …"), damit sich das in Sekunden pruefen laesst.
 11a. Eine Migration darf NICHT stur alle Wochen verschieben. Wer trainiert, waehrend die
     neue Zeile schon im Plan steht, traegt diese Woche bereits in der NEUEN Aufteilung ein —
     ein pauschaler Shift verschiebt sie ein zweites Mal (real passiert am 15.08.2026:
@@ -554,6 +563,22 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Nachtrag 3: Die Reparatur kam gar nicht erst an — Auto-Update jetzt inhaltsbasiert.**
+   Nachtrag 2 war live, auf dem iPhone aber weiter der alte Stand. Ursache: checkUpdate()
+   setzte peach_ver auf den neuen Commit-SHA, BEVOR feststand, dass der neue Inhalt auch
+   ankommt. Lieferte GitHub Pages waehrend des Deploys noch die alte Datei aus, galt die
+   Version als geholt und es wurde nie wieder versucht — dauerhaft alter Stand, ohne dass
+   man es merkt. Neu: checkUpdate() holt die ausgelieferte index.html von der eigenen
+   Domain (kein API-Limit) und vergleicht deren BUILD_ID mit der eigenen; damit zaehlt, was
+   tatsaechlich geladen wurde, und ein Fehlversuch heilt beim naechsten Start. Zaehler in
+   sessionStorage (max. 2 Versuche/Version) gegen Endlosschleifen. Zusaetzlich:
+   repairSlots() laeuft jetzt OHNE Guard bei jedem Start (idempotent), damit die Heilung
+   nicht daran haengt, wann die Version ankommt; und es ruehrt eine Woche nur an, wenn der
+   eingefuegte Slot LEER ist — sonst waere das Zurueckschieben in die Zeile davor gelaufen
+   und haette sie ueberschrieben. Die Version steht jetzt unten in der Uebersicht.
+   Verifiziert per Playwright (4 Update-Faelle inkl. hartnaeckigem Cache und Rueckschritt)
+   und 7 Reparatur-Faellen inkl. Rexis echtem Datenstand.
 
 NEU. **Nachtrag 2: Wochen, die waehrend des Fehlers trainiert wurden, doppelt verschoben.**
    Die Migration schob STUR jede Woche um +1. Rexi hatte Woche 6 aber schon eingetragen,
