@@ -351,29 +351,25 @@ Vererbt: exercise, extraSets — NICHT: reps, weight
     darum die BUILD_ID der TATSAECHLICH ausgelieferten Datei mit der eigenen.
     Wird BUILD_ID vergessen, kommt das Update nicht an — die Version steht unten in der
     Uebersicht ("Version …"), damit sich das in Sekunden pruefen laesst.
-11b. Reparaturen NICHT als Versatz denken. Ein Vorgaenger von repairSlots() korrigierte
-    genau eine Position — bei Rexi lagen die Eintraege aber 4-5 Positionen zu weit hinten
-    (die Verschiebung war mehrfach angewendet worden), teils ausserhalb des Plans und damit
-    unsichtbar. Die Korrektur griff deshalb nicht, obwohl die richtige Version drauf war.
-    Robust ist nur die KATEGORISCHE Zuordnung ueber CATOF: eine Brust-Uebung gehoert in die
-    Brust-Zeile, egal wo sie vorher stand. Verifiziert gegen Rexis echten Datenexport
-    (48 Eintraege zurechtgerueckt, 250 Werte erhalten).
-11a. Eine Migration darf NICHT stur alle Wochen verschieben. Wer trainiert, waehrend die
-    neue Zeile schon im Plan steht, traegt diese Woche bereits in der NEUEN Aufteilung ein —
-    ein pauschaler Shift verschiebt sie ein zweites Mal (real passiert am 15.08.2026:
-    Woche 6 lag danach eine Position zu weit hinten, und die Folgewoche erbte den Murks).
-    Richtig ist PRUEFEN statt raten: ueber CATOF (Uebung -> Kategorie) laesst sich messen,
-    ob die gespeicherten Uebungen zum Plan passen, und nur verschieben, wenn es die
-    Zuordnung echt verbessert (Muster: alignScore()/repairSlots() in index.html). Das ist
-    zugleich idempotent und heilt Altschaeden mit.
 11. **Workout-Keys sind POSITIONSBASIERT (..__d[Tag]__e[Slot]).** Wer eine Zeile MITTEN in
     einen Tag einfuegt, entfernt oder verschiebt, verschiebt damit die Daten aller Slots
-    dahinter — die Uebung, das Gewicht und die Historie landen in der falschen Kategorie
-    (real passiert: Butterfly Maschine tauchte im neuen Adduktoren-Slot auf).
-    Also IMMER eine einmalige Migration mitliefern, die die betroffenen Keys um die
-    Differenz verschiebt (Muster: MIG_ADD / migAdduktoren() in index.html — absteigend
-    laufen, Guard-Key setzen, Sicherheitskopie unter peach_v4_pre_* ablegen).
-    Anhaengen am ENDE eines Tages ist der einzige Fall, der ohne Migration auskommt.
+    dahinter — Uebung, Gewicht und Historie landen in der falschen Kategorie (real passiert
+    am 15.08.2026: Butterfly Maschine stand unter "Adduktoren"). Anhaengen am ENDE eines
+    Tages ist der einzige Fall, der ohne Datenkorrektur auskommt.
+11a. **Zum Zurechtruecken NIEMALS einen festen Versatz verwenden — immer die KATEGORIE.**
+    Der Weg ueber "alle Keys ab Position X um +1 schieben" ist dreimal gescheitert:
+    (1) Er verschiebt auch Wochen, die schon in der neuen Aufteilung eingetragen wurden
+    (wer trainiert, waehrend die neue Zeile im Plan steht), also ein zweites Mal.
+    (2) Passiert das mehrfach, liegen Eintraege irgendwann 4-5 Positionen daneben und
+    teilweise ausserhalb des Plans — unsichtbar in der App.
+    (3) Eine Korrektur, die nur genau eine Position zurueckschiebt, greift dann nicht mehr.
+    Robust ist ausschliesslich die kategorische Zuordnung ueber CATOF (Uebung -> Kategorie):
+    eine Brust-Uebung gehoert in die Brust-Zeile, egal wo sie vorher stand. Genau das macht
+    repairSlots() — versatzunabhaengig, idempotent, laeuft bei jedem Start und heilt
+    Altschaeden mit. Neue Plaenderungen brauchen daher gar keine eigene Migration mehr,
+    solange jede Uebung in EXERCISES einer Kategorie zugeordnet ist.
+    Pflicht bei jedem Eingriff in Daten: Sicherheitskopie unter peach_v4_pre_* ablegen und
+    Eintraege MIT Werten niemals verwerfen.
 
 ---
 
