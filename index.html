@@ -540,6 +540,60 @@ function migAdduktoren(){
   }catch{}
 }
 migAdduktoren();
+
+// SELBSTHEILUNG DER SLOT-ZUORDNUNG (Nachtrag zur Migration oben).
+// Die Migration hat STUR alle Wochen um +1 geschoben. Wer aber trainiert hat, WAEHREND die
+// Adduktoren-Zeile schon im Plan stand (die Version davor aktualisierte sich nicht von
+// selbst), hatte diese Woche bereits in der NEUEN Aufteilung eingetragen — die wurde dann
+// ein zweites Mal verschoben und lag danach eine Position ZU WEIT hinten.
+// Diese Funktion raet nicht, sondern PRUEFT: zu jeder gespeicherten Uebung ist bekannt, zu
+// welcher Kategorie sie gehoert. Passt die Zeile besser, wenn man sie um eins zurueck-
+// schiebt, wird zurueckgeschoben — sonst bleibt alles unangetastet. Damit heilen sich
+// falsch verschobene Wochen, korrekte Wochen bleiben unberuehrt, und ein zweiter Lauf
+// aendert nichts mehr. Guard: peach_fix_slots, Sicherheitskopie: peach_v4_pre_fix.
+const CATOF={};
+for(const c in EXERCISES)for(const ex of EXERCISES[c])CATOF[ex]=c;
+// Wie gut passen die gespeicherten Uebungen zum Plan, wenn man sie um off verschiebt?
+function alignScore(cy,w,di,slots,off,from){
+  let sc=0;
+  for(let e=from;e<=from+slots.length;e++){
+    const d=S.data[mk(cy,w,di,e)];
+    if(!d||!d.exercise)continue;
+    const cat=CATOF[d.exercise];
+    if(!cat)continue;                       // unbekannte Uebung: neutral
+    const t=e+off;
+    sc+=(t>=from&&slots[t]&&slots[t].c===cat)?1:-1;
+  }
+  return sc;
+}
+function repairSlots(){
+  try{
+    if(localStorage.getItem('peach_fix_slots')==='1')return;
+    try{localStorage.setItem('peach_v4_pre_fix',JSON.stringify(S.data))}catch{}
+    let moved=0;
+    for(const m of MIG_ADD){
+      const slots=(m.p==='p3'?P3:P4)[m.d].e;
+      for(let c=1;c<=3;c++){
+        const cy=m.p+'cycle'+c;
+        for(let w=1;w<=12;w++){
+          // Nur zurueckschieben, wenn das die Zuordnung ECHT verbessert
+          if(!(alignScore(cy,w,m.d,slots,-1,m.from)>alignScore(cy,w,m.d,slots,0,m.from)))continue;
+          // AUFSTEIGEND laufen: der Zielplatz ist dann schon frei
+          for(let e=m.from;e<=m.from+slots.length;e++){
+            const ok=mk(cy,w,m.d,e);
+            if(S.data[ok]===undefined)continue;
+            S.data[mk(cy,w,m.d,e-1)]=S.data[ok];
+            delete S.data[ok];
+            moved++;
+          }
+        }
+      }
+    }
+    if(moved)save();
+    localStorage.setItem('peach_fix_slots','1');
+  }catch{}
+}
+repairSlots();
 function plan(){return S.pt==='p3'?P3:P4}
 // Zyklus ohne Plan-Praefix ('p3cycle2' -> 'cycle2') — fuer Button-Markierung & Deload-Text
 function cyBase(){return String(S.cy).replace(/^p3/,'')}

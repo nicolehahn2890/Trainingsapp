@@ -339,6 +339,14 @@ Vererbt: exercise, extraSets — NICHT: reps, weight
     fehlerhafte Version fuer aktueller als ihre eigene Reparatur und aktualisierte sich NIE
     mehr — der Fix war live, kam auf dem iPhone aber nicht an (real passiert am 15.08.2026).
     checkUpdate() vergleicht jetzt nur noch den Commit-SHA auf Gleichheit.
+11a. Eine Migration darf NICHT stur alle Wochen verschieben. Wer trainiert, waehrend die
+    neue Zeile schon im Plan steht, traegt diese Woche bereits in der NEUEN Aufteilung ein —
+    ein pauschaler Shift verschiebt sie ein zweites Mal (real passiert am 15.08.2026:
+    Woche 6 lag danach eine Position zu weit hinten, und die Folgewoche erbte den Murks).
+    Richtig ist PRUEFEN statt raten: ueber CATOF (Uebung -> Kategorie) laesst sich messen,
+    ob die gespeicherten Uebungen zum Plan passen, und nur verschieben, wenn es die
+    Zuordnung echt verbessert (Muster: alignScore()/repairSlots() in index.html). Das ist
+    zugleich idempotent und heilt Altschaeden mit.
 11. **Workout-Keys sind POSITIONSBASIERT (..__d[Tag]__e[Slot]).** Wer eine Zeile MITTEN in
     einen Tag einfuegt, entfernt oder verschiebt, verschiebt damit die Daten aller Slots
     dahinter — die Uebung, das Gewicht und die Historie landen in der falschen Kategorie
@@ -546,6 +554,21 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Nachtrag 2: Wochen, die waehrend des Fehlers trainiert wurden, doppelt verschoben.**
+   Die Migration schob STUR jede Woche um +1. Rexi hatte Woche 6 aber schon eingetragen,
+   waehrend die Adduktoren-Zeile im Plan stand (die Version aktualisierte sich wegen des
+   BUILD_TS-Fehlers nicht) — diese Woche lag also bereits in der neuen Aufteilung und wurde
+   ein zweites Mal verschoben. Folge: Adduktionsmaschine stand unter "Brust", der
+   Adduktoren-Slot war leer, und Woche 7 erbte genau diesen Murks (Symptom aus Rexis Sicht:
+   "die Uebungen werden nicht in die Folgewoche uebernommen"). Neu ist repairSlots():
+   bewertet ueber CATOF (Uebung -> Kategorie) mit alignScore(), ob die gespeicherten
+   Uebungen besser zum Plan passen, wenn man sie um eins zurueckschiebt, und schiebt NUR
+   dann zurueck. Korrekte Wochen bleiben unangetastet, ein zweiter Lauf aendert nichts.
+   Guard peach_fix_slots, Sicherheitskopie peach_v4_pre_fix. Verifiziert per Node-Test
+   (falsch geschobene Woche, korrekte Wochen, Idempotenz, nicht betroffener Tag, leerer
+   Datensatz, Geraet ohne gelaufene Erst-Migration) und Chromium-Render von Woche 6 + 7
+   inkl. Vorbelegung. Daraus die neue Regel 11a.
 
 NEU. **Auto-Update haengt nicht mehr an einem Datum — BUILD_TS ersatzlos entfernt.**
    Die Migration aus dem naechsten Eintrag war live, kam auf dem iPhone aber nicht an: die
