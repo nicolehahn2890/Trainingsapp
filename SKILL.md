@@ -371,6 +371,16 @@ Vererbt: exercise, extraSets — NICHT: reps, weight
     Pflicht bei jedem Eingriff in Daten: Sicherheitskopie unter peach_v4_pre_* ablegen und
     Eintraege MIT Werten niemals verwerfen.
 
+12. **Was save() benutzt, muss VOR save() deklariert sein — und leere `catch{}` in den
+    Start-Migrationen verstecken genau solche Fehler.** `_exIdx` stand mit `let` erst weit
+    unter save(). Jeder save()-Aufruf beim Start (migAdduktoren, migLegCurl, repairSlots)
+    lief damit in einen TDZ-Fehler, den die umgebenden try/catch schluckten: die Reparatur
+    rechnete korrekt, wirkte aber NUR im Speicher und wurde nie nach peach_v4 geschrieben —
+    sie musste bei jedem Start von vorn anfangen, und ein Backup-Export haette den
+    unreparierten Stand enthalten. Nach Aenderungen an den Start-Migrationen deshalb IMMER
+    im Browser pruefen, ob localStorage danach wirklich den neuen Stand hat — nicht nur, ob
+    die Oberflaeche richtig aussieht.
+
 ---
 
 ## Trainingsplan 4-Tage (P4) — Standard-Plan
@@ -569,6 +579,23 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Glute & Hams: zwei Leg-Curl-Varianten statt einer Sammel-Option.** "Leg Curl
+   (Maschine)" ist ersetzt durch "Leg Curls stehend" und "Leg Curls liegend" — beide mit
+   eigenem Maschinen-Tipp (Einstell-Checkliste fuer 169 cm + Ausfuehrungs-Cues) und
+   REC-Stern; die uebrigen neun Glute-&-Hams-Uebungen bleiben unveraendert (136 Uebungen
+   gesamt). Bestehende Daten benennt migLegCurl() auf "Leg Curls liegend" um
+   (Workout-Eintraege, tip__ex__, set__ex__): ohne das kennt CATOF den alten Namen nicht
+   mehr, repairSlots() faende keine passende Zeile und haenge den Eintrag ans Ende des
+   Tages, und Notiz + Einstellung waeren verwaist. Kein Guard noetig — nach dem Lauf gibt
+   es den alten Namen nicht mehr.
+   Dabei aufgefallen und mitbehoben: **`_exIdx` wurde erst NACH save() mit `let`
+   deklariert**, weshalb jedes Speichern beim Start in einen TDZ-Fehler lief, den die
+   try/catch verschluckten — repairSlots() heilte nur im Speicher und schrieb nie zurueck.
+   Deklaration nach vorne gezogen; daraus die neue Regel 12. Verifiziert im Browser mit
+   simulierten Altdaten (Umbenennung persistiert, Slot bleibt an Ort und Stelle, Vorwert
+   und Badge stimmen, zweiter Start aendert nichts) plus Konsistenz-Check ueber alle 136
+   Uebungen.
 
 NEU. **Nachtrag 4: Reparatur ueber die Kategorie statt ueber den Versatz.** Rexis echter
    Datenexport zeigte, dass die Verschiebung MEHRFACH angewendet worden war: Brust-,
@@ -774,7 +801,7 @@ NEU. **Nachtrag: Rep-Bereich gehoert in den Vergleichsschluessel:** Der erste Wu
    Gesamtsumme, parseWeight fuer Spannen/Komma, P3/Plan-Umschalter entfernt,
    Dropdown-Such-Fokus-Fix, REC-Stern im Dropdown, veraltete Duplikat-PDF geloescht.
 
-Konsistenz-Audit (zuletzt ausgefuehrt): alle 135 Uebungen haben Tipps, keine verwaisten
+Konsistenz-Audit (zuletzt ausgefuehrt): alle 136 Uebungen haben Tipps, keine verwaisten
 Tipps/REC-Eintraege, keine Duplikate, Rep-Bereiche plausibel (4-8/6-10/8-12), jede im Plan
 verwendete Kategorie existiert in EXERCISES und hat eine Farbe in CC,
 prog()/rcol()/autoExtraSets() per Funktionstest verifiziert.
