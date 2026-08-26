@@ -170,7 +170,13 @@ parseWeight(w,inv)      Parst "25-27" -> 27 (oberer Wert), "27,5" -> 27.5 (Komma
                         inv=true (assistierte Uebung): aus einer Spanne zaehlt der KLEINERE
                         Wert ("20-25" -> 20), weil weniger Hilfe die bessere Leistung ist.
 isAssist(ex)            true fuer Uebungen aus ASSIST (Gegengewichts-Maschinen)
-isWeightRange(w)        true bei echter Spanne ("42-45"), false bei Einzelwert oder "45-45"
+weightBounds(w)         Untere/obere Grenze einer Gewichtsangabe: "40-45" -> {lo:40,hi:45},
+                        "45" -> {lo:45,hi:45}, "27,5" -> {lo:27.5,hi:27.5}; leer -> null
+cmpWeight(cw,pw,inv)    Gewichtsvergleich: 1 = mehr Leistung, -1 = weniger, 0 = gleich/unbekannt.
+                        Erst der BESTWERT (obere Grenze; bei assistierten Uebungen die untere),
+                        bei Gleichstand die ZWEITE Grenze. Damit ist ein heruntergesetzter
+                        Rahmen (45 -> "40-45") weniger und ein angezogener ("40-45" -> 45) mehr.
+                        Leeres Gewichtsfeld liefert 0 und gilt nie als Abstieg.
 prog(cr,pr,cw,pw,ex)    'w'|'r'|'s'|'d' Fortschritts-Status. ex nur noetig um assistierte
                         Uebungen zu erkennen (dort dreht sich die Gewichtsrichtung um).
                         Gewicht schlaegt Reps (weniger
@@ -273,7 +279,13 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
   Erst bei gleichem Gewicht (oder fehlendem Vorgewicht) entscheiden die Reps.
   Ein noch LEERES Gewichtsfeld (cu=0) zaehlt NICHT als Abstieg — sonst waere jede Uebung
   waehrend der Eingabe rot.
-- Spanne vs. Einzelwert: glatter Einzelwert auf gleichem Top schlaegt eine Spanne (45 > 42-45 -> 'w'), via Helper isWeightRange(). Zwei gleiche Spannen oder Einzelwerte -> kein 'w'. Gelockerte Spanne (42-45 nach glattem 45) -> kein 'w', faellt auf den Rep-Vergleich durch.
+- GEWICHTSRAHMEN werden ueber BEIDE Grenzen verglichen (cmpWeight): zuerst der Bestwert
+  (oben, bei assistierten Uebungen unten), bei Gleichstand die zweite Grenze. Ein glatter
+  Einzelwert schlaegt deshalb eine gleich hoch endende Spanne (45 > 42-45 -> 'w'), ein
+  angezogener Rahmen ebenfalls (42-45 > 40-45 -> 'w') — und ein HERUNTERGESETZTER Rahmen
+  ist 'd' (45 -> 40-45, weil ein Teil der Saetze mit 40 lief). Frueher fiel genau dieser Fall
+  auf den Rep-Vergleich durch und meldete faelschlich 'Mehr Wiederholungen ✓'. Identische
+  Angaben (zwei gleiche Spannen oder Einzelwerte) -> Reps entscheiden.
 - Reps: Vergleich ueber den DURCHSCHNITT pro ausgefuelltem Satz, NICHT Satz-fuer-Satz und
   NICHT als Gesamtsumme. 12/15 zaehlt gleich wie 15/12 -> 's'. Hoeherer Schnitt -> 'r',
   niedriger -> 'd'. (Positionsweise meldete faelschlich 'd' sobald ein einzelner Satz
@@ -533,7 +545,8 @@ Spezial: 3D Abduktor Maschine, Belt Squat, Belt Squat RDL, Beinpresse 45 Grad, R
 - Auto: 3 stagnierende Wochenvergleiche = +1 Satz automatisch (greift fruehestens Woche 5, nur bei gleicher Uebung)
 - Satzanzahl + Uebung werden in Folgewoche vererbt
 - Gewichtsbereiche ("25-27kg") und Komma ("27,5") werden korrekt ausgewertet (oberer Wert zaehlt)
-- Glatter Einzelwert schlaegt eine gleich hoch endende Spanne (45 > 42-45 = Steigerung)
+- Glatter Einzelwert schlaegt eine gleich hoch endende Spanne (45 > 42-45 = Steigerung),
+  umgekehrt ist ein heruntergesetzter Rahmen (45 -> 40-45) weniger Gewicht
 - Weniger Gewicht = 'Weniger', auch bei mehr Reps (Gewicht wird zuerst verglichen)
 - Reps werden als Durchschnitt pro Satz verglichen, nicht satzweise und nicht als Summe
   (Reihenfolge der Saetze egal, zusaetzliche oder noch leere Saetze verfaelschen nichts)
@@ -596,6 +609,19 @@ NEU. **Glute & Hams: zwei Leg-Curl-Varianten statt einer Sammel-Option.** "Leg C
    simulierten Altdaten (Umbenennung persistiert, Slot bleibt an Ort und Stelle, Vorwert
    und Badge stimmen, zweiter Start aendert nichts) plus Konsistenz-Check ueber alle 136
    Uebungen.
+
+NEU. **Heruntergesetzter Gewichtsrahmen zaehlte nicht als weniger Gewicht.** Rexi setzte
+   den Rahmen von 45 auf "40-45" (bzw. 19 auf "17-19") herunter — die App verglich aber nur
+   den OBEREN Wert, sah 45 gegen 45 und meldete ueber die Reps "Mehr Wiederholungen ✓",
+   obwohl ein Teil der Saetze leichter lief. Neu vergleicht cmpWeight() beide Grenzen:
+   zuerst den Bestwert (oben; bei assistierten Uebungen unten), bei Gleichstand die zweite
+   Grenze. Damit ist "40-45" nach 45 ein 'd' ("Weniger Gewicht - kein Problem!"), "42-45"
+   nach "40-45" ein 'w', und die alte Regel "glatter Einzelwert schlaegt Spanne" faellt als
+   Sonderfall automatisch mit heraus (isWeightRange() wird nicht mehr gebraucht und ist
+   entfernt). hintHTML() begruendet 'd' jetzt ebenfalls ueber cmpWeight, sonst stand dort
+   nur "Kein Problem!" ohne Grund. Verifiziert per Node-Funktionstest (24 Faelle inkl.
+   assistierter Richtung, Komma-Werten und leerem Feld) und Chromium-Render beider
+   Screenshot-Situationen.
 
 NEU. **Nachtrag 4: Reparatur ueber die Kategorie statt ueber den Versatz.** Rexis echter
    Datenexport zeigte, dass die Verschiebung MEHRFACH angewendet worden war: Brust-,

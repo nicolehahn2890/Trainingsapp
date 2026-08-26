@@ -660,11 +660,27 @@ function parseWeight(w,inv){
   const n=parseFloat(s);
   return isNaN(n)?0:n;
 }
-// true wenn echte Spanne ("42-45"), false bei Einzelwert ("45") oder "45-45"
-function isWeightRange(w){
-  if(!w&&w!==0)return false;
-  const parts=String(w).trim().replace(/,/g,'.').split('-').map(p=>parseFloat(p)).filter(n=>!isNaN(n));
-  return parts.length>=2&&parts[0]!==parts[parts.length-1];
+// Untere und obere Grenze einer Gewichtsangabe: "40-45" -> {lo:40,hi:45}, "45" -> {lo:45,hi:45}
+function weightBounds(w){
+  if(!w&&w!==0)return null;
+  const parts=String(w).trim().replace(/,/g,'.').split('-').map(x=>parseFloat(x)).filter(n=>!isNaN(n));
+  if(!parts.length)return null;
+  return {lo:Math.min.apply(null,parts),hi:Math.max.apply(null,parts)};
+}
+// Vergleicht zwei Gewichtsangaben: 1 = mehr Leistung, -1 = weniger, 0 = gleich/unbekannt.
+// Zuerst zaehlt der BESTWERT (obere Grenze; bei assistierten Uebungen das kleinste
+// Gegengewicht). Bei Gleichstand entscheidet die ZWEITE Grenze, sonst faellt ein
+// heruntergesetzter Rahmen durchs Raster: 45 -> "40-45" ist WENIGER Gewicht (ein Teil der
+// Saetze lief mit 40), "40-45" -> 45 ist mehr. Ohne diese Stufe meldete die App bei
+// heruntergesetztem Rahmen faelschlich "Gleiche Leistung"/"Mehr Wiederholungen".
+function cmpWeight(cw,pw,inv){
+  const c=weightBounds(cw),p=weightBounds(pw);
+  if(!c||!p||c.hi<=0||p.hi<=0)return 0;
+  const cBest=inv?c.lo:c.hi,pBest=inv?p.lo:p.hi;
+  if(cBest!==pBest)return (inv?cBest<pBest:cBest>pBest)?1:-1;
+  const cSec=inv?c.hi:c.lo,pSec=inv?p.hi:p.lo;
+  if(cSec!==pSec)return (inv?cSec<pSec:cSec>pSec)?1:-1;
+  return 0;
 }
 // exName wird nur gebraucht um assistierte Uebungen zu erkennen (umgekehrte Richtung).
 function prog(cr,pr,cw,pw,exName){
@@ -675,19 +691,15 @@ function prog(cr,pr,cw,pw,exName){
   const prFilled=pr&&pr.filter(v=>v!==''&&v!==undefined&&v!==null&&parseInt(v)>0);
   if(!prFilled||!prFilled.length)return null;
   const inv=isAssist(exName);
-  const cu=parseWeight(cw,inv),pu=parseWeight(pw,inv);
-  // Gewicht schlaegt Reps: es wird IMMER zuerst das Gewicht verglichen.
-  // (cu>0 noetig, damit ein noch leeres Gewichtsfeld nicht faelschlich als Abstieg gilt.)
+  // Gewicht schlaegt Reps: es wird IMMER zuerst das Gewicht verglichen. cmpWeight() liefert
+  // 0 bei leerem Feld — ein noch nicht ausgefuelltes Gewicht gilt nie als Abstieg.
   // Bei assistierten Uebungen ist die Richtung umgedreht: weniger Gegengewicht = besser.
-  if(pu>0&&cu>0){
-    const better=inv?(cu<pu):(cu>pu), worse=inv?(cu>pu):(cu<pu);
-    if(better)return'w';
-    // Die falsche Richtung ist weniger Leistung — auch wenn dabei mehr Reps geschafft wurden.
-    if(worse)return'd';
-    // Gleicher Bestwert: glatter Einzelwert schlaegt eine Spanne (45 > 42-45, bzw. 20 > 20-25)
-    if(!isWeightRange(cw)&&isWeightRange(pw))return'w';
-    // Gelockerte Spanne -> kein 'w', weiter zum Rep-Vergleich
-  }
+  const wc=cmpWeight(cw,pw,inv);
+  // Mehr Gewicht ODER angezogener Rahmen ("40-45" -> 45) = Steigerung.
+  if(wc>0)return'w';
+  // Weniger Gewicht ODER heruntergesetzter Rahmen (45 -> "40-45") = weniger Leistung,
+  // auch wenn dabei mehr Reps geschafft wurden.
+  if(wc<0)return'd';
   // Reps als DURCHSCHNITT pro ausgefuelltem Satz vergleichen (nicht als Gesamtsumme).
   // So zaehlt 12/15 genauso viel wie 15/12 (Reihenfolge egal) UND unterschiedliche
   // Satz-Anzahlen verfaelschen das Ergebnis nicht mehr: ein zusaetzlicher Satz meldete
@@ -935,9 +947,9 @@ function exState(di,ei){
 function hintHTML(st){
   if(!(st.hasPrev&&st.prv.weight))return'';
   const inv=st.inv,p=st.p;
-  const cu=parseWeight(st.cur.weight,inv),pu=parseWeight(st.prv.weight,inv);
-  // Bei 'd' unterscheiden, ob das Gewicht die falsche Richtung ging — sonst bleibt unklar warum
-  const wWorse=cu>0&&pu>0&&(inv?cu>pu:cu<pu);
+  // Bei 'd' unterscheiden, ob das Gewicht die falsche Richtung ging — sonst bleibt unklar warum.
+  // Zaehlt auch den heruntergesetzten Rahmen (45 -> "40-45") als weniger Gewicht.
+  const wWorse=cmpWeight(st.cur.weight,st.prv.weight,inv)<0;
   const dTxt=wWorse?(inv?'→ Mehr Gegengewicht – kein Problem!':'→ Weniger Gewicht – kein Problem!'):'→ Kein Problem!';
   const wTxt=inv?'→ Weniger Gegengewicht – stärker geworden! ✓':'→ Gewicht gesteigert! ✓';
   const pm=p==='w'?' <span style="color:var(--green)">'+wTxt+'</span>':p==='r'?' <span style="color:var(--blue)">→ Mehr Wiederholungen! ✓</span>':p==='s'?' <span style="color:var(--gold)">→ Gleiche Leistung!</span>':p==='d'?' <span style="color:var(--red)">'+dTxt+'</span>':'';
@@ -1221,7 +1233,7 @@ document.addEventListener('click',e=>{
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-08-19-01';
+const BUILD_ID='2026-08-26-01';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();
