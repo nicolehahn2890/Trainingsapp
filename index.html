@@ -266,7 +266,7 @@ const EXERCISES={
 "Schultern":["KH Seitheben","Vorgebeugtes KH Seitheben","Seithebemaschine (sitzend)","Seithebemaschine (stehend)","Seitheben Kabel","Vorgebeugtes Seitheben Kabel","LH Überkopfdrücken","KH Überkopfdrücken","Überkopfmaschine","Butterfly Reverse Maschine","Butterfly Reverse Kabel","Upright Row Kabel","Arnold Press","Einarmiges Überkopfdrücken Kabel"],
 "Bizeps":["SZ Curls","LH Curls","KH Curls","Kabel Curls","KH Hammer Curls","SZ Preacher Curls","KH Preacher Curls","Bizeps Maschine","Konzentrations Curls","Spinne Curls","Kabel Curls einarmig","Reverse Curls"],
 "Trizeps":["SZ Skullcrusher","Enges Bankdrücken","Pushdown Kabel","Pushdown Kabel einarmig","SZ Überkopf Tri. Drücken","KH Überkopf Tri. Drücken","Kabel Überkopf Tri. Drücken","Dips Maschine","Trizeps Maschine","KH Kickback Trizeps"],
-"Bauch":["Crunches","Crunches am Kabelzug","Panatta Super Crunch","Panatta Low Crunch","Panatta High Crunch","Bauch Maschine (Precor)","Beinheben (Liegend)","Beinheben (Hängend)","Reverse Crunch","Dead Bug","Ab Rollout","Pallof Press","Hollow Body Hold"]
+"Bauch":["Crunches","Crunches am Kabelzug","Panatta Super Crunch","Panatta Low Crunch","Panatta High Crunch","Panatta Side Crunch","Bauch Maschine (Precor)","Beinheben (Liegend)","Beinheben (Hängend)","Reverse Crunch","Dead Bug","Ab Rollout","Pallof Press","Hollow Body Hold"]
 };
 const TIPS={
 "Hip Thrusts Langhantel":"Stange auf Hüftbeugern auflegen, Schulterblätter auf Bank. Hüfte vollständig strecken, Gesäß oben kurz anspannen. Kinn zur Brust, Blick nach oben.",
@@ -383,6 +383,7 @@ const TIPS={
 "Panatta Super Crunch":"⚙ Einstellung: Sitzhöhe (Gasdruck-Hebel) so, dass die Drehachse auf Höhe des unteren Brustbeins liegt, Polster fest an Brust/Schultern.\nAusführung: Oberkörper nach vorne einrollen – der Bauch macht die Arbeit, nicht mit der Hüfte ziehen. Langsam zurück, Spannung halten.",
 "Panatta Low Crunch":"⚙ Einstellung: Rücken fest ans Polster, Beine sicher in den Auflagen fixieren.\nAusführung: Fokus unterer Bauch – Beine zur Brust einrollen und das Becken mit einrollen, Rücken bleibt am Polster. Langsam zurück.",
 "Panatta High Crunch":"⚙ Einstellung: Sitz so, dass du die Griffe oben bequem greifst, ohne die Schultern hochzuziehen.\nAusführung: Fokus oberer Bauch – Oberkörper nach vorne-unten einrollen, langsam und kontrolliert zurück.",
+"Panatta Side Crunch":"⚙ Einstellung: Seitlich in die Maschine setzen, Sitzhöhe so, dass die Drehachse auf Höhe des Beckenkamms liegt. Hüftpolster fest ans Becken, damit die Hüfte nicht mitkippt; oberes Polster seitlich an die Rippen/unter die Achsel. Start mit leicht gestrecktem Oberkörper, Fuß auf der Stütze.\nAusführung: Fokus seitlicher Bauch (Obliques) – Oberkörper rein seitlich zur Hüfte einrollen, nicht nach vorne drehen und nicht mit dem Arm drücken. Oben 1 Sekunde halten, langsam zurück, Seite wechseln. Wichtig für die schmale Taille: leichtes bis mittleres Gewicht, saubere 10-12 Wdh. – kein Maximalgewicht, sonst werden die Obliques dicker.",
 "Bauch Maschine (Precor)":"⚙ Einstellung: Sitzhöhe so, dass die Drehachse auf Höhe des unteren Brustbeins liegt, Widerstand passend wählen.\nAusführung: Oberkörper nach vorne einrollen, nicht mit der Hüfte ziehen. Langsam zurück.",
 "Schrägbankdrücken Maschine":"⚙ Einstellung: Rückenlehne auf ca. 30–45 Grad, Sitz so, dass die Griffe auf Höhe der oberen Brust starten.\nAusführung: Schulterblätter zusammenziehen, kontrolliert drücken und langsam zurück.",
 "Beinheben (Liegend)":"Beine gestreckt oder leicht gebeugt. Langsam senken ohne Boden zu berühren. Kein Hüfteinsatz – Becken kippen vermeiden.",
@@ -1233,7 +1234,7 @@ document.addEventListener('click',e=>{
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-08-26-01';
+const BUILD_ID='2026-09-16-01';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();

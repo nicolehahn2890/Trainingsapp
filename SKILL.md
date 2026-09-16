@@ -524,13 +524,13 @@ Bizeps (12): SZ Curls, LH Curls, KH Curls, Kabel Curls, KH Hammer Curls, SZ Prea
 
 Trizeps (10): SZ Skullcrusher, Enges Bankdruecken, Pushdown Kabel, Pushdown Kabel einarmig, SZ Ueberkopf Tri. Druecken, KH Ueberkopf Tri. Druecken, Kabel Ueberkopf Tri. Druecken, Dips Maschine, Trizeps Maschine, KH Kickback Trizeps
 
-Bauch (13): Crunches, Crunches am Kabelzug, Panatta Super Crunch, Panatta Low Crunch, Panatta High Crunch, Bauch Maschine (Precor), Beinheben (Liegend), Beinheben (Haengend), Reverse Crunch, Dead Bug, Ab Rollout, Pallof Press, Hollow Body Hold
+Bauch (14): Crunches, Crunches am Kabelzug, Panatta Super Crunch, Panatta Low Crunch, Panatta High Crunch, Panatta Side Crunch, Bauch Maschine (Precor), Beinheben (Liegend), Beinheben (Haengend), Reverse Crunch, Dead Bug, Ab Rollout, Pallof Press, Hollow Body Hold
 
 ---
 
 ## Panatta/Precor Maschinen-Varianten
 
-Bauch: Panatta Super Crunch, Panatta Low Crunch, Panatta High Crunch, Bauch Maschine (Precor)
+Bauch: Panatta Super Crunch, Panatta Low Crunch, Panatta High Crunch, Panatta Side Crunch, Bauch Maschine (Precor)
 Ruecken: Rudermaschine (Panatta), Rudermaschine (Precor), High Row Maschine, Latzug Maschine (Panatta), Latzug Maschine (Precor)
 Brust: Brustpresse (Panatta), Brustpresse (Precor)
 Schultern: Seithebemaschine (sitzend), Seithebemaschine (stehend)
@@ -592,6 +592,15 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Bauch: "Panatta Side Crunch" als 14. Bauch-Uebung.** Seitliche Crunch-Maschine
+   (Obliques) mit Maschinen-Tipp im Standard-Format (Drehachse auf Beckenkamm, Hueftpolster
+   fixiert das Becken, oberes Polster seitlich an die Rippen; rein seitlich einrollen, nicht
+   nach vorne drehen). Bewusst KEIN REC-Stern und im Tipp der Hinweis auf leichtes bis
+   mittleres Gewicht: schwere Obliques-Arbeit arbeitet gegen das Ziel "schmale Taille".
+   Rein additiv (nur EXERCISES + TIPS, 137 Uebungen gesamt), keine Plan- oder Datenaenderung,
+   BUILD_ID 2026-09-16-01. Verifiziert per node --check, Konsistenz-Check (Tipps/REC/
+   Duplikate) und Chromium-Render mit gesetzter Uebung an Tag B.
 
 NEU. **Glute & Hams: zwei Leg-Curl-Varianten statt einer Sammel-Option.** "Leg Curl
    (Maschine)" ist ersetzt durch "Leg Curls stehend" und "Leg Curls liegend" — beide mit
@@ -827,7 +836,7 @@ NEU. **Nachtrag: Rep-Bereich gehoert in den Vergleichsschluessel:** Der erste Wu
    Gesamtsumme, parseWeight fuer Spannen/Komma, P3/Plan-Umschalter entfernt,
    Dropdown-Such-Fokus-Fix, REC-Stern im Dropdown, veraltete Duplikat-PDF geloescht.
 
-Konsistenz-Audit (zuletzt ausgefuehrt): alle 136 Uebungen haben Tipps, keine verwaisten
+Konsistenz-Audit (zuletzt ausgefuehrt): alle 137 Uebungen haben Tipps, keine verwaisten
 Tipps/REC-Eintraege, keine Duplikate, Rep-Bereiche plausibel (4-8/6-10/8-12), jede im Plan
 verwendete Kategorie existiert in EXERCISES und hat eine Farbe in CC,
 prog()/rcol()/autoExtraSets() per Funktionstest verifiziert.
