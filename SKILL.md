@@ -4,7 +4,7 @@ description: >
   Use this skill for EVERY request related to the Peach Project — a glute-focused
   fitness tracking app built in standalone HTML, deployed to GitHub Pages.
   Trigger on any mention of: "Trainingsapp", "Peach Project", "Peach App", "Glute",
-  "Uebungen", "Exercise", "Deload", "Woche", "Trainingsplan", "fitness app",
+  "Uebungen", "Exercise", "Woche", "Trainingsplan", "fitness app",
   "nicolehahn2890.github.io/Trainingsapp", or any request to add/fix/style features
   in the fitness app. Also trigger when the user uploads an HTML file related to the app.
   Never skip this skill for fitness app work.
@@ -98,7 +98,7 @@ in der Uebersicht ist das Tages-Label eine Pille in der jeweiligen Tagesfarbe.
 ### Fortschritts-Farben (pbadge = solide Pill; rcol = ganzes Rep-Feld gefuellt)
   Gruen #6FC36A = Gewicht gesteigert (--prog-up)
   Blau  #5EA8E0 = Mehr Reps (--prog-reps)
-  Gelb  #F5CB44 = Gleiche Leistung / Deload (--prog-same)
+  Gelb  #F5CB44 = Gleiche Leistung (--prog-same)
   Rot   #EC6A6A = Weniger als Vorwoche (--prog-down)
 
 ### Marke / Assets
@@ -162,7 +162,7 @@ mk(cy,week,di,ei)       Workout-Key
 mkt(cy,week,di,ei)      Slot-Key
 initKey(di,ei)          Key mit Vorwoche-Daten init — IMMER statt mk() beim Schreiben!
 plan()                  gibt P3 (S.pt==='p3') oder P4 (Default) zurueck
-cyBase()                Zyklus ohne Plan-Praefix ('p3cycle2' -> 'cycle2') — fuer Buttons + Deload-Text
+cyBase()                Zyklus ohne Plan-Praefix ('p3cycle2' -> 'cycle2') — fuer Buttons + Zyklus-Ende-Text
 setPlan(pt)             Plan-Umschalter 'p3'/'p4' (Header-Pills "3 Tage"/"4 Tage", Klasse .plan-btn).
                         Behaellt die Zyklus-Nummer (cycle2 <-> p3cycle2), schliesst offene Tage/Dropdown,
                         speichert via saveUI(). Daten der Plaene bleiben strikt getrennt (p3-Key-Praefix).
@@ -209,10 +209,13 @@ exDone(di,ei)           true wenn Uebung gewaehlt UND alle Saetze der aktuellen 
 refreshDone(di,ei)      Aktualisiert Erledigt-Haken (#done-di-ei) + Tages-Pill (#dc-di) GEZIELT im DOM
                         — wird von updRep aufgerufen, KEIN renderT (Fokus bleibt erhalten)!
 exState(di,ei)          EINE Quelle fuer den Zustand einer Uebungszeile: {ex,cur,prv,ms,autoX,reps,
-                        hasPrev,p,srcL}. Genutzt von renderEx, refreshProg und weekStats — dadurch
+                        hasPrev,noCmp,p,srcL}. noCmp = (S.week===1): Zyklus-Start ohne Vergleich,
+                        p ist dann ''. Genutzt von renderEx, refreshProg und weekStats — dadurch
                         koennen Badge, Hinweis und Fortschrittsbalken nicht auseinanderlaufen.
                         reps ist auf ms GESCHNITTEN (entfernte Zusatzsaetze zaehlen nicht mehr mit).
-hintHTML(st)            Baut die VW-Zeile ("VW: 17 kg · 12 / 12 Wdh … → Gleiche Leistung!")
+hintHTML(st)            Baut die VW-Zeile ("VW: 17 kg · 12 / 12 Wdh … → Gleiche Leistung!").
+                        In Woche 1 (noCmp) stattdessen: "(Zur Orientierung – zuletzt: Z1 W12 ·
+                        Tag A · 60 kg · 8 / 8 Wdh) Woche 1: leichter einsteigen, kein Vergleich"
 refreshProg(di,ei)      Zieht Badge (#pb-di-ei), VW-Hinweis (#ph-di-ei), Rep-Feld-Farben
                         (#rp-di-ei-i) und den Wochenbalken LIVE nach — KEIN renderT.
                         Wird von updRep UND updW aufgerufen.
@@ -258,8 +261,15 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
   Rep-Bereich noch keinen Wert, wird BEWUSST gar kein Vorwert gezeigt (kein Rueckfall auf
   einen anderen Rep-Bereich). Der Bereich kommt aus dem Plan via repRange(), nicht aus den
   gespeicherten Daten — Eintraege an Plan-Positionen, die es nicht mehr gibt, fallen raus.
-- Deshalb kann es auch in Woche 1 (und im neuen Zyklus) Vorwerte + Fortschritts-Badges geben.
-  Die frueheren Guards `if(S.week>1)` in renderT/renderEx sind durch `hasPrev` ersetzt.
+- Deshalb kann es auch in Woche 1 (und im neuen Zyklus) Vorwerte geben. Die frueheren Guards
+  `if(S.week>1)` in renderT/renderEx sind durch `hasPrev` ersetzt.
+- **WOCHE 1 = KEIN VERGLEICH (Zyklus-Start).** In Woche 1 jedes Zyklus steigt Rexi bewusst mit
+  weniger Gewicht ein. exState setzt dort noCmp=true: KEIN Fortschritts-Badge (p=''), weekStats
+  zaehlt nichts (Wochenbalken bleibt versteckt), der VW-Hinweis wird zur reinen
+  Orientierungszeile in Klammern ohne Bewertung. Sichtbar bleiben die Vorwerte als
+  Orientierung: "(VW: xx)" neben dem Gewichtsfeld, die kleinen Vorwerte unter den Rep-Feldern
+  und die Klammer-Zeile. Die Rep-Feld-Farben (rcol) bleiben — sie bewerten nur den Rep-Bereich,
+  nicht den Vergleich. Ab Woche 2 laeuft alles normal, INKLUSIVE Woche 12.
 - Herkunft wird transparent angezeigt: hinter dem VW-Hinweis steht "(Z1 W5 · Tag A)".
 - Plan-Trennung bleibt beim SPEICHERN strikt (p3-Praefix). Nur beim LESEN gibt es einen
   Rueckfall auf den jeweils anderen Plan, wenn im aktuellen Plan noch kein Wert existiert;
@@ -348,7 +358,7 @@ Vererbt: exercise, extraSets — NICHT: reps, weight
 4. KEIN Grad-Zeichen (°) in Strings im Script — zerstoert den JS-Parser! "Grad" ausschreiben
 5. Keine renderT() in updRep/updW
 6. plan() gibt P3 oder P4 zurueck (je nach S.pt) — beide Plaene folgen denselben Regeln
-   (Steigerung, autoExtraSets, Vererbung, Deload); 3-Tage-Daten IMMER unter p3cycle-Keys
+   (Steigerung, autoExtraSets, Vererbung, Woche-1-Regel); 3-Tage-Daten IMMER unter p3cycle-Keys
 7. Bei groesseren Aenderungen: Python-Script verwenden, am Ende node --check ausfuehren
 8. Sonderzeichen generell meiden in JS-Strings
 9. Gewicht IMMER mit parseWeight() parsen, nie parseFloat() — sonst geht der obere Bereichswert verloren ("42-45" -> 42)
@@ -456,7 +466,7 @@ Vererbt: exercise, extraSets — NICHT: reps, weight
 ## Trainingsplan 3-Tage (P3) — waehlbar ueber "3 Tage"-Pill im Header
 
 Eigene Zyklen 1-3 (Keys p3cycle1-3), gleiche Regeln wie P4 (Steigerung, Auto-Extra-Satz,
-Vererbung, Deload Woche 12). Tagesfarben: A Peach, B Pink, C Lime.
+Vererbung, kein Vergleich in Woche 1). Tagesfarben: A Peach, B Pink, C Lime.
 
 ### Tag A — Ganzkoerper
 | Kategorie | Saetze | Reps |
@@ -554,11 +564,16 @@ Spezial: 3D Abduktor Maschine, Belt Squat, Belt Squat RDL, Beinpresse 45 Grad, R
 
 ---
 
-## Deload-Banner (Woche 12)
+## Zyklus-Ende-Banner (Woche 12) — KEINE Deload-Woche!
 
-Erscheint automatisch in Woche 12. Gelber Block (var(--yellow)), 2,5px Ink-Rahmen, harte
-Schatten (--sh-card), Titel in Archivo Black, schwarzer (ink) Text.
-Hinweis: 50-60% Gewicht, 2 Saetze, gleiche Uebungen, kein Muskelabbau.
+Rexi macht KEINE Deload-Woche. Woche 12 ist eine ganz normale Trainingswoche und wird
+genauso verglichen wie Woche 2-11 (Badge, Hinweis, Wochenbalken). NIEMALS wieder eine
+Deload-Empfehlung (50-60 % Gewicht, 2 Saetze o. ae.) einbauen und Woche 12 nicht als
+Orientierungs-Quelle ueberspringen — sie ist der echte letzte Wert vor dem neuen Zyklus.
+Banner in Woche 12: gelber Block (var(--yellow)), 2,5px Ink-Rahmen, harte Schatten
+(--sh-card), Titel "Woche 12 – Zyklus fast abgeschlossen!" in Archivo Black. Text: letzte
+Woche des Zyklus, danach Zyklus X mit Woche 1 — dort leichter einsteigen, Werte nur zur
+Orientierung, verglichen wird erst ab Woche 2.
 
 ---
 
@@ -592,6 +607,18 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Woche 1 ohne Vergleich + keine Deload-Woche mehr (23.09.2026).** (1) In Woche 1
+   jedes Zyklus steigt Rexi bewusst leichter ein — exState setzt noCmp=true: kein
+   Fortschritts-Badge, kein Wochenbalken, der VW-Hinweis wird zur Klammer-Zeile "(Zur
+   Orientierung – zuletzt: …) Woche 1: leichter einsteigen, kein Vergleich". Vorwerte neben
+   dem Gewichtsfeld und unter den Rep-Feldern bleiben als Orientierung. (2) Rexi macht keine
+   Deload-Woche: Woche 12 wurde rechnerisch schon wie Woche 2-11 behandelt, nur der Banner
+   empfahl noch 50-60 % Gewicht / 2 Saetze. Er weist jetzt nur auf das Zyklus-Ende und den
+   leichten Einstieg in Woche 1 hin. Die Orientierungs-Werte in Woche 1 kommen damit aus
+   Woche 12 (echter letzter Wert). BUILD_ID 2026-09-23-02. Verifiziert per node --check und
+   Chromium-Test (Z2 W1 ohne Badge/Balken mit Klammer-Zeile aus Z1 W12, Z2 W2 und Z1 W12
+   mit normalem "↑ Gewicht").
 
 NEU. **Bauch: "Panatta Side Crunch" als 14. Bauch-Uebung.** Seitliche Crunch-Maschine
    (Obliques) mit Maschinen-Tipp im Standard-Format (Drehachse auf Beckenkamm, Hueftpolster
@@ -794,7 +821,7 @@ NEU. **Nachtrag: Rep-Bereich gehoert in den Vergleichsschluessel:** Der erste Wu
    laufen identisch, weil prog/findLastExData/autoExtraSets/initKey ueber S.cy arbeiten.
    S.pt ('p4' Default) wird in peach_ui mitgespeichert; setPlan() mappt die Zyklus-Nummer
    (cycle2 <-> p3cycle2). plan() gibt jetzt P3 oder P4 zurueck, cyBase() liefert den
-   Zyklus ohne Praefix (Buttons + Deload-Text). Verifiziert per Node-Funktionstest
+   Zyklus ohne Praefix (Buttons + Zyklus-Ende-Text, frueher Deload-Text). Verifiziert per Node-Funktionstest
    (Key-Trennung, Steigerungserkennung im P3) und Playwright-Screenshots.
 4. **Neobrutalism-Redesign + Dark Mode entfernt:** Komplettes Re-Skin auf das neue
    Peach-Designsystem — flache Farb-Bloecke, fast-schwarze Ink-Rahmen (2,5px), harte
