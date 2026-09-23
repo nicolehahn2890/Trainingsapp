@@ -447,7 +447,7 @@ const P4=[
 ]}
 ];
 // 3-Tage-Plan: eigene Zyklen (Key-Praefix p3cycle1-3 in peach_v4) — voellig getrennt
-// vom 4-Tage-Plan, gleiche Regeln (Steigerung, Auto-Extra-Satz, Vererbung, Deload).
+// vom 4-Tage-Plan, gleiche Regeln (Steigerung, Auto-Extra-Satz, Vererbung).
 const P3=[
 {l:"Tag A – Ganzkörper",e:[
   {c:"Glute Max",s:3,r:[4,8]},{c:"Glute Max",s:2,r:[8,12]},
@@ -642,7 +642,7 @@ function repairSlots(){
 }
 repairSlots();
 function plan(){return S.pt==='p3'?P3:P4}
-// Zyklus ohne Plan-Praefix ('p3cycle2' -> 'cycle2') — fuer Button-Markierung & Deload-Text
+// Zyklus ohne Plan-Praefix ('p3cycle2' -> 'cycle2') — fuer Button-Markierung & Zyklus-Ende-Text
 function cyBase(){return String(S.cy).replace(/^p3/,'')}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
 // Performance-Farbe fuer ausgefuelltes Rep-Feld (leer -> '' = weisses Feld)
@@ -754,16 +754,8 @@ function renderT(){
     const nextCy=cyBase()==='cycle1'?'2':cyBase()==='cycle2'?'3':'1 (neu)';
     h+='<div style="background:var(--yellow);border:var(--bw) solid var(--ink);border-radius:var(--r-xl);padding:16px 18px;margin-top:8px;box-shadow:var(--sh-card)">'
       +'<div style="font-family:var(--font-display);text-transform:uppercase;font-size:15px;letter-spacing:-0.5px;color:var(--ink);margin-bottom:6px">🏁 Woche 12 – Zyklus fast abgeschlossen!</div>'
-      +'<p style="color:var(--ink);font-size:13px;line-height:1.7;margin:0 0 10px">Nach dieser Woche folgt eine <b>Deload-Woche</b> – danach startest du Zyklus '+nextCy+' mit neuem Gewicht.</p>'
-      +'<div style="color:var(--ink);font-size:12px;line-height:1.9">'
-      +'<b>Deload-Woche – so geht\'s:</b><br>'
-      +'• Gleiche Übungen wie gewohnt – nichts Neues einführen<br>'
-      +'• Gewicht auf <b>50–60%</b> deines normalen Arbeitsgewichts reduzieren<br>'
-      +'• Sätze auf <b>2 pro Übung</b> reduzieren<br>'
-      +'• Wiederholungen moderat halten (nicht bis ans Limit gehen)<br>'
-      +'• Ziel: Erholung, Gelenke entlasten, Nervensystem regenerieren<br>'
-      +'• <b>Kein Muskelabbau</b> – 1 Woche Deload verändert nichts an deiner Leistung!'
-      +'</div></div>';
+      +'<p style="color:var(--ink);font-size:13px;line-height:1.7;margin:0">Letzte Woche des Zyklus – danach startest du Zyklus '+nextCy+' mit Woche 1. Dort bewusst etwas leichter einsteigen: Die letzten Werte stehen nur zur Orientierung da, verglichen wird erst ab Woche 2.</p>'
+      +'</div>';
   }
   document.getElementById('view-training').innerHTML=h;
 }
@@ -1239,7 +1231,7 @@ document.addEventListener('click',e=>{
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-09-23-01';
+const BUILD_ID='2026-09-23-02';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();
