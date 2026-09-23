@@ -877,7 +877,7 @@ function weekStats(){
   let tot=0,imp=0;
   plan().forEach((d,di)=>d.e.forEach((ex,ei)=>{
     const st=exState(di,ei);
-    if(!st.cur.exercise||!st.hasPrev)return;
+    if(!st.cur.exercise||!st.hasPrev||st.noCmp)return;
     if(!st.reps.some(v=>v!==''&&v!=null&&parseInt(v)>0))return;
     tot++;if(st.p==='w'||st.p==='r')imp++;
   }));
@@ -940,14 +940,19 @@ function exState(di,ei){
   // als Rest im Vergleich haengen bleiben (sonst zaehlt eine geloeschte Zahl weiter mit).
   const reps=(cur.reps||[]).slice(0,ms);
   const hasPrev=!!(prv.weight||(prv.reps||[]).some(r=>r!==''&&r!=null));
-  return {ex,cur,prv,ms,autoX,reps,hasPrev,inv:isAssist(cur.exercise),
-    p:prog(reps,prv.reps||[],cur.weight,prv.weight,cur.exercise),
+  // Woche 1 (Zyklus-Start): bewusst leichter einsteigen -> KEIN Vergleich (kein Badge,
+  // kein Wochenbalken). Vorwerte bleiben nur zur Orientierung in Klammern sichtbar.
+  const noCmp=S.week===1;
+  return {ex,cur,prv,ms,autoX,reps,hasPrev,noCmp,inv:isAssist(cur.exercise),
+    p:noCmp?'':prog(reps,prv.reps||[],cur.weight,prv.weight,cur.exercise),
     srcL:hasPrev?srcLabel(prv._src):''};
 }
 // Vorwochen-Hinweis ("VW: 17 kg · 12 / 12 Wdh … → Gleiche Leistung!")
 function hintHTML(st){
   if(!(st.hasPrev&&st.prv.weight))return'';
   const inv=st.inv,p=st.p;
+  const sl0=st.srcL?' '+esc(st.srcL)+' ·':'';
+  if(st.noCmp)return '<div class="phint">(Zur Orientierung – zuletzt:'+sl0+' '+esc(st.prv.weight)+' kg '+(inv?'Hilfe ':'')+'· '+esc((st.prv.reps||[]).filter(Boolean).join(' / '))+' Wdh) <span style="opacity:.75">Woche 1: leichter einsteigen, kein Vergleich</span></div>';
   // Bei 'd' unterscheiden, ob das Gewicht die falsche Richtung ging — sonst bleibt unklar warum.
   // Zaehlt auch den heruntergesetzten Rahmen (45 -> "40-45") als weniger Gewicht.
   const wWorse=cmpWeight(st.cur.weight,st.prv.weight,inv)<0;
@@ -1234,7 +1239,7 @@ document.addEventListener('click',e=>{
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-09-16-01';
+const BUILD_ID='2026-09-23-01';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();
