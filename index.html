@@ -1084,25 +1084,26 @@ function exIndex(){
   for(const n in idx)idx[n].sort((a,b)=>a.ord-b.ord);
   _exIdx=idx;return idx;
 }
-// Letzter gespeicherter Wert dieser Uebung VOR der aktuellen Position — der JUENGSTE Eintrag,
-// egal ob aus dem 3- oder 4-Tage-Plan (Reihenfolge: Zyklus > Woche > Tag > Position). Frueher
-// hatte der gleiche Plan Vorrang: im neuen 4-Tage-Zyklus 2 kam dann Z1 W3 (4 Tage, Juni) statt
-// Z1 W12 (3 Tage, zuletzt trainiert).
-// Ab Woche 2 zaehlt fuer den Vergleich nur der GLEICHE Rep-Bereich (4-8 laeuft mit viel mehr
-// Gewicht als 8-12); gibt es dort nichts, kommt der juengste Wert aus einem anderen Bereich nur
-// zur Orientierung (_orient: kein Badge). Woche 1 vergleicht nicht und zeigt den juengsten Wert
-// der Uebung, egal in welchem Bereich.
+// Vorwert einer Zeile: letzter Wert dieser Uebung VOR der aktuellen Position, ueber BEIDE Plaene
+// (3 und 4 Tage; Reihenfolge Zyklus > Woche > Tag > Position, bei Gleichstand der aktuelle Plan).
+// Regel — fuer JEDE Woche gleich, damit Woche 1 und 2 nicht auseinanderlaufen:
+//  1. Gleicher Rep-Bereich (4-8 laeuft mit viel mehr Gewicht als 8-12), sofern er aus dem
+//     zuletzt trainierten Zyklus dieser Uebung stammt.
+//  2. Sonst der juengste Wert in einem anderen Bereich — nur zur Orientierung (_orient: kein
+//     Badge, Bereich steht im Hinweis).
+// Fehler davor (26.09.2026): Woche 1 nahm den zeitlich letzten Eintrag egal welchen Bereichs
+// (Hip Thrust 8-12 mit 135 kg statt 4-8 mit 148 kg vom selben Tag), Woche 2 den gleichen
+// Bereich — und noch frueher kam ein gleicher Bereich aus einem alten Zyklus (Z1 W3, Juni).
 function findLastExData(di,ei,currentExercise){
   if(!currentExercise)return{};
   const rr=repRange(S.cy,di,ei);
   if(!rr)return{};
   const idx=exIndex(),cur=exOrd(S.cy,S.week,di,ei);
-  const byR=idx[exKey(currentExercise,rr)]||[],byAny=idx[exKey(currentExercise,'*')]||[];
-  // Liste ist aufsteigend sortiert -> der letzte Treffer vor cur ist der juengste;
-  // bei exakt gleicher Position in beiden Plaenen gewinnt der aktuelle Plan.
-  const last=l=>{let h=null;for(const e of l)if(e.ord<cur&&(!h||e.ord>h.ord||(e.ord===h.ord&&e.pt===S.pt)))h=e;return h};
-  const hit=S.week===1?last(byAny):(last(byR)||last(byAny));
-  if(!hit)return{};
+  const last=l=>{let h=null;for(const e of (l||[]))if(e.ord<cur&&(!h||e.ord>h.ord||(e.ord===h.ord&&e.pt===S.pt)))h=e;return h};
+  const any=last(idx[exKey(currentExercise,'*')]);
+  if(!any)return{};
+  const same=last(idx[exKey(currentExercise,rr)]);
+  const hit=same&&same.cy===any.cy?same:any;
   return{...hit.d,_orient:hit.rr!==rr,_src:{pt:hit.pt,cy:hit.cy,w:hit.w,di:hit.di,rr:hit.rr}};
 }
 // Kurzlabel woher der Vorwert stammt, z. B. "Z1 W5 · Tag A" (bei anderem Plan zusaetzlich "3-Tage")
@@ -1520,7 +1521,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeWeekPick()});
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-09-26-08';
+const BUILD_ID='2026-09-26-09';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();

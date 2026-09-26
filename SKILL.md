@@ -221,12 +221,13 @@ prog(cr,pr,cw,pw,ex)    'w'|'r'|'s'|'d' Fortschritts-Status. ex nur noetig um as
                         Uebungen zu erkennen (dort dreht sich die Gewichtsrichtung um).
                         Gewicht schlaegt Reps (weniger
                         Gewicht -> immer 'd'); Reps als DURCHSCHNITT pro ausgefuelltem Satz.
-findLastExData(di,ei,ex) JUENGSTER Wert dieser Uebung VOR der aktuellen Position — ueber BEIDE
-                        Plaene (3 und 4 Tage) hinweg, Reihenfolge exOrd (Zyklus > Woche > Tag >
-                        Position), bei Gleichstand gewinnt der aktuelle Plan. Woche 1: egal welcher
-                        Rep-Bereich (nur Orientierung). Ab Woche 2: gleicher Rep-Bereich; ohne
-                        Treffer der juengste Wert in anderem Bereich (_orient = nur Orientierung,
-                        kein Badge). NIE Eintraege nach der aktuellen Position. Liefert _src {pt,cy,w,di,rr} und _orient.
+findLastExData(di,ei,ex) Vorwert VOR der aktuellen Position, ueber BEIDE Plaene (exOrd: Zyklus >
+                        Woche > Tag > Position; Gleichstand -> aktueller Plan). EINE Regel fuer
+                        alle Wochen: (1) juengster Wert im GLEICHEN Rep-Bereich, sofern er aus
+                        dem Zyklus des insgesamt juengsten Eintrags der Uebung stammt; (2) sonst
+                        der juengste Wert egal welcher Bereich (_orient: nur Orientierung, kein
+                        Badge, Bereich im Hinweis). Pflicht-Test: Woche 1 und 2 eines neuen
+                        Zyklus zeigen bei leerer Woche 1 fuer JEDE Zeile denselben Vorwert. Liefert _src {pt,cy,w,di,rr} und _orient.
                         Index: exIndex() fuehrt jede Uebung zusaetzlich unter "Uebung||*".
 exOrd(cy,w,di,ei)       Reihenfolge-Wert eines Eintrags: Zyklus > Woche > Tag > Position
 repRange(cy,di,ei)      Rep-Bereich eines Plan-Platzes als String ("4-8"); '' wenn es den Platz
@@ -648,6 +649,12 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Vorwert: eine Regel fuer alle Wochen (26.09.2026, Version -09).** Woche 1 zeigte bei
+   Hip Thrust 4-8 den Wert aus dem 8-12-Satz desselben Tages (135 kg), Woche 2 den richtigen
+   4-8-Wert (148 kg). Jetzt: gleicher Bereich zuerst (wenn aus dem zuletzt trainierten
+   Zyklus), sonst juengster Wert anderer Bereich zur Orientierung. Test: W1 = W2 fuer alle 30
+   Uebungen des 4-Tage-Plans mit Rexis Verlauf.
 
 NEU. **Kompletter Bugcheck (26.09.2026, Version -08).** 3 Playwright-Reihen, 89 Pruefungen:
    Start/Rendering aller 288 Ansichten, Layout 390 px, Eingaben (Uebung, Gewicht, Reps, Fokus,
