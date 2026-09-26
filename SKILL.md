@@ -44,7 +44,8 @@ auf main einmalig eine Sicherheitsfreigabe verlangen; dann kurz bestaetigen lass
 - localStorage-Keys: peach_v4 (Trainingsdaten — NIEMALS umbenennen!),
   peach_ver (Auto-Update-Guard: Commit-SHA, fuer den bereits neu geladen wurde),
   peach_ui (zuletzt offene Position: view/week/cy/pt/openDays — getrennt von peach_v4).
-  Sicherheitskopien vor Daten-Eingriffen: peach_v4_pre_add, peach_v4_pre_fix, peach_v4_pre_v2.
+  Sicherheitskopien vor Daten-Eingriffen: peach_v4_pre_add, peach_v4_pre_fix, peach_v4_pre_v2,
+  peach_v4_pre_order.
   Plan-Version pro Zyklus steht als pv__-Marker IN peach_v4 (siehe Key-Formate).
   (peach_theme wurde entfernt — es gibt keinen Dark Mode mehr.)
 - Gym: Workshop Fitness Barcelona, Carrer d'Avila 120, El Poblenou. Panatta, Precor, Rogue, Eleiko, TRX.
@@ -186,6 +187,10 @@ carryMap(cy)            Uebungs-Uebernahme in einen neuen Zyklus (nur Nicht-Alt-
                         dann anderer Plan n..1), gleiche KATEGORIE laut CATOF, bevorzugt gleicher
                         Rep-Bereich (+4) und gleicher Tag (+2), pro Tag keine Dopplung. Cache _carry
                         (vor save() deklariert, in save() geleert).
+migOrderV2()            Einmal-Korrektur fuer die Reihenfolge-Umstellung innerhalb von V2 (26.09.):
+                        Tag-Gruppen in Nicht-Alt-Zyklen, die komplett zur ERSTEN V2-Reihenfolge
+                        passen und nicht zur aktuellen, werden per Tabelle V2_REORDER umsortiert.
+                        Inhaltsbasiert (Kategorie), idempotent, laeuft vor repairSlots.
 inhEx(di,ei)            Vorbelegte Uebung einer leeren Zeile: ab Woche 2 die der Vorwoche, in Woche 1
                         carryMap. Genutzt von exState, exDone, initKey, updSetting.
 cyBase()                Zyklus ohne Plan-Praefix ('p3cycle2' -> 'cycle2') — fuer Buttons + Zyklus-Ende-Text
@@ -440,7 +445,8 @@ extraSets starten bei 0. Nur Vorbelegung — gespeichert wird erst beim Eintrage
     Version festnageln (markLegacy), alles Plan-Abhaengige ueber planOf(cy) lesen. Bei einer
     weiteren Plan-Aenderung: V1 bleibt, aktueller Plan wird V2, Marker um die Version
     erweitern (z. B. pv__cycle3=2) — NIE einen Marker loeschen. Verschiebt sich eine Uebung in
-    eine neue Kategorie, braucht die alte Kategorie einen ALIAS-Eintrag.
+    eine neue Kategorie, braucht die alte Kategorie einen ALIAS-Eintrag. Die Tabelle
+    V2_REORDER (migOrderV2) gilt nur fuer die jetzige V2 — bei V3 entfernen bzw. anpassen.
 
 ---
 
@@ -450,7 +456,8 @@ Peach-Aufbau mit vollem Po-Fokus, trainingswissenschaftlich gegengeprueft (Pella
 abnehmender Grenznutzen, ~25-30 anteilige Saetze/Woche; Remmert 2025: ab ~11 Saetzen pro
 Muskel und Einheit kein Zusatznutzen; Plotkin 2023/Kubo 2019: Hip Thrust + tiefe
 kniedominante Uebung; Maeo 2021: sitzender Beinbeuger > liegend). Grundsaetze:
-- Jede Einheit startet frisch mit den zwei wichtigsten Po-Uebungen (kurze + lange Muskellaenge).
+- REIHENFOLGE pro Tag (ausdruecklicher Wunsch): erst Glute Max, dann Glute Med, dann die
+  restlichen Po-/Bein-Uebungen (Grunduebungen vor Isolation), dann Oberkoerper, Bauch zuletzt.
 - Pro Einheit hoechstens ~9 harte Po-Saetze; Glute Med 4x pro Woche (Wunsch: deutliche Huefte).
 - Adduktoren bleiben (2x2 Saetze). Neu: Beinbeuger + Beinstrecker fuer definierte Beine.
 - JEDER Tag endet mit Bauch, 2 Saetze (ausdruecklicher Wunsch).
@@ -462,10 +469,10 @@ Saetze sind Startwerte — Auto-Zusatzsatz und +-Button steigern gezielt.
 ### 4 Tage (P4) — 67 Saetze/Woche
 | Tag A – Unterkörper | Tag B – Oberkörper + Po | Tag C – Ganzkörper | Tag D – Unterkörper |
 |---|---|---|---|
-| Glute Max 3x4-8 | Glute Max 2x8-12 | Glute & Hams 3x6-10 | Glute Max 3x8-12 |
-| Glute & Quad 3x6-10 | Glute Med 2x8-12 | Glute Max 3x6-10 | Glute & Quad 2x8-12 |
-| Glute Max 2x8-12 | Rücken 3x6-10 | Glute Max 2x8-12 | Glute & Hams 2x8-12 |
-| Glute Med 2x8-12 | Schultern 3x8-12 | Glute Med 2x8-12 | Glute Med 2x8-12 |
+| Glute Max 3x4-8 | Glute Max 2x8-12 | Glute Max 3x6-10 | Glute Max 3x8-12 |
+| Glute Max 2x8-12 | Glute Med 2x8-12 | Glute Max 2x8-12 | Glute Med 2x8-12 |
+| Glute Med 2x8-12 | Rücken 3x6-10 | Glute Med 2x8-12 | Glute & Quad 2x8-12 |
+| Glute & Quad 3x6-10 | Schultern 3x8-12 | Glute & Hams 3x6-10 | Glute & Hams 2x8-12 |
 | Beinbeuger 2x8-12 | Brust 2x6-10 | Beinbeuger 2x8-12 | Beinstrecker 2x8-12 |
 | Adduktoren 2x8-12 | Bizeps 2x8-12 | Rücken 2x8-12 | Adduktoren 2x8-12 |
 | Bauch 2x8-12 | Trizeps 2x8-12 | Schultern 2x8-12 | Bauch 2x8-12 |
@@ -478,11 +485,11 @@ Pro Tag 16/18/18/15 Saetze (7/8/8/7 Uebungen).
 ### 3 Tage (P3) — 56 Saetze/Woche
 | Tag A – Po schwer | Tag B – Po & Beinrückseite | Tag C – Po & Hüfte |
 |---|---|---|
-| Glute Max 3x4-8 | Glute & Hams 3x6-10 | Glute Max 3x8-12 |
-| Glute & Quad 3x6-10 | Glute Max 3x6-10 | Glute & Quad 2x8-12 |
-| Glute Max 2x8-12 | Glute Max 2x8-12 | Glute & Hams 2x8-12 |
+| Glute Max 3x4-8 | Glute Max 3x6-10 | Glute Max 3x8-12 |
+| Glute Max 2x8-12 | Glute Max 2x8-12 | Glute Med 2x8-12 |
 | Glute Med 2x8-12 | Glute Med 2x8-12 | Glute Med 2x8-12 |
-| Adduktoren 2x8-12 | Beinbeuger 3x8-12 | Glute Med 2x8-12 |
+| Glute & Quad 3x6-10 | Glute & Hams 3x6-10 | Glute & Quad 2x8-12 |
+| Adduktoren 2x8-12 | Beinbeuger 3x8-12 | Glute & Hams 2x8-12 |
 | Rücken 2x6-10 | Rücken 2x8-12 | Beinstrecker 2x8-12 |
 | Schultern 2x8-12 | Brust 2x6-10 | Adduktoren 2x8-12 |
 | Bauch 2x8-12 | Bauch 2x8-12 | Schultern 2x8-12 |
@@ -605,6 +612,15 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **V2-Tage umsortiert: Fokus-Uebungen zuerst (26.09.2026, Version -02).** Wunsch: pro Tag
+   erst Glute Max, dann Glute Med, dann restliche Po-/Bein-Uebungen, dann Oberkoerper, Bauch
+   zuletzt. Saetze/Rep-Bereiche unveraendert. Weil die erste V2-Fassung schon ~1 Std. live
+   war, sortiert migOrderV2() evtl. bereits eingetragene Tage inhaltsbasiert um (sonst
+   landete z. B. Hip Thrust 6-10 in der 8-12-Zeile). Verifiziert: 30 Playwright-Pruefungen
+   inkl. Umsortierung, Idempotenz und unberuehrten Eintraegen in neuer Reihenfolge.
+   AUSSERDEM: Die Session hatte zusaetzlich auf ihren Arbeitsbranch gepusht — Rexi will
+   das NICHT. Nur main pushen, keine claude/...-Branches auf GitHub anlegen.
 
 NEU. **Neue Trainingsplaene (Version 2), Beinbeuger/Beinstrecker, Zyklen 1-6 (26.09.2026).**
    Ausloeser: Stagnation, Einheiten ueber 2 h, neue Ziele (definierte Beine, Sanduhr).

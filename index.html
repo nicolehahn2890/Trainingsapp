@@ -422,8 +422,9 @@ const CC={"Glute Max":"#EE8FB4","Glute Med":"#B49DF2","Adduktoren":"#7FD1C1","Gl
 const DAYBG=["#F4A45E","#F18FB6","#B6DD57","#8CCBE8"];
 // TRAININGSPLAENE — Version 2 (ab Sept. 2026): Peach-Aufbau mit vollem Po-Fokus.
 // Wochenvolumen am oberen Ende dessen, was laut Studienlage noch wirkt (Po ~25-30 anteilige
-// Saetze/Woche), pro Einheit hoechstens ~9 harte Po-Saetze. Jede Einheit beginnt frisch mit
-// den zwei wichtigsten Po-Uebungen (kurze + lange Muskellaenge), Glute Med 4x pro Woche,
+// Saetze/Woche), pro Einheit hoechstens ~9 harte Po-Saetze. Reihenfolge pro Tag (Wunsch):
+// erst Glute Max, dann Glute Med, dann die restlichen Po-/Bein-Uebungen (Grunduebungen vor
+// Isolation), dann Oberkoerper, Bauch immer zuletzt. Glute Med 4x pro Woche,
 // neu: Beinbeuger + Beinstrecker fuer definierte Beine. Oberkoerper bewusst schlank, jeder
 // Tag endet mit Bauch (2 Saetze) als letzter Uebung.
 // WICHTIG: Zyklen, die schon mit dem alten Plan trainiert wurden, zeigen weiter P4_V1/P3_V1
@@ -432,9 +433,9 @@ const DAYBG=["#F4A45E","#F18FB6","#B6DD57","#8CCBE8"];
 const P4=[
 {l:"Tag A – Unterkörper",e:[
   {c:"Glute Max",s:3,r:[4,8]},
-  {c:"Glute & Quad",s:3,r:[6,10]},
   {c:"Glute Max",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
+  {c:"Glute & Quad",s:3,r:[6,10]},
   {c:"Beinbeuger",s:2,r:[8,12]},
   {c:"Adduktoren",s:2,r:[8,12]},
   {c:"Bauch",s:2,r:[8,12]}
@@ -450,10 +451,10 @@ const P4=[
   {c:"Bauch",s:2,r:[8,12]}
 ]},
 {l:"Tag C – Ganzkörper",e:[
-  {c:"Glute & Hams",s:3,r:[6,10]},
   {c:"Glute Max",s:3,r:[6,10]},
   {c:"Glute Max",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
+  {c:"Glute & Hams",s:3,r:[6,10]},
   {c:"Beinbeuger",s:2,r:[8,12]},
   {c:"Rücken",s:2,r:[8,12]},
   {c:"Schultern",s:2,r:[8,12]},
@@ -461,9 +462,9 @@ const P4=[
 ]},
 {l:"Tag D – Unterkörper",e:[
   {c:"Glute Max",s:3,r:[8,12]},
+  {c:"Glute Med",s:2,r:[8,12]},
   {c:"Glute & Quad",s:2,r:[8,12]},
   {c:"Glute & Hams",s:2,r:[8,12]},
-  {c:"Glute Med",s:2,r:[8,12]},
   {c:"Beinstrecker",s:2,r:[8,12]},
   {c:"Adduktoren",s:2,r:[8,12]},
   {c:"Bauch",s:2,r:[8,12]}
@@ -474,19 +475,19 @@ const P4=[
 const P3=[
 {l:"Tag A – Po schwer",e:[
   {c:"Glute Max",s:3,r:[4,8]},
-  {c:"Glute & Quad",s:3,r:[6,10]},
   {c:"Glute Max",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
+  {c:"Glute & Quad",s:3,r:[6,10]},
   {c:"Adduktoren",s:2,r:[8,12]},
   {c:"Rücken",s:2,r:[6,10]},
   {c:"Schultern",s:2,r:[8,12]},
   {c:"Bauch",s:2,r:[8,12]}
 ]},
 {l:"Tag B – Po & Beinrückseite",e:[
-  {c:"Glute & Hams",s:3,r:[6,10]},
   {c:"Glute Max",s:3,r:[6,10]},
   {c:"Glute Max",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
+  {c:"Glute & Hams",s:3,r:[6,10]},
   {c:"Beinbeuger",s:3,r:[8,12]},
   {c:"Rücken",s:2,r:[8,12]},
   {c:"Brust",s:2,r:[6,10]},
@@ -494,10 +495,10 @@ const P3=[
 ]},
 {l:"Tag C – Po & Hüfte",e:[
   {c:"Glute Max",s:3,r:[8,12]},
+  {c:"Glute Med",s:2,r:[8,12]},
+  {c:"Glute Med",s:2,r:[8,12]},
   {c:"Glute & Quad",s:2,r:[8,12]},
   {c:"Glute & Hams",s:2,r:[8,12]},
-  {c:"Glute Med",s:2,r:[8,12]},
-  {c:"Glute Med",s:2,r:[8,12]},
   {c:"Beinstrecker",s:2,r:[8,12]},
   {c:"Adduktoren",s:2,r:[8,12]},
   {c:"Schultern",s:2,r:[8,12]},
@@ -727,6 +728,46 @@ migPlanV2();
 const ALIAS={"Glute & Hams":["Beinbeuger"]};
 function rowFits(rowCat,exCat){return rowCat===exCat||(ALIAS[rowCat]||[]).indexOf(exCat)>=0}
 function hasVals(v){return !!(v&&((v.weight&&String(v.weight).trim()!=='')||(v.reps||[]).some(function(r){return r!==''&&r!=null})))}
+// REIHENFOLGE-UMSTELLUNG IN V2 (26.09.2026). Die erste V2-Fassung (Version 2026-09-26-01)
+// hatte eine andere Reihenfolge innerhalb der Tage; kurz darauf kamen Glute Max + Glute Med
+// nach oben (Wunsch). Wurde dazwischen schon etwas eingetragen, laege es in der falschen
+// Zeile — repairSlots() findet zwar die Kategorie, bei zwei Glute-Max-Zeilen aber nicht den
+// richtigen Rep-Bereich. Deshalb gezielt und NUR per Inhaltspruefung (kein fester Versatz,
+// Regel 11a): passt ein Tag komplett zur ALTEN Reihenfolge und mindestens ein Eintrag NICHT
+// zur neuen, wird er einmal nach der Tabelle alt->neu umsortiert. Idempotent. Gilt nur fuer
+// Zyklen OHNE pv__-Marker. Aendern sich P3/P4 erneut, muss diese Tabelle weg (Regel 13).
+const V2_REORDER={p4:[[0,3,1,2,4,5,6],null,[3,0,1,2,4,5,6,7],[0,2,3,1,4,5,6]],
+                  p3:[[0,3,1,2,4,5,6,7],[3,0,1,2,4,5,6,7],[0,3,4,1,2,5,6,7,8]]};
+function migOrderV2(){
+  try{
+    const before=JSON.stringify(S.data),grp={};
+    for(const k in S.data){
+      const m=/^((p3)?cycle\d+)__w(\d+)__d(\d+)__e(\d+)$/.exec(k);
+      if(!m||isLegacy(m[1]))continue;
+      const g=m[1]+'|'+m[3]+'|'+m[4];
+      (grp[g]=grp[g]||[]).push(+m[5]);
+    }
+    for(const g in grp){
+      const cy=g.split('|')[0],w=g.split('|')[1],di=+g.split('|')[2];
+      const map=V2_REORDER[cy.indexOf('p3')===0?'p3':'p4'][di],day=planOf(cy)[di];
+      const slots=grp[g];
+      if(!map||!day||slots.some(i=>i>=map.length))continue;
+      const key=i=>cy+'__w'+w+'__d'+di+'__e'+i;
+      const fits=(i,row)=>{const v=S.data[key(i)],c=v&&v.exercise?CATOF[v.exercise]:null;return !c||rowFits(row,c)};
+      const fitsOld=slots.every(i=>fits(i,day.e[map[i]].c));
+      const fitsNew=slots.every(i=>fits(i,day.e[i].c));
+      if(!fitsOld||fitsNew)continue;
+      const vals={};
+      slots.forEach(i=>{vals[i]=S.data[key(i)];delete S.data[key(i)]});
+      slots.forEach(i=>{S.data[key(map[i])]=vals[i]});
+    }
+    if(JSON.stringify(S.data)!==before){
+      if(!localStorage.getItem('peach_v4_pre_order')){try{localStorage.setItem('peach_v4_pre_order',before)}catch{}}
+      save();
+    }
+  }catch{}
+}
+migOrderV2();
 function repairSlots(){
   try{
     const before=JSON.stringify(S.data);
@@ -1426,7 +1467,7 @@ document.addEventListener('click',e=>{
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-09-26-01';
+const BUILD_ID='2026-09-26-02';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();
