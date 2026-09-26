@@ -115,7 +115,6 @@ button:disabled:active{transform:none;}
 .day-header{width:100%;background:none;border:none;padding:15px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;color:var(--ink);text-align:left;border-radius:var(--r-xl);}
 .day-title{font-family:var(--font-display);text-transform:uppercase;font-size:14px;letter-spacing:-0.5px;color:var(--ink);}
 .day-header{flex-wrap:wrap;row-gap:6px;}
-.wk1-note{font-size:12px;font-weight:600;color:var(--ink);background:var(--cream);border:2px solid var(--ink);border-radius:var(--r-pill);padding:6px 12px;margin-bottom:12px;display:inline-block;}
 .day-header .day-title{flex:1 1 0;min-width:0;}
 .day-focus{flex-basis:100%;font-family:var(--font-sans);font-size:12px;font-weight:600;line-height:1.35;color:var(--ink);opacity:.78;}
 .day-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
@@ -985,7 +984,6 @@ function renderT(){
     const w=weekStats();
     h+='<div class="week-progress'+(w.tot?'':' hidden')+'" id="wp-box"><div class="wp-top"><span class="wp-title">Woche '+S.week+'</span><span class="wp-pct" id="wp-pct">'+w.pct+'%</span></div><div class="wp-bar-wrap"><div class="wp-bar" id="wp-bar" style="width:'+w.pct+'%;background:'+(w.pct>=100?'var(--green)':'var(--peach)')+(w.pct>0&&w.pct<100?';border-right:2px solid var(--ink)':'')+'"></div></div><div class="wp-sub" id="wp-sub">'+w.imp+'/'+w.tot+' Übungen gesteigert</div></div>';
   }
-  if(S.week===1)h+='<div class="wk1-note">Woche 1: leichter einsteigen – verglichen wird ab Woche 2.</div>';
   pl.forEach((day,di)=>{
     const op=S.openDays[di]===true;
     const total=day.e.length;let done=0;day.e.forEach((ex,ei)=>{if(exDone(di,ei))done++});
@@ -1075,7 +1073,8 @@ function exIndex(){
 // (neuer Plan) auf den anderen Plan zurueck und zeigte z. B. Werte aus dem Juli (Z2 W3,
 // 4-Tage) statt aus der Woche davor. Gibt es ab Woche 2 im gleichen Bereich nichts, kommt der
 // juengste Wert in einem anderen Bereich nur zur Orientierung (_orient: kein Badge/Vergleich).
-// Der andere Plan (3/4 Tage) ist erst der letzte Rueckfall — nur lesend.
+// Der andere Plan (3/4 Tage) ist erst der letzte Rueckfall — nur lesend und ebenfalls nur mit
+// Eintraegen VOR der aktuellen Position (sonst zeigte eine alte Woche Werte, die erst spaeter kamen).
 function findLastExData(di,ei,currentExercise){
   if(!currentExercise)return{};
   const rr=repRange(S.cy,di,ei);
@@ -1083,7 +1082,7 @@ function findLastExData(di,ei,currentExercise){
   const idx=exIndex(),cur=exOrd(S.cy,S.week,di,ei);
   const byR=idx[exKey(currentExercise,rr)]||[],byAny=idx[exKey(currentExercise,'*')]||[];
   const lastSame=l=>{let h=null;for(const e of l)if(e.pt===S.pt&&e.ord<cur)h=e;return h};
-  const lastOther=l=>{let h=null;for(const e of l)if(e.pt!==S.pt)h=e;return h};
+  const lastOther=l=>{let h=null;for(const e of l)if(e.pt!==S.pt&&e.ord<cur)h=e;return h};
   let hit=S.week===1?lastSame(byAny):(lastSame(byR)||lastSame(byAny));
   if(!hit)hit=lastOther(byR)||lastOther(byAny);
   if(!hit)return{};
@@ -1249,11 +1248,12 @@ function renderEx(ex,ei,di){
   // hint — Container hat eine feste ID, damit refreshProg ihn ohne renderT neu fuellen kann
   const hint='<div id="ph-'+di+'-'+ei+'">'+hintHTML(st)+'</div>';
 
-  // reps + +/- buttons
+  // reps + +/- buttons — kleine Vorwerte darunter nur, wenn der Vorwert Reps hat (sonst stand "0 0 0")
+  const hasPrevReps=hasPrev&&(prv.reps||[]).some(r=>r!==''&&r!=null);
   let rh='';
   for(let i=0;i<ms;i++){
     const c=rcol(reps[i],ex.r),pr=(prv.reps||[])[i];
-    const prevLabel=hasPrev?(pr!=null&&pr!==''?pr:'0'):'';
+    const prevLabel=hasPrevReps?(pr!=null&&pr!==''?pr:'0'):'';
     const repBg=c?c:'var(--field-bg)';
     rh+='<div class="rep-col"><span class="rep-lbl">S'+(i+1)+'</span><input class="rep-inp" id="rp-'+di+'-'+ei+'-'+i+'" type="text" inputmode="numeric" value="'+esc(reps[i]||'')+'" placeholder="–" style="background:'+repBg+'" oninput="updRep('+di+','+ei+','+i+',this.value)" onchange="updRep('+di+','+ei+','+i+',this.value)"/>'+(prevLabel!==''?'<span class="rep-prev" style="'+(pr==null||pr===''?'color:var(--text-ghost)':'')+'">'+prevLabel+'</span>':'')+'</div>';
   }
@@ -1503,7 +1503,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeWeekPick()});
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-09-26-05';
+const BUILD_ID='2026-09-26-06';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();

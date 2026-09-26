@@ -218,7 +218,8 @@ findLastExData(di,ei,ex) Letzter Wert dieser Uebung VOR der aktuellen Position (
                         welcher Rep-Bereich (nur Orientierung). Ab Woche 2: gleicher Rep-Bereich im
                         gleichen Plan; ohne Treffer der juengste Wert in anderem Bereich (_orient =
                         nur Orientierung, kein Vergleich). Letzter Rueckfall: anderer Plan (gleicher
-                        Bereich, sonst beliebig). Liefert _src {pt,cy,w,di,rr} und _orient.
+                        Bereich, sonst beliebig) — ebenfalls NUR Eintraege vor der aktuellen Position
+                        (sonst zeigte eine alte Woche Werte, die erst spaeter kamen). Liefert _src {pt,cy,w,di,rr} und _orient.
                         Index: exIndex() fuehrt jede Uebung zusaetzlich unter "Uebung||*".
 exOrd(cy,w,di,ei)       Reihenfolge-Wert eines Eintrags: Zyklus > Woche > Tag > Position
 repRange(cy,di,ei)      Rep-Bereich eines Plan-Platzes als String ("4-8"); '' wenn es den Platz
@@ -307,9 +308,8 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
   `if(S.week>1)` in renderT/renderEx sind durch `hasPrev` ersetzt.
 - **WOCHE 1 = KEIN VERGLEICH (Zyklus-Start).** In Woche 1 jedes Zyklus steigt Rexi bewusst mit
   weniger Gewicht ein. exState setzt dort noCmp=true: KEIN Fortschritts-Badge (p=''), weekStats
-  zaehlt nichts (Wochenbalken bleibt versteckt). Oben steht EINMAL der Hinweis (.wk1-note)
-  "Woche 1: leichter einsteigen – verglichen wird ab Woche 2." (nicht in jeder Zeile).
-  Sichtbar bleiben als Orientierung "(zuletzt xx)" am Gewichtsfeld, die kleinen Vorwerte unter
+  zaehlt nichts (Wochenbalken bleibt versteckt). KEIN Woche-1-Hinweistext (weder pro Zeile
+  noch als Kasten oben — ausdruecklich nicht gewuenscht). Sichtbar bleiben als Orientierung "(zuletzt xx)" am Gewichtsfeld, die kleinen Vorwerte unter
   den Rep-Feldern und die Herkunftszeile. Die Rep-Feld-Farben (rcol) bleiben — sie bewerten nur den Rep-Bereich,
   nicht den Vergleich. Ab Woche 2 laeuft alles normal, INKLUSIVE Woche 12.
 - Herkunft wird transparent angezeigt: "zuletzt: Z1 W5 · Tag A". NICHT "VW" schreiben — der
@@ -380,6 +380,8 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
 - Einstellungs-Feld (gelbes Zahnrad-Chip + .set-input): erscheint sobald eine Uebung gewaehlt ist,
   zwischen ex-meta und reps-row. Speichert uebungsbasiert (set__ex__Name) via updSetting() — ohne renderT
 - KEIN Theme-Button mehr (Dark Mode entfernt) — der header-right enthaelt nur die beiden Tab-Pills
+- Kleine Vorwerte unter den Rep-Feldern (.rep-prev) nur, wenn der Vorwert ueberhaupt Reps hat
+  (hasPrevReps) — sonst stand dort "0 0 0".
 - Tipp-Panel: Standard-Tipp (TIPS) immer sichtbar; eigene Notiz (tip__ex__) darunter mit
   Label "Deine Notiz" (.tip-note, .tip-note-lbl); Editor bearbeitet NUR die Notiz
 
@@ -636,6 +638,17 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Vorwert-Fehler behoben + Texte entschlackt (26.09.2026, Versionen -04 bis -06).**
+   (1) Im neuen Zyklus kamen Vorwerte bei geaendertem Rep-Bereich aus dem anderen Plan
+   (Z2 W3, 4-Tage, Juli) statt aus W11 — findLastExData neu (siehe Vergleichslogik).
+   (2) Alte Wochen zeigten ueber den Plan-Rueckfall Werte, die erst spaeter kamen
+   (P4 Z1 W1 "zuletzt 148 · Z1 W12 · 3-Tage") — Rueckfall jetzt nur auf fruehere Eintraege.
+   (3) "0 0 0" unter den Rep-Feldern, wenn der Vorwert keine Reps hatte — entfernt.
+   (4) Uebungs-Vorbelegung auch ueber ausgelassene Wochen (inhEx).
+   (5) Texte gekuerzt, Dopplungen raus ("VW:"-Zeile -> "zuletzt: Z2 W11 · Tag C",
+   "(zuletzt 42)" am Gewicht, Woche-12-Hinweis ein Satz, Fokus-Zeilen, Tipps). Woche-1-
+   Hinweis komplett entfernt (Wunsch). Neue Regel: Abschnitt TEXT-STIL.
 
 NEU. **Aussagekraeftige Tagesnamen + Woche direkt waehlen (26.09.2026, Version -03).**
    (1) Neue Plaene: Titel nennt den Schwerpunkt (3 Tage: Po Kraft / Po & Beinrueckseite /
