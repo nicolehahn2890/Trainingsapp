@@ -191,8 +191,9 @@ migOrderV2()            Einmal-Korrektur fuer die Reihenfolge-Umstellung innerha
                         Tag-Gruppen in Nicht-Alt-Zyklen, die komplett zur ERSTEN V2-Reihenfolge
                         passen und nicht zur aktuellen, werden per Tabelle V2_REORDER umsortiert.
                         Inhaltsbasiert (Kategorie), idempotent, laeuft vor repairSlots.
-inhEx(di,ei)            Vorbelegte Uebung einer leeren Zeile: ab Woche 2 die der Vorwoche, in Woche 1
-                        carryMap. Genutzt von exState, exDone, initKey, updSetting.
+inhEx(di,ei)            Vorbelegte Uebung einer leeren Zeile: die der letzten GESPEICHERTEN Woche davor
+                        (auch ueber ausgelassene Wochen), sonst carryMap. Geleertes Feld ('') bleibt
+                        leer. Genutzt von exState, exDone, initKey, updSetting.
 cyBase()                Zyklus ohne Plan-Praefix ('p3cycle2' -> 'cycle2') — fuer Buttons + Zyklus-Ende-Text
 setPlan(pt)             Plan-Umschalter 'p3'/'p4' (Header-Pills "3 Tage"/"4 Tage", Klasse .plan-btn).
                         Behaellt die Zyklus-Nummer (cycle2 <-> p3cycle2), schliesst offene Tage/Dropdown,
@@ -212,11 +213,13 @@ prog(cr,pr,cw,pw,ex)    'w'|'r'|'s'|'d' Fortschritts-Status. ex nur noetig um as
                         Uebungen zu erkennen (dort dreht sich die Gewichtsrichtung um).
                         Gewicht schlaegt Reps (weniger
                         Gewicht -> immer 'd'); Reps als DURCHSCHNITT pro ausgefuelltem Satz.
-findLastExData(di,ei,ex) Sucht den letzten gespeicherten Wert dieser Uebung IM SELBEN
-                        REP-BEREICH UEBERALL in der Historie (alle Zyklen, Wochen, Tage,
-                        Positionen) — nicht mehr nur an derselben Plan-Position in Vorwochen.
-                        Liefert zusaetzlich _src {pt,cy,w,di} als Herkunft. Rueckfall auf den
-                        anderen Plan (nur lesend), wenn im aktuellen Plan noch nichts steht.
+findLastExData(di,ei,ex) Letzter Wert dieser Uebung VOR der aktuellen Position (alle Zyklen,
+                        Wochen, Tage, Positionen). Woche 1: juengster Wert im gleichen Plan, egal
+                        welcher Rep-Bereich (nur Orientierung). Ab Woche 2: gleicher Rep-Bereich im
+                        gleichen Plan; ohne Treffer der juengste Wert in anderem Bereich (_orient =
+                        nur Orientierung, kein Vergleich). Letzter Rueckfall: anderer Plan (gleicher
+                        Bereich, sonst beliebig). Liefert _src {pt,cy,w,di,rr} und _orient.
+                        Index: exIndex() fuehrt jede Uebung zusaetzlich unter "Uebung||*".
 exOrd(cy,w,di,ei)       Reihenfolge-Wert eines Eintrags: Zyklus > Woche > Tag > Position
 repRange(cy,di,ei)      Rep-Bereich eines Plan-Platzes als String ("4-8"); '' wenn es den Platz
                         im Plan nicht (mehr) gibt — solche Eintraege bleiben aus dem Index raus.
@@ -248,9 +251,10 @@ exState(di,ei)          EINE Quelle fuer den Zustand einer Uebungszeile: {ex,cur
                         p ist dann ''. Genutzt von renderEx, refreshProg und weekStats — dadurch
                         koennen Badge, Hinweis und Fortschrittsbalken nicht auseinanderlaufen.
                         reps ist auf ms GESCHNITTEN (entfernte Zusatzsaetze zaehlen nicht mehr mit).
-hintHTML(st)            Baut die VW-Zeile ("VW: 17 kg · 12 / 12 Wdh … → Gleiche Leistung!").
-                        In Woche 1 (noCmp) stattdessen: "(Zur Orientierung – zuletzt: Z1 W12 ·
-                        Tag A · 60 kg · 8 / 8 Wdh) Woche 1: leichter einsteigen, kein Vergleich"
+hintHTML(st)            Nur noch die Herkunft: "zuletzt: Z2 W11 · Tag C" (+ " · 4–8 Wdh." wenn der
+                        Wert aus einem anderen Rep-Bereich stammt). Gewicht steht als "(zuletzt 42)"
+                        am Gewichtsfeld, Reps unter den Rep-Feldern, das Ergebnis im Badge — die
+                        frueheren Texte ("VW: …", "→ Gleiche Leistung!") waren doppelt.
 refreshProg(di,ei)      Zieht Badge (#pb-di-ei), VW-Hinweis (#ph-di-ei), Rep-Feld-Farben
                         (#rp-di-ei-i) und den Wochenbalken LIVE nach — KEIN renderT.
                         Wird von updRep UND updW aufgerufen.
@@ -292,20 +296,24 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
 - WICHTIG: Der Rep-Bereich gehoert ZWINGEND zum Vergleichsschluessel (exKey "Uebung||4-8").
   Dieselbe Uebung laeuft im 4-8er Slot mit deutlich mehr Gewicht als im 8-12er Slot (z. B.
   Hip Thrusts 134 kg vs. 115 kg) — ohne diese Trennung zieht der 8-12er Slot den viel zu
-  hohen 4-8er Vorwert und meldet dauerhaft "weniger". Gibt es zu einer Uebung im aktuellen
-  Rep-Bereich noch keinen Wert, wird BEWUSST gar kein Vorwert gezeigt (kein Rueckfall auf
-  einen anderen Rep-Bereich). Der Bereich kommt aus dem Plan via repRange(), nicht aus den
+  hohen 4-8er Vorwert und meldet dauerhaft "weniger". VERGLICHEN wird deshalb nur im gleichen
+  Bereich. Gibt es dort (noch) keinen Wert — z. B. im neuen Plan mit geaenderten Bereichen —,
+  zeigt die App den juengsten Wert aus einem anderen Bereich NUR zur Orientierung (mit Bereich
+  im Hinweis, ohne Badge). FEHLER bis 26.09.2026: stattdessen griff der Rueckfall auf den
+  anderen Plan und zeigte im neuen Zyklus Werte aus Z2 W3 (4-Tage, Juli) statt aus W11.
+  Der Bereich kommt aus dem Plan via repRange(), nicht aus den
   gespeicherten Daten — Eintraege an Plan-Positionen, die es nicht mehr gibt, fallen raus.
 - Deshalb kann es auch in Woche 1 (und im neuen Zyklus) Vorwerte geben. Die frueheren Guards
   `if(S.week>1)` in renderT/renderEx sind durch `hasPrev` ersetzt.
 - **WOCHE 1 = KEIN VERGLEICH (Zyklus-Start).** In Woche 1 jedes Zyklus steigt Rexi bewusst mit
   weniger Gewicht ein. exState setzt dort noCmp=true: KEIN Fortschritts-Badge (p=''), weekStats
-  zaehlt nichts (Wochenbalken bleibt versteckt), der VW-Hinweis wird zur reinen
-  Orientierungszeile in Klammern ohne Bewertung. Sichtbar bleiben die Vorwerte als
-  Orientierung: "(VW: xx)" neben dem Gewichtsfeld, die kleinen Vorwerte unter den Rep-Feldern
-  und die Klammer-Zeile. Die Rep-Feld-Farben (rcol) bleiben — sie bewerten nur den Rep-Bereich,
+  zaehlt nichts (Wochenbalken bleibt versteckt). Oben steht EINMAL der Hinweis (.wk1-note)
+  "Woche 1: leichter einsteigen – verglichen wird ab Woche 2." (nicht in jeder Zeile).
+  Sichtbar bleiben als Orientierung "(zuletzt xx)" am Gewichtsfeld, die kleinen Vorwerte unter
+  den Rep-Feldern und die Herkunftszeile. Die Rep-Feld-Farben (rcol) bleiben — sie bewerten nur den Rep-Bereich,
   nicht den Vergleich. Ab Woche 2 laeuft alles normal, INKLUSIVE Woche 12.
-- Herkunft wird transparent angezeigt: hinter dem VW-Hinweis steht "(Z1 W5 · Tag A)".
+- Herkunft wird transparent angezeigt: "zuletzt: Z1 W5 · Tag A". NICHT "VW" schreiben — der
+  Wert stammt oft nicht aus der Vorwoche (anderer Tag/Zyklus), "VW" hat verwirrt.
 - Plan-Trennung bleibt beim SPEICHERN strikt (p3-Praefix). Nur beim LESEN gibt es einen
   Rueckfall auf den jeweils anderen Plan, wenn im aktuellen Plan noch kein Wert existiert;
   das Label nennt dann "3-Tage"/"4-Tage".
@@ -376,7 +384,8 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
   Label "Deine Notiz" (.tip-note, .tip-note-lbl); Editor bearbeitet NUR die Notiz
 
 ### Daten-Vererbung zwischen Wochen
-Vererbt: exercise, extraSets — NICHT: reps, weight
+Vererbt: exercise (aus der letzten gespeicherten Woche, auch ueber Luecken), extraSets (nur aus
+der direkten Vorwoche) — NICHT: reps, weight
 Woche 1 eines neuen Zyklus: exercise aus dem vorherigen Zyklus (carryMap, nach Kategorie),
 extraSets starten bei 0. Nur Vorbelegung — gespeichert wird erst beim Eintragen (initKey).
 
@@ -451,6 +460,15 @@ extraSets starten bei 0. Nur Vorbelegung — gespeichert wird erst beim Eintrage
     erweitern (z. B. pv__cycle3=2) — NIE einen Marker loeschen. Verschiebt sich eine Uebung in
     eine neue Kategorie, braucht die alte Kategorie einen ALIAS-Eintrag. Die Tabelle
     V2_REORDER (migOrderV2) gilt nur fuer die jetzige V2 — bei V3 entfernen bzw. anpassen.
+
+---
+
+## TEXT-STIL (ausdruecklicher Wunsch, 26.09.2026)
+
+Alle Beschriftungen kurz, sachlich, ohne KI-Ton: keine ausschweifenden Saetze, keine
+Ausrufe-Floskeln ("kein Problem!", "stärker geworden! ✓"), nichts doppelt anzeigen (was am Feld
+oder im Badge steht, nicht noch einmal als Text). Hinweise einmal pro Ansicht statt in jeder
+Zeile. Tipps im Format "⚙ Einstellung: … / Ausführung: …" mit 2-3 knappen Saetzen.
 
 ---
 
@@ -579,10 +597,9 @@ genauso verglichen wie Woche 2-11 (Badge, Hinweis, Wochenbalken). NIEMALS wieder
 Deload-Empfehlung (50-60 % Gewicht, 2 Saetze o. ae.) einbauen und Woche 12 nicht als
 Orientierungs-Quelle ueberspringen — sie ist der echte letzte Wert vor dem neuen Zyklus.
 Banner in Woche 12: gelber Block (var(--yellow)), 2,5px Ink-Rahmen, harte Schatten
-(--sh-card), Titel "Woche 12 – Zyklus fast abgeschlossen!" in Archivo Black. Text: letzte
-Woche des Zyklus, danach Zyklus X mit Woche 1 — dort leichter einsteigen, Werte nur zur
-Orientierung, verglichen wird erst ab Woche 2. Ist der aktuelle Zyklus ein alter (pv__) und der
-naechste nicht, kommt der Satz "Ab Zyklus X gilt dein neuer Plan ..." dazu. Nach Zyklus 6
+(--sh-card), Titel "🏁 Letzte Woche von Zyklus N" in Archivo Black. Text EIN Satz: "Danach geht
+es mit Zyklus X weiter." bzw. (alter Zyklus -> naechster neu) "Danach startet Zyklus X mit dem
+neuen Plan – deine Übungen werden übernommen."  Nach Zyklus 6
 geht es auf "1 (neu)" — dort steht aber der alte Plan (Marker): spaetestens dann braucht es
 eine Loesung (z. B. mehr Zyklen oder Zyklus-Archiv).
 

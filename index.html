@@ -1000,10 +1000,10 @@ function renderT(){
     const cn=parseInt(cyBase().replace('cycle',''))||1;
     const nextCy=cn<CYCLES.length?String(cn+1):'1 (neu)';
     const nextN=cn<CYCLES.length?cn+1:1,nextKey=(S.pt==='p3'?'p3':'')+'cycle'+nextN;
-    const newPlanTxt=isLegacy(S.cy)&&!isLegacy(nextKey)?' Zyklus '+nextN+' startet mit dem neuen Plan, deine Übungen werden übernommen.':'';
+    const nextTxt=isLegacy(S.cy)&&!isLegacy(nextKey)?'Danach startet Zyklus '+nextN+' mit dem neuen Plan – deine Übungen werden übernommen.':'Danach geht es mit Zyklus '+nextCy+' weiter.';
     h+='<div style="background:var(--yellow);border:var(--bw) solid var(--ink);border-radius:var(--r-xl);padding:16px 18px;margin-top:8px;box-shadow:var(--sh-card)">'
       +'<div style="font-family:var(--font-display);text-transform:uppercase;font-size:15px;letter-spacing:-0.5px;color:var(--ink);margin-bottom:6px">🏁 Letzte Woche von Zyklus '+cn+'</div>'
-      +'<p style="color:var(--ink);font-size:13px;line-height:1.6;margin:0">Danach geht es mit Zyklus '+nextCy+' weiter.'+newPlanTxt+'</p>'
+      +'<p style="color:var(--ink);font-size:13px;line-height:1.6;margin:0">'+nextTxt+'</p>'
       +'</div>';
   }
   document.getElementById('view-training').innerHTML=h;
@@ -1503,7 +1503,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeWeekPick()});
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-09-26-04';
+const BUILD_ID='2026-09-26-05';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();
