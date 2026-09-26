@@ -115,6 +115,7 @@ button:disabled:active{transform:none;}
 .day-header{width:100%;background:none;border:none;padding:15px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;color:var(--ink);text-align:left;border-radius:var(--r-xl);}
 .day-title{font-family:var(--font-display);text-transform:uppercase;font-size:14px;letter-spacing:-0.5px;color:var(--ink);}
 .day-header{flex-wrap:wrap;row-gap:6px;}
+.wk1-note{font-size:12px;font-weight:600;color:var(--ink);background:var(--cream);border:2px solid var(--ink);border-radius:var(--r-pill);padding:6px 12px;margin-bottom:12px;display:inline-block;}
 .day-header .day-title{flex:1 1 0;min-width:0;}
 .day-focus{flex-basis:100%;font-family:var(--font-sans);font-size:12px;font-weight:600;line-height:1.35;color:var(--ink);opacity:.78;}
 .day-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
@@ -308,14 +309,14 @@ const TIPS={
 "Pelvic Drop":"Einbeinig auf einer Stufe stehen. Hüfte der Hängeseite langsam absinken lassen, dann Glute Med anspannen und anheben.",
 "Abduktionsmaschine stehend":"⚙ Einstellung: Beckenpolster bzw. Auflage auf Hüfthöhe, Standbein mittig und leicht gebeugt, Polster am Arbeitsbein außen knapp über dem Knie.\nAusführung: Bein seitlich heben ohne mit dem Oberkörper wegzukippen, oben kurz halten. Mehr Glute-Med-Aktivierung als sitzend.",
 "Fire Hydrants Kabel":"Auf allen Vieren, Kabel am Knie/Fußgelenk. Bein seitlich-nach-oben führen wie ein Feuerhydrant. Hüfte nicht mitdrehen.",
-"Low Bar Squat":"⚠️ Für Po-Fokus: Füße weit auseinander, Zehen leicht nach außen, Fersen ggf. erhöht. Tief absenken, Knie über Zehen. Enger Stand + volle Tiefe = mehr Quad – bei Ziel schmale Beine vermeiden!",
-"Beinpresse":"⚙ Einstellung: Rückenlehne eher flach stellen, Sitz so, dass der untere Rücken unten NICHT vom Polster abrollt. Füße HOCH und breit auf der Plattform, Zehen leicht nach außen.\n⚠️ Für Po-Fokus: genau diese hohe, breite Fußstellung – enge tiefe Fußstellung = mehr Quad. Bei Ziel schmale Beine im Zweifel lieber Reverse Lunge oder Split Squat. Durch die Fersen drücken, Knie Richtung Zehen führen.",
+"Low Bar Squat":"⚠️ Für Po-Fokus: Füße weit auseinander, Zehen leicht nach außen, Fersen ggf. erhöht. Tief absenken, Knie über Zehen. Enger Stand + volle Tiefe = mehr Quad – für schlanke, definierte Beine vermeiden!",
+"Beinpresse":"⚙ Einstellung: Rückenlehne eher flach stellen, Sitz so, dass der untere Rücken unten NICHT vom Polster abrollt. Füße HOCH und breit auf der Plattform, Zehen leicht nach außen.\n⚠️ Für Po-Fokus: genau diese hohe, breite Fußstellung – enge tiefe Fußstellung = mehr Quad. Für schlanke, definierte Beine im Zweifel lieber Reverse Lunge oder Split Squat. Durch die Fersen drücken, Knie Richtung Zehen führen.",
 "Step Ups":"Hohe Box (mind. Kniehöhe) für maximale Glute-Aktivierung. Ferse fest aufstellen, durch die Ferse drücken.",
-"Split Squat Kurzhantel":"✅ Gute Wahl bei Ziel schmale Beine. Hinterer Fuß auf Bank oder am Boden. Oberkörper leicht vorgebeugt – mehr Po, weniger Quad.",
-"Split Squat Langhantel":"✅ Gute Wahl bei Ziel schmale Beine. Stange auf Schultern, Oberkörper leicht vorgebeugt – mehr Glute-Aktivierung als aufrecht.",
-"Split Squat Multipresse":"✅ Gute Wahl bei Ziel schmale Beine. Geführte Variante, mehr Stabilität. Oberkörper leicht vorgebeugt halten.",
-"Hack Squat":"⚙ Einstellung: Schulterpolster so hoch, dass du zum Entriegeln nur leicht aufrichten musst. Rücken und Becken fest an der Lehne.\n⚠️ Für Po-Fokus: Füße weit oben auf der Plattform, weit auseinander, tief absenken. Enger Stand + flache Fußstellung = dominanter Quad – bei Ziel schmale Beine nur mit weitem hohen Stand.",
-"Reverse Lunge":"✅ Beste Wahl bei Ziel schmale Beine. Weniger Quad-dominant als alle anderen Varianten. Schritt weit nach hinten, durch Ferse drücken.",
+"Split Squat Kurzhantel":"✅ Gute Wahl für schlanke, definierte Beine. Hinterer Fuß auf Bank oder am Boden. Oberkörper leicht vorgebeugt – mehr Po, weniger Quad.",
+"Split Squat Langhantel":"✅ Gute Wahl für schlanke, definierte Beine. Stange auf Schultern, Oberkörper leicht vorgebeugt – mehr Glute-Aktivierung als aufrecht.",
+"Split Squat Multipresse":"✅ Gute Wahl für schlanke, definierte Beine. Geführte Variante, mehr Stabilität. Oberkörper leicht vorgebeugt halten.",
+"Hack Squat":"⚙ Einstellung: Schulterpolster so hoch, dass du zum Entriegeln nur leicht aufrichten musst. Rücken und Becken fest an der Lehne.\n⚠️ Für Po-Fokus: Füße weit oben auf der Plattform, weit auseinander, tief absenken. Enger Stand + flache Fußstellung = dominanter Quad – für schlanke, definierte Beine nur mit weitem hohen Stand.",
+"Reverse Lunge":"✅ Beste Wahl für schlanke, definierte Beine. Weniger Quad-dominant als alle anderen Varianten. Schritt weit nach hinten, durch Ferse drücken.",
 "RDL Langhantel":"Füße hüftbreit, Stange nah am Körper. Hüfte nach hinten schieben, Rücken gerade. Dehnung in den Hamstrings spüren, dann durch Gesäß nach oben.",
 "RDL Kurzhanteln":"Gleiche Technik wie LH-RDL. KH vor dem Körper, nah an den Beinen entlangführen.",
 "Glute Hyperextensions":"⚙ Einstellung: Polsterkante exakt auf den Hüftknochen – die Hüfte muss frei beugen können, sonst arbeitet der Rücken.\nAusführung: Oberkörper absenken, dann durch das Gesäß strecken – nicht mit dem Rücken aufschwingen. Oberen Rücken leicht rund lassen und Zehen leicht nach außen drehen = mehr Po, weniger unterer Rücken. Oben 1 Sek. Po anspannen.",
@@ -325,9 +326,9 @@ const TIPS={
 "Leg Curls stehend":"⚙ Einstellung: Einbeinig im Stand, Standbein leicht gebeugt. Kniegelenk des Arbeitsbeins auf die Drehachse der Maschine, Oberschenkelpolster fest ans Bein, Fußrolle knapp über die Ferse. Bei 169 cm: mittlere Polsterhöhe als Start, Oberkörper aufrecht am Griff abstützen.\nAusführung: Ferse langsam zum Po ziehen, oben 1 Sek. halten, kontrolliert zurück. Hüfte bleibt gestreckt und die Beckenseiten gerade – nicht mit dem unteren Rücken nachhelfen. Weil die Hüfte gestreckt bleibt, arbeitet der obere Hamstring-Ansatz direkt unterm Po besonders stark. Beide Seiten gleich viele Wiederholungen.",
 "Leg Curls liegend":"⚙ Einstellung: Bauchlage, Kniegelenk EXAKT auf die Drehachse der Maschine ausrichten (oft markiert) – Polster entsprechend vor/zurück schieben. Fußrolle ans untere Wadenende knapp über die Ferse, Hüfte fest auf dem Polster. Bei 169 cm: mittlere Einstellung als Start.\nAusführung: Fersen kontrolliert Richtung Po ziehen, kurz halten, langsam in die volle Streckung zurück. Po anspannen, damit die Hüfte nicht abhebt – die Dehnung unten gibt der Beinrückseite die runde Form direkt unterm Po.",
 "Nordic Curls":"Knie auf gepolsterter Unterlage, Füße fixiert. Oberkörper langsam nach vorne fallen lassen – exzentrische Hamstring-Arbeit. Fortgeschrittene Übung.",
-"Leg Curls sitzend":"⚙ Einstellung: Kniegelenk EXAKT auf die Drehachse der Maschine, Rückenlehne so einstellen, dass der Po ganz hinten sitzt und die Kniekehle knapp vor der Sitzkante liegt. Oberschenkelpolster fest knapp oberhalb der Knie, Fußrolle am unteren Wadenende knapp über der Ferse. Bei 169 cm: mittlere Lehnenposition als Start.\nAusführung: Fersen kontrolliert nach unten-hinten ziehen, unten 1 Sek. halten, langsam bis in die volle Streckung zurück. Oberkörper aufrecht oder leicht nach vorne lehnen – die gebeugte Hüfte dehnt die Beinrückseite stärker. Genau deshalb wächst sie sitzend deutlich besser als liegend (Studie: +14 % statt +9 %). Erste Wahl für definierte Beine und einen klaren Übergang vom Po zur Beinrückseite.",
-"Beinstrecker Maschine":"⚙ Einstellung: Kniegelenk auf die Drehachse, Rückenlehne so, dass die Kniekehle an der Sitzkante anliegt. Fußrolle vorne knapp über dem Sprunggelenk. Lehne lieber eine Stufe weiter nach hinten – die offenere Hüfte dehnt den vorderen Oberschenkel stärker und bringt mehr Reiz bei gleichem Gewicht. Bei 169 cm: mittlere Lehnenposition als Start.\nAusführung: Beine kontrolliert strecken, oben 1 Sek. anspannen, langsam bis ganz unten absenken – nicht schwingen. Für definierte, nicht massige Oberschenkel reicht diese kleine Dosis vollkommen.",
-"Beinstrecker einbeinig":"⚙ Einstellung wie beim Beinstrecker: Kniegelenk auf die Drehachse, Fußrolle knapp über dem Sprunggelenk, Lehne eher eine Stufe zurück.\nAusführung: Ein Bein nach dem anderen – gleicht Seitenunterschiede aus. Mit dem schwächeren Bein beginnen, das andere macht gleich viele Wiederholungen. Kontrolliert strecken, oben 1 Sek. halten, langsam ganz absenken.",
+"Leg Curls sitzend":"⚙ Einstellung: Knie auf die Drehachse, Po ganz hinten an der Lehne. Oberschenkelpolster knapp über den Knien, Fußrolle knapp über der Ferse. Bei 169 cm: mittlere Lehnenposition als Start.\nAusführung: Fersen kontrolliert nach hinten ziehen, 1 Sek. halten, langsam ganz strecken. Oberkörper aufrecht oder leicht vor – mehr Dehnung, mehr Reiz. Wächst sitzend besser als liegend.",
+"Beinstrecker Maschine":"⚙ Einstellung: Knie auf die Drehachse, Kniekehle an der Sitzkante, Fußrolle knapp über dem Sprunggelenk. Lehne eher eine Stufe zurück – mehr Dehnung vorne. Bei 169 cm: mittlere Position als Start.\nAusführung: Kontrolliert strecken, oben 1 Sek. halten, langsam ganz absenken. Nicht schwingen.",
+"Beinstrecker einbeinig":"⚙ Einstellung wie Beinstrecker Maschine.\nAusführung: Ein Bein nach dem anderen, mit dem schwächeren beginnen – beide gleich viele Wiederholungen. Oben 1 Sek. halten, langsam absenken.",
 "LH Rudern":"Oberkörper ca. 45 Grad vorgebeugt. Stange zum Bauch ziehen, Ellbogen nah am Körper.",
 "KH Rudern":"Einarmig auf Bank gestützt. KH zum Hüftknochen ziehen, Schulterblatt einziehen.",
 "KH Rudern (breit)":"Ellbogen weiter außen – betont oberen Rücken und hintere Schulter.",
@@ -349,7 +350,7 @@ const TIPS={
 "Straight-Arm Pulldown":"Kabel oben, Arme gestreckt. Lat nach unten ziehen bis Oberschenkel. Isolierter Lat ohne Bizeps.",
 "Einarmiger Latzug Kabel":"Einarmig am Kabel. Mehr Range und Rotation möglich. Lat gut einziehen am Ende.",
 "Diverging Low Row":"⚙ Einstellung: Sitzhöhe so, dass das Brustpolster auf Brustmitte liegt und die Griffe auf Bauchhöhe starten.\nAusführung: Griffe zur Hüfte ziehen – divergierender Zugweg. Schulterblätter am Ende zusammenziehen, nicht mit dem Oberkörper schwingen.",
-"Super Squat":"⚙ Einstellung: Schulterpolster so, dass du beim Einstieg fast gestreckt stehst, Rücken fest an der Lehne.\n⚠️ Für Po-Fokus: Füße weit vorne und breit positionieren, tief absenken, durch die Fersen drücken. Enge tiefe Fußstellung = mehr Quad – bei Ziel schmale Beine weite vordere Stellung wählen.",
+"Super Squat":"⚙ Einstellung: Schulterpolster so, dass du beim Einstieg fast gestreckt stehst, Rücken fest an der Lehne.\n⚠️ Für Po-Fokus: Füße weit vorne und breit positionieren, tief absenken, durch die Fersen drücken. Enge tiefe Fußstellung = mehr Quad – für schlanke, definierte Beine weite vordere Stellung wählen.",
 "LH Bankdrücken":"Schulterbreiter Griff. Stange zur unteren Brust, Ellbogen ca. 75 Grad vom Körper.",
 "KH Bankdrücken":"Ermöglicht mehr Bewegungsfreiheit. KH am Ende leicht zusammenführen.",
 "Bankdrücken Multipresse":"Geführte Bewegung. Griffposition anpassen – leicht schräg für natürlichere Bewegung.",
@@ -418,12 +419,12 @@ const TIPS={
 "3D Abduktor Maschine":"Panatta-Highlight! Trainiert Abduktion + Streckung + Außenrotation gleichzeitig – aktiviert die hinteren Fasern des Gluteus Medius.\n⚙ Einstellung: 3 Rückenlehnen-Positionen = verschiedene Muskelfasern. Aufrechte Lehne (wenig Hüftbeugung) = hintere Glute-Med-Fasern – dein Fokus! Flachere Lehne = mehr vordere Fasern. Starte mittig, arbeite dich zur aufrechten Position. Sitz so, dass die Hüfte auf Höhe der Drehachse liegt.\nAusführung: Bein im Bogen nach außen-hinten-oben führen, oben kurz halten, kontrolliert zurück. Aufrecht sitzen, Becken fest am Polster.",
 "Belt Squat RDL":"✅ Belt Squat Maschine als RDL nutzen – schont den Rücken, schwere Gewichte möglich.\n⚙ Einstellung: Gurt über die Hüftknochen, Füße mittig und hüftbreit (nicht weit vorne wie beim Belt Squat).\nAusführung: Hüftgelenk-Scharnier – Hüfte nach hinten schieben, nicht in die Kniebeuge! Stark auf Hamstrings und Po. Kontrolliert absenken für den Stretch, oben Po anspannen.",
 "Belt Squat":"Panatta Belt Squat: Gewicht hängt am Hüftgurt – kein Rückenloading.\n⚙ Einstellung: Gurt fest über die Hüftknochen, Karabiner mittig vor dem Körper einhängen. Füße weit VORNE auf den Fußplatten = mehr Hüftbeugung = maximaler Glute-Fokus! Füße mittig = mehr Quad. Griff vorne nur zur Balance nutzen, nicht hochziehen.\nAusführung: Tief absenken, durch die Fersen drücken, oben Po anspannen.",
-"Beinpresse 45 Grad":"⚙ Einstellung: Rückenlehne in die flachste angenehme Position, Sitz so, dass das Becken unten nicht abkippt.\n⚠️ Fußposition entscheidet, was wächst: Füße HOCH auf der Platte = Glutes und Hamstrings. Füße tief = Quads dominant – bei Ziel schmale Beine unbedingt vermeiden. Für dein Ziel: Füße immer hoch, schulterbreit bis breit, Zehen leicht nach außen. Knie aktiv Richtung Zehen drücken, Rücken bleibt durchgehend am Polster.",
+"Beinpresse 45 Grad":"⚙ Einstellung: Rückenlehne in die flachste angenehme Position, Sitz so, dass das Becken unten nicht abkippt.\n⚠️ Fußposition entscheidet, was wächst: Füße HOCH auf der Platte = Glutes und Hamstrings. Füße tief = Quads dominant – für schlanke, definierte Beine unbedingt vermeiden. Für dein Ziel: Füße immer hoch, schulterbreit bis breit, Zehen leicht nach außen. Knie aktiv Richtung Zehen drücken, Rücken bleibt durchgehend am Polster.",
 "Adduktionsmaschine":"\u2699 Einstellung: Sitz so, dass Hüfte und Knie im 90-Grad-Winkel stehen, die Polster liegen innen knapp über dem Knie. Startweite so weit öffnen, dass du innen eine deutliche Dehnung spürst – genau da entsteht der Reiz.\nAusführung: Beine kontrolliert zusammenführen, 1 Sek. halten, dann LANGSAM (ca. 3 Sek.) in die volle Dehnung zurück. Rücken bleibt am Polster. Der Adduktor magnus ist gleichzeitig ein Hüftstrecker – er arbeitet mit dem Po und füllt die Innenseite, ohne die Oberschenkel-Vorderseite dicker zu machen.",
 "Adduktion Kabel Stehend":"Kabel unten, Manschette ans INNERE Fußgelenk, seitlich zur Maschine stellen und festhalten. Standbein leicht gebeugt.\nAusführung: Arbeitsbein vor dem Standbein vorbei zur Mitte und leicht darüber hinaus ziehen, kurz halten, dann langsam gegen den Zug zurück in die Dehnung. Becken bleibt gerade – nicht mit dem Oberkörper wegkippen.",
 "Adduktion Kabel Liegend":"Auf der Seite liegend, Kabel am UNTEREN Fußgelenk, oberes Bein angewinkelt vor dem Körper abgelegt.\nAusführung: Unteres Bein gestreckt nach oben zur Mitte führen, oben kurz halten, langsam ablassen. Sehr isoliert – gute zweite Übung nach der Maschine, wenn die Innenseite schon vorermüdet ist.",
 "Copenhagen Plank":"Seitstütz auf dem Unterarm, oberes Bein auf einer Bank abgelegt, unteres Bein frei in der Luft.\nAusführung: Hüfte hochdrücken und Position halten – das obere Bein zieht dich aktiv nach oben. Start: KNIE auf der Bank, 15–20 Sek. pro Seite. Steigerung: gestrecktes Bein auf der Bank. Ins Wdh.-Feld einfach die gehaltenen SEKUNDEN eintragen. Kräftigt Adduktoren und stabilisiert das Becken – ideale Ergänzung zur vielen Abduktions-Arbeit.",
-"Sumo Squat Kurzhantel":"✅ Adduktoren + Po ohne Quad-Betonung – passt zum Ziel schmale Beine. Füße deutlich weiter als schulterbreit, Zehen 30–45 Grad nach außen, KH senkrecht zwischen den Beinen.\nAusführung: Hüfte gerade nach UNTEN senken (nicht nach hinten wie beim RDL), Knie aktiv nach außen Richtung Zehen drücken, unten die Innenseite dehnen spüren. Oben Hüfte durchstrecken und Po anspannen, Oberkörper bleibt aufrecht.",
+"Sumo Squat Kurzhantel":"✅ Adduktoren + Po ohne Quad-Betonung – passt zum Ziel schlanke, definierte Beine. Füße deutlich weiter als schulterbreit, Zehen 30–45 Grad nach außen, KH senkrecht zwischen den Beinen.\nAusführung: Hüfte gerade nach UNTEN senken (nicht nach hinten wie beim RDL), Knie aktiv nach außen Richtung Zehen drücken, unten die Innenseite dehnen spüren. Oben Hüfte durchstrecken und Po anspannen, Oberkörper bleibt aufrecht.",
 "Sumo RDL Langhantel":"Weiter Sumo-Stand, Zehen nach außen, Stange nah am Körper.\nAusführung: Hüftgelenk-Scharnier – Hüfte nach hinten schieben, Rücken neutral, absenken bis Innenseite und Beinrückseite deutlich ziehen. Der weite Stand verlagert die Arbeit stark auf den Adduktor magnus (ein Hüftstrecker) – sehr po-freundlich und nicht quad-lastig. Oben durch die Fersen drücken.",
 "Cossack Squat":"Sehr weiter Stand. Gewicht auf ein Bein verlagern und darauf tief absinken, das andere Bein bleibt gestreckt, Zehen hochgezogen.\nAusführung: Langsam absenken bis zur Dehnung der Innenseite, kurz halten, kontrolliert wieder hoch. Erst mit Körpergewicht sauber lernen, dann leichte KH oder Kettlebell vor der Brust. Bringt Adduktoren-Kraft in voller Dehnung plus Hüftbeweglichkeit.",
 "Lateral Lunge":"Seitlicher Ausfallschritt: großer Schritt zur Seite, Gewicht auf das Schrittbein, das andere Bein bleibt gestreckt.\nAusführung: Hüfte nach hinten-unten schieben, der Fuß des gestreckten Beins bleibt flach am Boden – die Innenseite zieht deutlich. Über die Ferse zurückdrücken. Freie Variante des Cossack Squat, gut mit KH oder Kettlebell vor der Brust.",
@@ -443,7 +444,7 @@ const DAYBG=["#F4A45E","#F18FB6","#B6DD57","#8CCBE8"];
 // (Marker pv__[Zyklus] in peach_v4, siehe planOf) — sonst lagen die positionsbasierten
 // Daten in den falschen Zeilen.
 const P4=[
-{l:"Tag A – Po Kraft",f:"Po schwer (4–8) · Beinvorderseite · Beinbeuger · Innenschenkel",e:[
+{l:"Tag A – Po Kraft",f:"4–8 Wdh. · Beinvorderseite · Innenschenkel",e:[
   {c:"Glute Max",s:3,r:[4,8]},
   {c:"Glute Max",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
@@ -452,7 +453,7 @@ const P4=[
   {c:"Adduktoren",s:2,r:[8,12]},
   {c:"Bauch",s:2,r:[8,12]}
 ]},
-{l:"Tag B – Oberkörper & Po",f:"Rücken & Schultern für die V-Form · Po-Pump · Arme",e:[
+{l:"Tag B – Oberkörper & Po",f:"Rücken · Schultern · Arme",e:[
   {c:"Glute Max",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
   {c:"Rücken",s:3,r:[6,10]},
@@ -462,7 +463,7 @@ const P4=[
   {c:"Trizeps",s:2,r:[8,12]},
   {c:"Bauch",s:2,r:[8,12]}
 ]},
-{l:"Tag C – Po & Beinrückseite",f:"Po mittelschwer (6–10) · Hüftbeuge (RDL) · Beinbeuger · Rücken & Schultern",e:[
+{l:"Tag C – Po & Beinrückseite",f:"6–10 Wdh. · Hüftbeuge · Beinbeuger",e:[
   {c:"Glute Max",s:3,r:[6,10]},
   {c:"Glute Max",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
@@ -472,7 +473,7 @@ const P4=[
   {c:"Schultern",s:2,r:[8,12]},
   {c:"Bauch",s:2,r:[8,12]}
 ]},
-{l:"Tag D – Po-Volumen & Beine",f:"Po 8–12 Wdh. · Beinvorderseite · Beinstrecker · Innenschenkel",e:[
+{l:"Tag D – Po-Volumen & Beine",f:"8–12 Wdh. · Beinstrecker · Innenschenkel",e:[
   {c:"Glute Max",s:3,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
   {c:"Glute & Quad",s:2,r:[8,12]},
@@ -485,7 +486,7 @@ const P4=[
 // 3-Tage-Plan: eigene Zyklen (Key-Praefix p3cycle1-6 in peach_v4) — voellig getrennt
 // vom 4-Tage-Plan, gleiche Regeln (Steigerung, Auto-Extra-Satz, Vererbung).
 const P3=[
-{l:"Tag A – Po Kraft",f:"Po schwer (4–8) · Beinvorderseite · Innenschenkel · Rücken & Schultern",e:[
+{l:"Tag A – Po Kraft",f:"4–8 Wdh. · Beinvorderseite · Innenschenkel",e:[
   {c:"Glute Max",s:3,r:[4,8]},
   {c:"Glute Max",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
@@ -495,7 +496,7 @@ const P3=[
   {c:"Schultern",s:2,r:[8,12]},
   {c:"Bauch",s:2,r:[8,12]}
 ]},
-{l:"Tag B – Po & Beinrückseite",f:"Po mittelschwer (6–10) · Hüftbeuge (RDL) · Beinbeuger · Rücken & Brust",e:[
+{l:"Tag B – Po & Beinrückseite",f:"6–10 Wdh. · Hüftbeuge · Beinbeuger",e:[
   {c:"Glute Max",s:3,r:[6,10]},
   {c:"Glute Max",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
@@ -505,7 +506,7 @@ const P3=[
   {c:"Brust",s:2,r:[6,10]},
   {c:"Bauch",s:2,r:[8,12]}
 ]},
-{l:"Tag C – Hüfte & Sanduhr",f:"Po-Volumen (8–12) · seitlicher Po doppelt · Beinstrecker · Innenschenkel",e:[
+{l:"Tag C – Hüfte & Sanduhr",f:"8–12 Wdh. · Glute Med doppelt · Beinstrecker",e:[
   {c:"Glute Max",s:3,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
@@ -877,10 +878,12 @@ function carryMap(cy){
   _carry[cy]=res;
   return res;
 }
-// Vorbelegte Uebung einer Zeile, solange in der aktuellen Woche nichts gewaehlt ist:
-// ab Woche 2 die der Vorwoche, in Woche 1 die aus dem vorherigen Zyklus uebernommene.
+// Vorbelegte Uebung einer Zeile, solange in der aktuellen Woche nichts gewaehlt ist: die
+// der letzten Woche davor, in der die Zeile gespeichert ist (auch ueber ausgelassene Wochen
+// hinweg), sonst die aus dem vorherigen Zyklus uebernommene (carryMap). Ein bewusst geleertes
+// Feld (exercise '') bleibt leer.
 function inhEx(di,ei){
-  if(S.week>1){const p=S.data[mk(S.cy,S.week-1,di,ei)];return (p&&p.exercise)||''}
+  for(let w=S.week-1;w>=1;w--){const p=S.data[mk(S.cy,w,di,ei)];if(p&&p.exercise!==undefined)return p.exercise||''}
   return carryMap(S.cy)[di+'|'+ei]||'';
 }
 // Zyklus ohne Plan-Praefix ('p3cycle2' -> 'cycle2') — fuer Button-Markierung & Zyklus-Ende-Text
@@ -982,6 +985,7 @@ function renderT(){
     const w=weekStats();
     h+='<div class="week-progress'+(w.tot?'':' hidden')+'" id="wp-box"><div class="wp-top"><span class="wp-title">Woche '+S.week+'</span><span class="wp-pct" id="wp-pct">'+w.pct+'%</span></div><div class="wp-bar-wrap"><div class="wp-bar" id="wp-bar" style="width:'+w.pct+'%;background:'+(w.pct>=100?'var(--green)':'var(--peach)')+(w.pct>0&&w.pct<100?';border-right:2px solid var(--ink)':'')+'"></div></div><div class="wp-sub" id="wp-sub">'+w.imp+'/'+w.tot+' Übungen gesteigert</div></div>';
   }
+  if(S.week===1)h+='<div class="wk1-note">Woche 1: leichter einsteigen – verglichen wird ab Woche 2.</div>';
   pl.forEach((day,di)=>{
     const op=S.openDays[di]===true;
     const total=day.e.length;let done=0;day.e.forEach((ex,ei)=>{if(exDone(di,ei))done++});
@@ -996,10 +1000,10 @@ function renderT(){
     const cn=parseInt(cyBase().replace('cycle',''))||1;
     const nextCy=cn<CYCLES.length?String(cn+1):'1 (neu)';
     const nextN=cn<CYCLES.length?cn+1:1,nextKey=(S.pt==='p3'?'p3':'')+'cycle'+nextN;
-    const newPlanTxt=isLegacy(S.cy)&&!isLegacy(nextKey)?' Ab Zyklus '+nextN+' gilt dein neuer Plan: weniger Übungen, voller Po-Fokus, neu mit Beinbeuger und Beinstrecker. Deine gewählten Übungen werden automatisch übernommen, nur neue Plätze wie den Beinstrecker wählst du einmal selbst aus.':'';
+    const newPlanTxt=isLegacy(S.cy)&&!isLegacy(nextKey)?' Zyklus '+nextN+' startet mit dem neuen Plan, deine Übungen werden übernommen.':'';
     h+='<div style="background:var(--yellow);border:var(--bw) solid var(--ink);border-radius:var(--r-xl);padding:16px 18px;margin-top:8px;box-shadow:var(--sh-card)">'
-      +'<div style="font-family:var(--font-display);text-transform:uppercase;font-size:15px;letter-spacing:-0.5px;color:var(--ink);margin-bottom:6px">🏁 Woche 12 – Zyklus fast abgeschlossen!</div>'
-      +'<p style="color:var(--ink);font-size:13px;line-height:1.7;margin:0">Letzte Woche des Zyklus – danach startest du Zyklus '+nextCy+' mit Woche 1. Dort bewusst etwas leichter einsteigen: Die letzten Werte stehen nur zur Orientierung da, verglichen wird erst ab Woche 2.'+newPlanTxt+'</p>'
+      +'<div style="font-family:var(--font-display);text-transform:uppercase;font-size:15px;letter-spacing:-0.5px;color:var(--ink);margin-bottom:6px">🏁 Letzte Woche von Zyklus '+cn+'</div>'
+      +'<p style="color:var(--ink);font-size:13px;line-height:1.6;margin:0">Danach geht es mit Zyklus '+nextCy+' weiter.'+newPlanTxt+'</p>'
       +'</div>';
   }
   document.getElementById('view-training').innerHTML=h;
@@ -1057,31 +1061,33 @@ function exIndex(){
     const rr=repRange(cy,di,ei);
     if(!rr)continue; // Platz gibt es im Plan nicht mehr -> kein sinnvoller Vergleich
     const e={pt:pt,cy:cy,w:w,di:di,ei:ei,rr:rr,d:d,ord:exOrd(cy,w,di,ei)};
-    const key=exKey(d.exercise,rr);
+    const key=exKey(d.exercise,rr),all=exKey(d.exercise,'*');
     (idx[key]=idx[key]||[]).push(e);
+    (idx[all]=idx[all]||[]).push(e); // alle Rep-Bereiche (fuer den Orientierungswert)
   }
   for(const n in idx)idx[n].sort((a,b)=>a.ord-b.ord);
   _exIdx=idx;return idx;
 }
-// Letzter gespeicherter Wert dieser Uebung im SELBEN Rep-Bereich, VOR der aktuellen Position.
-// Sucht im aktuellen Plan ueber alle Zyklen/Wochen/Tage; findet sich dort nichts, wird als
-// Rueckfall der letzte Eintrag aus dem anderen Plan (3- bzw. 4-Tage) genommen — nur lesend,
-// gespeichert wird weiterhin strikt getrennt.
+// Letzter gespeicherter Wert dieser Uebung VOR der aktuellen Position.
+// Ab Woche 2 zaehlt fuer den Vergleich nur der GLEICHE Rep-Bereich im gleichen Plan (4-8 laeuft
+// mit viel mehr Gewicht als 8-12). Woche 1 vergleicht nicht — dort wird der JUENGSTE Wert der
+// Uebung gezeigt, egal in welchem Bereich. Frueher fiel der Wert bei geaendertem Rep-Bereich
+// (neuer Plan) auf den anderen Plan zurueck und zeigte z. B. Werte aus dem Juli (Z2 W3,
+// 4-Tage) statt aus der Woche davor. Gibt es ab Woche 2 im gleichen Bereich nichts, kommt der
+// juengste Wert in einem anderen Bereich nur zur Orientierung (_orient: kein Badge/Vergleich).
+// Der andere Plan (3/4 Tage) ist erst der letzte Rueckfall — nur lesend.
 function findLastExData(di,ei,currentExercise){
   if(!currentExercise)return{};
   const rr=repRange(S.cy,di,ei);
   if(!rr)return{};
-  const list=exIndex()[exKey(currentExercise,rr)];
-  if(!list||!list.length)return{};
-  const cur=exOrd(S.cy,S.week,di,ei);
-  let same=null,other=null;
-  for(const e of list){
-    if(e.pt===S.pt){if(e.ord<cur)same=e}
-    else other=e;
-  }
-  const hit=same||other;
+  const idx=exIndex(),cur=exOrd(S.cy,S.week,di,ei);
+  const byR=idx[exKey(currentExercise,rr)]||[],byAny=idx[exKey(currentExercise,'*')]||[];
+  const lastSame=l=>{let h=null;for(const e of l)if(e.pt===S.pt&&e.ord<cur)h=e;return h};
+  const lastOther=l=>{let h=null;for(const e of l)if(e.pt!==S.pt)h=e;return h};
+  let hit=S.week===1?lastSame(byAny):(lastSame(byR)||lastSame(byAny));
+  if(!hit)hit=lastOther(byR)||lastOther(byAny);
   if(!hit)return{};
-  return{...hit.d,_src:{pt:hit.pt,cy:hit.cy,w:hit.w,di:hit.di}};
+  return{...hit.d,_orient:hit.rr!==rr,_src:{pt:hit.pt,cy:hit.cy,w:hit.w,di:hit.di,rr:hit.rr}};
 }
 // Kurzlabel woher der Vorwert stammt, z. B. "Z1 W5 · Tag A" (bei anderem Plan zusaetzlich "3-Tage")
 function srcLabel(src){
@@ -1181,25 +1187,18 @@ function exState(di,ei){
   const hasPrev=!!(prv.weight||(prv.reps||[]).some(r=>r!==''&&r!=null));
   // Woche 1 (Zyklus-Start): bewusst leichter einsteigen -> KEIN Vergleich (kein Badge,
   // kein Wochenbalken). Vorwerte bleiben nur zur Orientierung in Klammern sichtbar.
-  const noCmp=S.week===1;
+  const noCmp=S.week===1||!!prv._orient;
   return {ex,cur,prv,ms,autoX,reps,hasPrev,noCmp,inv:isAssist(cur.exercise),
     p:noCmp?'':prog(reps,prv.reps||[],cur.weight,prv.weight,cur.exercise),
     srcL:hasPrev?srcLabel(prv._src):''};
 }
-// Vorwochen-Hinweis ("VW: 17 kg · 12 / 12 Wdh … → Gleiche Leistung!")
+// Herkunft des letzten Werts ("zuletzt: Z2 W11 · Tag C"). Gewicht und Reps stehen schon am
+// Gewichtsfeld bzw. unter den Rep-Feldern, das Ergebnis zeigt das Badge — deshalb hier nur die
+// Quelle, plus Rep-Bereich, wenn er vom aktuellen abweicht (dann ohne Vergleich).
 function hintHTML(st){
-  if(!(st.hasPrev&&st.prv.weight))return'';
-  const inv=st.inv,p=st.p;
-  const sl0=st.srcL?' '+esc(st.srcL)+' ·':'';
-  if(st.noCmp)return '<div class="phint">(Zur Orientierung – zuletzt:'+sl0+' '+esc(st.prv.weight)+' kg '+(inv?'Hilfe ':'')+'· '+esc((st.prv.reps||[]).filter(Boolean).join(' / '))+' Wdh) <span style="opacity:.75">Woche 1: leichter einsteigen, kein Vergleich</span></div>';
-  // Bei 'd' unterscheiden, ob das Gewicht die falsche Richtung ging — sonst bleibt unklar warum.
-  // Zaehlt auch den heruntergesetzten Rahmen (45 -> "40-45") als weniger Gewicht.
-  const wWorse=cmpWeight(st.cur.weight,st.prv.weight,inv)<0;
-  const dTxt=wWorse?(inv?'→ Mehr Gegengewicht – kein Problem!':'→ Weniger Gewicht – kein Problem!'):'→ Kein Problem!';
-  const wTxt=inv?'→ Weniger Gegengewicht – stärker geworden! ✓':'→ Gewicht gesteigert! ✓';
-  const pm=p==='w'?' <span style="color:var(--green)">'+wTxt+'</span>':p==='r'?' <span style="color:var(--blue)">→ Mehr Wiederholungen! ✓</span>':p==='s'?' <span style="color:var(--gold)">→ Gleiche Leistung!</span>':p==='d'?' <span style="color:var(--red)">'+dTxt+'</span>':'';
-  const sl=st.srcL?' <span style="opacity:.75">('+esc(st.srcL)+')</span>':'';
-  return '<div class="phint">VW: '+esc(st.prv.weight)+' kg '+(inv?'Hilfe ':'')+'· '+esc((st.prv.reps||[]).filter(Boolean).join(' / '))+' Wdh'+sl+pm+'</div>';
+  if(!st.hasPrev||!st.srcL)return'';
+  const src=st.prv._src||{},rrTxt=st.prv._orient&&src.rr?' · '+esc(src.rr.replace('-','–'))+' Wdh.':'';
+  return '<div class="phint">zuletzt: '+esc(st.srcL)+rrTxt+'</div>';
 }
 function renderEx(ex,ei,di){
   const st=exState(di,ei);
@@ -1282,7 +1281,7 @@ function renderEx(ex,ei,di){
     +'<span class="pick-btn-arr">'+(dropOpen?'▲':'▼')+'</span></button>'+dh+'</div>'
     +'<span id="pb-'+di+'-'+ei+'" style="display:contents">'+pbadge(p,st.inv)+'</span>'+doneChip+'</div>'
     +'<div class="ex-meta"><span class="sets-info">'+ms+' Sätze · <span style="color:var(--text)">'+ex.r[0]+'–'+ex.r[1]+' Reps</span>'+autoLabel+'</span>'
-    +'<div class="w-wrap"><span class="w-label"'+(st.inv?' title="Gegengewicht der Maschine – weniger Hilfe bedeutet mehr eigene Kraft"':'')+'>'+(st.inv?'Hilfe:':'Gewicht:')+'</span><input class="w-input" type="text" value="'+esc(cur.weight||'')+'" placeholder="kg" onchange="updW('+di+','+ei+',this.value)"/>'+(prv.weight?'<span style="color:var(--text-faint);font-size:11px" title="Letzter Eintrag dieser Übung'+(srcL?': '+esc(srcL):'')+'">(VW: '+esc(prv.weight)+')</span>':'')+'</div></div>'
+    +'<div class="w-wrap"><span class="w-label"'+(st.inv?' title="Gegengewicht der Maschine – weniger Hilfe bedeutet mehr eigene Kraft"':'')+'>'+(st.inv?'Hilfe:':'Gewicht:')+'</span><input class="w-input" type="text" value="'+esc(cur.weight||'')+'" placeholder="kg" onchange="updW('+di+','+ei+',this.value)"/>'+(prv.weight?'<span style="color:var(--text-faint);font-size:11px" title="Letzter Eintrag dieser Übung'+(srcL?': '+esc(srcL):'')+'">(zuletzt '+esc(prv.weight)+')</span>':'')+'</div></div>'
     +setH
     +'<div class="reps-row">'+rh+'</div>'+hint+tipH+'</div>';
 }
@@ -1311,8 +1310,8 @@ function renderOv(){
       const gainTxt=gain&&gain>0?(inv?'−'+gain.toFixed(1)+' kg Hilfe':'+'+gain.toFixed(1)+' kg'):'';
       // Hinweiszeile UNTER den Balken (auf dem iPhone gibt es keinen Hover-Tooltip)
       const prevNames=usedNames.filter(n=>n!==name);
-      const swapNote=(prevNames.length?'<div style="font-size:10px;color:var(--text-faint);margin-top:3px">Davor hier: '+esc(prevNames.join(', '))+' (grau) – nicht mit eingerechnet</div>':'')
-        +(inv&&filled.length?'<div style="font-size:10px;color:var(--text-faint);margin-top:3px">Gegengewicht der Maschine – weniger Hilfe = mehr Kraft (höherer Balken)</div>':'');
+      const swapNote=(prevNames.length?'<div style="font-size:10px;color:var(--text-faint);margin-top:3px">Davor: '+esc(prevNames.join(', '))+' (grau, nicht eingerechnet)</div>':'')
+        +(inv&&filled.length?'<div style="font-size:10px;color:var(--text-faint);margin-top:3px">Weniger Hilfe = mehr Kraft (höherer Balken)</div>':'');
       const bars=nums.map((v,i)=>{
         const isCur=(i+1)===S.week;
         const other=!!(ws[i].name&&name&&ws[i].name!==name);
@@ -1327,7 +1326,7 @@ function renderOv(){
   // Daten-Backup: Export/Import der kompletten Trainingsdaten (Geraete-/Icon-Wechsel, Sicherung)
   h+='<div class="bk-card">'
     +'<div class="bk-title">💾 Daten-Backup</div>'
-    +'<p class="bk-sub">Sichere deine Trainingsdaten oder übertrage sie auf ein anderes Gerät oder Icon. <b>Kopieren</b> legt alles in die Zwischenablage – dann in der anderen Version unten einfügen und <b>einspielen</b>.</p>'
+    +'<p class="bk-sub">Zum Sichern oder Übertragen: <b>kopieren</b>, in der anderen Version unten einfügen, <b>einspielen</b>.</p>'
     +'<button class="bk-btn nb-shadow" onclick="expBackup()">Backup kopieren</button>'
     +'<span class="bk-status" id="bk-status"></span>'
     +'<textarea class="bk-ta" id="bk-ta" rows="3" placeholder="Backup-Text hier einfügen (Feld gedrückt halten → Einfügen / Pegar) …"></textarea>'
@@ -1385,7 +1384,7 @@ function togWeekPick(ev){
   if(open){
     let h='<div class="week-pick-ttl">Woche wählen</div>';
     for(let w=1;w<=12;w++)h+='<button class="wk-btn nb-shadow'+(w===S.week?' cur':weekHasData(w)?' has':'')+'" onclick="setWeek('+w+')" aria-label="Woche '+w+'">'+w+'</button>';
-    h+='<div class="week-pick-leg"><span class="wk-dot"></span>schon Einträge</div>';
+    h+='<div class="week-pick-leg"><span class="wk-dot"></span>mit Einträgen</div>';
     el.innerHTML=h;
   }
   el.classList.toggle('hidden',!open);
@@ -1504,7 +1503,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeWeekPick()});
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-09-26-03';
+const BUILD_ID='2026-09-26-04';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();
