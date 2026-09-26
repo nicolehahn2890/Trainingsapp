@@ -45,7 +45,8 @@ auf main einmalig eine Sicherheitsfreigabe verlangen; dann kurz bestaetigen lass
   peach_ver (Auto-Update-Guard: Commit-SHA, fuer den bereits neu geladen wurde),
   peach_ui (zuletzt offene Position: view/week/cy/pt/openDays — getrennt von peach_v4).
   Sicherheitskopien vor Daten-Eingriffen: peach_v4_pre_add, peach_v4_pre_fix, peach_v4_pre_v2,
-  peach_v4_pre_order.
+  peach_v4_pre_order. Unlesbares peach_v4 (kaputtes JSON) wird beim Start als Rohtext nach
+  peach_v4_corrupt kopiert und NICHT ueberschrieben (load/loadFailed).
   Plan-Version pro Zyklus steht als pv__-Marker IN peach_v4 (siehe Key-Formate).
   (peach_theme wurde entfernt — es gibt keinen Dark Mode mehr.)
 - Gym: Workshop Fitness Barcelona, Carrer d'Avila 120, El Poblenou. Panatta, Precor, Rogue, Eleiko, TRX.
@@ -175,9 +176,15 @@ planOf(cy)              p3-Praefix -> 3 Tage, sonst 4 Tage; Zyklus mit pv__-Mark
                         (P3_V1/P4_V1), sonst die neue (P3/P4). JEDE Stelle, die einen Plan-Platz
                         braucht (repairSlots, repRange, srcLabel, carryMap), nimmt planOf(cy).
 isLegacy(cy)            true wenn S.data['pv__'+cy]===1
+save()                  Schreibt peach_v4; schlaegt das fehl (Speicher voll/gesperrt), erscheint unten
+                        die rote Warnung #save-warn (saveWarn) — frueher ging das still verloren.
+load()                  Bei kaputtem JSON: Rohtext -> peach_v4_corrupt, loadFailed=true, Warnung
+                        "Gespeicherte Daten konnten nicht gelesen werden – bitte ein Backup einspielen."
 markLegacy(data)        Einmal-Markierung: jeder Zyklus mit echten Werten (hasVals) bekommt
                         pv__[cycle]=1, danach pv__done=1. Laeuft beim Start (migPlanV2, vorher
                         Kopie nach peach_v4_pre_v2) und in impBackup (fuer alte Backups).
+                        migPlanV2 speichert NUR, wenn es Trainingsdaten gibt — sonst haette der
+                        Start leere/unlesbare Daten mit {pv__done:1} ueberschrieben.
 ALIAS / rowFits(r,e)    Zeile der Kategorie r akzeptiert Uebung der Kategorie e (gleich ODER Alias).
                         ALIAS {"Glute & Hams":["Beinbeuger"]}: Leg Curls/Nordic Curls standen bis
                         Sept. 2026 in Glute & Hams — ohne Alias schoebe repairSlots sie aus den
@@ -641,6 +648,16 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Kompletter Bugcheck (26.09.2026, Version -08).** 3 Playwright-Reihen, 89 Pruefungen:
+   Start/Rendering aller 288 Ansichten, Layout 390 px, Eingaben (Uebung, Gewicht, Reps, Fokus,
+   Haken, Tages-Zaehler), Saetze +/- (max. 5), Vererbung, Badges live, prog()/parseWeight-
+   Logik inkl. Spannen/Komma/assistiert, Auto-Zusatzsatz, Navigation + Position merken,
+   Wochen-Auswahl, Dropdown (Suche, Tastatur, Esc), Tipps/Notiz/Einstellung, Uebersicht,
+   Backup Export/Import, Plan-Versionen, Uebernahme, Rexis echter Verlauf, Robustheit.
+   Gefunden + behoben: (1) unlesbares peach_v4 wurde beim Start ueberschrieben (durch
+   migPlanV2 vom selben Tag) — jetzt Kopie + keine Start-Speicherung ohne Daten;
+   (2) fehlgeschlagenes Speichern blieb unbemerkt — jetzt rote Warnung unten.
 
 NEU. **Vorwert + Uebernahme planuebergreifend nach Aktualitaet (26.09.2026, Version -07).**
    Im neuen 4-Tage-Zyklus 2 kam der Vorwert aus 4-Tage Z1 W3 (Juni), weil der gleiche Plan

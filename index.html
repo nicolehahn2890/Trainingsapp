@@ -196,6 +196,7 @@ button:disabled:active{transform:none;}
 .ov-bar{flex:1;height:100%;border:2px solid var(--ink);border-radius:999px;background:var(--bar-empty);overflow:hidden;display:flex;align-items:flex-end;}
 .ov-bar-fill{width:100%;border-radius:999px;transition:height .3s;}
 .hidden{display:none!important;}
+.save-warn{position:fixed;left:12px;right:12px;bottom:12px;z-index:100;background:var(--prog-down);color:var(--ink);border:var(--bw) solid var(--ink);border-radius:var(--r-lg);padding:10px 14px;font-size:13px;font-weight:700;box-shadow:var(--sh-card);}
 </style>
 </head>
 <body>
@@ -266,6 +267,7 @@ button:disabled:active{transform:none;}
     </div>
   </div>
 </div>
+<div id="save-warn" class="save-warn hidden" role="alert"></div>
 <div id="content">
   <div id="view-training"></div>
   <div id="view-overview" class="hidden"></div>
@@ -589,14 +591,20 @@ const P3_V1=[
 
 // STATE
 let S={view:'training',week:1,cy:'cycle1',pt:'p4',data:{},openDays:{},drop:null,dropSearch:'',tips:{},tipEdit:{},animDay:null,dropAnim:false};
-function load(){try{const r=localStorage.getItem('peach_v4');return r?JSON.parse(r):{}}catch{return{}}}
+// Beschaedigte Daten NIE ueberschreiben: der Rohtext wird unter peach_v4_corrupt gesichert,
+// und bis zur ersten eigenen Eingabe speichert der Start nichts (siehe migPlanV2).
+let loadFailed=false;
+function load(){let r=null;try{r=localStorage.getItem('peach_v4');return r?JSON.parse(r):{}}catch{if(r){loadFailed=true;try{if(!localStorage.getItem('peach_v4_corrupt'))localStorage.setItem('peach_v4_corrupt',r)}catch{}}return{}}}
+// Sichtbare Warnung, wenn Speichern nicht klappt (Speicher voll/gesperrt) — sonst gingen
+// Eingaben unbemerkt verloren.
+function saveWarn(t){const el=document.getElementById('save-warn');if(!el)return;el.textContent=t;el.classList.toggle('hidden',!t)}
 // Cache-Variable MUSS vor save() stehen: save() setzt sie, und save() laeuft schon beim
 // Start (Migrationen, repairSlots). Stand die Deklaration weiter unten, warf jeder
 // Start-save() einen TDZ-Fehler, den die umgebenden try/catch verschluckt haben —
 // die Reparatur lief dann nur im Speicher und wurde NIE gespeichert.
 let _exIdx=null; // Cache: Schluessel -> Eintraege (aufsteigend sortiert); save() verwirft ihn
 let _carry={};   // Cache: Zyklus -> uebernommene Uebungen (carryMap); save() verwirft ihn
-function save(){_exIdx=null;_carry={};try{localStorage.setItem('peach_v4',JSON.stringify(S.data))}catch{}}
+function save(){_exIdx=null;_carry={};try{localStorage.setItem('peach_v4',JSON.stringify(S.data));if(!loadFailed)saveWarn('')}catch{saveWarn('Speichern fehlgeschlagen – bitte in der Übersicht ein Backup kopieren.')}}
 S.data=load();
 // POSITION MERKEN (eigener Key peach_ui — merkt sich Tab/Zyklus/Woche/aufgeklappten Tag,
 // damit die App nach App-Wechsel oder Schliessen genau dort weitermacht. peach_v4 unberuehrt!)
@@ -728,7 +736,9 @@ function migPlanV2(){
   try{
     if(S.data.pv__done)return;
     try{localStorage.setItem('peach_v4_pre_v2',JSON.stringify(S.data))}catch{}
-    if(markLegacy(S.data))save();
+    // Ohne Trainingsdaten nichts schreiben (leeres Geraet oder unlesbare Daten): die Markierung
+    // gilt im Speicher und wird mit der ersten eigenen Eingabe gespeichert.
+    if(markLegacy(S.data)&&Object.keys(S.data).some(k=>/__w\d+__d\d+__e\d+$/.test(k)))save();
   }catch{}
 }
 migPlanV2();
@@ -1510,7 +1520,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeWeekPick()});
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-09-26-07';
+const BUILD_ID='2026-09-26-08';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();
@@ -1534,6 +1544,7 @@ function checkUpdate(){
 }
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
 
+if(loadFailed)saveWarn('Gespeicherte Daten konnten nicht gelesen werden – bitte ein Backup einspielen.');
 render();
 checkUpdate();
 </script>
