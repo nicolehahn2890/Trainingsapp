@@ -40,9 +40,11 @@ auf main einmalig eine Sicherheitsfreigabe verlangen; dann kurz bestaetigen lass
 - Technologie: Standalone HTML-Datei (kein Framework, kein Build-Schritt)
 - Repo-Dateien: index.html (App), apple-touch-icon.png (Home-Screen-Icon),
   manifest.json (display:browser — Icon oeffnet Safari, NICHT standalone!),
-  Peach_Project.pdf (Plan-Doku, 41 Seiten), SKILL.md (diese Datei)
+  Peach_Project.pdf (Original-Handbuch des Trainers, 41 Seiten — nicht aendern), SKILL.md
+  (diese Datei), tests/ (Browser-Tests, siehe Abschnitt Tests)
 - localStorage-Keys: peach_v4 (Trainingsdaten — NIEMALS umbenennen!),
-  peach_ver (Auto-Update-Guard: Commit-SHA, fuer den bereits neu geladen wurde),
+  (peach_ver wird nicht mehr genutzt — Auto-Update zaehlt Versuche in sessionStorage
+  peach_try_[BUILD_ID], siehe checkUpdate),
   peach_ui (zuletzt offene Position: view/week/cy/pt/openDays — getrennt von peach_v4).
   Sicherheitskopien vor Daten-Eingriffen: peach_v4_pre_add, peach_v4_pre_fix, peach_v4_pre_v2,
   peach_v4_pre_order. Unlesbares peach_v4 (kaputtes JSON) wird beim Start als Rohtext nach
@@ -170,7 +172,8 @@ Plan-Marker:  pv__[cycle] = 1  -> dieser Zyklus zeigt den ALTEN Plan (P4_V1/P3_V
 ```
 mk(cy,week,di,ei)       Workout-Key
 mkt(cy,week,di,ei)      Slot-Key
-initKey(di,ei)          Key mit Vorwoche-Daten init — IMMER statt mk() beim Schreiben!
+initKey(di,ei)          Legt den Key der aktuellen Woche an (Uebung via inhEx, extraSets der Vorwoche) —
+                        IMMER statt mk() beim Schreiben!
 plan()                  = planOf(S.cy) — der Plan DES AKTUELLEN ZYKLUS
 planOf(cy)              p3-Praefix -> 3 Tage, sonst 4 Tage; Zyklus mit pv__-Marker -> alte Version
                         (P3_V1/P4_V1), sonst die neue (P3/P4). JEDE Stelle, die einen Plan-Platz
@@ -235,7 +238,7 @@ repRange(cy,di,ei)      Rep-Bereich eines Plan-Platzes als String ("4-8"); '' we
 exKey(ex,rr)            Index-Schluessel "Uebung||4-8"
 exIndex()               Baut/cached den Index exKey -> Eintraege (aufsteigend). Cache
                         _exIdx wird in save() verworfen — jede Datenaenderung geht durch save().
-srcLabel(src)           "Z1 W5 · Tag A" (bei Plan-Rueckfall zusaetzlich "3-Tage"/"4-Tage")
+srcLabel(src)           "Z1 W5 · Tag A" (stammt der Wert aus dem anderen Plan, zusaetzlich "3-Tage"/"4-Tage")
 rcol(v,r)               Performance-Farbe, mit der das ganze Rep-Feld gefuellt wird (leer -> weiss)
 esc(s)                  HTML-escape
 autoExtraSets(di,ei)    0 oder 1. Braucht 3 stagnierende WOCHENVERGLEICHE ('s'/'d') in Folge bei
@@ -256,15 +259,19 @@ exDone(di,ei)           true wenn Uebung gewaehlt UND alle Saetze der aktuellen 
 refreshDone(di,ei)      Aktualisiert Erledigt-Haken (#done-di-ei) + Tages-Pill (#dc-di) GEZIELT im DOM
                         — wird von updRep aufgerufen, KEIN renderT (Fokus bleibt erhalten)!
 exState(di,ei)          EINE Quelle fuer den Zustand einer Uebungszeile: {ex,cur,prv,ms,autoX,reps,
-                        hasPrev,noCmp,p,srcL}. noCmp = (S.week===1): Zyklus-Start ohne Vergleich,
-                        p ist dann ''. Genutzt von renderEx, refreshProg und weekStats — dadurch
+                        hasPrev,noCmp,inv,p,srcL}. noCmp = Woche 1 ODER Vorwert aus anderem
+                        Rep-Bereich (_orient) — dann kein Vergleich, p ist ''. Genutzt von renderEx, refreshProg und weekStats — dadurch
                         koennen Badge, Hinweis und Fortschrittsbalken nicht auseinanderlaufen.
                         reps ist auf ms GESCHNITTEN (entfernte Zusatzsaetze zaehlen nicht mehr mit).
 hintHTML(st)            Nur noch die Herkunft: "zuletzt: Z2 W11 · Tag C" (+ " · 4–8 Wdh." wenn der
                         Wert aus einem anderen Rep-Bereich stammt). Gewicht steht als "(zuletzt 42)"
                         am Gewichtsfeld, Reps unter den Rep-Feldern, das Ergebnis im Badge — die
                         frueheren Texte ("VW: …", "→ Gleiche Leistung!") waren doppelt.
-refreshProg(di,ei)      Zieht Badge (#pb-di-ei), VW-Hinweis (#ph-di-ei), Rep-Feld-Farben
+incCand(st)/incDue(st)  Steigerungsregel (Peach): Vorwert im gleichen Rep-Bereich, 1. Satz >= Obergrenze
+                        -> Hinweis "▲ Gewicht steigern" (#ih-di-ei, .inc-hint) in der Zeile "3 Saetze ·
+                        4–8 Reps"; ab Woche 2, verschwindet live, sobald mehr Gewicht eingetragen ist.
+                        Assistierte Uebungen: "▼ Hilfe senken".
+refreshProg(di,ei)      Zieht Badge (#pb-di-ei), Herkunftszeile (#ph-di-ei), Steigerungs-Hinweis (#ih-di-ei), Rep-Feld-Farben
                         (#rp-di-ei-i) und den Wochenbalken LIVE nach — KEIN renderT.
                         Wird von updRep UND updW aufgerufen.
 weekStats()             {tot,imp,pct} der aktuellen Woche, auf Basis von exState
@@ -277,7 +284,8 @@ saveUI()                Merkt die aktuelle Position (view/week/cy/openDays) im K
 expBackup()             Backup: JSON {app:'peach',v:1,date,data:S.data} in die Zwischenablage,
                         Fallback: Text ins bk-ta-Feld + markieren. UI unten in der Uebersicht (bk-card).
 impBackup()             Import: akzeptiert das Wrapper-Format ODER rohes peach_v4-Objekt. Validiert
-                        Keys (__w_d_e / tip__ / set__), confirm() vor Ueberschreiben.
+                        Keys (__w_d_e / tip__ / set__), confirm() vor Ueberschreiben; alte Backups
+                        ohne pv__done werden markiert (markLegacy). pv__-Keys zaehlen nicht als Eintraege.
 checkUpdate()           Auto-Update gegen iOS-Webapp-Cache: holt die AUSGELIEFERTE index.html von
                         der eigenen Domain (kein API-Limit) und vergleicht deren BUILD_ID mit der
                         eigenen — GLEICH/UNGLEICH, NIE groesser/kleiner. Bei Abweichung
@@ -306,9 +314,10 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
   Dieselbe Uebung laeuft im 4-8er Slot mit deutlich mehr Gewicht als im 8-12er Slot (z. B.
   Hip Thrusts 134 kg vs. 115 kg) — ohne diese Trennung zieht der 8-12er Slot den viel zu
   hohen 4-8er Vorwert und meldet dauerhaft "weniger". VERGLICHEN wird deshalb nur im gleichen
-  Bereich. Gibt es dort (noch) keinen Wert — z. B. im neuen Plan mit geaenderten Bereichen —,
-  zeigt die App den juengsten Wert aus einem anderen Bereich NUR zur Orientierung (mit Bereich
-  im Hinweis, ohne Badge). FEHLER bis 26.09.2026: stattdessen griff der Rueckfall auf den
+  Bereich — und nur, wenn dieser Wert aus dem zuletzt trainierten Zyklus der Uebung stammt.
+  Sonst (z. B. im neuen Plan mit geaenderten Bereichen) zeigt die App den juengsten Wert aus
+  einem anderen Bereich NUR zur Orientierung (Bereich im Hinweis, kein Badge). Die Regel gilt
+  fuer ALLE Wochen gleich (siehe findLastExData). FEHLER bis 26.09.2026: stattdessen griff der Rueckfall auf den
   anderen Plan und zeigte im neuen Zyklus Werte aus Z2 W3 (4-Tage, Juli) statt aus W11.
   Der Bereich kommt aus dem Plan via repRange(), nicht aus den
   gespeicherten Daten — Eintraege an Plan-Positionen, die es nicht mehr gibt, fallen raus.
@@ -334,7 +343,7 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
   Das eingetragene Gewicht ist das GEGENGEWICHT der Maschine — WENIGER ist mehr Leistung.
   Fuer diese Uebungen dreht sich alles um: prog() ('w' bei cu<pu), parseWeight nimmt aus einer
   Spanne den kleineren Wert, das Badge heisst "↓ Hilfe"/"↑ Hilfe", das Eingabefeld heisst
-  "Hilfe:" statt "Gewicht:", der Hinweis sagt "Weniger Gegengewicht – staerker geworden!",
+  "Hilfe:" statt "Gewicht:", der Steigerungs-Hinweis heisst "▼ Hilfe senken",
   und in der Uebersicht wird die Balkenhoehe gespiegelt (weniger Hilfe = hoeherer Balken)
   plus Bilanz als "−X kg Hilfe". Neue Maschinen dieser Art NUR in ASSIST eintragen — der
   Rest folgt automatisch.
@@ -356,7 +365,7 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
   niedriger war; die Gesamtsumme meldete faelschlich 'r' bei einem zusaetzlichen Satz und
   faelschlich 'd' solange die Woche erst halb ausgefuellt war.)
 - Fortschritt wird nur berechnet wenn aktuelle Woche tatsaechlich Reps hat
-- LIVE-AKTUALISIERUNG: Badge, VW-Hinweis, Rep-Feld-Farben und Wochenbalken werden bei jeder
+- LIVE-AKTUALISIERUNG: Badge, Herkunftszeile, Steigerungs-Hinweis, Rep-Feld-Farben und Wochenbalken werden bei jeder
   Rep- und Gewichts-Eingabe per refreshProg() nachgezogen. Ohne das zeigten sie den Stand von
   VOR der letzten Aenderung (z. B. noch "Gleiche Leistung", obwohl das Gewicht gerade reduziert
   wurde) — es sah aus, als wuerde sich die App irren. NIEMALS renderT() daraus aufrufen!
@@ -386,11 +395,13 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
 - Uebersicht: vertikale Kapsel-Balken (.ov-bar = Pill-Track, .ov-bar-fill von unten) —
   aktuelle Woche (S.week) Peach, andere Wochen Lilac, Wochen mit einer ANDEREN Uebung grau
   (--text-ghost). Titel = zuletzt trainierte Uebung; kg-Zugewinn und Start/Aktuell zaehlen nur
-  Wochen MIT DIESER Uebung, darunter die Zeile "Davor hier: … (grau) – nicht mit eingerechnet"
+  Wochen MIT DIESER Uebung, darunter die Zeile "Davor: … (grau, nicht eingerechnet)"
 - Animationen: fadeSlide (Ansicht/Tag aufklappen), dropIn (Dropdown nur beim Oeffnen, nicht bei Suche)
 - Einstellungs-Feld (gelbes Zahnrad-Chip + .set-input): erscheint sobald eine Uebung gewaehlt ist,
   zwischen ex-meta und reps-row. Speichert uebungsbasiert (set__ex__Name) via updSetting() — ohne renderT
 - KEIN Theme-Button mehr (Dark Mode entfernt) — der header-right enthaelt nur die beiden Tab-Pills
+- Steigerungs-Hinweis (.inc-hint, #ih-di-ei): kleine weisse Pill "▲ Gewicht steigern" hinter
+  "3 Saetze · 4–8 Reps" — keine eigene Zeile (Wunsch: nichts vollgeschrieben/gequetscht).
 - Kleine Vorwerte unter den Rep-Feldern (.rep-prev) nur, wenn der Vorwert ueberhaupt Reps hat
   (hasPrevReps) — sonst stand dort "0 0 0".
 - Tipp-Panel: Standard-Tipp (TIPS) immer sichtbar; eigene Notiz (tip__ex__) darunter mit
@@ -600,6 +611,8 @@ Spezial: 3D Abduktor Maschine, Belt Squat, Belt Squat RDL, Beinpresse 45 Grad, R
 - Reps werden als Durchschnitt pro Satz verglichen, nicht satzweise und nicht als Summe
   (Reihenfolge der Saetze egal, zusaetzliche oder noch leere Saetze verfaelschen nichts)
 - Vergleich basiert auf letztem Wert dieser Uebung, nicht einfach Vorwoche
+- STEIGERUNGSREGEL (Peach-Handbuch): Obergrenze im 1. Satz erreicht/ueberschritten -> naechstes
+  Mal mehr Gewicht (App zeigt "▲ Gewicht steigern"); sonst Gewicht halten und mehr Reps schaffen.
 
 ---
 
@@ -635,9 +648,20 @@ Glute & Quad: Weite Fussstellung + erhoehte Ferse = Po. Enge Fussstellung + Tief
 
 ---
 
+## Tests (seit 26.09.2026)
+
+`sh tests/run.sh` startet einen lokalen Server und fuehrt alle Playwright-Tests aus (iPhone-
+Breite, simulierte Daten, echte Nutzerdaten werden nie beruehrt). **Vor JEDEM Deploy laufen
+lassen — am Ende muss "ALLE TESTS GRUEN" stehen.** Neue Funktionen/Bugfixes bekommen einen
+eigenen Test (Datei tests/<thema>.test.js, Exit-Code 1 bei Fehler). Details: tests/README.md.
+Blockierte Google Fonts im Sandbox-Netz sind kein Fehler; gezaehlt werden nur JS-Exceptions.
+
+---
+
 ## Deployment
 
-Standard (Claude-Session): direkt auf main committen und pushen — GitHub Pages baut
+Standard (Claude-Session): `sh tests/run.sh` gruen -> BUILD_ID hochzaehlen -> direkt auf main
+committen und pushen (NIE einen claude/...-Branch auf GitHub anlegen) — GitHub Pages baut
 automatisch, nach ~2 Min live unter https://nicolehahn2890.github.io/Trainingsapp/
 
 Fallback (manuell, ohne Session):
@@ -649,6 +673,12 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Steigerungsregel + Tests im Repo + Doku-Abgleich (26.09.2026, Version -10).**
+   (1) Hinweis "▲ Gewicht steigern" nach der Peach-Regel (incCand/incDue), dezent in der
+   Zeile "3 Saetze · 4–8 Reps". (2) Ordner tests/ mit 5 Testreihen + run.sh (alle gruen).
+   (3) SKILL.md komplett gegen den Code abgeglichen (veraltete Stellen zu VW-Hinweis, Hinweis-
+   texten, initKey, exState, Uebersicht, Backup korrigiert).
 
 NEU. **Vorwert: eine Regel fuer alle Wochen (26.09.2026, Version -09).** Woche 1 zeigte bei
    Hip Thrust 4-8 den Wert aus dem 8-12-Satz desselben Tages (135 kg), Woche 2 den richtigen

@@ -147,6 +147,7 @@ button:disabled:active{transform:none;}
 .pbadge{font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;border:2px solid var(--ink);color:var(--ink);white-space:nowrap;}
 .ex-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
 .sets-info{color:var(--text-mid);font-size:12px;}
+.inc-hint{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:999px;border:2px solid var(--ink);background:var(--field-bg);color:var(--ink);font-size:11px;font-weight:700;white-space:nowrap;}
 .w-wrap{display:flex;align-items:center;gap:6px;}
 .w-label{color:var(--text);font-size:12px;background:var(--surface);border:2px solid var(--ink);border-radius:999px;padding:2px 8px;}
 .w-input{width:78px;background:var(--field-bg);border:var(--bw) solid var(--ink);border-radius:var(--r-sm);color:var(--text);font-size:16px;font-weight:700;padding:7px 8px;outline:none;}
@@ -1161,6 +1162,8 @@ function refreshProg(di,ei){
   const st=exState(di,ei);
   const b=document.getElementById('pb-'+di+'-'+ei);
   if(b)b.innerHTML=pbadge(st.p,st.inv);
+  const ih=document.getElementById('ih-'+di+'-'+ei);
+  if(ih)ih.classList.toggle('hidden',!incDue(st));
   const hb=document.getElementById('ph-'+di+'-'+ei);
   if(hb)hb.innerHTML=hintHTML(st);
   for(let i=0;i<st.ms;i++){
@@ -1217,6 +1220,16 @@ function hintHTML(st){
   const src=st.prv._src||{},rrTxt=st.prv._orient&&src.rr?' · '+esc(src.rr.replace('-','–'))+' Wdh.':'';
   return '<div class="phint">zuletzt: '+esc(st.srcL)+rrTxt+'</div>';
 }
+// STEIGERUNGSREGEL (Peach): Obergrenze der Wiederholungen im ERSTEN Satz erreicht -> diesmal
+// mehr Gewicht. Kleiner Hinweis in der Zeile "3 Saetze · 4–8 Reps" — nur ab Woche 2, nur bei
+// einem Vorwert im gleichen Rep-Bereich und nur, solange das Gewicht noch nicht gesteigert ist
+// (verschwindet live beim Eintragen). Assistierte Uebungen: steigern = weniger Hilfe.
+function incCand(st){
+  if(st.noCmp||!st.hasPrev||st.prv._orient||!st.prv.weight)return false;
+  const r0=parseInt((st.prv.reps||[])[0]);
+  return !isNaN(r0)&&r0>=st.ex.r[1];
+}
+function incDue(st){return incCand(st)&&!(cmpWeight(st.cur.weight,st.prv.weight,st.inv)>0)}
 function renderEx(ex,ei,di){
   const st=exState(di,ei);
   const {cur,prv,ms,reps,hasPrev,p,srcL}=st;
@@ -1278,6 +1291,7 @@ function renderEx(ex,ei,di){
   if(xs>0)rh+='<button class="add-set-btn nb-shadow" style="background:var(--surface)" onclick="removeSet('+di+','+ei+')">−</button>';
   if(ms<5)rh+='<button class="add-set-btn nb-shadow" onclick="addSet('+di+','+ei+')">+</button>';
 
+  const incH=incCand(st)?'<span class="inc-hint'+(incDue(st)?'':' hidden')+'" id="ih-'+di+'-'+ei+'">'+(st.inv?'▼ Hilfe senken':'▲ Gewicht steigern')+'</span>':'';
   const autoLabel=autoTriggered?'<span style="color:var(--gold);font-size:10px;margin-left:6px">⚡ +1 Satz (3 Wo. kein Fortschritt)</span>':'';
 
   let fil=0;for(let i=0;i<ms;i++){const v=reps[i];if(v!==''&&v!=null&&parseInt(v)>0)fil++}
@@ -1298,7 +1312,7 @@ function renderEx(ex,ei,di){
     +'<span class="pick-btn-txt">'+esc(cur.exercise||'– Übung wählen –')+'</span>'
     +'<span class="pick-btn-arr">'+(dropOpen?'▲':'▼')+'</span></button>'+dh+'</div>'
     +'<span id="pb-'+di+'-'+ei+'" style="display:contents">'+pbadge(p,st.inv)+'</span>'+doneChip+'</div>'
-    +'<div class="ex-meta"><span class="sets-info">'+ms+' Sätze · <span style="color:var(--text)">'+ex.r[0]+'–'+ex.r[1]+' Reps</span>'+autoLabel+'</span>'
+    +'<div class="ex-meta"><span class="sets-info">'+ms+' Sätze · <span style="color:var(--text)">'+ex.r[0]+'–'+ex.r[1]+' Reps</span>'+incH+autoLabel+'</span>'
     +'<div class="w-wrap"><span class="w-label"'+(st.inv?' title="Gegengewicht der Maschine – weniger Hilfe bedeutet mehr eigene Kraft"':'')+'>'+(st.inv?'Hilfe:':'Gewicht:')+'</span><input class="w-input" type="text" value="'+esc(cur.weight||'')+'" placeholder="kg" onchange="updW('+di+','+ei+',this.value)"/>'+(prv.weight?'<span style="color:var(--text-faint);font-size:11px" title="Letzter Eintrag dieser Übung'+(srcL?': '+esc(srcL):'')+'">(zuletzt '+esc(prv.weight)+')</span>':'')+'</div></div>'
     +setH
     +'<div class="reps-row">'+rh+'</div>'+hint+tipH+'</div>';
@@ -1521,7 +1535,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeWeekPick()});
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-09-26-09';
+const BUILD_ID='2026-09-26-10';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();
