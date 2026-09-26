@@ -839,19 +839,27 @@ function carryMap(cy){
   if(_carry[cy])return _carry[cy];
   const res={};
   if(!isLegacy(cy)){
-    const by={}; // Zyklus -> "Tag|Zeile" -> {w, ex} (jeweils die letzte Woche mit Auswahl)
+    const by={},top={}; // Zyklus -> "Tag|Zeile" -> {w, ex} (letzte Woche mit Auswahl); top = juengster Eintrag
     for(const k in S.data){
       const m=/^((p3)?cycle\d+)__w(\d+)__d(\d+)__e(\d+)$/.exec(k);
       const v=S.data[k];
       if(!m||!v||typeof v!=='object'||!v.exercise)continue;
       const g=by[m[1]]=by[m[1]]||{},sk=m[4]+'|'+m[5],w=+m[3];
       if(!g[sk]||g[sk].w<w)g[sk]={w:w,ex:v.exercise};
+      const o=exOrd(m[1],w,+m[4],+m[5]);
+      if(!(top[m[1]]>=o))top[m[1]]=o;
     }
+    // Quelle: der zuletzt trainierte Zyklus mit kleinerer Nummer — egal ob 3 oder 4 Tage
+    // (nach 3-Tage-Zyklus 1 uebernimmt der 4-Tage-Zyklus 2 dessen Auswahl, nicht die aelteren
+    // 4-Tage-Wochen). Gibt es keinen, notfalls der andere Plan mit gleicher Nummer.
     const p3=String(cy).indexOf('p3')===0,n=parseInt(String(cy).replace(/^p3/,'').replace('cycle',''))||1;
-    const cands=[];
-    for(let c=n-1;c>=1;c--)cands.push((p3?'p3':'')+'cycle'+c);
-    for(let c=n;c>=1;c--)cands.push((p3?'':'p3')+'cycle'+c);
-    const src=cands.find(c=>by[c]);
+    const num=c=>parseInt(String(c).replace(/^p3/,'').replace('cycle',''))||0;
+    let src=null;
+    for(const c in by){
+      if(c===cy||num(c)>=n)continue;
+      if(!src||top[c]>top[src]||(top[c]===top[src]&&(c.indexOf('p3')===0)===p3))src=c;
+    }
+    if(!src){const same=(p3?'':'p3')+'cycle'+n;if(by[same])src=same}
     if(src){
       const sp=planOf(src),pool=[];
       Object.keys(by[src]).forEach(sk=>{
@@ -1066,25 +1074,24 @@ function exIndex(){
   for(const n in idx)idx[n].sort((a,b)=>a.ord-b.ord);
   _exIdx=idx;return idx;
 }
-// Letzter gespeicherter Wert dieser Uebung VOR der aktuellen Position.
-// Ab Woche 2 zaehlt fuer den Vergleich nur der GLEICHE Rep-Bereich im gleichen Plan (4-8 laeuft
-// mit viel mehr Gewicht als 8-12). Woche 1 vergleicht nicht — dort wird der JUENGSTE Wert der
-// Uebung gezeigt, egal in welchem Bereich. Frueher fiel der Wert bei geaendertem Rep-Bereich
-// (neuer Plan) auf den anderen Plan zurueck und zeigte z. B. Werte aus dem Juli (Z2 W3,
-// 4-Tage) statt aus der Woche davor. Gibt es ab Woche 2 im gleichen Bereich nichts, kommt der
-// juengste Wert in einem anderen Bereich nur zur Orientierung (_orient: kein Badge/Vergleich).
-// Der andere Plan (3/4 Tage) ist erst der letzte Rueckfall — nur lesend und ebenfalls nur mit
-// Eintraegen VOR der aktuellen Position (sonst zeigte eine alte Woche Werte, die erst spaeter kamen).
+// Letzter gespeicherter Wert dieser Uebung VOR der aktuellen Position — der JUENGSTE Eintrag,
+// egal ob aus dem 3- oder 4-Tage-Plan (Reihenfolge: Zyklus > Woche > Tag > Position). Frueher
+// hatte der gleiche Plan Vorrang: im neuen 4-Tage-Zyklus 2 kam dann Z1 W3 (4 Tage, Juni) statt
+// Z1 W12 (3 Tage, zuletzt trainiert).
+// Ab Woche 2 zaehlt fuer den Vergleich nur der GLEICHE Rep-Bereich (4-8 laeuft mit viel mehr
+// Gewicht als 8-12); gibt es dort nichts, kommt der juengste Wert aus einem anderen Bereich nur
+// zur Orientierung (_orient: kein Badge). Woche 1 vergleicht nicht und zeigt den juengsten Wert
+// der Uebung, egal in welchem Bereich.
 function findLastExData(di,ei,currentExercise){
   if(!currentExercise)return{};
   const rr=repRange(S.cy,di,ei);
   if(!rr)return{};
   const idx=exIndex(),cur=exOrd(S.cy,S.week,di,ei);
   const byR=idx[exKey(currentExercise,rr)]||[],byAny=idx[exKey(currentExercise,'*')]||[];
-  const lastSame=l=>{let h=null;for(const e of l)if(e.pt===S.pt&&e.ord<cur)h=e;return h};
-  const lastOther=l=>{let h=null;for(const e of l)if(e.pt!==S.pt&&e.ord<cur)h=e;return h};
-  let hit=S.week===1?lastSame(byAny):(lastSame(byR)||lastSame(byAny));
-  if(!hit)hit=lastOther(byR)||lastOther(byAny);
+  // Liste ist aufsteigend sortiert -> der letzte Treffer vor cur ist der juengste;
+  // bei exakt gleicher Position in beiden Plaenen gewinnt der aktuelle Plan.
+  const last=l=>{let h=null;for(const e of l)if(e.ord<cur&&(!h||e.ord>h.ord||(e.ord===h.ord&&e.pt===S.pt)))h=e;return h};
+  const hit=S.week===1?last(byAny):(last(byR)||last(byAny));
   if(!hit)return{};
   return{...hit.d,_orient:hit.rr!==rr,_src:{pt:hit.pt,cy:hit.cy,w:hit.w,di:hit.di,rr:hit.rr}};
 }
@@ -1503,7 +1510,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeWeekPick()});
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-09-26-06';
+const BUILD_ID='2026-09-26-07';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();

@@ -183,8 +183,9 @@ ALIAS / rowFits(r,e)    Zeile der Kategorie r akzeptiert Uebung der Kategorie e 
                         Sept. 2026 in Glute & Hams — ohne Alias schoebe repairSlots sie aus den
                         alten Zeilen ans Tagesende. NUR fuer die Daten-Zuordnung, NICHT im Dropdown.
 carryMap(cy)            Uebungs-Uebernahme in einen neuen Zyklus (nur Nicht-Alt-Zyklen): pro Zeile
-                        die Uebung aus dem letzten Zyklus mit Auswahl (erst gleicher Plan n-1..1,
-                        dann anderer Plan n..1), gleiche KATEGORIE laut CATOF, bevorzugt gleicher
+                        die Uebung aus dem ZULETZT TRAINIERTEN Zyklus mit kleinerer Nummer — egal ob
+                        3 oder 4 Tage (juengster Eintrag nach exOrd; notfalls anderer Plan gleiche
+                        Nummer), gleiche KATEGORIE laut CATOF, bevorzugt gleicher
                         Rep-Bereich (+4) und gleicher Tag (+2), pro Tag keine Dopplung. Cache _carry
                         (vor save() deklariert, in save() geleert).
 migOrderV2()            Einmal-Korrektur fuer die Reihenfolge-Umstellung innerhalb von V2 (26.09.):
@@ -213,13 +214,12 @@ prog(cr,pr,cw,pw,ex)    'w'|'r'|'s'|'d' Fortschritts-Status. ex nur noetig um as
                         Uebungen zu erkennen (dort dreht sich die Gewichtsrichtung um).
                         Gewicht schlaegt Reps (weniger
                         Gewicht -> immer 'd'); Reps als DURCHSCHNITT pro ausgefuelltem Satz.
-findLastExData(di,ei,ex) Letzter Wert dieser Uebung VOR der aktuellen Position (alle Zyklen,
-                        Wochen, Tage, Positionen). Woche 1: juengster Wert im gleichen Plan, egal
-                        welcher Rep-Bereich (nur Orientierung). Ab Woche 2: gleicher Rep-Bereich im
-                        gleichen Plan; ohne Treffer der juengste Wert in anderem Bereich (_orient =
-                        nur Orientierung, kein Vergleich). Letzter Rueckfall: anderer Plan (gleicher
-                        Bereich, sonst beliebig) — ebenfalls NUR Eintraege vor der aktuellen Position
-                        (sonst zeigte eine alte Woche Werte, die erst spaeter kamen). Liefert _src {pt,cy,w,di,rr} und _orient.
+findLastExData(di,ei,ex) JUENGSTER Wert dieser Uebung VOR der aktuellen Position — ueber BEIDE
+                        Plaene (3 und 4 Tage) hinweg, Reihenfolge exOrd (Zyklus > Woche > Tag >
+                        Position), bei Gleichstand gewinnt der aktuelle Plan. Woche 1: egal welcher
+                        Rep-Bereich (nur Orientierung). Ab Woche 2: gleicher Rep-Bereich; ohne
+                        Treffer der juengste Wert in anderem Bereich (_orient = nur Orientierung,
+                        kein Badge). NIE Eintraege nach der aktuellen Position. Liefert _src {pt,cy,w,di,rr} und _orient.
                         Index: exIndex() fuehrt jede Uebung zusaetzlich unter "Uebung||*".
 exOrd(cy,w,di,ei)       Reihenfolge-Wert eines Eintrags: Zyklus > Woche > Tag > Position
 repRange(cy,di,ei)      Rep-Bereich eines Plan-Platzes als String ("4-8"); '' wenn es den Platz
@@ -314,9 +314,12 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
   nicht den Vergleich. Ab Woche 2 laeuft alles normal, INKLUSIVE Woche 12.
 - Herkunft wird transparent angezeigt: "zuletzt: Z1 W5 · Tag A". NICHT "VW" schreiben — der
   Wert stammt oft nicht aus der Vorwoche (anderer Tag/Zyklus), "VW" hat verwirrt.
-- Plan-Trennung bleibt beim SPEICHERN strikt (p3-Praefix). Nur beim LESEN gibt es einen
-  Rueckfall auf den jeweils anderen Plan, wenn im aktuellen Plan noch kein Wert existiert;
-  das Label nennt dann "3-Tage"/"4-Tage".
+- Plan-Trennung bleibt beim SPEICHERN strikt (p3-Praefix). Beim LESEN zaehlt der juengste
+  Wert aus BEIDEN Plaenen (seit 26.09.2026 — vorher hatte der gleiche Plan Vorrang, dann kam im
+  4-Tage-Zyklus 2 der Wert aus 4-Tage Z1 W3 vom Juni statt aus 3-Tage Z1 W12). Kommt der Wert
+  aus dem anderen Plan, nennt das Label "3-Tage"/"4-Tage". Grenze: Wechselt man den Plan
+  MITTEN in einer Zyklus-Nummer und startet dort wieder bei Woche 1, ist die Reihenfolge der
+  beiden Plaene innerhalb dieser Nummer nicht eindeutig (betrifft nur alte Wochen).
 - Wenn Uebung gewechselt wird, startet Vergleich frisch
 - Gewicht: parseWeight() unterstuetzt Bereiche wie "25-27" (nimmt oberen Wert 27) und Komma wie "27,5". Auch renderOv (Uebersicht) nutzt parseWeight() — nie parseFloat(), das gibt bei "42-45" nur 42 zurueck.
 - ASSISTIERTE UEBUNGEN (Set ASSIST, aktuell die beiden "Assistierter Klimmzug"-Varianten):
@@ -638,6 +641,12 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Vorwert + Uebernahme planuebergreifend nach Aktualitaet (26.09.2026, Version -07).**
+   Im neuen 4-Tage-Zyklus 2 kam der Vorwert aus 4-Tage Z1 W3 (Juni), weil der gleiche Plan
+   Vorrang hatte — Rexi hatte danach aber den ganzen 3-Tage-Zyklus 1 trainiert. Jetzt zaehlt
+   in findLastExData und carryMap immer der juengste Eintrag aus beiden Plaenen. Test mit
+   genau diesem Verlauf (4 Tage Z1 W1-3, 3 Tage Z1 W1-12, dann 4 Tage Z2) gruen.
 
 NEU. **Vorwert-Fehler behoben + Texte entschlackt (26.09.2026, Versionen -04 bis -06).**
    (1) Im neuen Zyklus kamen Vorwerte bei geaendertem Rep-Bereich aus dem anderen Plan
