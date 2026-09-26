@@ -87,9 +87,17 @@ button:disabled:active{transform:none;}
 .cycle-btn.active{background:var(--ink);color:var(--cream);box-shadow:var(--sh-xs);}
 .plan-btn{padding:7px 13px;border-radius:999px;font-size:12px;font-weight:700;border:var(--bw) solid var(--ink);background:var(--surface);color:var(--ink);}
 .plan-btn.active{background:var(--peach);color:var(--ink);box-shadow:var(--sh-xs);}
-.week-nav{margin-left:auto;display:flex;align-items:center;gap:6px;}
+.week-nav{margin-left:auto;display:flex;align-items:center;gap:6px;position:relative;}
 .week-arrow{width:38px;height:38px;border-radius:50%;background:var(--sky);border:var(--bw) solid var(--ink);color:var(--ink);font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:var(--sh-xs);}
-.week-label{font-size:13px;font-weight:700;min-width:64px;text-align:center;background:var(--surface);color:var(--text);border:var(--bw) solid var(--ink);border-radius:999px;padding:6px 10px;}
+.week-label{font-size:13px;font-weight:700;min-width:64px;text-align:center;background:var(--surface);color:var(--text);border:var(--bw) solid var(--ink);border-radius:999px;padding:6px 10px;cursor:pointer;box-shadow:var(--sh-xs);}
+.week-label::after{content:' \25BE';font-size:11px;}
+.week-pick{position:absolute;right:0;top:calc(100% + 8px);z-index:60;background:var(--surface);border:var(--bw) solid var(--ink);border-radius:var(--r-lg);box-shadow:var(--sh-drop);padding:10px;display:grid;grid-template-columns:repeat(4,44px);gap:6px;animation:dropIn .15s ease-out;}
+.week-pick-ttl{grid-column:1/-1;font-family:var(--font-display);text-transform:uppercase;font-size:12px;letter-spacing:-0.3px;color:var(--ink);margin-bottom:2px;}
+.wk-btn{height:40px;border-radius:999px;border:2px solid var(--ink);background:var(--field-bg);color:var(--ink);font-size:14px;font-weight:700;}
+.wk-btn.has{background:var(--lilac);}
+.wk-btn.cur{background:var(--ink);color:var(--cream);}
+.week-pick-leg{grid-column:1/-1;display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--text-dim);margin-top:2px;}
+.wk-dot{width:12px;height:12px;border-radius:50%;background:var(--lilac);border:2px solid var(--ink);display:inline-block;}
 
 #content{padding:16px 16px 40px;max-width:680px;margin:0 auto;}
 
@@ -106,6 +114,9 @@ button:disabled:active{transform:none;}
 .day-card{border:var(--bw) solid var(--ink);border-radius:var(--r-xl);margin-bottom:12px;overflow:visible;box-shadow:var(--sh-card);}
 .day-header{width:100%;background:none;border:none;padding:15px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;color:var(--ink);text-align:left;border-radius:var(--r-xl);}
 .day-title{font-family:var(--font-display);text-transform:uppercase;font-size:14px;letter-spacing:-0.5px;color:var(--ink);}
+.day-header{flex-wrap:wrap;row-gap:6px;}
+.day-header .day-title{flex:1 1 0;min-width:0;}
+.day-focus{flex-basis:100%;font-family:var(--font-sans);font-size:12px;font-weight:600;line-height:1.35;color:var(--ink);opacity:.78;}
 .day-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .day-count{font-family:var(--font-display);font-size:11px;padding:5px 11px;border-radius:999px;background:var(--ink);border:2px solid var(--ink);white-space:nowrap;letter-spacing:-0.3px;}
 .day-chevron{color:var(--ink);font-size:14px;font-weight:700;}
@@ -249,8 +260,9 @@ button:disabled:active{transform:none;}
     </div>
     <div class="week-nav">
       <button class="week-arrow nb-shadow" onclick="changeWeek(-1)">&#8249;</button>
-      <span class="week-label" id="week-label">W 1 / 12</span>
+      <button class="week-label" id="week-label" onclick="togWeekPick(event)" aria-haspopup="true" aria-expanded="false" title="Woche direkt wählen">W 1 / 12</button>
       <button class="week-arrow nb-shadow" onclick="changeWeek(1)">&#8250;</button>
+      <div class="week-pick hidden" id="week-pick"></div>
     </div>
   </div>
 </div>
@@ -431,7 +443,7 @@ const DAYBG=["#F4A45E","#F18FB6","#B6DD57","#8CCBE8"];
 // (Marker pv__[Zyklus] in peach_v4, siehe planOf) — sonst lagen die positionsbasierten
 // Daten in den falschen Zeilen.
 const P4=[
-{l:"Tag A – Unterkörper",e:[
+{l:"Tag A – Po Kraft",f:"Po schwer (4–8) · Beinvorderseite · Beinbeuger · Innenschenkel",e:[
   {c:"Glute Max",s:3,r:[4,8]},
   {c:"Glute Max",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
@@ -440,7 +452,7 @@ const P4=[
   {c:"Adduktoren",s:2,r:[8,12]},
   {c:"Bauch",s:2,r:[8,12]}
 ]},
-{l:"Tag B – Oberkörper + Po",e:[
+{l:"Tag B – Oberkörper & Po",f:"Rücken & Schultern für die V-Form · Po-Pump · Arme",e:[
   {c:"Glute Max",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
   {c:"Rücken",s:3,r:[6,10]},
@@ -450,7 +462,7 @@ const P4=[
   {c:"Trizeps",s:2,r:[8,12]},
   {c:"Bauch",s:2,r:[8,12]}
 ]},
-{l:"Tag C – Ganzkörper",e:[
+{l:"Tag C – Po & Beinrückseite",f:"Po mittelschwer (6–10) · Hüftbeuge (RDL) · Beinbeuger · Rücken & Schultern",e:[
   {c:"Glute Max",s:3,r:[6,10]},
   {c:"Glute Max",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
@@ -460,7 +472,7 @@ const P4=[
   {c:"Schultern",s:2,r:[8,12]},
   {c:"Bauch",s:2,r:[8,12]}
 ]},
-{l:"Tag D – Unterkörper",e:[
+{l:"Tag D – Po-Volumen & Beine",f:"Po 8–12 Wdh. · Beinvorderseite · Beinstrecker · Innenschenkel",e:[
   {c:"Glute Max",s:3,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
   {c:"Glute & Quad",s:2,r:[8,12]},
@@ -473,7 +485,7 @@ const P4=[
 // 3-Tage-Plan: eigene Zyklen (Key-Praefix p3cycle1-6 in peach_v4) — voellig getrennt
 // vom 4-Tage-Plan, gleiche Regeln (Steigerung, Auto-Extra-Satz, Vererbung).
 const P3=[
-{l:"Tag A – Po schwer",e:[
+{l:"Tag A – Po Kraft",f:"Po schwer (4–8) · Beinvorderseite · Innenschenkel · Rücken & Schultern",e:[
   {c:"Glute Max",s:3,r:[4,8]},
   {c:"Glute Max",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
@@ -483,7 +495,7 @@ const P3=[
   {c:"Schultern",s:2,r:[8,12]},
   {c:"Bauch",s:2,r:[8,12]}
 ]},
-{l:"Tag B – Po & Beinrückseite",e:[
+{l:"Tag B – Po & Beinrückseite",f:"Po mittelschwer (6–10) · Hüftbeuge (RDL) · Beinbeuger · Rücken & Brust",e:[
   {c:"Glute Max",s:3,r:[6,10]},
   {c:"Glute Max",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
@@ -493,7 +505,7 @@ const P3=[
   {c:"Brust",s:2,r:[6,10]},
   {c:"Bauch",s:2,r:[8,12]}
 ]},
-{l:"Tag C – Po & Hüfte",e:[
+{l:"Tag C – Hüfte & Sanduhr",f:"Po-Volumen (8–12) · seitlicher Po doppelt · Beinstrecker · Innenschenkel",e:[
   {c:"Glute Max",s:3,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
@@ -974,7 +986,8 @@ function renderT(){
     const op=S.openDays[di]===true;
     const total=day.e.length;let done=0;day.e.forEach((ex,ei)=>{if(exDone(di,ei))done++});
     const dcol=DAYBG[di%4];
-    h+='<div class="day-card" style="background:'+dcol+'"><button class="day-header" onclick="toggleDay('+di+')"><span class="day-title">'+esc(day.l)+'</span><span class="day-right"><span class="day-count" id="dc-'+di+'" style="color:'+dcol+'">'+(done===total?'✓ ':'')+done+'/'+total+' Übungen</span><span class="day-chevron">'+(op?'▲':'▼')+'</span></span></button>';
+    // Titel = Schwerpunkt des Tages, darunter (nur neue Plaene) die Fokus-Zeile day.f
+    h+='<div class="day-card" style="background:'+dcol+'"><button class="day-header" onclick="toggleDay('+di+')"><span class="day-title">'+esc(day.l)+'</span><span class="day-right"><span class="day-count" id="dc-'+di+'" style="color:'+dcol+'">'+(done===total?'✓ ':'')+done+'/'+total+' Übungen</span><span class="day-chevron">'+(op?'▲':'▼')+'</span></span>'+(day.f?'<span class="day-focus">'+esc(day.f)+'</span>':'')+'</button>';
     if(op){h+='<div class="day-body'+(S.animDay===di?' anim':'')+'">';day.e.forEach((ex,ei)=>{h+=renderEx(ex,ei,di)});h+='</div>'}
     h+='</div>';
   });
@@ -1361,7 +1374,29 @@ function setView(v){S.view=v;saveUI();render();flashView()}
 // Plan-Wechsel 3/4 Tage: Zyklus-Nummer bleibt, Daten-Keys sind pro Plan getrennt (p3-Praefix)
 function setPlan(pt){if(S.pt===pt)return;S.pt=pt;S.cy=(pt==='p3'?'p3':'')+cyBase();S.openDays={};S.drop=null;saveUI();render();flashView()}
 function setCycle(c){S.cy=(S.pt==='p3'?'p3':'')+c;saveUI();render();flashView()}
-function changeWeek(d){const old=S.week;S.week=Math.max(1,Math.min(12,S.week+d));saveUI();render();if(S.week!==old)flashView()}
+// WOCHE DIREKT WAEHLEN: Tipp auf "W x / 12" oeffnet ein Raster 1-12 (die Pfeile bleiben).
+// Ink = aktuelle Woche, Lila = Woche hat im aktuellen Zyklus schon Eintraege.
+function weekHasData(w){const pre=S.cy+'__w'+w+'__';for(const k in S.data)if(k.indexOf(pre)===0&&hasVals(S.data[k]))return true;return false}
+function togWeekPick(ev){
+  ev.stopPropagation();
+  const el=document.getElementById('week-pick'),lbl=document.getElementById('week-label');
+  if(!el)return;
+  const open=el.classList.contains('hidden');
+  if(open){
+    let h='<div class="week-pick-ttl">Woche wählen</div>';
+    for(let w=1;w<=12;w++)h+='<button class="wk-btn nb-shadow'+(w===S.week?' cur':weekHasData(w)?' has':'')+'" onclick="setWeek('+w+')" aria-label="Woche '+w+'">'+w+'</button>';
+    h+='<div class="week-pick-leg"><span class="wk-dot"></span>schon Einträge</div>';
+    el.innerHTML=h;
+  }
+  el.classList.toggle('hidden',!open);
+  if(lbl)lbl.setAttribute('aria-expanded',open?'true':'false');
+}
+function closeWeekPick(){
+  const el=document.getElementById('week-pick');
+  if(el&&!el.classList.contains('hidden')){el.classList.add('hidden');const l=document.getElementById('week-label');if(l)l.setAttribute('aria-expanded','false')}
+}
+function setWeek(w){closeWeekPick();if(w===S.week)return;S.week=w;saveUI();render();flashView()}
+function changeWeek(d){closeWeekPick();const old=S.week;S.week=Math.max(1,Math.min(12,S.week+d));saveUI();render();if(S.week!==old)flashView()}
 function toggleDay(di){const wasOpen=S.openDays[di]===true;S.openDays={};if(!wasOpen){S.openDays[di]=true;S.animDay=di}saveUI();render()}
 
 function togDrop(di,ei,ev){
@@ -1450,7 +1485,9 @@ function resTip(tk,sk){delete S.data[tk];save();S.tipEdit[sk]=false;renderT()}
 
 document.addEventListener('click',e=>{
   if(S.drop&&!e.target.closest('.picker-wrap')){S.drop=null;renderT()}
+  if(!e.target.closest('.week-nav'))closeWeekPick();
 });
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeWeekPick()});
 
 // AUTO-UPDATE gegen den iOS-Webapp-Cache. BUILD_ID bei JEDEM Deploy hochzaehlen (Regel 10).
 //
@@ -1467,7 +1504,7 @@ document.addEventListener('click',e=>{
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-09-26-02';
+const BUILD_ID='2026-09-26-03';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();

@@ -229,6 +229,10 @@ esc(s)                  HTML-escape
 autoExtraSets(di,ei)    0 oder 1. Braucht 3 stagnierende WOCHENVERGLEICHE ('s'/'d') in Folge bei
                         gleicher Uebung -> greift fruehestens in WOCHE 5 (W2vsW1 + W3vsW2 + W4vsW3).
                         Der Guard "if(S.week<4)return 0" ist nur ein Early-Out. Verifiziert per Test.
+togWeekPick(ev)         Tipp auf "W x / 12" (#week-label, jetzt ein Button) oeffnet #week-pick: Raster
+                        1-12, Ink = aktuelle Woche, Lila (.has) = Woche hat im Zyklus schon Werte
+                        (weekHasData). setWeek(w) springt direkt, closeWeekPick() schliesst (auch bei
+                        Tipp daneben, Esc und den Pfeilen). Die Pfeile bleiben zusaetzlich.
 toggleDay(di)           Accordion: andere Tage schliessen sich automatisch (setzt S.animDay fuer Animation)
 onDS(di,ei,v)           Dropdown-Suche — stellt nach renderT() Fokus + Cursor im Suchfeld wieder her
 dsKey(di,ei,e)          Tastatur im Dropdown-Suchfeld: Pfeile bewegen .hl-Highlight (Peach), Enter
@@ -465,9 +469,12 @@ kniedominante Uebung; Maeo 2021: sitzender Beinbeuger > liegend). Grundsaetze:
 - Oberkoerper schlank: Latzug/Rudern + Seitheben, wenig Brust/Arme.
 - Athena (FPS) wurde geprueft und bewusst NICHT uebernommen (Aufbau gefiel nicht).
 Saetze sind Startwerte — Auto-Zusatzsatz und +-Button steigern gezielt.
+Tagesnamen = Schwerpunkt, dazu Feld f (Fokus-Zeile) im Plan-Objekt: {l:"Tag A – Po Kraft",
+f:"Po schwer (4–8) · Beinvorderseite · ...",e:[...]}. renderT zeigt f als .day-focus in einer
+eigenen Zeile unter Titel + Uebungs-Pill (volle Breite). Alte Plaene haben kein f.
 
 ### 4 Tage (P4) — 67 Saetze/Woche
-| Tag A – Unterkörper | Tag B – Oberkörper + Po | Tag C – Ganzkörper | Tag D – Unterkörper |
+| Tag A – Po Kraft | Tag B – Oberkörper & Po | Tag C – Po & Beinrückseite | Tag D – Po-Volumen & Beine |
 |---|---|---|---|
 | Glute Max 3x4-8 | Glute Max 2x8-12 | Glute Max 3x6-10 | Glute Max 3x8-12 |
 | Glute Max 2x8-12 | Glute Med 2x8-12 | Glute Max 2x8-12 | Glute Med 2x8-12 |
@@ -483,7 +490,7 @@ Beinstrecker 2, Adduktoren 4, Ruecken 5, Schultern 5, Brust 2, Bizeps 2, Trizeps
 Pro Tag 16/18/18/15 Saetze (7/8/8/7 Uebungen).
 
 ### 3 Tage (P3) — 56 Saetze/Woche
-| Tag A – Po schwer | Tag B – Po & Beinrückseite | Tag C – Po & Hüfte |
+| Tag A – Po Kraft | Tag B – Po & Beinrückseite | Tag C – Hüfte & Sanduhr |
 |---|---|---|
 | Glute Max 3x4-8 | Glute Max 3x6-10 | Glute Max 3x8-12 |
 | Glute Max 2x8-12 | Glute Max 2x8-12 | Glute Med 2x8-12 |
@@ -612,6 +619,13 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Aussagekraeftige Tagesnamen + Woche direkt waehlen (26.09.2026, Version -03).**
+   (1) Neue Plaene: Titel nennt den Schwerpunkt (3 Tage: Po Kraft / Po & Beinrueckseite /
+   Hüfte & Sanduhr; 4 Tage: Po Kraft / Oberkoerper & Po / Po & Beinrueckseite / Po-Volumen
+   & Beine), darunter eine Fokus-Zeile (Feld f). (2) Wochen-Auswahl: Tipp auf "W x / 12"
+   oeffnet ein 1-12-Raster statt durch alle Wochen zu klicken. Verifiziert: 34 Playwright-
+   Pruefungen + Screenshots 390 px.
 
 NEU. **V2-Tage umsortiert: Fokus-Uebungen zuerst (26.09.2026, Version -02).** Wunsch: pro Tag
    erst Glute Max, dann Glute Med, dann restliche Po-/Bein-Uebungen, dann Oberkoerper, Bauch
