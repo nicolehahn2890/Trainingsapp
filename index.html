@@ -82,7 +82,8 @@ button:disabled:active{transform:none;}
 .tab-btn{padding:8px 15px;border-radius:999px;border:var(--bw) solid var(--ink);font-size:13px;font-weight:700;}
 .tab-btn.active{background:var(--peach);color:var(--ink);box-shadow:var(--sh-sm);}
 .tab-btn.inactive{background:var(--surface);color:var(--text);}
-.cycle-btn{padding:7px 13px;border-radius:999px;font-size:12px;font-weight:600;border:var(--bw) solid var(--ink);background:transparent;color:var(--ink);}
+.cycle-btn{padding:7px 0;min-width:32px;text-align:center;border-radius:999px;font-size:12px;font-weight:700;border:var(--bw) solid var(--ink);background:transparent;color:var(--ink);}
+.cycle-lbl{font-size:12px;font-weight:700;color:var(--ink);margin-right:2px;}
 .cycle-btn.active{background:var(--ink);color:var(--cream);box-shadow:var(--sh-xs);}
 .plan-btn{padding:7px 13px;border-radius:999px;font-size:12px;font-weight:700;border:var(--bw) solid var(--ink);background:var(--surface);color:var(--ink);}
 .plan-btn.active{background:var(--peach);color:var(--ink);box-shadow:var(--sh-xs);}
@@ -238,9 +239,13 @@ button:disabled:active{transform:none;}
       <button class="plan-btn nb-shadow active" id="plan-p4" onclick="setPlan('p4')">4 Tage</button>
     </div>
     <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;">
-      <button class="cycle-btn nb-shadow active" id="cycle-cycle1" onclick="setCycle('cycle1')">Zyklus 1</button>
-      <button class="cycle-btn nb-shadow" id="cycle-cycle2" onclick="setCycle('cycle2')">Zyklus 2</button>
-      <button class="cycle-btn nb-shadow" id="cycle-cycle3" onclick="setCycle('cycle3')">Zyklus 3</button>
+      <span class="cycle-lbl">Zyklus</span>
+      <button class="cycle-btn nb-shadow active" id="cycle-cycle1" onclick="setCycle('cycle1')" aria-label="Zyklus 1">1</button>
+      <button class="cycle-btn nb-shadow" id="cycle-cycle2" onclick="setCycle('cycle2')" aria-label="Zyklus 2">2</button>
+      <button class="cycle-btn nb-shadow" id="cycle-cycle3" onclick="setCycle('cycle3')" aria-label="Zyklus 3">3</button>
+      <button class="cycle-btn nb-shadow" id="cycle-cycle4" onclick="setCycle('cycle4')" aria-label="Zyklus 4">4</button>
+      <button class="cycle-btn nb-shadow" id="cycle-cycle5" onclick="setCycle('cycle5')" aria-label="Zyklus 5">5</button>
+      <button class="cycle-btn nb-shadow" id="cycle-cycle6" onclick="setCycle('cycle6')" aria-label="Zyklus 6">6</button>
     </div>
     <div class="week-nav">
       <button class="week-arrow nb-shadow" onclick="changeWeek(-1)">&#8249;</button>
@@ -260,7 +265,9 @@ const EXERCISES={
 "Glute Med":["Kabel Abduktion Stehend","Kabel Abduktion Liegend","Kabel Abduktion Schrägbank","Abduktionsmaschine","Pelvic Drop","Abduktionsmaschine stehend","Fire Hydrants Kabel","3D Abduktor Maschine"],
 "Adduktoren":["Adduktionsmaschine","Adduktion Kabel Stehend","Adduktion Kabel Liegend","Copenhagen Plank","Sumo Squat Kurzhantel","Sumo RDL Langhantel","Cossack Squat","Lateral Lunge"],
 "Glute & Quad":["Low Bar Squat","Beinpresse 45 Grad","Beinpresse","Step Ups","Split Squat Kurzhantel","Split Squat Langhantel","Split Squat Multipresse","Hack Squat","Reverse Lunge","Belt Squat","Super Squat"],
-"Glute & Hams":["RDL Langhantel","RDL Kurzhanteln","RDL Maschine","Belt Squat RDL","Glute Hyperextensions","Reverse Hack RDL","Good Mornings","Single-Leg RDL","Nordic Curls","Leg Curls stehend","Leg Curls liegend"],
+"Beinstrecker":["Beinstrecker Maschine","Beinstrecker einbeinig"],
+"Glute & Hams":["RDL Langhantel","RDL Kurzhanteln","RDL Maschine","Belt Squat RDL","Glute Hyperextensions","Reverse Hack RDL","Good Mornings","Single-Leg RDL"],
+"Beinbeuger":["Leg Curls sitzend","Leg Curls stehend","Leg Curls liegend","Nordic Curls"],
 "Rücken":["LH Rudern","KH Rudern","KH Rudern (breit)","Rudern Kabel (eng)","Rudern Kabel (breit)","Rudermaschine (Panatta)","Rudermaschine (Precor)","High Row Maschine","Latzug (eng)","Latzug (breit)","Latzug Maschine (Panatta)","Latzug Maschine (Precor)","Überzug am Kabel","T Bar Rudern (neutral)","T Bar Rudern (breit)","Assistierter Klimmzug (eng)","Assistierter Klimmzug (breit)","Face Pull Kabel","Straight-Arm Pulldown","Einarmiger Latzug Kabel","Diverging Low Row"],
 "Brust":["LH Bankdrücken","KH Bankdrücken","Bankdrücken Multipresse","Bankdrücken Maschine","LH Schrägbankdrücken","KH Schrägbankdrücken","Schrägbankdrücken Multipresse","Schrägbankdrücken Maschine","Brustpresse (Panatta)","Brustpresse (Precor)","Butterfly Maschine","Flys von oben Kabel","Flys von unten Kabel","Flachbank KH Flys","Schrägbank KH Flys"],
 "Schultern":["KH Seitheben","Vorgebeugtes KH Seitheben","Seithebemaschine (sitzend)","Seithebemaschine (stehend)","Seitheben Kabel","Vorgebeugtes Seitheben Kabel","LH Überkopfdrücken","KH Überkopfdrücken","Überkopfmaschine","Butterfly Reverse Maschine","Butterfly Reverse Kabel","Upright Row Kabel","Arnold Press","Einarmiges Überkopfdrücken Kabel"],
@@ -306,6 +313,9 @@ const TIPS={
 "Leg Curls stehend":"⚙ Einstellung: Einbeinig im Stand, Standbein leicht gebeugt. Kniegelenk des Arbeitsbeins auf die Drehachse der Maschine, Oberschenkelpolster fest ans Bein, Fußrolle knapp über die Ferse. Bei 169 cm: mittlere Polsterhöhe als Start, Oberkörper aufrecht am Griff abstützen.\nAusführung: Ferse langsam zum Po ziehen, oben 1 Sek. halten, kontrolliert zurück. Hüfte bleibt gestreckt und die Beckenseiten gerade – nicht mit dem unteren Rücken nachhelfen. Weil die Hüfte gestreckt bleibt, arbeitet der obere Hamstring-Ansatz direkt unterm Po besonders stark. Beide Seiten gleich viele Wiederholungen.",
 "Leg Curls liegend":"⚙ Einstellung: Bauchlage, Kniegelenk EXAKT auf die Drehachse der Maschine ausrichten (oft markiert) – Polster entsprechend vor/zurück schieben. Fußrolle ans untere Wadenende knapp über die Ferse, Hüfte fest auf dem Polster. Bei 169 cm: mittlere Einstellung als Start.\nAusführung: Fersen kontrolliert Richtung Po ziehen, kurz halten, langsam in die volle Streckung zurück. Po anspannen, damit die Hüfte nicht abhebt – die Dehnung unten gibt der Beinrückseite die runde Form direkt unterm Po.",
 "Nordic Curls":"Knie auf gepolsterter Unterlage, Füße fixiert. Oberkörper langsam nach vorne fallen lassen – exzentrische Hamstring-Arbeit. Fortgeschrittene Übung.",
+"Leg Curls sitzend":"⚙ Einstellung: Kniegelenk EXAKT auf die Drehachse der Maschine, Rückenlehne so einstellen, dass der Po ganz hinten sitzt und die Kniekehle knapp vor der Sitzkante liegt. Oberschenkelpolster fest knapp oberhalb der Knie, Fußrolle am unteren Wadenende knapp über der Ferse. Bei 169 cm: mittlere Lehnenposition als Start.\nAusführung: Fersen kontrolliert nach unten-hinten ziehen, unten 1 Sek. halten, langsam bis in die volle Streckung zurück. Oberkörper aufrecht oder leicht nach vorne lehnen – die gebeugte Hüfte dehnt die Beinrückseite stärker. Genau deshalb wächst sie sitzend deutlich besser als liegend (Studie: +14 % statt +9 %). Erste Wahl für definierte Beine und einen klaren Übergang vom Po zur Beinrückseite.",
+"Beinstrecker Maschine":"⚙ Einstellung: Kniegelenk auf die Drehachse, Rückenlehne so, dass die Kniekehle an der Sitzkante anliegt. Fußrolle vorne knapp über dem Sprunggelenk. Lehne lieber eine Stufe weiter nach hinten – die offenere Hüfte dehnt den vorderen Oberschenkel stärker und bringt mehr Reiz bei gleichem Gewicht. Bei 169 cm: mittlere Lehnenposition als Start.\nAusführung: Beine kontrolliert strecken, oben 1 Sek. anspannen, langsam bis ganz unten absenken – nicht schwingen. Für definierte, nicht massige Oberschenkel reicht diese kleine Dosis vollkommen.",
+"Beinstrecker einbeinig":"⚙ Einstellung wie beim Beinstrecker: Kniegelenk auf die Drehachse, Fußrolle knapp über dem Sprunggelenk, Lehne eher eine Stufe zurück.\nAusführung: Ein Bein nach dem anderen – gleicht Seitenunterschiede aus. Mit dem schwächeren Bein beginnen, das andere macht gleich viele Wiederholungen. Kontrolliert strecken, oben 1 Sek. halten, langsam ganz absenken.",
 "LH Rudern":"Oberkörper ca. 45 Grad vorgebeugt. Stange zum Bauch ziehen, Ellbogen nah am Körper.",
 "KH Rudern":"Einarmig auf Bank gestützt. KH zum Hüftknochen ziehen, Schulterblatt einziehen.",
 "KH Rudern (breit)":"Ellbogen weiter außen – betont oberen Rücken und hintere Schulter.",
@@ -407,10 +417,95 @@ const TIPS={
 "Lateral Lunge":"Seitlicher Ausfallschritt: großer Schritt zur Seite, Gewicht auf das Schrittbein, das andere Bein bleibt gestreckt.\nAusführung: Hüfte nach hinten-unten schieben, der Fuß des gestreckten Beins bleibt flach am Boden – die Innenseite zieht deutlich. Über die Ferse zurückdrücken. Freie Variante des Cossack Squat, gut mit KH oder Kettlebell vor der Brust.",
 "RDL Maschine":"⚙ Einstellung: Starthöhe der Griffe etwa auf Mitte Schienbein – volle Hamstring-Dehnung ohne runden Rücken muss möglich sein.\nAusführung: Hüftgelenk-Scharnier – Rücken neutral, Hüfte nach hinten schieben, langsam absenken bis zur starken Dehnung in den Hamstrings – das ist der entscheidende Reiz für Po und Beinrückseite. Oben durch die Fersen drücken und Po aktiv anspannen. Die Maschinenführung macht schwere Gewichte sicher – nutze das für Stretch-Hypertrophie."
 };
-const CC={"Glute Max":"#EE8FB4","Glute Med":"#B49DF2","Adduktoren":"#7FD1C1","Glute & Quad":"#E8B86A","Glute & Hams":"#A7D98C","Rücken":"#84C3E0","Brust":"#F0A0A0","Schultern":"#C2DB7E","Bizeps":"#E6C57E","Trizeps":"#93B6E0","Bauch":"#D6D080"};
+const CC={"Glute Max":"#EE8FB4","Glute Med":"#B49DF2","Adduktoren":"#7FD1C1","Glute & Quad":"#E8B86A","Glute & Hams":"#A7D98C","Beinbeuger":"#D7A0E8","Beinstrecker":"#F9B98A","Rücken":"#84C3E0","Brust":"#F0A0A0","Schultern":"#C2DB7E","Bizeps":"#E6C57E","Trizeps":"#93B6E0","Bauch":"#D6D080"};
 // Tagesfarbe pro Tag-Card (Tag A peach, B pink, C lime, D sky)
 const DAYBG=["#F4A45E","#F18FB6","#B6DD57","#8CCBE8"];
+// TRAININGSPLAENE — Version 2 (ab Sept. 2026): Peach-Aufbau mit vollem Po-Fokus.
+// Wochenvolumen am oberen Ende dessen, was laut Studienlage noch wirkt (Po ~25-30 anteilige
+// Saetze/Woche), pro Einheit hoechstens ~9 harte Po-Saetze. Jede Einheit beginnt frisch mit
+// den zwei wichtigsten Po-Uebungen (kurze + lange Muskellaenge), Glute Med 4x pro Woche,
+// neu: Beinbeuger + Beinstrecker fuer definierte Beine. Oberkoerper bewusst schlank, jeder
+// Tag endet mit Bauch (2 Saetze) als letzter Uebung.
+// WICHTIG: Zyklen, die schon mit dem alten Plan trainiert wurden, zeigen weiter P4_V1/P3_V1
+// (Marker pv__[Zyklus] in peach_v4, siehe planOf) — sonst lagen die positionsbasierten
+// Daten in den falschen Zeilen.
 const P4=[
+{l:"Tag A – Unterkörper",e:[
+  {c:"Glute Max",s:3,r:[4,8]},
+  {c:"Glute & Quad",s:3,r:[6,10]},
+  {c:"Glute Max",s:2,r:[8,12]},
+  {c:"Glute Med",s:2,r:[8,12]},
+  {c:"Beinbeuger",s:2,r:[8,12]},
+  {c:"Adduktoren",s:2,r:[8,12]},
+  {c:"Bauch",s:2,r:[8,12]}
+]},
+{l:"Tag B – Oberkörper + Po",e:[
+  {c:"Glute Max",s:2,r:[8,12]},
+  {c:"Glute Med",s:2,r:[8,12]},
+  {c:"Rücken",s:3,r:[6,10]},
+  {c:"Schultern",s:3,r:[8,12]},
+  {c:"Brust",s:2,r:[6,10]},
+  {c:"Bizeps",s:2,r:[8,12]},
+  {c:"Trizeps",s:2,r:[8,12]},
+  {c:"Bauch",s:2,r:[8,12]}
+]},
+{l:"Tag C – Ganzkörper",e:[
+  {c:"Glute & Hams",s:3,r:[6,10]},
+  {c:"Glute Max",s:3,r:[6,10]},
+  {c:"Glute Max",s:2,r:[8,12]},
+  {c:"Glute Med",s:2,r:[8,12]},
+  {c:"Beinbeuger",s:2,r:[8,12]},
+  {c:"Rücken",s:2,r:[8,12]},
+  {c:"Schultern",s:2,r:[8,12]},
+  {c:"Bauch",s:2,r:[8,12]}
+]},
+{l:"Tag D – Unterkörper",e:[
+  {c:"Glute Max",s:3,r:[8,12]},
+  {c:"Glute & Quad",s:2,r:[8,12]},
+  {c:"Glute & Hams",s:2,r:[8,12]},
+  {c:"Glute Med",s:2,r:[8,12]},
+  {c:"Beinstrecker",s:2,r:[8,12]},
+  {c:"Adduktoren",s:2,r:[8,12]},
+  {c:"Bauch",s:2,r:[8,12]}
+]}
+];
+// 3-Tage-Plan: eigene Zyklen (Key-Praefix p3cycle1-6 in peach_v4) — voellig getrennt
+// vom 4-Tage-Plan, gleiche Regeln (Steigerung, Auto-Extra-Satz, Vererbung).
+const P3=[
+{l:"Tag A – Po schwer",e:[
+  {c:"Glute Max",s:3,r:[4,8]},
+  {c:"Glute & Quad",s:3,r:[6,10]},
+  {c:"Glute Max",s:2,r:[8,12]},
+  {c:"Glute Med",s:2,r:[8,12]},
+  {c:"Adduktoren",s:2,r:[8,12]},
+  {c:"Rücken",s:2,r:[6,10]},
+  {c:"Schultern",s:2,r:[8,12]},
+  {c:"Bauch",s:2,r:[8,12]}
+]},
+{l:"Tag B – Po & Beinrückseite",e:[
+  {c:"Glute & Hams",s:3,r:[6,10]},
+  {c:"Glute Max",s:3,r:[6,10]},
+  {c:"Glute Max",s:2,r:[8,12]},
+  {c:"Glute Med",s:2,r:[8,12]},
+  {c:"Beinbeuger",s:3,r:[8,12]},
+  {c:"Rücken",s:2,r:[8,12]},
+  {c:"Brust",s:2,r:[6,10]},
+  {c:"Bauch",s:2,r:[8,12]}
+]},
+{l:"Tag C – Po & Hüfte",e:[
+  {c:"Glute Max",s:3,r:[8,12]},
+  {c:"Glute & Quad",s:2,r:[8,12]},
+  {c:"Glute & Hams",s:2,r:[8,12]},
+  {c:"Glute Med",s:2,r:[8,12]},
+  {c:"Glute Med",s:2,r:[8,12]},
+  {c:"Beinstrecker",s:2,r:[8,12]},
+  {c:"Adduktoren",s:2,r:[8,12]},
+  {c:"Schultern",s:2,r:[8,12]},
+  {c:"Bauch",s:2,r:[8,12]}
+]}
+];
+// Alter 4-Tage-Plan (bis Sept. 2026) — nur noch fuer Zyklen, die damit trainiert wurden.
+const P4_V1=[
 {l:"Tag A – Beine",e:[
   {c:"Glute Max",s:3,r:[4,8]},{c:"Glute Max",s:2,r:[8,12]},
   {c:"Glute Med",s:3,r:[8,12]},{c:"Glute Med",s:2,r:[8,12]},
@@ -446,9 +541,8 @@ const P4=[
   {c:"Bauch",s:2,r:[8,12]}
 ]}
 ];
-// 3-Tage-Plan: eigene Zyklen (Key-Praefix p3cycle1-3 in peach_v4) — voellig getrennt
-// vom 4-Tage-Plan, gleiche Regeln (Steigerung, Auto-Extra-Satz, Vererbung).
-const P3=[
+// Alter 3-Tage-Plan (bis Sept. 2026) — nur noch fuer Zyklen, die damit trainiert wurden.
+const P3_V1=[
 {l:"Tag A – Ganzkörper",e:[
   {c:"Glute Max",s:3,r:[4,8]},{c:"Glute Max",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},{c:"Glute Med",s:2,r:[8,12]},
@@ -488,7 +582,8 @@ function load(){try{const r=localStorage.getItem('peach_v4');return r?JSON.parse
 // Start-save() einen TDZ-Fehler, den die umgebenden try/catch verschluckt haben —
 // die Reparatur lief dann nur im Speicher und wurde NIE gespeichert.
 let _exIdx=null; // Cache: Schluessel -> Eintraege (aufsteigend sortiert); save() verwirft ihn
-function save(){_exIdx=null;try{localStorage.setItem('peach_v4',JSON.stringify(S.data))}catch{}}
+let _carry={};   // Cache: Zyklus -> uebernommene Uebungen (carryMap); save() verwirft ihn
+function save(){_exIdx=null;_carry={};try{localStorage.setItem('peach_v4',JSON.stringify(S.data))}catch{}}
 S.data=load();
 // POSITION MERKEN (eigener Key peach_ui — merkt sich Tab/Zyklus/Woche/aufgeklappten Tag,
 // damit die App nach App-Wechsel oder Schliessen genau dort weitermacht. peach_v4 unberuehrt!)
@@ -498,11 +593,11 @@ try{
   if(u.view==='training'||u.view==='overview')S.view=u.view;
   if(typeof u.week==='number'&&u.week>=1&&u.week<=12)S.week=u.week;
   if(u.pt==='p3'||u.pt==='p4')S.pt=u.pt;
-  if(['cycle1','cycle2','cycle3','p3cycle1','p3cycle2','p3cycle3'].includes(u.cy))S.cy=(S.pt==='p3'?'p3':'')+String(u.cy).replace(/^p3/,'');
+  if(/^(p3)?cycle[1-6]$/.test(String(u.cy)))S.cy=(S.pt==='p3'?'p3':'')+String(u.cy).replace(/^p3/,'');
   if(u.openDays&&typeof u.openDays==='object'&&!Array.isArray(u.openDays))S.openDays=u.openDays;
 }catch{}
 
-const REC=new Set(["Hip Thrusts Langhantel","Hip Thrusts Multipresse","Hip Thrust Maschine","Glute Bridge Langhantel","Kabel Kickback Liegend","Kickback Maschine","Abduktionsmaschine","Kabel Abduktion Liegend","Adduktionsmaschine","Adduktion Kabel Stehend","Copenhagen Plank","Sumo Squat Kurzhantel","Abduktionsmaschine stehend","3D Abduktor Maschine","Reverse Lunge","Split Squat Kurzhantel","Split Squat Langhantel","Split Squat Multipresse","Belt Squat","RDL Langhantel","RDL Maschine","Glute Hyperextensions","Single-Leg RDL","Leg Curls stehend","Leg Curls liegend","Latzug (breit)","High Row Maschine","Assistierter Klimmzug (breit)","Straight-Arm Pulldown","Überzug am Kabel","KH Seitheben","Seitheben Kabel","Seithebemaschine (sitzend)","Seithebemaschine (stehend)","Pallof Press","Hollow Body Hold"]);
+const REC=new Set(["Hip Thrusts Langhantel","Hip Thrusts Multipresse","Hip Thrust Maschine","Glute Bridge Langhantel","Kabel Kickback Liegend","Kickback Maschine","Abduktionsmaschine","Kabel Abduktion Liegend","Adduktionsmaschine","Adduktion Kabel Stehend","Copenhagen Plank","Sumo Squat Kurzhantel","Abduktionsmaschine stehend","3D Abduktor Maschine","Reverse Lunge","Split Squat Kurzhantel","Split Squat Langhantel","Split Squat Multipresse","Belt Squat","RDL Langhantel","RDL Maschine","Glute Hyperextensions","Single-Leg RDL","Leg Curls sitzend","Leg Curls stehend","Leg Curls liegend","Beinstrecker Maschine","Latzug (breit)","High Row Maschine","Assistierter Klimmzug (breit)","Straight-Arm Pulldown","Überzug am Kabel","KH Seitheben","Seitheben Kabel","Seithebemaschine (sitzend)","Seithebemaschine (stehend)","Pallof Press","Hollow Body Hold"]);
 
 // ASSISTIERTE UEBUNGEN: hier ist das eingetragene Gewicht das GEGENGEWICHT der Maschine —
 // WENIGER Gewicht bedeutet MEHR eigene Kraft. Fuer diese Uebungen dreht sich der komplette
@@ -510,6 +605,9 @@ const REC=new Set(["Hip Thrusts Langhantel","Hip Thrusts Multipresse","Hip Thrus
 // eintragen — der Name muss EXAKT dem Eintrag in EXERCISES entsprechen.
 const ASSIST=new Set(["Assistierter Klimmzug (eng)","Assistierter Klimmzug (breit)"]);
 function isAssist(ex){return ASSIST.has(ex)}
+// Zyklen 1-6 (frueher 1-3): nach Zyklus 3 ging es sonst auf Zyklus 1 zurueck, der schon
+// Daten und die alte Plan-Aufteilung traegt.
+const CYCLES=['cycle1','cycle2','cycle3','cycle4','cycle5','cycle6'];
 function mk(c,w,d,e){return c+'__w'+w+'__d'+d+'__e'+e}
 function mkt(c,w,d,e){return 'tip__'+c+'__w'+w+'__d'+d+'__e'+e}
 
@@ -596,6 +694,38 @@ for(const c in EXERCISES)for(const ex of EXERCISES[c])CATOF[ex]=c;
 // bei korrekt sitzenden Daten aendert die Zuordnung nichts (idempotent), und so heilt
 // sie auch dann noch, wenn diese Version erst spaeter auf dem Geraet ankommt.
 // Sicherheitskopie des Standes davor: peach_v4_pre_fix (nur beim ersten Eingriff).
+// PLAN-VERSION PRO ZYKLUS (Sept. 2026). Die Workout-Keys sind positionsbasiert — ein neuer
+// Plan darf deshalb NIE ueber bereits trainierte Zyklen gelegt werden. Jeder Zyklus, in dem
+// beim Umstieg schon Werte standen, bekommt den Marker pv__[Zyklus]=1 und zeigt weiter die
+// alte Aufteilung (P4_V1/P3_V1). Leere Zyklen nutzen den neuen Plan. Die Marker liegen IN
+// peach_v4 (nicht in einem eigenen Key), damit ein Backup sie mitnimmt. pv__done zeigt, dass
+// die Markierung gelaufen ist — ein altes Backup ohne pv__done wird beim Einspielen markiert.
+function isLegacy(cy){return S.data['pv__'+cy]===1}
+function planOf(cy){const p3=String(cy).indexOf('p3')===0;return isLegacy(cy)?(p3?P3_V1:P4_V1):(p3?P3:P4)}
+function markLegacy(data){
+  if(data.pv__done)return false;
+  for(const k in data){
+    const m=/^((p3)?cycle\d+)__w\d+__d\d+__e\d+$/.exec(k);
+    if(m&&hasVals(data[k]))data['pv__'+m[1]]=1;
+  }
+  data.pv__done=1;
+  return true;
+}
+function migPlanV2(){
+  try{
+    if(S.data.pv__done)return;
+    try{localStorage.setItem('peach_v4_pre_v2',JSON.stringify(S.data))}catch{}
+    if(markLegacy(S.data))save();
+  }catch{}
+}
+migPlanV2();
+// Leg Curls und Nordic Curls standen bis Sept. 2026 in "Glute & Hams" und haben jetzt eine
+// eigene Kategorie "Beinbeuger". In den alten Glute-&-Hams-Zeilen bleiben sie gueltig
+// (Alias) — sonst schoebe repairSlots() sie aus ihrer Zeile ans Tagesende und sie waeren
+// unsichtbar. Der Alias gilt NUR fuer die Zuordnung gespeicherter Daten — im Dropdown stehen
+// die Leg Curls ausschliesslich unter Beinbeuger (keine doppelten Uebungen).
+const ALIAS={"Glute & Hams":["Beinbeuger"]};
+function rowFits(rowCat,exCat){return rowCat===exCat||(ALIAS[rowCat]||[]).indexOf(exCat)>=0}
 function hasVals(v){return !!(v&&((v.weight&&String(v.weight).trim()!=='')||(v.reps||[]).some(function(r){return r!==''&&r!=null})))}
 function repairSlots(){
   try{
@@ -603,7 +733,7 @@ function repairSlots(){
     // nach Zyklus/Woche/Tag gruppieren
     const grp={};
     for(const k in S.data){
-      const m=k.match(/^(p3)?cycle(\d)__w(\d+)__d(\d+)__e(\d+)$/);
+      const m=k.match(/^(p3)?cycle(\d+)__w(\d+)__d(\d+)__e(\d+)$/);
       if(!m)continue;
       const g=[(m[1]||'')+'cycle'+m[2],+m[3],+m[4]].join('|');
       (grp[g]=grp[g]||[]).push({slot:+m[5],val:S.data[k]});
@@ -611,13 +741,13 @@ function repairSlots(){
     }
     for(const g in grp){
       const parts=g.split('|'),cy=parts[0],w=parts[1],di=+parts[2];
-      const day=(cy.indexOf('p3')===0?P3:P4)[di];
+      const day=planOf(cy)[di];
       if(!day){grp[g].forEach(function(it){S.data[cy+'__w'+w+'__d'+di+'__e'+it.slot]=it.val});continue}
       const slots=day.e, items=grp[g].sort(function(a,b){return a.slot-b.slot}), taken=[], rest=[];
       // 1. Durchgang: was schon auf einer passenden Zeile sitzt, bleibt liegen
       for(const it of items){
         const cat=CATOF[it.val.exercise||''];
-        if(cat&&it.slot<slots.length&&slots[it.slot].c===cat&&!taken[it.slot])taken[it.slot]=it;
+        if(cat&&it.slot<slots.length&&rowFits(slots[it.slot].c,cat)&&!taken[it.slot])taken[it.slot]=it;
         else rest.push(it);
       }
       // 2. Durchgang: der Rest der Reihe nach in die naechste freie Zeile seiner Kategorie
@@ -627,6 +757,7 @@ function repairSlots(){
         const cat=CATOF[ex];
         let t=-1;
         for(let i=0;i<slots.length;i++)if(slots[i].c===cat&&!taken[i]){t=i;break}
+        if(t<0)for(let i=0;i<slots.length;i++)if(rowFits(slots[i].c,cat)&&!taken[i]){t=i;break}
         if(t<0){ if(hasVals(it.val))taken.push(it); continue }  // mit Werten: nie wegwerfen
         taken[t]=it;
       }
@@ -641,7 +772,64 @@ function repairSlots(){
   }catch{}
 }
 repairSlots();
-function plan(){return S.pt==='p3'?P3:P4}
+function plan(){return planOf(S.cy)}
+// UEBUNGSAUSWAHL IN DEN NEUEN ZYKLUS UEBERNEHMEN (Sept. 2026)
+// Woche 1 eines neuen Zyklus uebernimmt pro Zeile die Uebung, die im vorherigen Zyklus in
+// derselben KATEGORIE gewaehlt war — bevorzugt mit gleichem Rep-Bereich und am gleichen Tag,
+// pro Tag keine Uebung doppelt. Die Kategorie kommt aus CATOF, nicht aus der alten Zeile:
+// Leg Curls aus einer alten Glute-&-Hams-Zeile landen so im neuen Beinbeuger-Platz, die
+// Glute-&-Hams-Plaetze bekommen die Hueftbeuge-Uebungen. Quelle: der letzte Zyklus desselben
+// Plans mit Uebungen, sonst der andere Plan (3/4 Tage). Nur Vorbelegung wie bei der
+// Wochen-Vererbung — gespeichert wird erst, wenn in der Zeile etwas eingetragen wird.
+// Alte Zyklen (pv__-Marker) bleiben unberuehrt.
+function carryMap(cy){
+  if(_carry[cy])return _carry[cy];
+  const res={};
+  if(!isLegacy(cy)){
+    const by={}; // Zyklus -> "Tag|Zeile" -> {w, ex} (jeweils die letzte Woche mit Auswahl)
+    for(const k in S.data){
+      const m=/^((p3)?cycle\d+)__w(\d+)__d(\d+)__e(\d+)$/.exec(k);
+      const v=S.data[k];
+      if(!m||!v||typeof v!=='object'||!v.exercise)continue;
+      const g=by[m[1]]=by[m[1]]||{},sk=m[4]+'|'+m[5],w=+m[3];
+      if(!g[sk]||g[sk].w<w)g[sk]={w:w,ex:v.exercise};
+    }
+    const p3=String(cy).indexOf('p3')===0,n=parseInt(String(cy).replace(/^p3/,'').replace('cycle',''))||1;
+    const cands=[];
+    for(let c=n-1;c>=1;c--)cands.push((p3?'p3':'')+'cycle'+c);
+    for(let c=n;c>=1;c--)cands.push((p3?'':'p3')+'cycle'+c);
+    const src=cands.find(c=>by[c]);
+    if(src){
+      const sp=planOf(src),pool=[];
+      Object.keys(by[src]).forEach(sk=>{
+        const sd=+sk.split('|')[0],se=+sk.split('|')[1],slot=sp[sd]&&sp[sd].e[se];
+        pool.push({ex:by[src][sk].ex,cat:CATOF[by[src][sk].ex],rr:slot?slot.r[0]+'-'+slot.r[1]:'',di:sd,ei:se});
+      });
+      pool.sort((a,b)=>a.di-b.di||a.ei-b.ei);
+      planOf(cy).forEach((day,di)=>{
+        const used={};
+        day.e.forEach((slot,ei)=>{
+          const rr=slot.r[0]+'-'+slot.r[1];
+          let best=null,bs=-1;
+          for(const p of pool){
+            if(p.cat!==slot.c||used[p.ex])continue;
+            const sc=(p.rr===rr?4:0)+(p.di===di?2:0);
+            if(sc>bs){bs=sc;best=p}
+          }
+          if(best){used[best.ex]=1;res[di+'|'+ei]=best.ex}
+        });
+      });
+    }
+  }
+  _carry[cy]=res;
+  return res;
+}
+// Vorbelegte Uebung einer Zeile, solange in der aktuellen Woche nichts gewaehlt ist:
+// ab Woche 2 die der Vorwoche, in Woche 1 die aus dem vorherigen Zyklus uebernommene.
+function inhEx(di,ei){
+  if(S.week>1){const p=S.data[mk(S.cy,S.week-1,di,ei)];return (p&&p.exercise)||''}
+  return carryMap(S.cy)[di+'|'+ei]||'';
+}
 // Zyklus ohne Plan-Praefix ('p3cycle2' -> 'cycle2') — fuer Button-Markierung & Zyklus-Ende-Text
 function cyBase(){return String(S.cy).replace(/^p3/,'')}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
@@ -725,7 +913,7 @@ function pbadge(p,inv){
 function render(){
   document.getElementById('week-label').textContent='W '+S.week+' / 12';
   ['p3','p4'].forEach(p=>document.getElementById('plan-'+p).className='plan-btn nb-shadow'+(S.pt===p?' active':''));
-  ['cycle1','cycle2','cycle3'].forEach(c=>document.getElementById('cycle-'+c).className='cycle-btn nb-shadow'+(cyBase()===c?' active':''));
+  CYCLES.forEach(c=>document.getElementById('cycle-'+c).className='cycle-btn nb-shadow'+(cyBase()===c?' active':''));
   document.getElementById('btn-training').className='tab-btn nb-shadow'+(S.view==='training'?' active':' inactive');
   document.getElementById('btn-overview').className='tab-btn nb-shadow'+(S.view==='overview'?' active':' inactive');
   document.getElementById('view-training').classList.toggle('hidden',S.view!=='training');
@@ -751,10 +939,13 @@ function renderT(){
   });
   S.animDay=null;
   if(S.week===12){
-    const nextCy=cyBase()==='cycle1'?'2':cyBase()==='cycle2'?'3':'1 (neu)';
+    const cn=parseInt(cyBase().replace('cycle',''))||1;
+    const nextCy=cn<CYCLES.length?String(cn+1):'1 (neu)';
+    const nextN=cn<CYCLES.length?cn+1:1,nextKey=(S.pt==='p3'?'p3':'')+'cycle'+nextN;
+    const newPlanTxt=isLegacy(S.cy)&&!isLegacy(nextKey)?' Ab Zyklus '+nextN+' gilt dein neuer Plan: weniger Übungen, voller Po-Fokus, neu mit Beinbeuger und Beinstrecker. Deine gewählten Übungen werden automatisch übernommen, nur neue Plätze wie den Beinstrecker wählst du einmal selbst aus.':'';
     h+='<div style="background:var(--yellow);border:var(--bw) solid var(--ink);border-radius:var(--r-xl);padding:16px 18px;margin-top:8px;box-shadow:var(--sh-card)">'
       +'<div style="font-family:var(--font-display);text-transform:uppercase;font-size:15px;letter-spacing:-0.5px;color:var(--ink);margin-bottom:6px">🏁 Woche 12 – Zyklus fast abgeschlossen!</div>'
-      +'<p style="color:var(--ink);font-size:13px;line-height:1.7;margin:0">Letzte Woche des Zyklus – danach startest du Zyklus '+nextCy+' mit Woche 1. Dort bewusst etwas leichter einsteigen: Die letzten Werte stehen nur zur Orientierung da, verglichen wird erst ab Woche 2.</p>'
+      +'<p style="color:var(--ink);font-size:13px;line-height:1.7;margin:0">Letzte Woche des Zyklus – danach startest du Zyklus '+nextCy+' mit Woche 1. Dort bewusst etwas leichter einsteigen: Die letzten Werte stehen nur zur Orientierung da, verglichen wird erst ab Woche 2.'+newPlanTxt+'</p>'
       +'</div>';
   }
   document.getElementById('view-training').innerHTML=h;
@@ -789,9 +980,10 @@ function exOrd(cy,w,di,ei){
   const c=parseInt(String(cy).replace(/^p3/,'').replace('cycle',''))||1;
   return c*1e7+w*1e4+di*100+ei;
 }
-// Rep-Bereich eines Plan-Platzes als String ("4-8"); '' wenn der Platz im Plan nicht existiert
-function repRange(pt,di,ei){
-  const day=(pt==='p3'?P3:P4)[di];
+// Rep-Bereich eines Plan-Platzes als String ("4-8"); '' wenn der Platz im Plan nicht existiert.
+// Gelesen wird der Plan DES ZYKLUS (alter oder neuer Plan, siehe planOf).
+function repRange(cy,di,ei){
+  const day=planOf(cy)[di];
   const slot=day&&day.e&&day.e[ei];
   return slot&&slot.r?slot.r[0]+'-'+slot.r[1]:'';
 }
@@ -801,14 +993,14 @@ function exIndex(){
   if(_exIdx)return _exIdx;
   const idx={};
   for(const k in S.data){
-    const m=/^(p3)?cycle([123])__w(\d+)__d(\d+)__e(\d+)$/.exec(k);
+    const m=/^(p3)?cycle(\d+)__w(\d+)__d(\d+)__e(\d+)$/.exec(k);
     if(!m)continue;
     const d=S.data[k];
     if(!d||typeof d!=='object'||!d.exercise)continue;
     // Nur Eintraege mit echtem Inhalt (Gewicht oder mindestens eine Wiederholung)
     if(!d.weight&&!((d.reps||[]).some(r=>r!==''&&r!=null)))continue;
     const cy=(m[1]||'')+'cycle'+m[2],w=+m[3],di=+m[4],ei=+m[5],pt=m[1]?'p3':'p4';
-    const rr=repRange(pt,di,ei);
+    const rr=repRange(cy,di,ei);
     if(!rr)continue; // Platz gibt es im Plan nicht mehr -> kein sinnvoller Vergleich
     const e={pt:pt,cy:cy,w:w,di:di,ei:ei,rr:rr,d:d,ord:exOrd(cy,w,di,ei)};
     const key=exKey(d.exercise,rr);
@@ -823,7 +1015,7 @@ function exIndex(){
 // gespeichert wird weiterhin strikt getrennt.
 function findLastExData(di,ei,currentExercise){
   if(!currentExercise)return{};
-  const rr=repRange(S.pt,di,ei);
+  const rr=repRange(S.cy,di,ei);
   if(!rr)return{};
   const list=exIndex()[exKey(currentExercise,rr)];
   if(!list||!list.length)return{};
@@ -841,7 +1033,7 @@ function findLastExData(di,ei,currentExercise){
 function srcLabel(src){
   if(!src)return'';
   const cyN=String(src.cy).replace(/^p3/,'').replace('cycle','');
-  const day=((src.pt==='p3'?P3:P4)[src.di]||{}).l||'';
+  const day=(planOf(src.cy)[src.di]||{}).l||'';
   const dm=/^Tag [A-D]/.exec(day);
   let t='Z'+cyN+' W'+src.w+(dm?' · '+dm[0]:'');
   if(src.pt!==S.pt)t+=' · '+(src.pt==='p3'?'3-Tage':'4-Tage');
@@ -854,7 +1046,7 @@ function exDone(di,ei){
   const rawCur=S.data[k]||{};
   const pk=S.week>1?mk(S.cy,S.week-1,di,ei):null;
   const prevW=pk?(S.data[pk]||{}):{};
-  const exName=rawCur.exercise!==undefined?rawCur.exercise:(prevW.exercise||'');
+  const exName=rawCur.exercise!==undefined?rawCur.exercise:inhEx(di,ei);
   if(!exName)return false;
   const xs=rawCur.extraSets!==undefined?rawCur.extraSets:(prevW.extraSets||0);
   const ms=Math.min(5,ex.s+xs+autoExtraSets(di,ei));
@@ -919,9 +1111,10 @@ function exState(di,ei){
   const k=mk(S.cy,S.week,di,ei),pk=S.week>1?mk(S.cy,S.week-1,di,ei):null;
   const rawCur=S.data[k]||{},prevWeekData=pk?(S.data[pk]||{}):{};
   // Übung + extraSets aus Vorwoche übernehmen wenn aktuelle Woche noch leer
+  // (Woche 1: Übung aus dem vorherigen Zyklus, siehe carryMap)
   const cur={
     ...rawCur,
-    exercise: rawCur.exercise!==undefined ? rawCur.exercise : (prevWeekData.exercise||''),
+    exercise: rawCur.exercise!==undefined ? rawCur.exercise : inhEx(di,ei),
     extraSets: rawCur.extraSets!==undefined ? rawCur.extraSets : (prevWeekData.extraSets||0),
   };
   // Vergleichswert: letzter gespeicherter Wert DIESER Uebung (nicht einfach Vorwoche)
@@ -1108,9 +1301,11 @@ function impBackup(){
   const data=p&&p.app==='peach'&&p.data?p.data:(p&&typeof p==='object'&&!Array.isArray(p)?p:null);
   const looksValid=data&&Object.keys(data).some(k=>/__w\d+__d\d+__e\d+/.test(k)||k.indexOf('tip__')===0||k.indexOf('set__')===0);
   if(!looksValid){bkMsg('Backup ist leer oder ungültig – bitte den Text aus "Backup kopieren" verwenden.');return}
-  const n=Object.keys(data).length,have=Object.keys(S.data).length;
+  // pv__-Marker (Plan-Version) sind keine Trainingseintraege und zaehlen nicht mit
+  const cnt=o=>Object.keys(o).filter(k=>k.indexOf('pv__')!==0).length;
+  const n=cnt(data),have=cnt(S.data);
   if(have>0&&!confirm('Achtung: Hier sind bereits '+have+' Einträge gespeichert. Wirklich mit dem Backup ('+n+' Einträge) überschreiben?'))return;
-  S.data=data;save();
+  S.data=data;markLegacy(S.data);save();
   render();
   bkMsg('✓ Backup eingespielt – '+n+' Einträge wiederhergestellt!');
 }
@@ -1183,7 +1378,7 @@ function initKey(di,ei){
   if(!S.data[k]){
     const pk=S.week>1?mk(S.cy,S.week-1,di,ei):null;
     const prv=pk?(S.data[pk]||{}):{};
-    S.data[k]={exercise:prv.exercise||'',extraSets:prv.extraSets||0};
+    S.data[k]={exercise:inhEx(di,ei),extraSets:prv.extraSets||0};
   }
   return k;
 }
@@ -1192,7 +1387,7 @@ function updW(di,ei,v){const k=initKey(di,ei);S.data[k]={...S.data[k],weight:v};
 function updSetting(di,ei,v){
   const k=mk(S.cy,S.week,di,ei),pk=S.week>1?mk(S.cy,S.week-1,di,ei):null;
   const rawCur=S.data[k]||{},prevW=pk?(S.data[pk]||{}):{};
-  const ex=rawCur.exercise!==undefined?rawCur.exercise:(prevW.exercise||'');
+  const ex=rawCur.exercise!==undefined?rawCur.exercise:inhEx(di,ei);
   if(!ex)return;
   const key='set__ex__'+ex;
   if(String(v).trim()==='')delete S.data[key];else S.data[key]=v;
@@ -1231,7 +1426,7 @@ document.addEventListener('click',e=>{
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-09-23-02';
+const BUILD_ID='2026-09-26-01';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();

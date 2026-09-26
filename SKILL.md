@@ -19,7 +19,9 @@ Deployment: Claude-Sessions pushen direkt auf main (GitHub Pages deployt automat
 Fallback ohne Session: GitHub Browser-Interface (Stift-Symbol, Strg+A, Inhalt ersetzen, Commit).
 Koerperdaten: 169 cm, 56 kg — Tipps und Maschinen-Einstellungen darauf zuschneiden
 (mittlere Sitz-/Lehnenpositionen als Startpunkt, wenig Unterstuetzung beim assistierten Klimmzug).
-Trainingsziel: Glute-Fokus + schmale Beine (Quad-Betonung vermeiden).
+Trainingsziel (seit Sept. 2026): grosser, runder, abstehender Po (Hauptfokus), deutliche
+Huefte/Sanduhr, DEFINIERTE (nicht massige) Beine, trainierter schlanker Oberkoerper,
+schmale Taille. Kann viel trainieren — Umfang soll aber sinnvoll und effektiv bleiben.
 
 **WICHTIG: Aenderungen IMMER direkt auf `main` pushen — NIEMALS Feature-Branches oder Pull
 Requests anlegen!** GitHub Pages deployt von `main`; nur dort wird die App live. Rexi hat das
@@ -42,6 +44,8 @@ auf main einmalig eine Sicherheitsfreigabe verlangen; dann kurz bestaetigen lass
 - localStorage-Keys: peach_v4 (Trainingsdaten — NIEMALS umbenennen!),
   peach_ver (Auto-Update-Guard: Commit-SHA, fuer den bereits neu geladen wurde),
   peach_ui (zuletzt offene Position: view/week/cy/pt/openDays — getrennt von peach_v4).
+  Sicherheitskopien vor Daten-Eingriffen: peach_v4_pre_add, peach_v4_pre_fix, peach_v4_pre_v2.
+  Plan-Version pro Zyklus steht als pv__-Marker IN peach_v4 (siehe Key-Formate).
   (peach_theme wurde entfernt — es gibt keinen Dark Mode mehr.)
 - Gym: Workshop Fitness Barcelona, Carrer d'Avila 120, El Poblenou. Panatta, Precor, Rogue, Eleiko, TRX.
 
@@ -93,7 +97,7 @@ in der Uebersicht ist das Tages-Label eine Pille in der jeweiligen Tagesfarbe.
 ### Kategorie-Farben (CC) — solide Pill, 2px Ink-Rahmen, schwarzer Uppercase-Text
   Glute Max #EE8FB4, Glute Med #B49DF2, Adduktoren #7FD1C1, Glute & Quad #E8B86A, Glute & Hams #A7D98C
   Ruecken #84C3E0, Brust #F0A0A0, Schultern #C2DB7E, Bizeps #E6C57E
-  Trizeps #93B6E0, Bauch #D6D080
+  Trizeps #93B6E0, Bauch #D6D080, Beinbeuger #D7A0E8 (Orchidee), Beinstrecker #F9B98A (Apricot)
 
 ### Fortschritts-Farben (pbadge = solide Pill; rcol = ganzes Rep-Feld gefuellt)
   Gruen #6FC36A = Gewicht gesteigert (--prog-up)
@@ -127,7 +131,7 @@ Empfohlene Uebungen (REC-Set) erhalten im Dropdown einen goldenen Stern (★).
 ### State-Objekt S
 ```
 S = {
-  cy: "cycle1",     // cycle1-3 (4-Tage-Plan) bzw. p3cycle1-3 (3-Tage-Plan)
+  cy: "cycle1",     // cycle1-6 (4-Tage-Plan) bzw. p3cycle1-6 (3-Tage-Plan)
   pt: "p4",         // Plan-Typ: "p4" (4 Tage, Default) | "p3" (3 Tage)
   week: 1,          // 1-12
   view: "training", // "training" | "overview"
@@ -145,7 +149,8 @@ S = {
 ### Key-Formate
 ```
 Workout:      [cycle]__w[week]__d[dayIdx]__e[exIdx]
-              [cycle] = cycle1-3 (4-Tage-Plan) ODER p3cycle1-3 (3-Tage-Plan).
+              [cycle] = cycle1-6 (4-Tage-Plan) ODER p3cycle1-6 (3-Tage-Plan).
+              (Bis Sept. 2026 nur 1-3 — nach Zyklus 3 ging es auf den befuellten Zyklus 1 zurueck.)
               Die Plaene sind dadurch komplett getrennt — NIEMALS Keys mischen/migrieren!
 Tipp-Notiz:   tip__ex__[Uebungsname]  (gilt ueber alle Wochen/Tage/Zyklen!)
               WICHTIG: Seit dem Notiz-Update ist das eine ZUSAETZLICHE eigene Notiz,
@@ -154,6 +159,9 @@ Tipp-Notiz:   tip__ex__[Uebungsname]  (gilt ueber alle Wochen/Tage/Zyklen!)
               bei leerem Text. Vorteil: TIPS-Updates erreichen die Nutzerin immer.
 Einstellung:  set__ex__[Uebungsname]  (Maschinen-Einstellung, uebungsbasiert wie Tipps)
 Slot:         tip__[cycle]__w[week]__d[dayIdx]__e[exIdx]  (nur UI-State)
+Plan-Marker:  pv__[cycle] = 1  -> dieser Zyklus zeigt den ALTEN Plan (P4_V1/P3_V1)
+              pv__done  = 1  -> Markierung ist gelaufen (Backups ohne pv__done werden
+                                beim Einspielen markiert). Beide zaehlen NICHT als Eintraege.
 ```
 
 ### Wichtige Funktionen
@@ -161,7 +169,25 @@ Slot:         tip__[cycle]__w[week]__d[dayIdx]__e[exIdx]  (nur UI-State)
 mk(cy,week,di,ei)       Workout-Key
 mkt(cy,week,di,ei)      Slot-Key
 initKey(di,ei)          Key mit Vorwoche-Daten init — IMMER statt mk() beim Schreiben!
-plan()                  gibt P3 (S.pt==='p3') oder P4 (Default) zurueck
+plan()                  = planOf(S.cy) — der Plan DES AKTUELLEN ZYKLUS
+planOf(cy)              p3-Praefix -> 3 Tage, sonst 4 Tage; Zyklus mit pv__-Marker -> alte Version
+                        (P3_V1/P4_V1), sonst die neue (P3/P4). JEDE Stelle, die einen Plan-Platz
+                        braucht (repairSlots, repRange, srcLabel, carryMap), nimmt planOf(cy).
+isLegacy(cy)            true wenn S.data['pv__'+cy]===1
+markLegacy(data)        Einmal-Markierung: jeder Zyklus mit echten Werten (hasVals) bekommt
+                        pv__[cycle]=1, danach pv__done=1. Laeuft beim Start (migPlanV2, vorher
+                        Kopie nach peach_v4_pre_v2) und in impBackup (fuer alte Backups).
+ALIAS / rowFits(r,e)    Zeile der Kategorie r akzeptiert Uebung der Kategorie e (gleich ODER Alias).
+                        ALIAS {"Glute & Hams":["Beinbeuger"]}: Leg Curls/Nordic Curls standen bis
+                        Sept. 2026 in Glute & Hams — ohne Alias schoebe repairSlots sie aus den
+                        alten Zeilen ans Tagesende. NUR fuer die Daten-Zuordnung, NICHT im Dropdown.
+carryMap(cy)            Uebungs-Uebernahme in einen neuen Zyklus (nur Nicht-Alt-Zyklen): pro Zeile
+                        die Uebung aus dem letzten Zyklus mit Auswahl (erst gleicher Plan n-1..1,
+                        dann anderer Plan n..1), gleiche KATEGORIE laut CATOF, bevorzugt gleicher
+                        Rep-Bereich (+4) und gleicher Tag (+2), pro Tag keine Dopplung. Cache _carry
+                        (vor save() deklariert, in save() geleert).
+inhEx(di,ei)            Vorbelegte Uebung einer leeren Zeile: ab Woche 2 die der Vorwoche, in Woche 1
+                        carryMap. Genutzt von exState, exDone, initKey, updSetting.
 cyBase()                Zyklus ohne Plan-Praefix ('p3cycle2' -> 'cycle2') — fuer Buttons + Zyklus-Ende-Text
 setPlan(pt)             Plan-Umschalter 'p3'/'p4' (Header-Pills "3 Tage"/"4 Tage", Klasse .plan-btn).
                         Behaellt die Zyklus-Nummer (cycle2 <-> p3cycle2), schliesst offene Tage/Dropdown,
@@ -187,7 +213,7 @@ findLastExData(di,ei,ex) Sucht den letzten gespeicherten Wert dieser Uebung IM S
                         Liefert zusaetzlich _src {pt,cy,w,di} als Herkunft. Rueckfall auf den
                         anderen Plan (nur lesend), wenn im aktuellen Plan noch nichts steht.
 exOrd(cy,w,di,ei)       Reihenfolge-Wert eines Eintrags: Zyklus > Woche > Tag > Position
-repRange(pt,di,ei)      Rep-Bereich eines Plan-Platzes als String ("4-8"); '' wenn es den Platz
+repRange(cy,di,ei)      Rep-Bereich eines Plan-Platzes als String ("4-8"); '' wenn es den Platz
                         im Plan nicht (mehr) gibt — solche Eintraege bleiben aus dem Index raus.
 exKey(ex,rr)            Index-Schluessel "Uebung||4-8"
 exIndex()               Baut/cached den Index exKey -> Eintraege (aufsteigend). Cache
@@ -342,6 +368,8 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
 
 ### Daten-Vererbung zwischen Wochen
 Vererbt: exercise, extraSets — NICHT: reps, weight
+Woche 1 eines neuen Zyklus: exercise aus dem vorherigen Zyklus (carryMap, nach Kategorie),
+extraSets starten bei 0. Nur Vorbelegung — gespeichert wird erst beim Eintragen (initKey).
 
 ---
 
@@ -354,10 +382,11 @@ Vererbt: exercise, extraSets — NICHT: reps, weight
    sonst wird ihr Fortschritt falsch herum gerechnet.
    Maschinen-Tipps folgen dem Format: "Zahnrad-Emoji Einstellung: ...\nAusfuehrung: ..." —
    Einstell-Checkliste (Gelenk auf Drehachse, Polster-Positionen, Startposition fuer 169 cm)
-   plus Ausfuehrungs-Cues, zugeschnitten auf Glute-Fokus / schmale Beine
+   plus Ausfuehrungs-Cues, zugeschnitten auf Glute-Fokus / definierte, nicht massige Beine
 4. KEIN Grad-Zeichen (°) in Strings im Script — zerstoert den JS-Parser! "Grad" ausschreiben
 5. Keine renderT() in updRep/updW
-6. plan() gibt P3 oder P4 zurueck (je nach S.pt) — beide Plaene folgen denselben Regeln
+6. plan() = planOf(S.cy): 3 oder 4 Tage je nach Praefix, alte oder neue Version je nach
+   pv__-Marker — alle Plaene folgen denselben Regeln
    (Steigerung, autoExtraSets, Vererbung, Woche-1-Regel); 3-Tage-Daten IMMER unter p3cycle-Keys
 7. Bei groesseren Aenderungen: Python-Script verwenden, am Ende node --check ausfuehren
 8. Sonderzeichen generell meiden in JS-Strings
@@ -403,112 +432,72 @@ Vererbt: exercise, extraSets — NICHT: reps, weight
     im Browser pruefen, ob localStorage danach wirklich den neuen Stand hat — nicht nur, ob
     die Oberflaeche richtig aussieht.
 
----
-
-## Trainingsplan 4-Tage (P4) — Standard-Plan
-
-### Tag A — Beine
-| Kategorie | Saetze | Reps |
-|---|---|---|
-| Glute Max | 3 | 4-8 |
-| Glute Max | 2 | 8-12 |
-| Glute Med | 3 | 8-12 |
-| Glute Med | 2 | 8-12 |
-| Glute & Hams | 2 | 8-12 |
-| Glute & Hams | 2 | 6-10 |
-| Glute & Quad | 2 | 6-10 |
-| Adduktoren | 2 | 8-12 |
-| Bauch | 2 | 8-12 |
-
-### Tag B — Oberkörper
-| Kategorie | Saetze | Reps |
-|---|---|---|
-| Ruecken | 3 | 4-8 |
-| Ruecken | 2 | 8-12 |
-| Schultern | 3 | 8-12 |
-| Schultern | 2 | 8-12 |
-| Brust | 2 | 8-12 |
-| Bizeps | 2 | 8-12 |
-| Trizeps | 2 | 8-12 |
-| Bauch | 2 | 8-12 |
-| Bauch | 2 | 8-12 |
-
-### Tag C — Ganzkörper
-| Kategorie | Saetze | Reps |
-|---|---|---|
-| Glute & Hams | 3 | 4-8 |
-| Glute & Hams | 2 | 6-10 |
-| Glute Max | 3 | 6-10 |
-| Glute Med | 2 | 8-12 |
-| Glute Med | 2 | 6-10 |
-| Glute & Quad | 2 | 6-10 |
-| Ruecken | 2 | 8-12 |
-| Schultern | 2 | 8-12 |
-| Bauch | 2 | 8-12 |
-| Bauch | 2 | 8-12 |
-
-### Tag D — Ganzkörper
-| Kategorie | Saetze | Reps |
-|---|---|---|
-| Glute Max | 3 | 4-8 |
-| Glute Max | 2 | 8-12 |
-| Glute Med | 3 | 8-12 |
-| Glute Med | 2 | 8-12 |
-| Glute & Hams | 2 | 6-10 |
-| Glute & Quad | 2 | 6-10 |
-| Adduktoren | 2 | 8-12 |
-| Brust | 2 | 8-12 |
-| Schultern | 2 | 8-12 |
-| Bauch | 2 | 8-12 |
+13. **Einen Plan NIE ueber bereits trainierte Zyklen legen — neue Aufteilung = neue
+    Plan-Version.** Die Workout-Keys sind positionsbasiert: aendert man P3/P4 selbst, zeigen
+    alle alten Wochen ihre Daten in fremden Zeilen, und repairSlots() sortiert sie beim
+    naechsten Start dauerhaft um. Vorgehen (so gemacht im Sept. 2026): alten Plan als
+    P3_V1/P4_V1 behalten, neuen als P3/P4 anlegen, alte Zyklen per pv__-Marker auf die alte
+    Version festnageln (markLegacy), alles Plan-Abhaengige ueber planOf(cy) lesen. Bei einer
+    weiteren Plan-Aenderung: V1 bleibt, aktueller Plan wird V2, Marker um die Version
+    erweitern (z. B. pv__cycle3=2) — NIE einen Marker loeschen. Verschiebt sich eine Uebung in
+    eine neue Kategorie, braucht die alte Kategorie einen ALIAS-Eintrag.
 
 ---
 
-## Trainingsplan 3-Tage (P3) — waehlbar ueber "3 Tage"-Pill im Header
+## Trainingsplaene — Version 2 (ab Sept. 2026, gilt fuer alle NEUEN Zyklen)
 
-Eigene Zyklen 1-3 (Keys p3cycle1-3), gleiche Regeln wie P4 (Steigerung, Auto-Extra-Satz,
-Vererbung, kein Vergleich in Woche 1). Tagesfarben: A Peach, B Pink, C Lime.
+Peach-Aufbau mit vollem Po-Fokus, trainingswissenschaftlich gegengeprueft (Pelland 2024:
+abnehmender Grenznutzen, ~25-30 anteilige Saetze/Woche; Remmert 2025: ab ~11 Saetzen pro
+Muskel und Einheit kein Zusatznutzen; Plotkin 2023/Kubo 2019: Hip Thrust + tiefe
+kniedominante Uebung; Maeo 2021: sitzender Beinbeuger > liegend). Grundsaetze:
+- Jede Einheit startet frisch mit den zwei wichtigsten Po-Uebungen (kurze + lange Muskellaenge).
+- Pro Einheit hoechstens ~9 harte Po-Saetze; Glute Med 4x pro Woche (Wunsch: deutliche Huefte).
+- Adduktoren bleiben (2x2 Saetze). Neu: Beinbeuger + Beinstrecker fuer definierte Beine.
+- JEDER Tag endet mit Bauch, 2 Saetze (ausdruecklicher Wunsch).
+- KEINE Supersaetze (ausdruecklicher Wunsch) — alles normale Saetze.
+- Oberkoerper schlank: Latzug/Rudern + Seitheben, wenig Brust/Arme.
+- Athena (FPS) wurde geprueft und bewusst NICHT uebernommen (Aufbau gefiel nicht).
+Saetze sind Startwerte — Auto-Zusatzsatz und +-Button steigern gezielt.
 
-### Tag A — Ganzkoerper
-| Kategorie | Saetze | Reps |
+### 4 Tage (P4) — 67 Saetze/Woche
+| Tag A – Unterkörper | Tag B – Oberkörper + Po | Tag C – Ganzkörper | Tag D – Unterkörper |
+|---|---|---|---|
+| Glute Max 3x4-8 | Glute Max 2x8-12 | Glute & Hams 3x6-10 | Glute Max 3x8-12 |
+| Glute & Quad 3x6-10 | Glute Med 2x8-12 | Glute Max 3x6-10 | Glute & Quad 2x8-12 |
+| Glute Max 2x8-12 | Rücken 3x6-10 | Glute Max 2x8-12 | Glute & Hams 2x8-12 |
+| Glute Med 2x8-12 | Schultern 3x8-12 | Glute Med 2x8-12 | Glute Med 2x8-12 |
+| Beinbeuger 2x8-12 | Brust 2x6-10 | Beinbeuger 2x8-12 | Beinstrecker 2x8-12 |
+| Adduktoren 2x8-12 | Bizeps 2x8-12 | Rücken 2x8-12 | Adduktoren 2x8-12 |
+| Bauch 2x8-12 | Trizeps 2x8-12 | Schultern 2x8-12 | Bauch 2x8-12 |
+| | Bauch 2x8-12 | Bauch 2x8-12 | |
+
+Woche: Glute Max 15, Glute & Quad 5, Glute & Hams 5, Glute Med 8, Beinbeuger 4,
+Beinstrecker 2, Adduktoren 4, Ruecken 5, Schultern 5, Brust 2, Bizeps 2, Trizeps 2, Bauch 8.
+Pro Tag 16/18/18/15 Saetze (7/8/8/7 Uebungen).
+
+### 3 Tage (P3) — 56 Saetze/Woche
+| Tag A – Po schwer | Tag B – Po & Beinrückseite | Tag C – Po & Hüfte |
 |---|---|---|
-| Glute Max | 3 | 4-8 |
-| Glute Max | 2 | 8-12 |
-| Glute Med | 2 | 8-12 |
-| Glute Med | 2 | 8-12 |
-| Glute & Hams | 2 | 4-8 |
-| Glute & Quad | 2 | 4-8 |
-| Adduktoren | 2 | 8-12 |
-| Brust | 2 | 8-12 |
-| Schultern | 2 | 8-12 |
-| Bauch | 3 | 8-12 |
+| Glute Max 3x4-8 | Glute & Hams 3x6-10 | Glute Max 3x8-12 |
+| Glute & Quad 3x6-10 | Glute Max 3x6-10 | Glute & Quad 2x8-12 |
+| Glute Max 2x8-12 | Glute Max 2x8-12 | Glute & Hams 2x8-12 |
+| Glute Med 2x8-12 | Glute Med 2x8-12 | Glute Med 2x8-12 |
+| Adduktoren 2x8-12 | Beinbeuger 3x8-12 | Glute Med 2x8-12 |
+| Rücken 2x6-10 | Rücken 2x8-12 | Beinstrecker 2x8-12 |
+| Schultern 2x8-12 | Brust 2x6-10 | Adduktoren 2x8-12 |
+| Bauch 2x8-12 | Bauch 2x8-12 | Schultern 2x8-12 |
+| | | Bauch 2x8-12 |
 
-### Tag B — Ganzkoerper
-| Kategorie | Saetze | Reps |
-|---|---|---|
-| Glute & Hams | 2 | 4-8 |
-| Glute & Hams | 2 | 6-10 |
-| Glute Max | 3 | 6-10 |
-| Glute Med | 2 | 8-12 |
-| Glute Med | 2 | 8-12 |
-| Glute & Quad | 2 | 6-10 |
-| Ruecken | 2 | 8-12 |
-| Ruecken | 2 | 8-12 |
-| Schultern | 2 | 8-12 |
-| Bauch | 3 | 8-12 |
+Woche: Glute Max 13, Glute & Quad 5, Glute & Hams 5, Glute Med 8, Beinbeuger 3,
+Beinstrecker 2, Adduktoren 4, Ruecken 4, Schultern 4, Brust 2, Bauch 6.
+Pro Tag 18/19/19 Saetze (8/8/9 Uebungen). Eigene Zyklen 1-6 (Keys p3cycle1-6), gleiche
+Regeln wie P4. Tagesfarben: A Peach, B Pink, C Lime (D Sky nur im 4-Tage-Plan).
 
-### Tag C — Ganzkoerper
-| Kategorie | Saetze | Reps |
-|---|---|---|
-| Glute Max | 3 | 4-8 |
-| Glute Max | 2 | 8-12 |
-| Glute Med | 2 | 8-12 |
-| Glute Med | 2 | 8-12 |
-| Glute & Hams | 3 | 4-8 |
-| Adduktoren | 2 | 8-12 |
-| Ruecken | 2 | 8-12 |
-| Brust | 2 | 8-12 |
-| Schultern | 2 | 8-12 |
-| Bauch | 3 | 8-12 |
+### Alte Plaene (P4_V1 / P3_V1, bis Sept. 2026) — nur fuer Zyklen mit pv__-Marker
+Stehen unveraendert in index.html (P4_V1: A Beine 9 / B Oberkoerper 9 / C 10 / D 10
+Uebungen, 84 Saetze; P3_V1: 10/10/10 Uebungen, 67 Saetze). Bei Rexi: der beim Umstieg
+laufende 3-Tage-Zyklus (Woche 12) und die 4-Tage-Zyklen davor. Leg Curls stehen dort in
+Glute-&-Hams-Zeilen (ALIAS).
 
 ---
 
@@ -522,7 +511,12 @@ Adduktoren (8): Adduktionsmaschine, Adduktion Kabel Stehend, Adduktion Kabel Lie
 
 Glute & Quad (11): Low Bar Squat, Beinpresse 45 Grad, Beinpresse, Step Ups, Split Squat Kurzhantel, Split Squat Langhantel, Split Squat Multipresse, Hack Squat, Reverse Lunge, Belt Squat, Super Squat
 
-Glute & Hams (11): RDL Langhantel, RDL Kurzhanteln, RDL Maschine, Belt Squat RDL, Glute Hyperextensions, Reverse Hack RDL, Good Mornings, Single-Leg RDL, Nordic Curls, Leg Curls stehend, Leg Curls liegend
+Glute & Hams (8): RDL Langhantel, RDL Kurzhanteln, RDL Maschine, Belt Squat RDL, Glute Hyperextensions, Reverse Hack RDL, Good Mornings, Single-Leg RDL
+
+Beinbeuger (4, NEU Sept. 2026): Leg Curls sitzend, Leg Curls stehend, Leg Curls liegend, Nordic Curls
+(Leg Curls + Nordic Curls NUR hier — keine Dopplung in Glute & Hams, ausdruecklicher Wunsch)
+
+Beinstrecker (2, NEU Sept. 2026): Beinstrecker Maschine, Beinstrecker einbeinig
 
 Ruecken (21): LH Rudern, KH Rudern, KH Rudern (breit), Rudern Kabel (eng), Rudern Kabel (breit), Rudermaschine (Panatta), Rudermaschine (Precor), High Row Maschine, Latzug (eng), Latzug (breit), Latzug Maschine (Panatta), Latzug Maschine (Precor), Ueberzug am Kabel, T Bar Rudern (neutral), T Bar Rudern (breit), Assistierter Klimmzug (eng), Assistierter Klimmzug (breit), Face Pull Kabel, Straight-Arm Pulldown, Einarmiger Latzug Kabel, Diverging Low Row
 
@@ -573,21 +567,25 @@ Orientierungs-Quelle ueberspringen — sie ist der echte letzte Wert vor dem neu
 Banner in Woche 12: gelber Block (var(--yellow)), 2,5px Ink-Rahmen, harte Schatten
 (--sh-card), Titel "Woche 12 – Zyklus fast abgeschlossen!" in Archivo Black. Text: letzte
 Woche des Zyklus, danach Zyklus X mit Woche 1 — dort leichter einsteigen, Werte nur zur
-Orientierung, verglichen wird erst ab Woche 2.
+Orientierung, verglichen wird erst ab Woche 2. Ist der aktuelle Zyklus ein alter (pv__) und der
+naechste nicht, kommt der Satz "Ab Zyklus X gilt dein neuer Plan ..." dazu. Nach Zyklus 6
+geht es auf "1 (neu)" — dort steht aber der alte Plan (Marker): spaetestens dann braucht es
+eine Loesung (z. B. mehr Zyklen oder Zyklus-Archiv).
 
 ---
 
-## Trainingsziele
+## Trainingsziele (Stand Sept. 2026)
 
-1. Ausladender Po, breite Huefte (Glute Max 13 + Glute Med 14 Saetze/Woche, 3x Frequenz)
-2. Schlanke Taille (Anti-Rotation, Transversus, V-Taper durch Lats)
-3. Schlanke Beine (Glute & Quad max. 8 Saetze/Woche, nur beinschonende Varianten)
-4. Breite Schultern, gute Haltung (Schultern 9 Saetze vs. Brust 4 Saetze)
-
-5. Volle Innenseite / runde Huefte von vorne (Adduktoren 4 Saetze/Woche, 2x Frequenz).
-   Der Adduktor magnus ist zugleich ein HUEFTSTRECKER — er arbeitet mit dem Po zusammen
-   und fuellt die Innenseite, ohne die Oberschenkel-Vorderseite dicker zu machen.
-   Deshalb eigene Kategorie und NICHT unter Glute Med (das ist die Gegenbewegung).
+1. Grosser, runder, abstehender Po — Hauptfokus: Glute Max 13 (3 Tage) / 15 (4 Tage)
+   Saetze direkt + Glute & Quad / Glute & Hams je 5 fuer die gedehnte Position.
+2. Deutliche Huefte / Sanduhr: Glute Med 4x pro Woche (8 Saetze), Abduktion mit
+   vorgeneigtem Oberkoerper fuer den oberen Po; dazu Lats + Seitheben (V-Form).
+3. Definierte, nicht massige Beine: Beinbeuger (sitzend bevorzugt) 3-4 Saetze,
+   Beinstrecker 2 Saetze, kniedominante Uebungen po-betont (langer Schritt, Oberkoerper vor).
+4. Trainierter, schlanker Oberkoerper: Ruecken + Schultern moderat, Brust/Arme minimal.
+5. Schmale Taille: Bauch als Abschluss (2 Saetze pro Tag), keine schweren Seitbeugen.
+6. Volle Innenseite: Adduktoren 2x2 Saetze. Der Adduktor magnus ist zugleich ein
+   HUEFTSTRECKER — eigene Kategorie, NICHT unter Glute Med (Gegenbewegung).
 
 Glute & Quad: Weite Fussstellung + erhoehte Ferse = Po. Enge Fussstellung + Tiefe = Quad.
 
@@ -607,6 +605,25 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Neue Trainingsplaene (Version 2), Beinbeuger/Beinstrecker, Zyklen 1-6 (26.09.2026).**
+   Ausloeser: Stagnation, Einheiten ueber 2 h, neue Ziele (definierte Beine, Sanduhr).
+   Recherche: Original-Peach-Tabellen im PDF (3 Tage 7 Uebungen/15 Saetze, 4 Tage 6/13) waren
+   deutlich schlanker als der App-Plan (67/84 Saetze); Glute Med war mit 12-14 Saetzen fast
+   verdreifacht. Athena (FPS) wurde ueber die Launch-Mails recherchiert und auf Wunsch NICHT
+   uebernommen. Neue Plaene siehe oben (56/67 Saetze, Po-Volumen am oberen sinnvollen Ende,
+   Bauch als letzte Uebung jeden Tag, keine Supersaetze). Technik:
+   (1) Plan-Versionen: alte Plaene als P3_V1/P4_V1, Marker pv__[Zyklus] fuer alle Zyklen mit
+   Werten (markLegacy/migPlanV2, auch beim Backup-Import), planOf(cy) ueberall — alte
+   Zyklen sehen exakt aus wie vorher, neue nutzen die neue Aufteilung (Regel 13).
+   (2) Neue Kategorien Beinbeuger (Leg Curls sitzend NEU + stehend/liegend + Nordic Curls,
+   aus Glute & Hams verschoben — keine Dopplung) und Beinstrecker (Maschine, einbeinig),
+   Tipps + REC-Sterne; ALIAS haelt alte Leg-Curl-Eintraege in ihren Glute-&-Hams-Zeilen.
+   (3) Uebungsauswahl wird in den neuen Zyklus uebernommen (carryMap/inhEx, nach Kategorie).
+   (4) Zyklen 1-6 statt 1-3 (kompakte Nummern-Pills mit Label "Zyklus"), Woche-12-Hinweis
+   nennt den neuen Plan. Verifiziert per Playwright mit simulierten Altdaten (26 Pruefungen:
+   Marker, Altdaten byte-gleich, alter/neuer Plan je Zyklus, Uebernahme inkl. Leg Curls ->
+   Beinbeuger, keine Dopplung, Idempotenz, Backup-Import, Zyklus 5 gemerkt) + Konsistenz-Audit.
 
 NEU. **Woche 1 ohne Vergleich + keine Deload-Woche mehr (23.09.2026).** (1) In Woche 1
    jedes Zyklus steigt Rexi bewusst leichter ein — exState setzt noCmp=true: kein
@@ -863,7 +880,7 @@ NEU. **Nachtrag: Rep-Bereich gehoert in den Vergleichsschluessel:** Der erste Wu
    Gesamtsumme, parseWeight fuer Spannen/Komma, P3/Plan-Umschalter entfernt,
    Dropdown-Such-Fokus-Fix, REC-Stern im Dropdown, veraltete Duplikat-PDF geloescht.
 
-Konsistenz-Audit (zuletzt ausgefuehrt): alle 137 Uebungen haben Tipps, keine verwaisten
+Konsistenz-Audit (zuletzt ausgefuehrt 26.09.2026): alle 140 Uebungen haben Tipps, keine verwaisten
 Tipps/REC-Eintraege, keine Duplikate, Rep-Bereiche plausibel (4-8/6-10/8-12), jede im Plan
-verwendete Kategorie existiert in EXERCISES und hat eine Farbe in CC,
+verwendete Kategorie (P3/P4 UND P3_V1/P4_V1) existiert in EXERCISES und hat eine Farbe in CC,
 prog()/rcol()/autoExtraSets() per Funktionstest verifiziert.
