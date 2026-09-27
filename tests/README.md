@@ -12,9 +12,9 @@ iPhone werden dabei nie beruehrt.
 | `planwechsel.test.js` | Alte Zyklen behalten ihren Plan, neue Zyklen den neuen, Uebernahme der Uebungen, Reihenfolge, Leg Curls nur unter Beinbeuger |
 | `verlauf-planwechsel.test.js` | Echter Verlauf: 4 Tage Z1 W1-3 -> 3 Tage Z1 W1-12 -> 4 Tage Z2 |
 | `verlauf-woche1-2.test.js` | Woche 1 und 2 zeigen denselben Vorwert (gleicher Rep-Bereich zuerst) |
-| `steigerung.test.js` | Hinweis "Gewicht steigern" nach der Peach-Regel |
+| `steigerung.test.js` | Hinweis "Gewicht steigern" nach der Peach-Regel, nicht beim Vorblaettern mit leerer Vorwoche |
 | `tag-a-erweiterung.test.js` | Neue Zeile in 4-Tage Tag A: vorhandene Wochen werden per Kategorie richtig einsortiert, nichts geht verloren |
-| `tag-b-erweiterung.test.js` | Zweite Ruecken- und zweite Schulter-Zeile in 4-Tage Tag B: Einsortierung, Vorbelegung ohne Dopplung |
+| `tag-b-erweiterung.test.js` | 4-Tage Tag B (2. Ruecken, 2. Schulter, ohne Arme): Einsortierung aller frueheren Aufteilungen, Arm-Werte bleiben gespeichert, Vorbelegung ohne Dopplung |
 
 Voraussetzung: Node.js mit `playwright` (in Claude-Cloud-Sessions vorinstalliert).
 Blockierte Google Fonts (Sandbox-Netz) sind kein Fehler — gezaehlt werden nur echte JS-Exceptions.

@@ -29,5 +29,13 @@ const h=await page.$eval('.day-body .ex-row .sets-info',e=>e.getBoundingClientRe
 ok(h<30,'Hinweis passt in eine Zeile (Hoehe '+Math.round(h)+' px)');
 await page.evaluate(()=>{S.openDays={1:true};render()});
 ok((await page.textContent('#ih-1-2').catch(()=>''))==='▼ Hilfe senken','Assistierter Klimmzug: "▼ Hilfe senken"');
+// Vorblaettern: W3 ohne Eintrag in W2 -> kein Hinweis aus W1 (Fehler bis 27.09.2026)
+await page.evaluate(()=>{for(const k in S.data)if(/__w2__/.test(k))delete S.data[k];S.week=3;S.openDays={0:true};save();render()});
+ok((await page.$$('#ih-0-0')).length===0||!(await vis('#ih-0-0')),'Woche 3, Woche 2 leer -> kein Hinweis (Vorwert stammt aus W1)');
+ok(/zuletzt: .*W1/.test(await page.textContent('.day-body .ex-row .phint').catch(()=>'')),'Woche 3: "zuletzt" zeigt trotzdem W1 zur Orientierung');
+await page.evaluate(()=>{S.data['cycle3__w2__d0__e0']={exercise:'Hip Thrusts Langhantel',extraSets:0,weight:'145',reps:['8','8','7']};save();render()});
+ok(await vis('#ih-0-0'),'Woche 3, Woche 2 mit 8 Wdh. -> Hinweis');
+await page.evaluate(()=>{S.week=4;render()});
+ok((await page.$$('#ih-0-0')).length===0||!(await vis('#ih-0-0')),'Woche 4, Woche 3 leer -> kein Hinweis');
 ok(errs.length===0,'keine JS-Fehler');console.log(fails?'FAILS '+fails:'ALL PASS');process.exitCode=fails?1:0;await b.close();})();
 

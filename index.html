@@ -456,7 +456,7 @@ const P4=[
   {c:"Adduktoren",s:2,r:[8,12]},
   {c:"Bauch",s:2,r:[8,12]}
 ]},
-{l:"Tag B – Oberkörper & Po",f:"Rücken · Schultern · Arme",e:[
+{l:"Tag B – Oberkörper & Po",f:"Rücken · Schultern",e:[
   {c:"Glute Max",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
   {c:"Rücken",s:3,r:[6,10]},
@@ -464,8 +464,6 @@ const P4=[
   {c:"Schultern",s:3,r:[8,12]},
   {c:"Schultern",s:2,r:[8,12]},
   {c:"Brust",s:2,r:[6,10]},
-  {c:"Bizeps",s:2,r:[8,12]},
-  {c:"Trizeps",s:2,r:[8,12]},
   {c:"Bauch",s:2,r:[8,12]}
 ]},
 {l:"Tag C – Po & Beinrückseite",f:"6–10 Wdh. · Hüftbeuge · Beinbeuger",e:[
@@ -814,6 +812,8 @@ function repairSlots(){
       const day=planOf(cy)[di];
       if(!day){grp[g].forEach(function(it){S.data[cy+'__w'+w+'__d'+di+'__e'+it.slot]=it.val});continue}
       const slots=day.e, items=grp[g].sort(function(a,b){return a.slot-b.slot}), taken=[], rest=[], leg=isLegacy(cy);
+      // Eintrag ohne passende Zeile (z. B. gestrichene Uebung): hinter dem Plan parken, unsichtbar
+      const park=function(it){taken[Math.max(taken.length,slots.length)]=it};
       // 1. Durchgang: was schon auf einer passenden Zeile sitzt, bleibt liegen
       for(const it of items){
         const cat=CATOF[it.val.exercise||''];
@@ -824,14 +824,14 @@ function repairSlots(){
       for(const it of rest){
         const ex=it.val.exercise||'';
         if(!ex){                               // leerer Platzhalter faellt weg — mit Werten nie:
-          if(hasVals(it.val)){if(it.slot<slots.length&&!taken[it.slot])taken[it.slot]=it;else taken.push(it)}
+          if(hasVals(it.val)){if(it.slot<slots.length&&!taken[it.slot])taken[it.slot]=it;else park(it)}
           continue;
         }
         const cat=CATOF[ex];
         let t=-1;
         for(let i=0;i<slots.length;i++)if(slots[i].c===cat&&!taken[i]){t=i;break}
         if(t<0)for(let i=0;i<slots.length;i++)if(rowFits(slots[i].c,cat,leg)&&!taken[i]){t=i;break}
-        if(t<0){ if(hasVals(it.val))taken.push(it); continue }  // mit Werten: nie wegwerfen
+        if(t<0){ if(hasVals(it.val))park(it); continue }  // mit Werten: nie wegwerfen
         taken[t]=it;
       }
       taken.forEach(function(it,i){if(it)S.data[cy+'__w'+w+'__d'+di+'__e'+i]=it.val});
@@ -1237,10 +1237,14 @@ function hintHTML(st){
 }
 // STEIGERUNGSREGEL (Peach): Obergrenze der Wiederholungen im ERSTEN Satz erreicht -> diesmal
 // mehr Gewicht. Kleiner Hinweis in der Zeile "3 Saetze · 4–8 Reps" — nur ab Woche 2, nur bei
-// einem Vorwert im gleichen Rep-Bereich und nur, solange das Gewicht noch nicht gesteigert ist
-// (verschwindet live beim Eintragen). Assistierte Uebungen: steigern = weniger Hilfe.
+// einem Vorwert im gleichen Rep-Bereich aus DIESER oder der VORWOCHE desselben Zyklus und nur,
+// solange das Gewicht noch nicht gesteigert ist (verschwindet live beim Eintragen).
+// Assistierte Uebungen: steigern = weniger Hilfe.
+// Fehler davor (27.09.2026): beim Vorblaettern (z. B. W5, W4 noch leer) kam der Hinweis aus W3.
 function incCand(st){
   if(st.noCmp||!st.hasPrev||st.prv._orient||!st.prv.weight)return false;
+  const src=st.prv._src||{};
+  if(src.cy!==S.cy||src.w<S.week-1)return false;
   const r0=parseInt((st.prv.reps||[])[0]);
   return !isNaN(r0)&&r0>=st.ex.r[1];
 }
@@ -1550,7 +1554,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeWeekPick()});
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-09-27-04';
+const BUILD_ID='2026-09-27-05';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();

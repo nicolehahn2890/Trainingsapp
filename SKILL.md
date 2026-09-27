@@ -275,6 +275,9 @@ hintHTML(st)            Nur noch die Herkunft: "zuletzt: Z2 W11 · Tag C" (+ " �
 incCand(st)/incDue(st)  Steigerungsregel (Peach): Vorwert im gleichen Rep-Bereich, 1. Satz >= Obergrenze
                         -> Hinweis "▲ Gewicht steigern" (#ih-di-ei, .inc-hint) in der Zeile "3 Saetze ·
                         4–8 Reps"; ab Woche 2, verschwindet live, sobald mehr Gewicht eingetragen ist.
+                        Vorwert MUSS aus derselben oder der Vorwoche desselben Zyklus stammen
+                        (_src.cy===S.cy, _src.w>=S.week-1) — beim Vorblaettern in Wochen mit leerer
+                        Vorwoche kein Hinweis ("zuletzt" zeigt den aelteren Wert weiter an).
                         Assistierte Uebungen: "▼ Hilfe senken".
 refreshProg(di,ei)      Zieht Badge (#pb-di-ei), Herkunftszeile (#ph-di-ei), Steigerungs-Hinweis (#ih-di-ei), Rep-Feld-Farben
                         (#rp-di-ei-i) und den Wochenbalken LIVE nach — KEIN renderT.
@@ -306,6 +309,9 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
                         Reihe nach in die naechste freie Zeile seiner Kategorie. Leere
                         Platzhalter fallen weg, Eintraege MIT Werten werden nie verworfen — auch
                         nicht ohne Uebungsname (bis 27.09.2026 fielen die im 2. Durchgang weg).
+                        Eintraege ohne passende Zeile (z. B. gestrichene Uebung) werden HINTER dem
+                        Plan geparkt (park(): Index >= Anzahl Zeilen) — unsichtbar, aber gespeichert.
+                        Vorher landeten sie per taken.push ggf. auf einer sichtbaren fremden Zeile.
                         Idempotent (korrekte Daten bleiben unveraendert). Stand vor jeder Aenderung:
                         peach_v4_pre_fix (erste) und peach_v4_pre_fix_last (juengste).
 ```
@@ -522,7 +528,7 @@ Tagesnamen = Schwerpunkt, dazu Feld f (Fokus-Zeile) im Plan-Objekt: {l:"Tag A �
 f:"Po schwer (4–8) · Beinvorderseite · ...",e:[...]}. renderT zeigt f als .day-focus in einer
 eigenen Zeile unter Titel + Uebungs-Pill (volle Breite). Alte Plaene haben kein f.
 
-### 4 Tage (P4) — 73 Saetze/Woche
+### 4 Tage (P4) — 69 Saetze/Woche
 | Tag A – Po Kraft | Tag B – Oberkörper & Po | Tag C – Po & Beinrückseite | Tag D – Po-Volumen & Beine |
 |---|---|---|---|
 | Glute Max 3x4-8 | Glute Max 2x8-12 | Glute Max 3x6-10 | Glute Max 3x8-12 |
@@ -532,16 +538,15 @@ eigenen Zeile unter Titel + Uebungs-Pill (volle Breite). Alte Plaene haben kein 
 | Glute & Hams 2x4-8 | Schultern 3x8-12 | Beinbeuger 2x8-12 | Beinstrecker 2x8-12 |
 | Beinbeuger 2x8-12 | Schultern 2x8-12 | Rücken 2x8-12 | Adduktoren 2x8-12 |
 | Adduktoren 2x8-12 | Brust 2x6-10 | Schultern 2x8-12 | Bauch 2x8-12 |
-| Bauch 2x8-12 | Bizeps 2x8-12 | Bauch 2x8-12 | |
-| | Trizeps 2x8-12 | | |
-| | Bauch 2x8-12 | | |
+| Bauch 2x8-12 | Bauch 2x8-12 | Bauch 2x8-12 | |
 
 Woche: Glute Max 15, Glute & Quad 5, Glute & Hams 7, Glute Med 8, Beinbeuger 4,
-Beinstrecker 2, Adduktoren 4, Ruecken 7, Schultern 7, Brust 2, Bizeps 2, Trizeps 2, Bauch 8.
-Pro Tag 18/22/18/15 Saetze (8/10/8/7 Uebungen). Tag B: zweite Ruecken-Zeile 2x8-12 (z. B. Rudern
-nach dem schweren Zug von oben) und zweite Schulter-Zeile 2x8-12 (z. B. hintere Schulter /
-Kabel-Seitheben) am 27.09.2026 auf Wunsch ergaenzt. Tag B ist damit so lang wie die alten
-Einheiten (10 Uebungen) — wird er zu lang, zuerst Bizeps/Trizeps streichen. Tag A: Glute & Hams 2x4-8 am 27.09.2026 auf
+Beinstrecker 2, Adduktoren 4, Ruecken 7, Schultern 7, Brust 2, Bauch 8 (keine Arme im 4-Tage-Plan).
+Pro Tag 18/18/18/15 Saetze (8/8/8/7 Uebungen). Tag B (Fokus "Rücken · Schultern"): zweite
+Ruecken-Zeile 2x8-12 (z. B. Rudern nach dem schweren Zug von oben) und zweite Schulter-Zeile
+2x8-12 (z. B. hintere Schulter / Kabel-Seitheben) am 27.09.2026 auf Wunsch ergaenzt, dafuer
+Bizeps/Trizeps gestrichen (sonst zu viel). Arme werden ueber Rudern/Latzug/Brust indirekt mit
+trainiert. Tag A: Glute & Hams 2x4-8 am 27.09.2026 auf
 Wunsch ergaenzt — Tag A ist der SCHWERE Tag, deshalb 4-8 (z. B. RDL schwer). Tag A liegt damit
 bei ~11 anteiligen Po-Saetzen — obere Grenze pro Einheit.
 
@@ -687,6 +692,15 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **4 Tage, Tag B ohne Arme + Steigerungs-Hinweis-Fix (27.09.2026, Version -05).**
+   (1) Bizeps und Trizeps aus Tag B gestrichen (Wunsch: sonst zu viel) — Tag B 8 Uebungen /
+   18 Saetze, Fokuszeile "Rücken · Schultern". Eingetragene Arm-Werte bleiben gespeichert
+   (geparkt hinter dem Plan), Bauch rutscht per Kategorie an Platz 8. (2) Bug: beim Vorblaettern
+   (z. B. W5 bei leerer W4) zeigte "▲ Gewicht steigern" den Wert aus W3 — jetzt nur mit Vorwert
+   aus derselben oder der Vorwoche. (3) repairSlots parkt Eintraege ohne passende Zeile hinter
+   dem Plan statt ggf. auf einer sichtbaren fremden Zeile. Tests: tag-b-erweiterung (8er/9er/
+   10er-Aufteilung, Arme geparkt), steigerung (leere Vorwoche); alle 7 Testreihen gruen.
 
 NEU. **4 Tage, Tag B: zweite Schulteruebung 2x8-12 (27.09.2026, Version -04).** Neue Zeile nach
    Schultern 3x8-12; eingetragene Wochen (8er- und 9er-Aufteilung) rutschen per Kategorie an die
