@@ -102,7 +102,7 @@ let fails=0; const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m); if(!c)fails++;
   await page.click('#plan-p4'); await page.click('#cycle-cycle2'); await page.waitForTimeout(150);
   labels=await page.$$eval('.day-title',e=>e.map(x=>x.textContent));
   const c4=await page.$$eval('.day-count',e=>e.map(x=>x.textContent.replace(/[^0-9/]/g,'')));
-  ok(labels.join('|')==='Tag A – Po Kraft|Tag B – Oberkörper & Po|Tag C – Po & Beinrückseite|Tag D – Po-Volumen & Beine'&&c4.join(',')==='0/7,0/8,0/8,0/7','4 Tage neu: '+labels.join(' | ')+' / '+c4.join(','));
+  ok(labels.join('|')==='Tag A – Po Kraft|Tag B – Oberkörper & Po|Tag C – Po & Beinrückseite|Tag D – Po-Volumen & Beine'&&c4.join(',')==='0/8,0/8,0/8,0/7','4 Tage neu: '+labels.join(' | ')+' / '+c4.join(','));
   await page.click('#cycle-cycle1'); await page.waitForTimeout(120);
   labels=await page.$$eval('.day-title',e=>e.map(x=>x.textContent));
   ok(labels[0]==='Tag A – Beine','cycle1 (4 Tage, alt) zeigt alten Plan');

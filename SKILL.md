@@ -188,10 +188,12 @@ markLegacy(data)        Einmal-Markierung: jeder Zyklus mit echten Werten (hasVa
                         Kopie nach peach_v4_pre_v2) und in impBackup (fuer alte Backups).
                         migPlanV2 speichert NUR, wenn es Trainingsdaten gibt — sonst haette der
                         Start leere/unlesbare Daten mit {pv__done:1} ueberschrieben.
-ALIAS / rowFits(r,e)    Zeile der Kategorie r akzeptiert Uebung der Kategorie e (gleich ODER Alias).
-                        ALIAS {"Glute & Hams":["Beinbeuger"]}: Leg Curls/Nordic Curls standen bis
-                        Sept. 2026 in Glute & Hams — ohne Alias schoebe repairSlots sie aus den
-                        alten Zeilen ans Tagesende. NUR fuer die Daten-Zuordnung, NICHT im Dropdown.
+ALIAS / rowFits(r,e,leg) Zeile der Kategorie r akzeptiert Uebung der Kategorie e (gleich ODER — nur in
+                        ALTEN Zyklen, leg=isLegacy — per Alias). ALIAS {"Glute & Hams":["Beinbeuger"]}:
+                        Leg Curls/Nordic Curls standen bis Sept. 2026 in Glute & Hams — ohne Alias
+                        schoebe repairSlots sie aus den alten Zeilen ans Tagesende. In V2 gilt der
+                        Alias NICHT: sonst blieb nach der neuen Glute-&-Hams-Zeile in Tag A ein
+                        Beinbeuger-Eintrag darin liegen. Nie im Dropdown.
 carryMap(cy)            Uebungs-Uebernahme in einen neuen Zyklus (nur Nicht-Alt-Zyklen): pro Zeile
                         die Uebung aus dem ZULETZT TRAINIERTEN Zyklus mit kleinerer Nummer — egal ob
                         3 oder 4 Tage (juengster Eintrag nach exOrd; notfalls anderer Plan gleiche
@@ -201,7 +203,8 @@ carryMap(cy)            Uebungs-Uebernahme in einen neuen Zyklus (nur Nicht-Alt-
 migOrderV2()            Einmal-Korrektur fuer die Reihenfolge-Umstellung innerhalb von V2 (26.09.):
                         Tag-Gruppen in Nicht-Alt-Zyklen, die komplett zur ERSTEN V2-Reihenfolge
                         passen und nicht zur aktuellen, werden per Tabelle V2_REORDER umsortiert.
-                        Inhaltsbasiert (Kategorie), idempotent, laeuft vor repairSlots.
+                        Inhaltsbasiert (Kategorie), idempotent, laeuft vor repairSlots. Seit 27.09.
+                        fuer P4 Tag A abgeschaltet (null) — der Tag hat jetzt 8 Zeilen.
 inhEx(di,ei)            Vorbelegte Uebung einer leeren Zeile: die der letzten GESPEICHERTEN Woche davor
                         (auch ueber ausgelassene Wochen), sonst carryMap. Geleertes Feld ('') bleibt
                         leer. Genutzt von exState, exDone, initKey, updSetting.
@@ -299,8 +302,10 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
                         Uebung KATEGORISCH gehoert — unabhaengig vom Versatz. 1. Durchgang:
                         was schon passend sitzt, bleibt liegen; 2. Durchgang: der Rest der
                         Reihe nach in die naechste freie Zeile seiner Kategorie. Leere
-                        Platzhalter fallen weg, Eintraege MIT Werten werden nie verworfen.
-                        Idempotent (korrekte Daten bleiben unveraendert).
+                        Platzhalter fallen weg, Eintraege MIT Werten werden nie verworfen — auch
+                        nicht ohne Uebungsname (bis 27.09.2026 fielen die im 2. Durchgang weg).
+                        Idempotent (korrekte Daten bleiben unveraendert). Stand vor jeder Aenderung:
+                        peach_v4_pre_fix (erste) und peach_v4_pre_fix_last (juengste).
 ```
 
 ### Vergleichslogik (wichtig!)
@@ -515,21 +520,23 @@ Tagesnamen = Schwerpunkt, dazu Feld f (Fokus-Zeile) im Plan-Objekt: {l:"Tag A �
 f:"Po schwer (4–8) · Beinvorderseite · ...",e:[...]}. renderT zeigt f als .day-focus in einer
 eigenen Zeile unter Titel + Uebungs-Pill (volle Breite). Alte Plaene haben kein f.
 
-### 4 Tage (P4) — 67 Saetze/Woche
+### 4 Tage (P4) — 69 Saetze/Woche
 | Tag A – Po Kraft | Tag B – Oberkörper & Po | Tag C – Po & Beinrückseite | Tag D – Po-Volumen & Beine |
 |---|---|---|---|
 | Glute Max 3x4-8 | Glute Max 2x8-12 | Glute Max 3x6-10 | Glute Max 3x8-12 |
 | Glute Max 2x8-12 | Glute Med 2x8-12 | Glute Max 2x8-12 | Glute Med 2x8-12 |
 | Glute Med 2x8-12 | Rücken 3x6-10 | Glute Med 2x8-12 | Glute & Quad 2x8-12 |
 | Glute & Quad 3x6-10 | Schultern 3x8-12 | Glute & Hams 3x6-10 | Glute & Hams 2x8-12 |
-| Beinbeuger 2x8-12 | Brust 2x6-10 | Beinbeuger 2x8-12 | Beinstrecker 2x8-12 |
-| Adduktoren 2x8-12 | Bizeps 2x8-12 | Rücken 2x8-12 | Adduktoren 2x8-12 |
-| Bauch 2x8-12 | Trizeps 2x8-12 | Schultern 2x8-12 | Bauch 2x8-12 |
-| | Bauch 2x8-12 | Bauch 2x8-12 | |
+| Glute & Hams 2x8-12 | Brust 2x6-10 | Beinbeuger 2x8-12 | Beinstrecker 2x8-12 |
+| Beinbeuger 2x8-12 | Bizeps 2x8-12 | Rücken 2x8-12 | Adduktoren 2x8-12 |
+| Adduktoren 2x8-12 | Trizeps 2x8-12 | Schultern 2x8-12 | Bauch 2x8-12 |
+| Bauch 2x8-12 | Bauch 2x8-12 | Bauch 2x8-12 | |
 
-Woche: Glute Max 15, Glute & Quad 5, Glute & Hams 5, Glute Med 8, Beinbeuger 4,
+Woche: Glute Max 15, Glute & Quad 5, Glute & Hams 7, Glute Med 8, Beinbeuger 4,
 Beinstrecker 2, Adduktoren 4, Ruecken 5, Schultern 5, Brust 2, Bizeps 2, Trizeps 2, Bauch 8.
-Pro Tag 16/18/18/15 Saetze (7/8/8/7 Uebungen).
+Pro Tag 18/18/18/15 Saetze (8/8/8/7 Uebungen). Tag A: Glute & Hams 2x8-12 am 27.09.2026 auf
+Wunsch ergaenzt (leichtere Hueftbeuge wie 45-Grad-Hyperextension / Single-Leg RDL; das schwere
+RDL liegt an Tag C). Tag A liegt damit bei ~11 anteiligen Po-Saetzen — obere Grenze pro Einheit.
 
 ### 3 Tage (P3) — 56 Saetze/Woche
 | Tag A – Po Kraft | Tag B – Po & Beinrückseite | Tag C – Hüfte & Sanduhr |
@@ -673,6 +680,14 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **4 Tage, Tag A: Glute & Hams 2x8-12 ergaenzt (27.09.2026, Version 2026-09-27-01).**
+   Neue Zeile nach Glute & Quad (Reihenfolge-Regel, Bauch bleibt letzte). Bereits eingetragene
+   Wochen in der alten 7er-Aufteilung sortiert repairSlots per Kategorie um — dafuer gilt der
+   Leg-Curl-Alias nur noch in alten Zyklen (sonst blieb Beinbeuger in der neuen G&H-Zeile).
+   Dazu: Eintraege mit Werten ohne Uebungsname werden nie mehr verworfen, peach_v4_pre_fix_last
+   sichert den Stand vor jeder Reparatur, V2_REORDER fuer P4 Tag A aus. Neuer Test
+   tests/tag-a-erweiterung.test.js; alle 6 Testreihen gruen.
 
 NEU. **Steigerungsregel + Tests im Repo + Doku-Abgleich (26.09.2026, Version -10).**
    (1) Hinweis "▲ Gewicht steigern" nach der Peach-Regel (incCand/incDue), dezent in der

@@ -451,6 +451,7 @@ const P4=[
   {c:"Glute Max",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
   {c:"Glute & Quad",s:3,r:[6,10]},
+  {c:"Glute & Hams",s:2,r:[8,12]},
   {c:"Beinbeuger",s:2,r:[8,12]},
   {c:"Adduktoren",s:2,r:[8,12]},
   {c:"Bauch",s:2,r:[8,12]}
@@ -749,7 +750,9 @@ migPlanV2();
 // unsichtbar. Der Alias gilt NUR fuer die Zuordnung gespeicherter Daten — im Dropdown stehen
 // die Leg Curls ausschliesslich unter Beinbeuger (keine doppelten Uebungen).
 const ALIAS={"Glute & Hams":["Beinbeuger"]};
-function rowFits(rowCat,exCat){return rowCat===exCat||(ALIAS[rowCat]||[]).indexOf(exCat)>=0}
+// Alias NUR fuer alte Zyklen (V1): in V2 haben Leg Curls eine eigene Zeile — sonst blieb nach
+// einer neuen Glute-&-Hams-Zeile ein Beinbeuger-Eintrag faelschlich darin liegen (27.09.2026).
+function rowFits(rowCat,exCat,legacy){return rowCat===exCat||(!!legacy&&(ALIAS[rowCat]||[]).indexOf(exCat)>=0)}
 function hasVals(v){return !!(v&&((v.weight&&String(v.weight).trim()!=='')||(v.reps||[]).some(function(r){return r!==''&&r!=null})))}
 // REIHENFOLGE-UMSTELLUNG IN V2 (26.09.2026). Die erste V2-Fassung (Version 2026-09-26-01)
 // hatte eine andere Reihenfolge innerhalb der Tage; kurz darauf kamen Glute Max + Glute Med
@@ -759,7 +762,8 @@ function hasVals(v){return !!(v&&((v.weight&&String(v.weight).trim()!=='')||(v.r
 // Regel 11a): passt ein Tag komplett zur ALTEN Reihenfolge und mindestens ein Eintrag NICHT
 // zur neuen, wird er einmal nach der Tabelle alt->neu umsortiert. Idempotent. Gilt nur fuer
 // Zyklen OHNE pv__-Marker. Aendern sich P3/P4 erneut, muss diese Tabelle weg (Regel 13).
-const V2_REORDER={p4:[[0,3,1,2,4,5,6],null,[3,0,1,2,4,5,6,7],[0,2,3,1,4,5,6]],
+// P4 Tag A: null seit 27.09.2026 (neue Glute-&-Hams-Zeile) — die Umsortierung lief dort bereits.
+const V2_REORDER={p4:[null,null,[3,0,1,2,4,5,6,7],[0,2,3,1,4,5,6]],
                   p3:[[0,3,1,2,4,5,6,7],[3,0,1,2,4,5,6,7],[0,3,4,1,2,5,6,7,8]]};
 function migOrderV2(){
   try{
@@ -776,7 +780,7 @@ function migOrderV2(){
       const slots=grp[g];
       if(!map||!day||slots.some(i=>i>=map.length))continue;
       const key=i=>cy+'__w'+w+'__d'+di+'__e'+i;
-      const fits=(i,row)=>{const v=S.data[key(i)],c=v&&v.exercise?CATOF[v.exercise]:null;return !c||rowFits(row,c)};
+      const fits=(i,row)=>{const v=S.data[key(i)],c=v&&v.exercise?CATOF[v.exercise]:null;return !c||rowFits(row,c,false)};
       const fitsOld=slots.every(i=>fits(i,day.e[map[i]].c));
       const fitsNew=slots.every(i=>fits(i,day.e[i].c));
       if(!fitsOld||fitsNew)continue;
@@ -807,21 +811,24 @@ function repairSlots(){
       const parts=g.split('|'),cy=parts[0],w=parts[1],di=+parts[2];
       const day=planOf(cy)[di];
       if(!day){grp[g].forEach(function(it){S.data[cy+'__w'+w+'__d'+di+'__e'+it.slot]=it.val});continue}
-      const slots=day.e, items=grp[g].sort(function(a,b){return a.slot-b.slot}), taken=[], rest=[];
+      const slots=day.e, items=grp[g].sort(function(a,b){return a.slot-b.slot}), taken=[], rest=[], leg=isLegacy(cy);
       // 1. Durchgang: was schon auf einer passenden Zeile sitzt, bleibt liegen
       for(const it of items){
         const cat=CATOF[it.val.exercise||''];
-        if(cat&&it.slot<slots.length&&rowFits(slots[it.slot].c,cat)&&!taken[it.slot])taken[it.slot]=it;
+        if(cat&&it.slot<slots.length&&rowFits(slots[it.slot].c,cat,leg)&&!taken[it.slot])taken[it.slot]=it;
         else rest.push(it);
       }
       // 2. Durchgang: der Rest der Reihe nach in die naechste freie Zeile seiner Kategorie
       for(const it of rest){
         const ex=it.val.exercise||'';
-        if(!ex)continue;                       // leerer Platzhalter faellt weg
+        if(!ex){                               // leerer Platzhalter faellt weg — mit Werten nie:
+          if(hasVals(it.val)){if(it.slot<slots.length&&!taken[it.slot])taken[it.slot]=it;else taken.push(it)}
+          continue;
+        }
         const cat=CATOF[ex];
         let t=-1;
         for(let i=0;i<slots.length;i++)if(slots[i].c===cat&&!taken[i]){t=i;break}
-        if(t<0)for(let i=0;i<slots.length;i++)if(rowFits(slots[i].c,cat)&&!taken[i]){t=i;break}
+        if(t<0)for(let i=0;i<slots.length;i++)if(rowFits(slots[i].c,cat,leg)&&!taken[i]){t=i;break}
         if(t<0){ if(hasVals(it.val))taken.push(it); continue }  // mit Werten: nie wegwerfen
         taken[t]=it;
       }
@@ -831,6 +838,7 @@ function repairSlots(){
       if(!localStorage.getItem('peach_v4_pre_fix')){
         try{localStorage.setItem('peach_v4_pre_fix',before)}catch{}
       }
+      try{localStorage.setItem('peach_v4_pre_fix_last',before)}catch{} // Stand vor der JUENGSTEN Reparatur
       save();
     }
   }catch{}
@@ -1535,7 +1543,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeWeekPick()});
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-09-26-10';
+const BUILD_ID='2026-09-27-01';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();
