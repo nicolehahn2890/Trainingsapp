@@ -197,8 +197,10 @@ ALIAS / rowFits(r,e,leg) Zeile der Kategorie r akzeptiert Uebung der Kategorie e
 carryMap(cy)            Uebungs-Uebernahme in einen neuen Zyklus (nur Nicht-Alt-Zyklen): pro Zeile
                         die Uebung aus dem ZULETZT TRAINIERTEN Zyklus mit kleinerer Nummer — egal ob
                         3 oder 4 Tage (juengster Eintrag nach exOrd; notfalls anderer Plan gleiche
-                        Nummer), gleiche KATEGORIE laut CATOF, bevorzugt gleicher
-                        Rep-Bereich (+4) und gleicher Tag (+2), pro Tag keine Dopplung. Cache _carry
+                        Nummer), gleiche KATEGORIE laut CATOF; erst Zeilen mit gleichem Rep-Bereich,
+                        dann beliebig, gleicher Tag bevorzugt, pro Tag keine Dopplung. Zeilen, die im
+                        Zyklus schon eine gespeicherte Uebung haben, bekommen nichts, ihre Uebungen
+                        gelten aber als vergeben (neue 2. Ruecken-Zeile != 1. Ruecken-Zeile). Cache _carry
                         (vor save() deklariert, in save() geleert).
 migOrderV2()            Einmal-Korrektur fuer die Reihenfolge-Umstellung innerhalb von V2 (26.09.):
                         Tag-Gruppen in Nicht-Alt-Zyklen, die komplett zur ERSTEN V2-Reihenfolge
@@ -520,21 +522,23 @@ Tagesnamen = Schwerpunkt, dazu Feld f (Fokus-Zeile) im Plan-Objekt: {l:"Tag A �
 f:"Po schwer (4–8) · Beinvorderseite · ...",e:[...]}. renderT zeigt f als .day-focus in einer
 eigenen Zeile unter Titel + Uebungs-Pill (volle Breite). Alte Plaene haben kein f.
 
-### 4 Tage (P4) — 69 Saetze/Woche
+### 4 Tage (P4) — 71 Saetze/Woche
 | Tag A – Po Kraft | Tag B – Oberkörper & Po | Tag C – Po & Beinrückseite | Tag D – Po-Volumen & Beine |
 |---|---|---|---|
 | Glute Max 3x4-8 | Glute Max 2x8-12 | Glute Max 3x6-10 | Glute Max 3x8-12 |
 | Glute Max 2x8-12 | Glute Med 2x8-12 | Glute Max 2x8-12 | Glute Med 2x8-12 |
 | Glute Med 2x8-12 | Rücken 3x6-10 | Glute Med 2x8-12 | Glute & Quad 2x8-12 |
-| Glute & Quad 3x6-10 | Schultern 3x8-12 | Glute & Hams 3x6-10 | Glute & Hams 2x8-12 |
-| Glute & Hams 2x4-8 | Brust 2x6-10 | Beinbeuger 2x8-12 | Beinstrecker 2x8-12 |
-| Beinbeuger 2x8-12 | Bizeps 2x8-12 | Rücken 2x8-12 | Adduktoren 2x8-12 |
-| Adduktoren 2x8-12 | Trizeps 2x8-12 | Schultern 2x8-12 | Bauch 2x8-12 |
-| Bauch 2x8-12 | Bauch 2x8-12 | Bauch 2x8-12 | |
+| Glute & Quad 3x6-10 | Rücken 2x8-12 | Glute & Hams 3x6-10 | Glute & Hams 2x8-12 |
+| Glute & Hams 2x4-8 | Schultern 3x8-12 | Beinbeuger 2x8-12 | Beinstrecker 2x8-12 |
+| Beinbeuger 2x8-12 | Brust 2x6-10 | Rücken 2x8-12 | Adduktoren 2x8-12 |
+| Adduktoren 2x8-12 | Bizeps 2x8-12 | Schultern 2x8-12 | Bauch 2x8-12 |
+| Bauch 2x8-12 | Trizeps 2x8-12 | Bauch 2x8-12 | |
+| | Bauch 2x8-12 | | |
 
 Woche: Glute Max 15, Glute & Quad 5, Glute & Hams 7, Glute Med 8, Beinbeuger 4,
-Beinstrecker 2, Adduktoren 4, Ruecken 5, Schultern 5, Brust 2, Bizeps 2, Trizeps 2, Bauch 8.
-Pro Tag 18/18/18/15 Saetze (8/8/8/7 Uebungen). Tag A: Glute & Hams 2x4-8 am 27.09.2026 auf
+Beinstrecker 2, Adduktoren 4, Ruecken 7, Schultern 5, Brust 2, Bizeps 2, Trizeps 2, Bauch 8.
+Pro Tag 18/20/18/15 Saetze (8/9/8/7 Uebungen). Tag B: zweite Ruecken-Zeile 2x8-12 (z. B. Rudern
+nach dem schweren Zug von oben) am 27.09.2026 auf Wunsch ergaenzt. Tag A: Glute & Hams 2x4-8 am 27.09.2026 auf
 Wunsch ergaenzt — Tag A ist der SCHWERE Tag, deshalb 4-8 (z. B. RDL schwer). Tag A liegt damit
 bei ~11 anteiligen Po-Saetzen — obere Grenze pro Einheit.
 
@@ -680,6 +684,12 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **4 Tage, Tag B: zweite Rueckenuebung 2x8-12 (27.09.2026, Version -03).** Neue Zeile nach
+   Ruecken 3x6-10; eingetragene Wochen rutschen per Kategorie (repairSlots) an die richtige
+   Stelle. carryMap verbessert: bereits gespeicherte Uebungen des Tages gelten als vergeben,
+   gleicher Rep-Bereich zuerst — sonst blieb die neue Zeile leer bzw. doppelte sich. Neuer Test
+   tests/tag-b-erweiterung.test.js; alle 7 Testreihen gruen.
 
 NEU. **4 Tage, Tag A: Glute & Hams 2x4-8 ergaenzt (27.09.2026, Versionen -01/-02; zuerst 8-12,
    auf Wunsch 4-8 — schwerer Tag).**

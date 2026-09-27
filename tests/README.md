@@ -14,6 +14,7 @@ iPhone werden dabei nie beruehrt.
 | `verlauf-woche1-2.test.js` | Woche 1 und 2 zeigen denselben Vorwert (gleicher Rep-Bereich zuerst) |
 | `steigerung.test.js` | Hinweis "Gewicht steigern" nach der Peach-Regel |
 | `tag-a-erweiterung.test.js` | Neue Zeile in 4-Tage Tag A: vorhandene Wochen werden per Kategorie richtig einsortiert, nichts geht verloren |
+| `tag-b-erweiterung.test.js` | Zweite Ruecken-Zeile in 4-Tage Tag B: Einsortierung, Vorbelegung ohne Dopplung |
 
 Voraussetzung: Node.js mit `playwright` (in Claude-Cloud-Sessions vorinstalliert).
 Blockierte Google Fonts (Sandbox-Netz) sind kein Fehler — gezaehlt werden nur echte JS-Exceptions.

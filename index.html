@@ -460,6 +460,7 @@ const P4=[
   {c:"Glute Max",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
   {c:"Rücken",s:3,r:[6,10]},
+  {c:"Rücken",s:2,r:[8,12]},
   {c:"Schultern",s:3,r:[8,12]},
   {c:"Brust",s:2,r:[6,10]},
   {c:"Bizeps",s:2,r:[8,12]},
@@ -886,18 +887,23 @@ function carryMap(cy){
         pool.push({ex:by[src][sk].ex,cat:CATOF[by[src][sk].ex],rr:slot?slot.r[0]+'-'+slot.r[1]:'',di:sd,ei:se});
       });
       pool.sort((a,b)=>a.di-b.di||a.ei-b.ei);
+      // Zeilen, die im Zyklus schon eine gespeicherte Uebung haben, brauchen keine Vorbelegung —
+      // ihre Uebungen gelten aber als vergeben (sonst schlug eine neue zweite Ruecken-Zeile
+      // dieselbe Uebung vor wie die erste). Erst gleicher Rep-Bereich, dann beliebiger.
       planOf(cy).forEach((day,di)=>{
-        const used={};
-        day.e.forEach((slot,ei)=>{
-          const rr=slot.r[0]+'-'+slot.r[1];
+        const used={},own=by[cy]||{},open=[];
+        day.e.forEach((slot,ei)=>{const o=own[di+'|'+ei];if(o)used[o.ex]=1;else open.push(ei)});
+        for(const exact of [true,false])for(const ei of open){
+          if(res[di+'|'+ei])continue;
+          const slot=day.e[ei],rr=slot.r[0]+'-'+slot.r[1];
           let best=null,bs=-1;
           for(const p of pool){
-            if(p.cat!==slot.c||used[p.ex])continue;
-            const sc=(p.rr===rr?4:0)+(p.di===di?2:0);
+            if(p.cat!==slot.c||used[p.ex]||(exact&&p.rr!==rr))continue;
+            const sc=p.di===di?2:0;
             if(sc>bs){bs=sc;best=p}
           }
           if(best){used[best.ex]=1;res[di+'|'+ei]=best.ex}
-        });
+        }
       });
     }
   }
@@ -1543,7 +1549,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeWeekPick()});
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-09-27-02';
+const BUILD_ID='2026-09-27-03';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();
