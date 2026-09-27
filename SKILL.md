@@ -527,16 +527,16 @@ eigenen Zeile unter Titel + Uebungs-Pill (volle Breite). Alte Plaene haben kein 
 | Glute Max 2x8-12 | Glute Med 2x8-12 | Glute Max 2x8-12 | Glute Med 2x8-12 |
 | Glute Med 2x8-12 | Rücken 3x6-10 | Glute Med 2x8-12 | Glute & Quad 2x8-12 |
 | Glute & Quad 3x6-10 | Schultern 3x8-12 | Glute & Hams 3x6-10 | Glute & Hams 2x8-12 |
-| Glute & Hams 2x8-12 | Brust 2x6-10 | Beinbeuger 2x8-12 | Beinstrecker 2x8-12 |
+| Glute & Hams 2x4-8 | Brust 2x6-10 | Beinbeuger 2x8-12 | Beinstrecker 2x8-12 |
 | Beinbeuger 2x8-12 | Bizeps 2x8-12 | Rücken 2x8-12 | Adduktoren 2x8-12 |
 | Adduktoren 2x8-12 | Trizeps 2x8-12 | Schultern 2x8-12 | Bauch 2x8-12 |
 | Bauch 2x8-12 | Bauch 2x8-12 | Bauch 2x8-12 | |
 
 Woche: Glute Max 15, Glute & Quad 5, Glute & Hams 7, Glute Med 8, Beinbeuger 4,
 Beinstrecker 2, Adduktoren 4, Ruecken 5, Schultern 5, Brust 2, Bizeps 2, Trizeps 2, Bauch 8.
-Pro Tag 18/18/18/15 Saetze (8/8/8/7 Uebungen). Tag A: Glute & Hams 2x8-12 am 27.09.2026 auf
-Wunsch ergaenzt (leichtere Hueftbeuge wie 45-Grad-Hyperextension / Single-Leg RDL; das schwere
-RDL liegt an Tag C). Tag A liegt damit bei ~11 anteiligen Po-Saetzen — obere Grenze pro Einheit.
+Pro Tag 18/18/18/15 Saetze (8/8/8/7 Uebungen). Tag A: Glute & Hams 2x4-8 am 27.09.2026 auf
+Wunsch ergaenzt — Tag A ist der SCHWERE Tag, deshalb 4-8 (z. B. RDL schwer). Tag A liegt damit
+bei ~11 anteiligen Po-Saetzen — obere Grenze pro Einheit.
 
 ### 3 Tage (P3) — 56 Saetze/Woche
 | Tag A – Po Kraft | Tag B – Po & Beinrückseite | Tag C – Hüfte & Sanduhr |
@@ -681,7 +681,8 @@ Fallback (manuell, ohne Session):
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
 
-NEU. **4 Tage, Tag A: Glute & Hams 2x8-12 ergaenzt (27.09.2026, Version 2026-09-27-01).**
+NEU. **4 Tage, Tag A: Glute & Hams 2x4-8 ergaenzt (27.09.2026, Versionen -01/-02; zuerst 8-12,
+   auf Wunsch 4-8 — schwerer Tag).**
    Neue Zeile nach Glute & Quad (Reihenfolge-Regel, Bauch bleibt letzte). Bereits eingetragene
    Wochen in der alten 7er-Aufteilung sortiert repairSlots per Kategorie um — dafuer gilt der
    Leg-Curl-Alias nur noch in alten Zyklen (sonst blieb Beinbeuger in der neuen G&H-Zeile).
