@@ -462,6 +462,7 @@ const P4=[
   {c:"Rücken",s:3,r:[6,10]},
   {c:"Rücken",s:2,r:[8,12]},
   {c:"Schultern",s:3,r:[8,12]},
+  {c:"Schultern",s:2,r:[8,12]},
   {c:"Brust",s:2,r:[6,10]},
   {c:"Bizeps",s:2,r:[8,12]},
   {c:"Trizeps",s:2,r:[8,12]},
@@ -1549,7 +1550,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeWeekPick()});
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-09-27-03';
+const BUILD_ID='2026-09-27-04';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();

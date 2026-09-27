@@ -522,7 +522,7 @@ Tagesnamen = Schwerpunkt, dazu Feld f (Fokus-Zeile) im Plan-Objekt: {l:"Tag A �
 f:"Po schwer (4–8) · Beinvorderseite · ...",e:[...]}. renderT zeigt f als .day-focus in einer
 eigenen Zeile unter Titel + Uebungs-Pill (volle Breite). Alte Plaene haben kein f.
 
-### 4 Tage (P4) — 71 Saetze/Woche
+### 4 Tage (P4) — 73 Saetze/Woche
 | Tag A – Po Kraft | Tag B – Oberkörper & Po | Tag C – Po & Beinrückseite | Tag D – Po-Volumen & Beine |
 |---|---|---|---|
 | Glute Max 3x4-8 | Glute Max 2x8-12 | Glute Max 3x6-10 | Glute Max 3x8-12 |
@@ -530,15 +530,18 @@ eigenen Zeile unter Titel + Uebungs-Pill (volle Breite). Alte Plaene haben kein 
 | Glute Med 2x8-12 | Rücken 3x6-10 | Glute Med 2x8-12 | Glute & Quad 2x8-12 |
 | Glute & Quad 3x6-10 | Rücken 2x8-12 | Glute & Hams 3x6-10 | Glute & Hams 2x8-12 |
 | Glute & Hams 2x4-8 | Schultern 3x8-12 | Beinbeuger 2x8-12 | Beinstrecker 2x8-12 |
-| Beinbeuger 2x8-12 | Brust 2x6-10 | Rücken 2x8-12 | Adduktoren 2x8-12 |
-| Adduktoren 2x8-12 | Bizeps 2x8-12 | Schultern 2x8-12 | Bauch 2x8-12 |
-| Bauch 2x8-12 | Trizeps 2x8-12 | Bauch 2x8-12 | |
+| Beinbeuger 2x8-12 | Schultern 2x8-12 | Rücken 2x8-12 | Adduktoren 2x8-12 |
+| Adduktoren 2x8-12 | Brust 2x6-10 | Schultern 2x8-12 | Bauch 2x8-12 |
+| Bauch 2x8-12 | Bizeps 2x8-12 | Bauch 2x8-12 | |
+| | Trizeps 2x8-12 | | |
 | | Bauch 2x8-12 | | |
 
 Woche: Glute Max 15, Glute & Quad 5, Glute & Hams 7, Glute Med 8, Beinbeuger 4,
-Beinstrecker 2, Adduktoren 4, Ruecken 7, Schultern 5, Brust 2, Bizeps 2, Trizeps 2, Bauch 8.
-Pro Tag 18/20/18/15 Saetze (8/9/8/7 Uebungen). Tag B: zweite Ruecken-Zeile 2x8-12 (z. B. Rudern
-nach dem schweren Zug von oben) am 27.09.2026 auf Wunsch ergaenzt. Tag A: Glute & Hams 2x4-8 am 27.09.2026 auf
+Beinstrecker 2, Adduktoren 4, Ruecken 7, Schultern 7, Brust 2, Bizeps 2, Trizeps 2, Bauch 8.
+Pro Tag 18/22/18/15 Saetze (8/10/8/7 Uebungen). Tag B: zweite Ruecken-Zeile 2x8-12 (z. B. Rudern
+nach dem schweren Zug von oben) und zweite Schulter-Zeile 2x8-12 (z. B. hintere Schulter /
+Kabel-Seitheben) am 27.09.2026 auf Wunsch ergaenzt. Tag B ist damit so lang wie die alten
+Einheiten (10 Uebungen) — wird er zu lang, zuerst Bizeps/Trizeps streichen. Tag A: Glute & Hams 2x4-8 am 27.09.2026 auf
 Wunsch ergaenzt — Tag A ist der SCHWERE Tag, deshalb 4-8 (z. B. RDL schwer). Tag A liegt damit
 bei ~11 anteiligen Po-Saetzen — obere Grenze pro Einheit.
 
@@ -684,6 +687,10 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **4 Tage, Tag B: zweite Schulteruebung 2x8-12 (27.09.2026, Version -04).** Neue Zeile nach
+   Schultern 3x8-12; eingetragene Wochen (8er- und 9er-Aufteilung) rutschen per Kategorie an die
+   richtige Stelle. tests/tag-b-erweiterung.test.js deckt beide Aufteilungen ab; alle gruen.
 
 NEU. **4 Tage, Tag B: zweite Rueckenuebung 2x8-12 (27.09.2026, Version -03).** Neue Zeile nach
    Ruecken 3x6-10; eingetragene Wochen rutschen per Kategorie (repairSlots) an die richtige
