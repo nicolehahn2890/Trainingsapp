@@ -274,7 +274,8 @@ hintHTML(st)            Nur noch die Herkunft: "zuletzt: Z2 W11 · Tag C" (+ " �
                         frueheren Texte ("VW: …", "→ Gleiche Leistung!") waren doppelt.
 incCand(st)/incDue(st)  Steigerungsregel (Peach): Vorwert im gleichen Rep-Bereich, 1. Satz >= Obergrenze
                         -> Hinweis "▲ Gewicht steigern" (#ih-di-ei, .inc-hint) in der Zeile "3 Saetze ·
-                        4–8 Reps"; ab Woche 2, verschwindet live, sobald mehr Gewicht eingetragen ist.
+                        4–8 Reps"; ab Woche 2, verschwindet live, sobald mehr Gewicht eingetragen ist
+                        ODER die Uebung fertig ist (st.done = alle Saetze eingetragen, wie der ✓).
                         Vorwert MUSS aus derselben oder der Vorwoche desselben Zyklus stammen
                         (_src.cy===S.cy, _src.w>=S.week-1) — beim Vorblaettern in Wochen mit leerer
                         Vorwoche kein Hinweis ("zuletzt" zeigt den aelteren Wert weiter an).
@@ -692,6 +693,12 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Steigerungs-Hinweis verschwindet bei fertiger Uebung (28.09.2026, Version 2026-09-28-01).**
+   Bug: bei gleichem oder weniger Gewicht blieb "▲ Gewicht steigern" nach dem letzten Satz
+   stehen (verschwand nur bei mehr Gewicht). exState liefert jetzt done (gleiche Regel wie der
+   Erledigt-Haken), incDue blendet bei done aus; Satz wieder leeren -> Hinweis kommt zurueck.
+   Badge/Auswertung unveraendert. Test in steigerung.test.js; alle 7 Testreihen gruen.
 
 NEU. **4 Tage, Tag B ohne Arme + Steigerungs-Hinweis-Fix (27.09.2026, Version -05).**
    (1) Bizeps und Trizeps aus Tag B gestrichen (Wunsch: sonst zu viel) — Tag B 8 Uebungen /

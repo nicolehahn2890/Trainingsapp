@@ -27,6 +27,18 @@ const line=await page.$eval('.day-body .ex-row .sets-info',e=>e.getBoundingClien
 await page.fill('.day-body .w-input >> nth=0','140');await page.dispatchEvent('.day-body .w-input >> nth=0','change');
 const h=await page.$eval('.day-body .ex-row .sets-info',e=>e.getBoundingClientRect().height);
 ok(h<30,'Hinweis passt in eine Zeile (Hoehe '+Math.round(h)+' px)');
+// Uebung fertig (alle Saetze) mit gleichem Gewicht -> Hinweis weg; Satz wieder leeren -> Hinweis zurueck
+const ms0=await page.evaluate(()=>exState(0,0).ms);
+for(let i=0;i<ms0;i++)await page.fill('#rp-0-0-'+i,'8');
+ok(!(await vis('#ih-0-0')),'Alle '+ms0+' Saetze mit gleichem Gewicht eingetragen -> Hinweis verschwindet');
+ok(await page.$eval('#done-0-0',e=>!e.classList.contains('hidden')),'Erledigt-Haken sichtbar');
+await page.fill('#rp-0-0-'+(ms0-1),'');
+ok(await vis('#ih-0-0'),'Letzten Satz wieder geleert -> Hinweis wieder da');
+await page.fill('.day-body .w-input >> nth=0','130');await page.dispatchEvent('.day-body .w-input >> nth=0','change');
+for(let i=0;i<ms0;i++)await page.fill('#rp-0-0-'+i,'8');
+ok(!(await vis('#ih-0-0')),'Weniger Gewicht, alle Saetze eingetragen -> Hinweis verschwindet');
+await page.evaluate(()=>{render()});
+ok(!(await vis('#ih-0-0')),'Auch nach neuem Rendern kein Hinweis bei fertiger Uebung');
 await page.evaluate(()=>{S.openDays={1:true};render()});
 ok((await page.textContent('#ih-1-2').catch(()=>''))==='▼ Hilfe senken','Assistierter Klimmzug: "▼ Hilfe senken"');
 // Vorblaettern: W3 ohne Eintrag in W2 -> kein Hinweis aus W1 (Fehler bis 27.09.2026)

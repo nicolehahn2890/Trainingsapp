@@ -1223,7 +1223,9 @@ function exState(di,ei){
   // Woche 1 (Zyklus-Start): bewusst leichter einsteigen -> KEIN Vergleich (kein Badge,
   // kein Wochenbalken). Vorwerte bleiben nur zur Orientierung in Klammern sichtbar.
   const noCmp=S.week===1||!!prv._orient;
-  return {ex,cur,prv,ms,autoX,reps,hasPrev,noCmp,inv:isAssist(cur.exercise),
+  // Alle Saetze eingetragen (gleiche Regel wie exDone / Erledigt-Haken)
+  const done=!!cur.exercise&&reps.filter(v=>v!==''&&v!=null&&parseInt(v)>0).length>=ms;
+  return {ex,cur,prv,ms,autoX,reps,hasPrev,noCmp,done,inv:isAssist(cur.exercise),
     p:noCmp?'':prog(reps,prv.reps||[],cur.weight,prv.weight,cur.exercise),
     srcL:hasPrev?srcLabel(prv._src):''};
 }
@@ -1238,8 +1240,9 @@ function hintHTML(st){
 // STEIGERUNGSREGEL (Peach): Obergrenze der Wiederholungen im ERSTEN Satz erreicht -> diesmal
 // mehr Gewicht. Kleiner Hinweis in der Zeile "3 Saetze · 4–8 Reps" — nur ab Woche 2, nur bei
 // einem Vorwert im gleichen Rep-Bereich aus DIESER oder der VORWOCHE desselben Zyklus und nur,
-// solange das Gewicht noch nicht gesteigert ist (verschwindet live beim Eintragen).
-// Assistierte Uebungen: steigern = weniger Hilfe.
+// solange das Gewicht noch nicht gesteigert und die Uebung nicht fertig ist (verschwindet live
+// bei mehr Gewicht oder sobald alle Saetze eingetragen sind). Assistierte: steigern = weniger Hilfe.
+// Fehler davor (28.09.2026): bei gleichem/weniger Gewicht blieb der Hinweis nach dem letzten Satz stehen.
 // Fehler davor (27.09.2026): beim Vorblaettern (z. B. W5, W4 noch leer) kam der Hinweis aus W3.
 function incCand(st){
   if(st.noCmp||!st.hasPrev||st.prv._orient||!st.prv.weight)return false;
@@ -1248,7 +1251,7 @@ function incCand(st){
   const r0=parseInt((st.prv.reps||[])[0]);
   return !isNaN(r0)&&r0>=st.ex.r[1];
 }
-function incDue(st){return incCand(st)&&!(cmpWeight(st.cur.weight,st.prv.weight,st.inv)>0)}
+function incDue(st){return incCand(st)&&!st.done&&!(cmpWeight(st.cur.weight,st.prv.weight,st.inv)>0)}
 function renderEx(ex,ei,di){
   const st=exState(di,ei);
   const {cur,prv,ms,reps,hasPrev,p,srcL}=st;
@@ -1554,7 +1557,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeWeekPick()});
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-09-27-05';
+const BUILD_ID='2026-09-28-01';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();
