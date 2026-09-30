@@ -601,7 +601,8 @@ Beinstrecker (3, NEU Sept. 2026): Beinstrecker Maschine (Panatta), Beinstrecker 
 HERSTELLER-VARIANTEN (30.09.2026, Wunsch): Maschinen mit unterschiedlichen Gewichten je Geraet als
 "Name (Panatta)" / "Name (Precor)" — wie Rudermaschine/Latzug Maschine. Leg Curls sitzend gibt es
 NUR bei Precor (keine Panatta-Variante, 30.09.2026 korrigiert). Alte Eintraege NICHT umbenennen
-(ausdruecklicher Wunsch 30.09.2026: im alten Zyklus allgemein lassen; liegend war an der Panatta). Die alten Namen "Leg Curls
+(ausdruecklicher Wunsch 30.09.2026: im alten Zyklus allgemein lassen). Bis dahin nur Leg Curls
+stehend trainiert (Name unveraendert) — die Umstellung betrifft ihre Historie praktisch nicht. Die alten Namen "Leg Curls
 sitzend", "Leg Curls liegend", "Beinstrecker Maschine" stehen in RETIRED: nicht mehr in der Auswahl,
 aber in CATOF bekannt (alte Eintraege bleiben unveraendert an ihrer Zeile, repairSlots findet sie),
 carryMap schlaegt sie in neuen Zyklen NICHT vor. Nicht umbenannt, weil das Geraet unbekannt ist —
