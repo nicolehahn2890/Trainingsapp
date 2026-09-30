@@ -127,6 +127,9 @@ button:disabled:active{transform:none;}
 .ex-row{background:var(--cream);border:var(--bw) solid var(--ink);border-radius:var(--r-lg);padding:12px 14px;margin-bottom:10px;box-shadow:var(--sh-xs);}
 .ex-row-top{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
 .cat-badge{font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;border:2px solid var(--ink);color:var(--ink);white-space:nowrap;letter-spacing:0.4px;text-transform:uppercase;}
+/* Badge + Erledigt-Haken immer in eigener 2. Zeile (sonst stand ein kurzes "= Gleich" neben der Auswahl); leer = unsichtbar */
+.ex-status{flex-basis:100%;display:flex;align-items:center;gap:8px;}
+.ex-status:not(:has(.pbadge,.done-chip:not(.hidden))){display:none;}
 .done-chip{width:22px;height:22px;border-radius:50%;background:var(--green);border:2px solid var(--ink);color:var(--ink);font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
 .picker-wrap{flex:1;min-width:140px;position:relative;}
 .pick-btn{width:100%;min-height:40px;background:var(--field-bg);border:var(--bw) solid var(--ink);border-radius:var(--r-sm);color:var(--text-dim);font-size:14px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:6px;text-align:left;}
@@ -1333,7 +1336,7 @@ function renderEx(ex,ei,di){
     +'<button class="pick-btn'+(cur.exercise?' has-val':'')+'" onclick="togDrop('+di+','+ei+',event)">'
     +'<span class="pick-btn-txt">'+esc(cur.exercise||'– Übung wählen –')+'</span>'
     +'<span class="pick-btn-arr">'+(dropOpen?'▲':'▼')+'</span></button>'+dh+'</div>'
-    +'<span id="pb-'+di+'-'+ei+'" style="display:contents">'+pbadge(p,st.inv)+'</span>'+doneChip+'</div>'
+    +'<div class="ex-status"><span id="pb-'+di+'-'+ei+'" style="display:contents">'+pbadge(p,st.inv)+'</span>'+doneChip+'</div></div>'
     +'<div class="ex-meta"><span class="sets-info">'+ms+' Sätze · <span style="color:var(--text)">'+ex.r[0]+'–'+ex.r[1]+' Reps</span>'+incH+autoLabel+'</span>'
     +'<div class="w-wrap"><span class="w-label"'+(st.inv?' title="Gegengewicht der Maschine – weniger Hilfe bedeutet mehr eigene Kraft"':'')+'>'+(st.inv?'Hilfe:':'Gewicht:')+'</span><input class="w-input" type="text" value="'+esc(cur.weight||'')+'" placeholder="kg" onchange="updW('+di+','+ei+',this.value)"/>'+(prv.weight?'<span style="color:var(--text-faint);font-size:11px" title="Letzter Eintrag dieser Übung'+(srcL?': '+esc(srcL):'')+'">(zuletzt '+esc(prv.weight)+')</span>':'')+'</div></div>'
     +setH
@@ -1557,7 +1560,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeWeekPick()});
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-09-28-01';
+const BUILD_ID='2026-09-30-01';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();

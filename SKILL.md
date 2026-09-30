@@ -414,6 +414,10 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
 - Einstellungs-Feld (gelbes Zahnrad-Chip + .set-input): erscheint sobald eine Uebung gewaehlt ist,
   zwischen ex-meta und reps-row. Speichert uebungsbasiert (set__ex__Name) via updSetting() — ohne renderT
 - KEIN Theme-Button mehr (Dark Mode entfernt) — der header-right enthaelt nur die beiden Tab-Pills
+- Badge (#pb-di-ei) + Erledigt-Haken (#done-di-ei) stehen IMMER in eigener 2. Zeile (.ex-status,
+  flex-basis 100%) unter Kategorie + Uebungsauswahl. Leer (kein Badge, kein ✓) -> per :has()
+  ausgeblendet, keine Leerzeile. Vorher rutschte nur ein breites Badge runter, "= Gleich" blieb
+  auf breiten iPhones (430 px) neben der Auswahl (Wunsch 30.09.2026: einheitlich 2. Zeile).
 - Steigerungs-Hinweis (.inc-hint, #ih-di-ei): kleine weisse Pill "▲ Gewicht steigern" hinter
   "3 Saetze · 4–8 Reps" — keine eigene Zeile (Wunsch: nichts vollgeschrieben/gequetscht).
 - Kleine Vorwerte unter den Rep-Feldern (.rep-prev) nur, wenn der Vorwert ueberhaupt Reps hat
@@ -693,6 +697,13 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Badge immer in der 2. Zeile (30.09.2026, Version 2026-09-30-01).** "= Gleich" stand auf
+   breiten iPhones neben der Uebungsauswahl, "↑ Gewicht"/"↓ Weniger" darunter. Badge + ✓ jetzt in
+   .ex-status (eigene Zeile, leer unsichtbar). Neuer Test tests/badge-zeile.test.js (390 + 430 px,
+   alter Code rot bei 430 px); alle 8 Testreihen gruen.
+   Hinweis 28.09.: Die Textauswertung ("→ Weniger Gewicht") NICHT wieder einbauen — Badge reicht
+   (ausdruecklich so bestaetigt).
 
 NEU. **Steigerungs-Hinweis verschwindet bei fertiger Uebung (28.09.2026, Version 2026-09-28-01).**
    Bug: bei gleichem oder weniger Gewicht blieb "▲ Gewicht steigern" nach dem letzten Satz

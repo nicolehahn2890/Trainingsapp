@@ -8,6 +8,7 @@ iPhone werden dabei nie beruehrt.
 
 | Datei | Prueft |
 |---|---|
+| `badge-zeile.test.js` | Badge und ✓ stehen immer in der 2. Zeile unter der Uebungsauswahl (390 und 430 px), keine Leerzeile ohne Badge |
 | `funktion.test.js` | Rendering aller 288 Ansichten, Layout, Eingaben, Saetze, Badges, Vergleichslogik, Auto-Zusatzsatz, Navigation, Tipps, Uebersicht, Backup, Robustheit |
 | `planwechsel.test.js` | Alte Zyklen behalten ihren Plan, neue Zyklen den neuen, Uebernahme der Uebungen, Reihenfolge, Leg Curls nur unter Beinbeuger |
 | `verlauf-planwechsel.test.js` | Echter Verlauf: 4 Tage Z1 W1-3 -> 3 Tage Z1 W1-12 -> 4 Tage Z2 |
