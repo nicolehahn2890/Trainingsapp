@@ -283,9 +283,9 @@ const EXERCISES={
 "Glute Med":["Kabel Abduktion Stehend","Kabel Abduktion Liegend","Kabel Abduktion Schrägbank","Abduktionsmaschine","Pelvic Drop","Abduktionsmaschine stehend","Fire Hydrants Kabel","3D Abduktor Maschine"],
 "Adduktoren":["Adduktionsmaschine","Adduktion Kabel Stehend","Adduktion Kabel Liegend","Copenhagen Plank","Sumo Squat Kurzhantel","Sumo RDL Langhantel","Cossack Squat","Lateral Lunge"],
 "Glute & Quad":["Low Bar Squat","Beinpresse 45 Grad","Beinpresse","Step Ups","Split Squat Kurzhantel","Split Squat Langhantel","Split Squat Multipresse","Hack Squat","Reverse Lunge","Belt Squat","Super Squat"],
-"Beinstrecker":["Beinstrecker Maschine","Beinstrecker einbeinig"],
+"Beinstrecker":["Beinstrecker Maschine (Panatta)","Beinstrecker Maschine (Precor)","Beinstrecker einbeinig"],
 "Glute & Hams":["RDL Langhantel","RDL Kurzhanteln","RDL Maschine","Belt Squat RDL","Glute Hyperextensions","Reverse Hack RDL","Good Mornings","Single-Leg RDL"],
-"Beinbeuger":["Leg Curls sitzend","Leg Curls stehend","Leg Curls liegend","Nordic Curls"],
+"Beinbeuger":["Leg Curls sitzend (Panatta)","Leg Curls sitzend (Precor)","Leg Curls liegend (Panatta)","Leg Curls liegend (Precor)","Leg Curls stehend","Nordic Curls"],
 "Rücken":["LH Rudern","KH Rudern","KH Rudern (breit)","Rudern Kabel (eng)","Rudern Kabel (breit)","Rudermaschine (Panatta)","Rudermaschine (Precor)","High Row Maschine","Latzug (eng)","Latzug (breit)","Latzug Maschine (Panatta)","Latzug Maschine (Precor)","Überzug am Kabel","T Bar Rudern (neutral)","T Bar Rudern (breit)","Assistierter Klimmzug (eng)","Assistierter Klimmzug (breit)","Face Pull Kabel","Straight-Arm Pulldown","Einarmiger Latzug Kabel","Diverging Low Row"],
 "Brust":["LH Bankdrücken","KH Bankdrücken","Bankdrücken Multipresse","Bankdrücken Maschine","LH Schrägbankdrücken","KH Schrägbankdrücken","Schrägbankdrücken Multipresse","Schrägbankdrücken Maschine","Brustpresse (Panatta)","Brustpresse (Precor)","Butterfly Maschine","Flys von oben Kabel","Flys von unten Kabel","Flachbank KH Flys","Schrägbank KH Flys"],
 "Schultern":["KH Seitheben","Vorgebeugtes KH Seitheben","Seithebemaschine (sitzend)","Seithebemaschine (stehend)","Seitheben Kabel","Vorgebeugtes Seitheben Kabel","LH Überkopfdrücken","KH Überkopfdrücken","Überkopfmaschine","Butterfly Reverse Maschine","Butterfly Reverse Kabel","Upright Row Kabel","Arnold Press","Einarmiges Überkopfdrücken Kabel"],
@@ -623,7 +623,7 @@ try{
   if(u.openDays&&typeof u.openDays==='object'&&!Array.isArray(u.openDays))S.openDays=u.openDays;
 }catch{}
 
-const REC=new Set(["Hip Thrusts Langhantel","Hip Thrusts Multipresse","Hip Thrust Maschine","Glute Bridge Langhantel","Kabel Kickback Liegend","Kickback Maschine","Abduktionsmaschine","Kabel Abduktion Liegend","Adduktionsmaschine","Adduktion Kabel Stehend","Copenhagen Plank","Sumo Squat Kurzhantel","Abduktionsmaschine stehend","3D Abduktor Maschine","Reverse Lunge","Split Squat Kurzhantel","Split Squat Langhantel","Split Squat Multipresse","Belt Squat","RDL Langhantel","RDL Maschine","Glute Hyperextensions","Single-Leg RDL","Leg Curls sitzend","Leg Curls stehend","Leg Curls liegend","Beinstrecker Maschine","Latzug (breit)","High Row Maschine","Assistierter Klimmzug (breit)","Straight-Arm Pulldown","Überzug am Kabel","KH Seitheben","Seitheben Kabel","Seithebemaschine (sitzend)","Seithebemaschine (stehend)","Pallof Press","Hollow Body Hold"]);
+const REC=new Set(["Hip Thrusts Langhantel","Hip Thrusts Multipresse","Hip Thrust Maschine","Glute Bridge Langhantel","Kabel Kickback Liegend","Kickback Maschine","Abduktionsmaschine","Kabel Abduktion Liegend","Adduktionsmaschine","Adduktion Kabel Stehend","Copenhagen Plank","Sumo Squat Kurzhantel","Abduktionsmaschine stehend","3D Abduktor Maschine","Reverse Lunge","Split Squat Kurzhantel","Split Squat Langhantel","Split Squat Multipresse","Belt Squat","RDL Langhantel","RDL Maschine","Glute Hyperextensions","Single-Leg RDL","Leg Curls sitzend (Panatta)","Leg Curls sitzend (Precor)","Leg Curls stehend","Leg Curls liegend (Panatta)","Leg Curls liegend (Precor)","Beinstrecker Maschine (Panatta)","Beinstrecker Maschine (Precor)","Latzug (breit)","High Row Maschine","Assistierter Klimmzug (breit)","Straight-Arm Pulldown","Überzug am Kabel","KH Seitheben","Seitheben Kabel","Seithebemaschine (sitzend)","Seithebemaschine (stehend)","Pallof Press","Hollow Body Hold"]);
 
 // ASSISTIERTE UEBUNGEN: hier ist das eingetragene Gewicht das GEGENGEWICHT der Maschine —
 // WENIGER Gewicht bedeutet MEHR eigene Kraft. Fuer diese Uebungen dreht sich der komplette
@@ -712,6 +712,14 @@ migLegCurl();
 // aendert nichts mehr. Guard: peach_fix_slots, Sicherheitskopie: peach_v4_pre_fix.
 const CATOF={};
 for(const c in EXERCISES)for(const ex of EXERCISES[c])CATOF[ex]=c;
+// HERSTELLER-VARIANTEN (30.09.2026): "Leg Curls sitzend", "Leg Curls liegend" und "Beinstrecker
+// Maschine" gibt es in der Auswahl nur noch als (Panatta) / (Precor) — die Geraete haben
+// unterschiedliche Gewichte. Die alten Namen bleiben BEKANNT (Kategorie), damit alte Eintraege
+// unveraendert an ihrer Zeile stehen; umbenannt wird nichts, weil unklar ist, welches Geraet es
+// war. Neue Zyklen schlagen sie nicht mehr vor (carryMap), die Auswahl zeigt nur die Varianten.
+const RETIRED={"Leg Curls sitzend":"Beinbeuger","Leg Curls liegend":"Beinbeuger","Beinstrecker Maschine":"Beinstrecker"};
+for(const ex in RETIRED)if(!CATOF[ex])CATOF[ex]=RETIRED[ex];
+for(const base in RETIRED)for(const v of [' (Panatta)',' (Precor)'])if(TIPS[base]&&!TIPS[base+v])TIPS[base+v]=TIPS[base];
 // Ordnet jeden gespeicherten Eintrag der Zeile zu, in die er GEHOERT — anhand der
 // Kategorie seiner Uebung (Butterfly Maschine ist Brust, also in die Brust-Zeile).
 // Der Versatz ist dabei egal: bei Rexi lagen Eintraege 4-5 Positionen zu weit hinten,
@@ -887,6 +895,7 @@ function carryMap(cy){
     if(src){
       const sp=planOf(src),pool=[];
       Object.keys(by[src]).forEach(sk=>{
+        if(RETIRED[by[src][sk].ex])return; // alter Name ohne Hersteller -> neu waehlen
         const sd=+sk.split('|')[0],se=+sk.split('|')[1],slot=sp[sd]&&sp[sd].e[se];
         pool.push({ex:by[src][sk].ex,cat:CATOF[by[src][sk].ex],rr:slot?slot.r[0]+'-'+slot.r[1]:'',di:sd,ei:se});
       });
@@ -1560,7 +1569,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeWeekPick()});
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-09-30-01';
+const BUILD_ID='2026-09-30-02';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();

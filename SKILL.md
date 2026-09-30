@@ -593,10 +593,18 @@ Glute & Quad (11): Low Bar Squat, Beinpresse 45 Grad, Beinpresse, Step Ups, Spli
 
 Glute & Hams (8): RDL Langhantel, RDL Kurzhanteln, RDL Maschine, Belt Squat RDL, Glute Hyperextensions, Reverse Hack RDL, Good Mornings, Single-Leg RDL
 
-Beinbeuger (4, NEU Sept. 2026): Leg Curls sitzend, Leg Curls stehend, Leg Curls liegend, Nordic Curls
+Beinbeuger (6, NEU Sept. 2026): Leg Curls sitzend (Panatta), Leg Curls sitzend (Precor), Leg Curls liegend (Panatta), Leg Curls liegend (Precor), Leg Curls stehend, Nordic Curls
 (Leg Curls + Nordic Curls NUR hier — keine Dopplung in Glute & Hams, ausdruecklicher Wunsch)
 
-Beinstrecker (2, NEU Sept. 2026): Beinstrecker Maschine, Beinstrecker einbeinig
+Beinstrecker (3, NEU Sept. 2026): Beinstrecker Maschine (Panatta), Beinstrecker Maschine (Precor), Beinstrecker einbeinig
+
+HERSTELLER-VARIANTEN (30.09.2026, Wunsch): Maschinen mit unterschiedlichen Gewichten je Geraet als
+"Name (Panatta)" / "Name (Precor)" — wie Rudermaschine/Latzug Maschine. Die alten Namen "Leg Curls
+sitzend", "Leg Curls liegend", "Beinstrecker Maschine" stehen in RETIRED: nicht mehr in der Auswahl,
+aber in CATOF bekannt (alte Eintraege bleiben unveraendert an ihrer Zeile, repairSlots findet sie),
+carryMap schlaegt sie in neuen Zyklen NICHT vor. Nicht umbenannt, weil das Geraet unbekannt ist —
+auf Wunsch per Migration (wie migLegCurl) auf die richtige Variante umbenennen, inkl. set__ex__/tip__ex__.
+TIPS der Varianten = TIPS des alten Namens (per Schleife nach CATOF gesetzt).
 
 Ruecken (21): LH Rudern, KH Rudern, KH Rudern (breit), Rudern Kabel (eng), Rudern Kabel (breit), Rudermaschine (Panatta), Rudermaschine (Precor), High Row Maschine, Latzug (eng), Latzug (breit), Latzug Maschine (Panatta), Latzug Maschine (Precor), Ueberzug am Kabel, T Bar Rudern (neutral), T Bar Rudern (breit), Assistierter Klimmzug (eng), Assistierter Klimmzug (breit), Face Pull Kabel, Straight-Arm Pulldown, Einarmiger Latzug Kabel, Diverging Low Row
 
@@ -697,6 +705,12 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Hersteller-Varianten Leg Curls + Beinstrecker (30.09.2026, Version 2026-09-30-02).**
+   Beinbeuger: Leg Curls sitzend/liegend je (Panatta) + (Precor); Beinstrecker Maschine (Panatta) +
+   (Precor). Alte Namen bleiben bekannt (RETIRED), alte Eintraege unveraendert, neue Zyklen schlagen
+   sie nicht vor. 143 Uebungen gesamt. Neuer Test tests/hersteller.test.js; planwechsel angepasst;
+   alle 9 Testreihen gruen.
 
 NEU. **Badge immer in der 2. Zeile (30.09.2026, Version 2026-09-30-01).** "= Gleich" stand auf
    breiten iPhones neben der Uebungsauswahl, "↑ Gewicht"/"↓ Weniger" darunter. Badge + ✓ jetzt in
@@ -1068,7 +1082,7 @@ NEU. **Nachtrag: Rep-Bereich gehoert in den Vergleichsschluessel:** Der erste Wu
    Gesamtsumme, parseWeight fuer Spannen/Komma, P3/Plan-Umschalter entfernt,
    Dropdown-Such-Fokus-Fix, REC-Stern im Dropdown, veraltete Duplikat-PDF geloescht.
 
-Konsistenz-Audit (zuletzt ausgefuehrt 26.09.2026): alle 140 Uebungen haben Tipps, keine verwaisten
+Konsistenz-Audit (zuletzt ausgefuehrt 30.09.2026): alle 143 Uebungen haben Tipps, keine verwaisten
 Tipps/REC-Eintraege, keine Duplikate, Rep-Bereiche plausibel (4-8/6-10/8-12), jede im Plan
 verwendete Kategorie (P3/P4 UND P3_V1/P4_V1) existiert in EXERCISES und hat eine Farbe in CC,
 prog()/rcol()/autoExtraSets() per Funktionstest verifiziert.

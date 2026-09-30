@@ -61,7 +61,7 @@ let fails=0; const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m); if(!c)fails++;
   ok([A,B,C].every(d=>d.every((r,i)=>i===0||rank(d[i-1][0])<=rank(r[0]))),'Reihenfolge: Glute Max, Glute Med, Rest, Oberkoerper, Bauch');
   ok([A,B,C].every(d=>d[d.length-1][0]==='Bauch'&&d[d.length-1][2].startsWith('2 Sätze')),'Jeder Tag endet mit Bauch 2 Saetze');
   ok(A[0][1]==='Hip Thrusts Langhantel','Uebernahme: Glute Max 4-8 -> Hip Thrusts Langhantel');
-  const bb=B.find(r=>r[0]==='Beinbeuger'); ok(bb&&bb[1]==='Leg Curls liegend','Uebernahme: Leg Curls aus alter G&H-Zeile landen im Beinbeuger-Platz');
+  const bb=B.find(r=>r[0]==='Beinbeuger'); ok(bb&&bb[1]==='– Übung wählen –','Uebernahme: altes "Leg Curls liegend" (ohne Hersteller) wird nicht vorgeschlagen -> neu waehlen');
   const gh=B.find(r=>r[0]==='Glute & Hams'); ok(gh&&gh[1]!=='Leg Curls liegend'&&gh[1]!=='– Übung wählen –','Glute & Hams bekommt Hueftbeuge-Uebung: '+(gh&&gh[1]));
   const bs=C.find(r=>r[0]==='Beinstrecker'); ok(bs&&bs[1]==='– Übung wählen –','Beinstrecker (neu) bleibt leer');
   const gm=C.filter(r=>r[0]==='Glute Med').map(r=>r[1]); ok(gm.length===2&&gm[0]!==gm[1],'Tag C: zwei Glute-Med-Plaetze ohne Dopplung: '+gm.join(' / '));
@@ -77,7 +77,7 @@ let fails=0; const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m); if(!c)fails++;
   const bi=B.findIndex(r=>r[0]==='Beinbeuger');
   await page.click('.day-body .pick-btn >> nth='+bi); await page.waitForTimeout(120);
   opts=await page.$$eval('.dropdown .drop-opt:not(.drop-empty-opt)',e=>e.map(x=>x.textContent.trim()));
-  ok(opts.length===4&&opts[0].startsWith('Leg Curls sitzend')&&opts[0].includes('★'),'Beinbeuger Dropdown: '+opts.join(', '));
+  ok(opts.length===6&&opts[0].startsWith('Leg Curls sitzend (Panatta)')&&opts[0].includes('★'),'Beinbeuger Dropdown: '+opts.join(', '));
   await page.click('body',{position:{x:5,y:5}}); await page.waitForTimeout(100);
   // Vorwert zur Orientierung in Woche 1 (Leg Curls liegend 8-12 gab es im alten P3 nicht, Hip Thrust 4-8 schon)
   await page.click('.day-header >> nth=0'); await page.waitForTimeout(120);
