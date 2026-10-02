@@ -456,6 +456,9 @@ const DAYBG=["#F4A45E","#F18FB6","#B6DD57","#8CCBE8"];
 // Isolation), dann Oberkoerper, Bauch immer zuletzt. Glute Med 4x pro Woche,
 // neu: Beinbeuger + Beinstrecker fuer definierte Beine. Oberkoerper bewusst schlank, jeder
 // Tag endet mit Bauch (2 Saetze) als letzter Uebung.
+// Beinbeuger NUR EINMAL pro Woche mit 3 Saetzen (Wunsch 02.10.2026): 4 Tage an Tag C, 3 Tage an
+// Tag B. Die fruehere Beinbeuger-Zeile in Tag A ist raus — dort schon eingetragene Werte parkt
+// repairSlots hinter dem Plan (bleiben gespeichert), Adduktoren/Bauch rutschen per Kategorie nach.
 // WICHTIG: Zyklen, die schon mit dem alten Plan trainiert wurden, zeigen weiter P4_V1/P3_V1
 // (Marker pv__[Zyklus] in peach_v4, siehe planOf) — sonst lagen die positionsbasierten
 // Daten in den falschen Zeilen.
@@ -466,7 +469,6 @@ const P4=[
   {c:"Glute Med",s:2,r:[8,12]},
   {c:"Glute & Quad",s:3,r:[6,10]},
   {c:"Glute & Hams",s:2,r:[4,8]},
-  {c:"Beinbeuger",s:2,r:[8,12]},
   {c:"Adduktoren",s:2,r:[8,12]},
   {c:"Bauch",s:2,r:[8,12]}
 ]},
@@ -485,7 +487,7 @@ const P4=[
   {c:"Glute Max",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
   {c:"Glute & Hams",s:3,r:[6,10]},
-  {c:"Beinbeuger",s:2,r:[8,12]},
+  {c:"Beinbeuger",s:3,r:[8,12]},
   {c:"Rücken",s:2,r:[8,12]},
   {c:"Schultern",s:2,r:[8,12]},
   {c:"Bauch",s:2,r:[8,12]}
@@ -507,7 +509,7 @@ const P4=[
 // FLEXIBLE WOCHE: jede Woche ist 3 ODER 4 Tage (siehe weekPt). Jede Zeile hat eine Partnerzeile
 // t:[Tag,Zeile] im 4-Tage-Plan P4 — gleiche Kategorie, gleicher Wdh.-Bereich. Ueber sie teilen sich
 // 3- und 4-Tage-Wochen die Uebungsauswahl, Zusatzsaetze und den Verlauf (twinOf/slotEntry).
-// P4-Zeilen ohne Partner: Tag A Beinbeuger, Tag B Glute Max, Ruecken 2x8-12, Schultern 2x8-12, Bauch.
+// P4-Zeilen ohne Partner: Tag B Glute Max, Ruecken 2x8-12, Schultern 2x8-12, Bauch.
 const P3=[
 {l:"Tag A – Po Kraft",f:"4–8 Wdh. · Beinvorderseite · Rücken · Schultern",e:[
   {c:"Glute Max",s:3,r:[4,8],t:[0,0]},
@@ -515,10 +517,10 @@ const P3=[
   {c:"Glute Med",s:2,r:[8,12],t:[0,2]},
   {c:"Glute & Quad",s:3,r:[6,10],t:[0,3]},
   {c:"Glute & Hams",s:2,r:[4,8],t:[0,4]},
-  {c:"Adduktoren",s:2,r:[8,12],t:[0,6]},
+  {c:"Adduktoren",s:2,r:[8,12],t:[0,5]},
   {c:"Rücken",s:3,r:[6,10],t:[1,2]},
   {c:"Schultern",s:3,r:[8,12],t:[1,4]},
-  {c:"Bauch",s:2,r:[8,12],t:[0,7]}
+  {c:"Bauch",s:2,r:[8,12],t:[0,6]}
 ]},
 {l:"Tag B – Po & Beinrückseite",f:"6–10 Wdh. · Hüftbeuge · Beinbeuger",e:[
   {c:"Glute Max",s:3,r:[6,10],t:[2,0]},
@@ -1786,7 +1788,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeWeekPick();clo
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-10-02-02';
+const BUILD_ID='2026-10-02-03';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();
