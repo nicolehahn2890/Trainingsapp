@@ -9,9 +9,11 @@ iPhone werden dabei nie beruehrt.
 | Datei | Prueft |
 |---|---|
 | `badge-zeile.test.js` | Badge und ✓ stehen immer in der 2. Zeile unter der Uebungsauswahl (390 und 430 px), keine Leerzeile ohne Badge |
+| `flex-woche.test.js` | 3 oder 4 Tage pro Woche: 3-Tage-Plan V3 (62 Saetze, Partnerzeilen), Uebernahme in beide Richtungen, Vorwerte/Steigerung/Auto-Satz/Uebersicht ueber beide Wochenarten, Rueckfrage beim Umstellen, alter 3-Tage-Plan (Marker 2) und alte Zyklen unveraendert, Tempo |
 | `funktion.test.js` | Rendering aller 288 Ansichten, Layout, Eingaben, Saetze, Badges, Vergleichslogik, Auto-Zusatzsatz, Navigation, Tipps, Uebersicht, Backup, Robustheit |
 | `hersteller.test.js` | Leg Curls liegend / Beinstrecker mit Panatta und Precor, Leg Curls sitzend nur Precor; alte Namen bleiben erhalten, werden in neuen Zyklen nicht vorgeschlagen |
 | `planwechsel.test.js` | Alte Zyklen behalten ihren Plan, neue Zyklen den neuen, Uebernahme der Uebungen, Reihenfolge, Leg Curls nur unter Beinbeuger |
+| `uebungswechsel.test.js` | Uebungswechsel ab Woche 2: "Nur diese Woche" / "Ab jetzt im Zyklus", Label, Abbrechen, keine Frage in Woche 1 / bei leerer Vorwoche / gleicher Uebung, naechster Zyklus nimmt die Standard-Uebung |
 | `verlauf-planwechsel.test.js` | Echter Verlauf: 4 Tage Z1 W1-3 -> 3 Tage Z1 W1-12 -> 4 Tage Z2 |
 | `verlauf-woche1-2.test.js` | Woche 1 und 2 zeigen denselben Vorwert (gleicher Rep-Bereich zuerst) |
 | `steigerung.test.js` | Hinweis "Gewicht steigern" nach der Peach-Regel, nicht beim Vorblaettern mit leerer Vorwoche, weg sobald die Uebung fertig ist |

@@ -47,7 +47,7 @@ auf main einmalig eine Sicherheitsfreigabe verlangen; dann kurz bestaetigen lass
   peach_try_[BUILD_ID], siehe checkUpdate),
   peach_ui (zuletzt offene Position: view/week/cy/pt/openDays — getrennt von peach_v4).
   Sicherheitskopien vor Daten-Eingriffen: peach_v4_pre_add, peach_v4_pre_fix, peach_v4_pre_v2,
-  peach_v4_pre_order. Unlesbares peach_v4 (kaputtes JSON) wird beim Start als Rohtext nach
+  peach_v4_pre_v3, peach_v4_pre_order. Unlesbares peach_v4 (kaputtes JSON) wird beim Start als Rohtext nach
   peach_v4_corrupt kopiert und NICHT ueberschrieben (load/loadFailed).
   Plan-Version pro Zyklus steht als pv__-Marker IN peach_v4 (siehe Key-Formate).
   (peach_theme wurde entfernt — es gibt keinen Dark Mode mehr.)
@@ -135,8 +135,8 @@ Empfohlene Uebungen (REC-Set) erhalten im Dropdown einen goldenen Stern (★).
 ### State-Objekt S
 ```
 S = {
-  cy: "cycle1",     // cycle1-6 (4-Tage-Plan) bzw. p3cycle1-6 (3-Tage-Plan)
-  pt: "p4",         // Plan-Typ: "p4" (4 Tage, Default) | "p3" (3 Tage)
+  cy: "cycle1",     // cycle1-6 (4-Tage-Woche) bzw. p3cycle1-6 (3-Tage-Woche) — Praefix folgt S.pt
+  pt: "p4",         // Art der ANGEZEIGTEN WOCHE: "p4" (4 Tage) | "p3" (3 Tage), via syncPt/weekPt
   week: 1,          // 1-12
   view: "training", // "training" | "overview"
   data: {},
@@ -153,9 +153,12 @@ S = {
 ### Key-Formate
 ```
 Workout:      [cycle]__w[week]__d[dayIdx]__e[exIdx]
-              [cycle] = cycle1-6 (4-Tage-Plan) ODER p3cycle1-6 (3-Tage-Plan).
+              [cycle] = cycle1-6 (4-Tage-Woche) ODER p3cycle1-6 (3-Tage-Woche).
               (Bis Sept. 2026 nur 1-3 — nach Zyklus 3 ging es auf den befuellten Zyklus 1 zurueck.)
-              Die Plaene sind dadurch komplett getrennt — NIEMALS Keys mischen/migrieren!
+              Gespeichert bleibt strikt getrennt — NIEMALS Keys mischen/migrieren! Seit 02.10.2026
+              enthaelt eine Zyklus-Nummer Wochen BEIDER Arten (flexible Woche, siehe weekPt).
+              Optionales Feld base: einmaliger Uebungswechsel ("nur diese Woche") — exercise wird
+              gezeigt, base vererbt (exBase). Ohne base wird exercise vererbt.
 Tipp-Notiz:   tip__ex__[Uebungsname]  (gilt ueber alle Wochen/Tage/Zyklen!)
               WICHTIG: Seit dem Notiz-Update ist das eine ZUSAETZLICHE eigene Notiz,
               KEIN Override mehr! Der Standard-Tipp aus TIPS wird IMMER angezeigt,
@@ -164,8 +167,12 @@ Tipp-Notiz:   tip__ex__[Uebungsname]  (gilt ueber alle Wochen/Tage/Zyklen!)
 Einstellung:  set__ex__[Uebungsname]  (Maschinen-Einstellung, uebungsbasiert wie Tipps)
 Slot:         tip__[cycle]__w[week]__d[dayIdx]__e[exIdx]  (nur UI-State)
 Plan-Marker:  pv__[cycle] = 1  -> dieser Zyklus zeigt den ALTEN Plan (P4_V1/P3_V1)
-              pv__done  = 1  -> Markierung ist gelaufen (Backups ohne pv__done werden
-                                beim Einspielen markiert). Beide zaehlen NICHT als Eintraege.
+              pv__p3cycleN = 2 -> 3-Tage-Zyklus mit dem Plan V2 (P3_V2, 56 Saetze, bis 02.10.2026)
+              pv__done  = 1  -> Markierung V1 ist gelaufen (Backups ohne pv__done werden
+                                beim Einspielen markiert). pv__v3 = 1 -> Markierung V2 gelaufen.
+                                Alle pv__ zaehlen NICHT als Eintraege.
+Wochen-Art:   wt__cycleN__wW = 'p3'|'p4'  -> 3 oder 4 Tage fuer diese Woche (setPlan). Zaehlt
+              NICHT als Eintrag. Nur in flexiblen Zyklen (flexCy) gesetzt.
 ```
 
 ### Wichtige Funktionen
@@ -175,10 +182,39 @@ mkt(cy,week,di,ei)      Slot-Key
 initKey(di,ei)          Legt den Key der aktuellen Woche an (Uebung via inhEx, extraSets der Vorwoche) —
                         IMMER statt mk() beim Schreiben!
 plan()                  = planOf(S.cy) — der Plan DES AKTUELLEN ZYKLUS
-planOf(cy)              p3-Praefix -> 3 Tage, sonst 4 Tage; Zyklus mit pv__-Marker -> alte Version
-                        (P3_V1/P4_V1), sonst die neue (P3/P4). JEDE Stelle, die einen Plan-Platz
-                        braucht (repairSlots, repRange, srcLabel, carryMap), nimmt planOf(cy).
-isLegacy(cy)            true wenn S.data['pv__'+cy]===1
+planOf(cy)              p3-Praefix -> 3 Tage, sonst 4 Tage; Marker 1 -> P3_V1/P4_V1, Marker 2 (nur
+                        3 Tage) -> P3_V2, sonst der aktuelle Plan (P3/P4). JEDE Stelle, die einen
+                        Plan-Platz braucht (repairSlots, repRange, srcLabel, carryMap), nimmt planOf(cy).
+isLegacy(cy)            true wenn S.data['pv__'+cy]===1;  pvOf(cy) = Marker-Wert (0 = aktueller Plan)
+markV3(data)/migPlanV3  Einmal-Markierung 02.10.2026: jeder 3-Tage-Zyklus OHNE Marker mit Werten bekommt
+                        pv__=2 (behaelt P3_V2), danach pv__v3=1. Laeuft beim Start VOR migOrderV2/
+                        repairSlots (Kopie peach_v4_pre_v3) und in impBackup.
+FLEXIBLE WOCHE (02.10.2026) — 3 oder 4 Tage pro Woche:
+cyNum(cy)/isP3(cy)      Zyklus-Nummer / 3-Tage-Praefix
+flexCy(n)               true, wenn WEDER cycleN NOCH p3cycleN einen pv__-Marker hat. Nur dann gilt die
+                        Wochen-Art; in alten Zyklen schalten die Buttons global wie frueher (sonst
+                        laege eine 3-Tage-Woche in einem alten 3-Tage-Zyklus gleicher Nummer).
+weekPt(n,w)             Art der Woche: Marker wt__ > Plan mit Eintraegen (wkData, Cache _wk) >
+                        Vorwoche (rueckwaerts) > S.pt. Beide Plaene mit Eintraegen ohne Marker -> S.pt.
+syncPt()                Setzt S.pt + S.cy-Praefix fuer die angezeigte Woche. Aufruf in setWeek,
+                        changeWeek, setCycle, impBackup und beim Start (vor render).
+twinOf(cy,di,ei)        Partnerzeile im anderen Plan: P3-Zeilen tragen t:[Tag,Zeile] im P4, TWIN4 ist
+                        die Rueckrichtung. Nur aktuelle Plaene in flexiblen Zyklen, sonst null.
+slotEntry(w,di,ei)      Eintrag der Zeile in Woche w — lief w im anderen Plan, der der Partnerzeile.
+                        Basis fuer inhEx, extraSets-Vererbung (exState/exDone/initKey), autoExtraSets
+                        und die Uebersicht. In alten Zyklen identisch mit S.data[mk(S.cy,w,di,ei)].
+canon(cy,di,ei)         Gemeinsame Kennung von Partnerzeilen ("4-Tage-Tag|Zeile") fuer carryMap.
+weekHasVals(cy,w)       Woche hat Werte in diesem (praefixierten) Zyklus; weekHasData(w) prueft in
+                        flexiblen Zyklen beide Plaene (Wochen-Auswahl).
+UEBUNGSWECHSEL (02.10.2026):
+selEx(di,ei,v)          Ab Woche 2 und wenn v != vererbte Uebung (inhEx, nicht leer): Abfrage
+                        "Nur diese Woche" (speichert base = bisherige Uebung) / "Ab jetzt im Zyklus"
+                        (ohne base) / "Abbrechen" (nichts gespeichert). Keine Frage in Woche 1, bei
+                        leerer Vorbelegung, gleicher Uebung oder Leeren. Dieselbe Uebung erneut waehlen
+                        fragt nur, wenn sie einmalig ist (so wird "nur diese Woche" zu "ab jetzt").
+exBase(v)               base falls vorhanden, sonst exercise — das, was vererbt wird.
+showSheet(t,html,btns)  Abfrage-Fenster unten (#sheet, .sheet-bg/.sheet/.sheet-btn/.sheet-cancel);
+closeSheet/sheetAct(i)  Tipp auf den Hintergrund oder Esc schliesst ohne Aktion.
 save()                  Schreibt peach_v4; schlaegt das fehl (Speicher voll/gesperrt), erscheint unten
                         die rote Warnung #save-warn (saveWarn) — frueher ging das still verloren.
 load()                  Bei kaputtem JSON: Rohtext -> peach_v4_corrupt, loadFailed=true, Warnung
@@ -194,7 +230,9 @@ ALIAS / rowFits(r,e,leg) Zeile der Kategorie r akzeptiert Uebung der Kategorie e
                         schoebe repairSlots sie aus den alten Zeilen ans Tagesende. In V2 gilt der
                         Alias NICHT: sonst blieb nach der neuen Glute-&-Hams-Zeile in Tag A ein
                         Beinbeuger-Eintrag darin liegen. Nie im Dropdown.
-carryMap(cy)            Uebungs-Uebernahme in einen neuen Zyklus (nur Nicht-Alt-Zyklen): pro Zeile
+carryMap(cy)            Uebungs-Uebernahme in einen neuen Zyklus (nur Nicht-Alt-Zyklen). ZUERST (seit
+                        02.10.2026) ueber Partnerzeilen (canon) aus BEIDEN Plaenen der Quell-Nummer, die
+                        juengste Woche gewinnt; einmalige Wechsel zaehlen mit ihrer base. Dann pro Zeile
                         die Uebung aus dem ZULETZT TRAINIERTEN Zyklus mit kleinerer Nummer — egal ob
                         3 oder 4 Tage (juengster Eintrag nach exOrd; notfalls anderer Plan gleiche
                         Nummer), gleiche KATEGORIE laut CATOF; erst Zeilen mit gleichem Rep-Bereich,
@@ -208,12 +246,15 @@ migOrderV2()            Einmal-Korrektur fuer die Reihenfolge-Umstellung innerha
                         Inhaltsbasiert (Kategorie), idempotent, laeuft vor repairSlots. Seit 27.09.
                         fuer P4 Tag A abgeschaltet (null) — der Tag hat jetzt 8 Zeilen.
 inhEx(di,ei)            Vorbelegte Uebung einer leeren Zeile: die der letzten GESPEICHERTEN Woche davor
-                        (auch ueber ausgelassene Wochen), sonst carryMap. Geleertes Feld ('') bleibt
-                        leer. Genutzt von exState, exDone, initKey, updSetting.
+                        (auch ueber ausgelassene Wochen; Woche im anderen Plan -> Partnerzeile via
+                        slotEntry; einmaliger Wechsel -> dessen base), sonst carryMap. Geleertes Feld
+                        ('') bleibt leer. Genutzt von exState, exDone, initKey, updSetting, selEx.
 cyBase()                Zyklus ohne Plan-Praefix ('p3cycle2' -> 'cycle2') — fuer Buttons + Zyklus-Ende-Text
-setPlan(pt)             Plan-Umschalter 'p3'/'p4' (Header-Pills "3 Tage"/"4 Tage", Klasse .plan-btn).
-                        Behaellt die Zyklus-Nummer (cycle2 <-> p3cycle2), schliesst offene Tage/Dropdown,
-                        speichert via saveUI(). Daten der Plaene bleiben strikt getrennt (p3-Key-Praefix).
+setPlan(pt)             Header-Pills "3 Tage"/"4 Tage" (.plan-btn) — gelten fuer die ANGEZEIGTE WOCHE:
+                        setzt wt__cycleN__wW (flexible Zyklen). Hat die Woche Werte im aktuellen Plan
+                        und keine im anderen -> Abfrage "Woche N auf X Tage?" (Werte bleiben gespeichert).
+                        Behaellt die Zyklus-Nummer, schliesst offene Tage/Dropdown, saveUI(). In alten
+                        Zyklen (flexCy false) wie frueher: globaler Umschalter ohne Marker.
 parseWeight(w,inv)      Parst "25-27" -> 27 (oberer Wert), "27,5" -> 27.5 (Komma -> Punkt).
                         inv=true (assistierte Uebung): aus einer Spanne zaehlt der KLEINERE
                         Wert ("20-25" -> 20), weil weniger Hilfe die bessere Leistung ist.
@@ -277,7 +318,8 @@ incCand(st)/incDue(st)  Steigerungsregel (Peach): Vorwert im gleichen Rep-Bereic
                         4–8 Reps"; ab Woche 2, verschwindet live, sobald mehr Gewicht eingetragen ist
                         ODER die Uebung fertig ist (st.done = alle Saetze eingetragen, wie der ✓).
                         Vorwert MUSS aus derselben oder der Vorwoche desselben Zyklus stammen
-                        (_src.cy===S.cy, _src.w>=S.week-1) — beim Vorblaettern in Wochen mit leerer
+                        (gleiche Zyklus-Nummer — in flexiblen Zyklen auch aus der 3/4-Tage-Woche
+                        davor —, _src.w>=S.week-1) — beim Vorblaettern in Wochen mit leerer
                         Vorwoche kein Hinweis ("zuletzt" zeigt den aelteren Wert weiter an).
                         Assistierte Uebungen: "▼ Hilfe senken".
 refreshProg(di,ei)      Zieht Badge (#pb-di-ei), Herkunftszeile (#ph-di-ei), Steigerungs-Hinweis (#ih-di-ei), Rep-Feld-Farben
@@ -428,8 +470,13 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
 ### Daten-Vererbung zwischen Wochen
 Vererbt: exercise (aus der letzten gespeicherten Woche, auch ueber Luecken), extraSets (nur aus
 der direkten Vorwoche) — NICHT: reps, weight
-Woche 1 eines neuen Zyklus: exercise aus dem vorherigen Zyklus (carryMap, nach Kategorie),
-extraSets starten bei 0. Nur Vorbelegung — gespeichert wird erst beim Eintragen (initKey).
+Woche 1 eines neuen Zyklus: exercise aus dem vorherigen Zyklus (carryMap, erst Partnerzeile, dann
+Kategorie), extraSets starten bei 0. Nur Vorbelegung — gespeichert wird erst beim Eintragen (initKey).
+3/4-Tage-Wechsel: lief die Vorwoche im anderen Plan, kommen Uebung und extraSets von der
+Partnerzeile (slotEntry). 4-Tage-Zeilen ohne Partner (Tag A Beinbeuger, Tag B Ruecken 2x8-12,
+Schultern 2x8-12, Bauch) erben aus der letzten 4-Tage-Woche.
+Einmaliger Wechsel ("nur diese Woche", Feld base): die Folgewoche erbt base, nicht exercise.
+Label "nur diese Woche" (.once-chip) in der Status-Zeile der Uebung.
 
 ---
 
@@ -502,6 +549,14 @@ extraSets starten bei 0. Nur Vorbelegung — gespeichert wird erst beim Eintrage
     erweitern (z. B. pv__cycle3=2) — NIE einen Marker loeschen. Verschiebt sich eine Uebung in
     eine neue Kategorie, braucht die alte Kategorie einen ALIAS-Eintrag. Die Tabelle
     V2_REORDER (migOrderV2) gilt nur fuer die jetzige V2 — bei V3 entfernen bzw. anpassen.
+    (02.10.2026 so gemacht fuer den 3-Tage-Plan: P3_V2 + Marker 2, neuer P3 = V3; V2_REORDER.p3
+    greift nur noch bei Marker 2.)
+
+14. **Partnerzeilen pflegen (flexible Woche).** Jede Zeile im P3 traegt t:[Tag,Zeile] im P4 —
+    gleiche Kategorie UND gleicher Wdh.-Bereich (Test prueft das). Aendert sich P3 oder P4,
+    muessen die t-Angaben mitgezogen werden, sonst bekommt eine 3-Tage-Woche falsche Uebungen.
+    Partnerzeilen gelten nur zwischen den AKTUELLEN Plaenen (canon/twinOf liefern bei pv__-Marker
+    null). Eine neue Plan-Version braucht deshalb eigene Partnerzeilen oder keine.
 
 ---
 
@@ -514,7 +569,7 @@ Zeile. Tipps im Format "⚙ Einstellung: … / Ausführung: …" mit 2-3 knappen
 
 ---
 
-## Trainingsplaene — Version 2 (ab Sept. 2026, gilt fuer alle NEUEN Zyklen)
+## Trainingsplaene — 4 Tage Version 2 (ab Sept. 2026), 3 Tage Version 3 (ab 02.10.2026)
 
 Peach-Aufbau mit vollem Po-Fokus, trainingswissenschaftlich gegengeprueft (Pelland 2024:
 abnehmender Grenznutzen, ~25-30 anteilige Saetze/Woche; Remmert 2025: ab ~11 Saetzen pro
@@ -555,23 +610,43 @@ trainiert. Tag A: Glute & Hams 2x4-8 am 27.09.2026 auf
 Wunsch ergaenzt — Tag A ist der SCHWERE Tag, deshalb 4-8 (z. B. RDL schwer). Tag A liegt damit
 bei ~11 anteiligen Po-Saetzen — obere Grenze pro Einheit.
 
-### 3 Tage (P3) — 56 Saetze/Woche
-| Tag A – Po Kraft | Tag B – Po & Beinrückseite | Tag C – Hüfte & Sanduhr |
+### 3 Tage (P3, Version 3 ab 02.10.2026) — 62 Saetze/Woche
+Wunsch 02.10.2026: 3-Tage-Woche flexibel statt fester 3-Tage-Zyklus, Volumen naeher an der
+4-Tage-Woche. Po/Beine wie in 4 Tagen (nur Beinbeuger 3 statt 4), Ruecken/Schultern je 5,
+Bauch weiter 2 pro Tag. Pro Einheit max. ~11 anteilige Po-Saetze (A 10,5 / B 10,5 / C 10).
+Volle 69 Saetze in 3 Tagen bewusst NICHT (~23 Saetze/Einheit, ueber der Po-Grenze pro Einheit).
+In Klammern die Partnerzeile im 4-Tage-Plan (t).
+| Tag A – Po Kraft (22) | Tag B – Po & Beinrückseite (21) | Tag C – Hüfte & Sanduhr (19) |
 |---|---|---|
-| Glute Max 3x4-8 | Glute Max 3x6-10 | Glute Max 3x8-12 |
-| Glute Max 2x8-12 | Glute Max 2x8-12 | Glute Med 2x8-12 |
-| Glute Med 2x8-12 | Glute Med 2x8-12 | Glute Med 2x8-12 |
-| Glute & Quad 3x6-10 | Glute & Hams 3x6-10 | Glute & Quad 2x8-12 |
-| Adduktoren 2x8-12 | Beinbeuger 3x8-12 | Glute & Hams 2x8-12 |
-| Rücken 2x6-10 | Rücken 2x8-12 | Beinstrecker 2x8-12 |
-| Schultern 2x8-12 | Brust 2x6-10 | Adduktoren 2x8-12 |
-| Bauch 2x8-12 | Bauch 2x8-12 | Schultern 2x8-12 |
-| | | Bauch 2x8-12 |
+| Glute Max 3x4-8 (A1) | Glute Max 3x6-10 (C1) | Glute Max 3x8-12 (D1) |
+| Glute Max 2x8-12 (A2) | Glute Max 2x8-12 (C2) | Glute Med 2x8-12 (D2) |
+| Glute Med 2x8-12 (A3) | Glute Max 2x8-12 (B1) | Glute Med 2x8-12 (B2) |
+| Glute & Quad 3x6-10 (A4) | Glute Med 2x8-12 (C3) | Glute & Quad 2x8-12 (D3) |
+| Glute & Hams 2x4-8 (A5) | Glute & Hams 3x6-10 (C4) | Glute & Hams 2x8-12 (D4) |
+| Adduktoren 2x8-12 (A7) | Beinbeuger 3x8-12 (C5) | Beinstrecker 2x8-12 (D5) |
+| Rücken 3x6-10 (B3) | Rücken 2x8-12 (C6) | Adduktoren 2x8-12 (D6) |
+| Schultern 3x8-12 (B5) | Brust 2x6-10 (B7) | Schultern 2x8-12 (C7) |
+| Bauch 2x8-12 (A8) | Bauch 2x8-12 (C8) | Bauch 2x8-12 (D7) |
 
-Woche: Glute Max 13, Glute & Quad 5, Glute & Hams 5, Glute Med 8, Beinbeuger 3,
-Beinstrecker 2, Adduktoren 4, Ruecken 4, Schultern 4, Brust 2, Bauch 6.
-Pro Tag 18/19/19 Saetze (8/8/9 Uebungen). Eigene Zyklen 1-6 (Keys p3cycle1-6), gleiche
-Regeln wie P4. Tagesfarben: A Peach, B Pink, C Lime (D Sky nur im 4-Tage-Plan).
+Woche: Glute Max 15, Glute & Quad 5, Glute & Hams 7, Glute Med 8, Beinbeuger 3,
+Beinstrecker 2, Adduktoren 4, Ruecken 5, Schultern 5, Brust 2, Bauch 6.
+Pro Tag 22/21/19 Saetze (9/9/9 Uebungen). Keys p3cycle1-6, gleiche Regeln wie P4.
+Tagesfarben: A Peach, B Pink, C Lime (D Sky nur im 4-Tage-Plan).
+Aenderung zu V2: Tag A + Glute & Hams 2x4-8, Ruecken und Schultern je 3 statt 2 Saetze;
+Tag B + Glute Max 2x8-12 (3. Zeile); Tag C unveraendert.
+
+### 3 Tage Version 2 (P3_V2, 26.09.-02.10.2026) — nur fuer 3-Tage-Zyklen mit Marker 2
+56 Saetze: A 18 (GMax 3x4-8, GMax 2x8-12, GMed, G&Q 3x6-10, Adduktoren, Ruecken 2x6-10,
+Schultern, Bauch), B 19 (GMax 3x6-10, GMax 2x8-12, GMed, G&H 3x6-10, Beinbeuger 3x8-12,
+Ruecken 2x8-12, Brust 2x6-10, Bauch), C 19 (wie V3).
+
+### Flexible Woche (02.10.2026)
+3 oder 4 Tage werden pro Woche ueber die Header-Pills gewaehlt (Vorauswahl = Vorwoche). Eine
+Zyklus-Nummer enthaelt Wochen beider Arten; gespeichert wird weiter getrennt (p3-Praefix).
+Uebungen, Zusatzsaetze, Vorwerte, Steigerungs-Hinweis, Auto-Satz und Uebersicht laufen ueber
+die Partnerzeilen durch. Wochen mit Werten umstellen -> Rueckfrage, Werte bleiben gespeichert.
+Moegliche Dopplung: nutzt Rexi in zwei 4-Tage-Tagen dieselbe Uebung (z. B. Glute Med an Tag B
+und D), steht sie im 3-Tage-Tag C zweimal — dann eine wechseln (bewusst nicht automatisch).
 
 ### Alte Plaene (P4_V1 / P3_V1, bis Sept. 2026) — nur fuer Zyklen mit pv__-Marker
 Stehen unveraendert in index.html (P4_V1: A Beine 9 / B Oberkoerper 9 / C 10 / D 10
@@ -638,7 +713,8 @@ Spezial: 3D Abduktor Maschine, Belt Squat, Belt Squat RDL, Beinpresse 45 Grad, R
 - + Button: Satz hinzufuegen (max. 5 gesamt)
 - - Button: Satz entfernen (nur wenn extraSets > 0)
 - Auto: 3 stagnierende Wochenvergleiche = +1 Satz automatisch (greift fruehestens Woche 5, nur bei gleicher Uebung)
-- Satzanzahl + Uebung werden in Folgewoche vererbt
+- Satzanzahl + Uebung werden in Folgewoche vererbt (auch zwischen 3- und 4-Tage-Wochen)
+- Uebungswechsel ab Woche 2: Abfrage "Nur diese Woche" / "Ab jetzt im Zyklus" (selEx)
 - Gewichtsbereiche ("25-27kg") und Komma ("27,5") werden korrekt ausgewertet (oberer Wert zaehlt)
 - Glatter Einzelwert schlaegt eine gleich hoch endende Spanne (45 > 42-45 = Steigerung),
   umgekehrt ist ein heruntergesetzter Rahmen (45 -> 40-45) weniger Gewicht
@@ -668,8 +744,8 @@ eine Loesung (z. B. mehr Zyklen oder Zyklus-Archiv).
 
 ## Trainingsziele (Stand Sept. 2026)
 
-1. Grosser, runder, abstehender Po — Hauptfokus: Glute Max 13 (3 Tage) / 15 (4 Tage)
-   Saetze direkt + Glute & Quad / Glute & Hams je 5 fuer die gedehnte Position.
+1. Grosser, runder, abstehender Po — Hauptfokus: Glute Max 15 Saetze direkt (3 und 4 Tage)
+   + Glute & Quad 5 / Glute & Hams 7 fuer die gedehnte Position.
 2. Deutliche Huefte / Sanduhr: Glute Med 4x pro Woche (8 Saetze), Abduktion mit
    vorgeneigtem Oberkoerper fuer den oberen Po; dazu Lats + Seitheben (V-Form).
 3. Definierte, nicht massige Beine: Beinbeuger (sitzend bevorzugt) 3-4 Saetze,
@@ -708,6 +784,16 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Flexible 3/4-Tage-Woche, 3-Tage-Plan V3, Uebungswechsel-Abfrage (02.10.2026, Version
+   2026-10-02-01).** (1) "3 Tage"/"4 Tage" gelten pro Woche (wt__-Marker, weekPt/syncPt),
+   Vorauswahl = Vorwoche; Partnerzeilen P3 <-> P4 (t, TWIN4, slotEntry) teilen Uebung,
+   Zusatzsaetze, Verlauf, Steigerungs-Hinweis, Auto-Satz und Uebersicht. Alte Zyklen (pv__-Marker)
+   unveraendert mit globalem Umschalter. (2) 3-Tage-Plan V3 mit 62 Saetzen (vorher 56); bisheriger
+   Plan als P3_V2, 3-Tage-Zyklen mit V2-Werten bekommen Marker 2 (markV3, auch beim Backup-Import).
+   (3) Uebungswechsel ab Woche 2 fragt "Nur diese Woche" (Feld base) / "Ab jetzt im Zyklus";
+   Label "nur diese Woche". Neues Abfrage-Fenster (showSheet). Neue Tests flex-woche +
+   uebungswechsel; planwechsel/hersteller angepasst; alle 11 Testreihen gruen.
 
 NEU. **Hersteller-Varianten Leg Curls + Beinstrecker (30.09.2026, Version -02, Korrektur -03).**
    Beinbeuger: Leg Curls sitzend (Precor), Leg Curls liegend (Panatta) + (Precor); Beinstrecker
@@ -1086,7 +1172,7 @@ NEU. **Nachtrag: Rep-Bereich gehoert in den Vergleichsschluessel:** Der erste Wu
    Gesamtsumme, parseWeight fuer Spannen/Komma, P3/Plan-Umschalter entfernt,
    Dropdown-Such-Fokus-Fix, REC-Stern im Dropdown, veraltete Duplikat-PDF geloescht.
 
-Konsistenz-Audit (zuletzt ausgefuehrt 30.09.2026): alle 142 Uebungen haben Tipps, keine verwaisten
+Konsistenz-Audit (zuletzt ausgefuehrt 02.10.2026; Partnerzeilen per Test flex-woche): alle 142 Uebungen haben Tipps, keine verwaisten
 Tipps/REC-Eintraege, keine Duplikate, Rep-Bereiche plausibel (4-8/6-10/8-12), jede im Plan
 verwendete Kategorie (P3/P4 UND P3_V1/P4_V1) existiert in EXERCISES und hat eine Farbe in CC,
 prog()/rcol()/autoExtraSets() per Funktionstest verifiziert.

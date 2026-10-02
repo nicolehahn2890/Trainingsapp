@@ -52,7 +52,7 @@ let fails=0; const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m); if(!c)fails++;
   labels=await page.$$eval('.day-title',e=>e.map(x=>x.textContent));
   ok(labels.join('|')==='Tag A – Po Kraft|Tag B – Po & Beinrückseite|Tag C – Hüfte & Sanduhr','p3cycle3 zeigt neuen Plan: '+labels.join(' | '));
   const cnts=await page.$$eval('.day-count',e=>e.map(x=>x.textContent));
-  ok(cnts.join('|')==='0/8 Übungen|0/8 Übungen|0/9 Übungen','Neue Tage 8/8/9 Uebungen: '+cnts.join(' | '));
+  ok(cnts.join('|')==='0/9 Übungen|0/9 Übungen|0/9 Übungen','Neue Tage 9/9/9 Uebungen (3-Tage-Plan V3): '+cnts.join(' | '));
   const dayRows=async di=>{await page.click('.day-header >> nth='+di);await page.waitForTimeout(120);return page.$$eval('.day-body .ex-row',rows=>rows.map(r=>[r.querySelector('.cat-badge').textContent,r.querySelector('.pick-btn-txt').textContent,r.querySelector('.sets-info').textContent.split(' Reps')[0]]))};
   const A=await dayRows(0),B=await dayRows(1),C=await dayRows(2);
   console.log('  A:',JSON.stringify(A));console.log('  B:',JSON.stringify(B));console.log('  C:',JSON.stringify(C));
@@ -123,6 +123,8 @@ let fails=0; const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m); if(!c)fails++;
   await page.evaluate(()=>window.scrollTo(0,0));
   await page.evaluate(()=>{S.openDays={};render()}); await page.click('#week-label'); await page.waitForTimeout(200);
   await page.evaluate(()=>{const d=JSON.parse(localStorage.getItem('peach_v4'));
+    // Daten aus der ersten V2-Fassung stammen aus dem 3-Tage-Plan V2 -> Zyklus traegt Marker 2 (markV3)
+    d.pv__p3cycle4=2;
     d['p3cycle4__w1__d1__e0']={exercise:'RDL Langhantel',extraSets:0,weight:'60',reps:['10','9','8']};
     d['p3cycle4__w1__d1__e1']={exercise:'Hip Thrusts Langhantel',extraSets:0,weight:'100',reps:['8','8','7']};
     localStorage.setItem('peach_v4',JSON.stringify(d));});

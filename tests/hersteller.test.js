@@ -17,7 +17,8 @@ const d={pv__done:1,pv__p3cycle1:1,
 await page.evaluate(d=>{localStorage.clear();localStorage.setItem('peach_mig_add','1');localStorage.setItem('peach_v4',JSON.stringify(d));localStorage.setItem('peach_ui',JSON.stringify({view:'training',week:2,cy:'cycle2',pt:'p4',openDays:{0:true}}));},d);
 await page.reload();await page.waitForTimeout(300);
 const st=await page.evaluate(()=>JSON.parse(localStorage.getItem('peach_v4')));
-const same=(a,b)=>{const ks=new Set([...Object.keys(a),...Object.keys(b)]);return [...ks].every(k=>JSON.stringify(a[k])===JSON.stringify(b[k]))};
+// Plan-Marker (pv__v3 seit 02.10.2026) sind keine Trainingsdaten
+const same=(a,b)=>{const ks=new Set([...Object.keys(a),...Object.keys(b)].filter(k=>k.indexOf('pv__')!==0||k==='pv__p3cycle1'));return [...ks].every(k=>JSON.stringify(a[k])===JSON.stringify(b[k]))};
 ok(same(st,d),'Alte Eintraege (liegend, sitzend, Beinstrecker, Einstellung) unveraendert');
 const txt=async sel=>(await page.textContent(sel).catch(()=>''));
 ok((await txt('#pw-0-5 .pick-btn-txt'))==='Leg Curls sitzend','Z2 W2: alte Auswahl "Leg Curls sitzend" steht weiter in der Beinbeuger-Zeile');
@@ -27,6 +28,9 @@ let opts=await page.$$eval('.dropdown .drop-opt:not(.drop-empty-opt)',e=>e.map(x
 ok(JSON.stringify(opts)===JSON.stringify(['Leg Curls sitzend (Precor)','Leg Curls liegend (Panatta)','Leg Curls liegend (Precor)','Leg Curls stehend','Nordic Curls']),'Beinbeuger-Auswahl: '+opts.join(', '));
 ok(await page.$$eval('.dropdown .drop-opt:not(.drop-empty-opt)',e=>e.slice(0,3).every(x=>x.textContent.includes('★'))),'Hersteller-Varianten mit Empfehlungs-Stern');
 await page.click('.dropdown .drop-opt[data-val="Leg Curls liegend (Precor)"]');await page.waitForTimeout(150);
+// Woche 2, andere Uebung als in Woche 1 -> Rueckfrage, "Ab jetzt im Zyklus"
+ok(await page.isVisible('#sheet .sheet'),'Wechsel ab Woche 2 fragt nach (nur diese Woche / ab jetzt)');
+await page.click('#sheet .sheet-btn.pri');await page.waitForTimeout(120);
 ok((await txt('#pw-0-5 .pick-btn-txt'))==='Leg Curls liegend (Precor)','Auswahl "Leg Curls liegend (Precor)" gespeichert');
 ok(await page.evaluate(()=>!!TIPS['Leg Curls liegend (Precor)']&&TIPS['Leg Curls liegend (Precor)']===TIPS['Leg Curls liegend']&&!!TIPS['Leg Curls sitzend (Precor)']&&!TIPS['Leg Curls sitzend (Panatta)']),'Ausfuehrungstipps fuer die Varianten vorhanden, keiner fuer Leg Curls sitzend (Panatta)');
 ok(!(await txt('#pw-0-5')).includes('zuletzt')&&!(await page.$eval('#pw-0-5',e=>e.closest('.ex-row').textContent)).includes('(zuletzt'),'Neue Variante: kein Vorwert vom anderen Geraet');
