@@ -1,4 +1,4 @@
-// Flexible Woche (02.10.2026): 3 oder 4 Tage pro WOCHE, 3-Tage-Plan V3 (62 Saetze) mit Partnerzeilen
+// Flexible Woche (02.10.2026): 3 oder 4 Tage pro WOCHE, 3-Tage-Plan V3 (60 Saetze) mit Partnerzeilen
 // zum 4-Tage-Plan, Uebernahme der Uebungen in beide Richtungen, Vorwerte/Steigerung/Auto-Satz/Uebersicht
 // ueber beide Wochenarten, Rueckfrage beim Umstellen einer Woche mit Werten, Schutz alter Zyklen
 // (Marker 2 fuer den bisherigen 3-Tage-Plan, globaler Umschalter in Zyklen mit Plan-Marker).
@@ -25,13 +25,14 @@ const P=await page.evaluate(()=>{
   const upper=['Rücken','Schultern','Brust','Bizeps','Trizeps'],rank=c=>c==='Glute Max'?0:c==='Glute Med'?1:c==='Bauch'?4:upper.includes(c)?3:2;
   return {sets:sum(P3),rows:P3.map(d=>d.e.length),v2:sum(P3_V2),cat,twinOk,twins:Object.keys(TWIN4).length,
     order:P3.every(d=>d.e.every((x,i)=>i===0||rank(d.e[i-1].c)<=rank(x.c))),bauch:P3.every(d=>d.e[d.e.length-1].c==='Bauch'&&d.e[d.e.length-1].s===2),
-    labels:P3.map(d=>d.l)};
+    labels:P3.map(d=>d.l),gmaxB:P3[1].e.filter(x=>x.c==='Glute Max').length};
 });
-ok(P.sets.join()==='22,21,19'&&P.sets.reduce((a,x)=>a+x)===62,'3-Tage-Plan V3: 22/21/19 = 62 Saetze');
-ok(P.rows.join()==='9,9,9','Je 9 Uebungen');
+ok(P.sets.join()==='22,19,19'&&P.sets.reduce((a,x)=>a+x)===60,'3-Tage-Plan V3: 22/19/19 = 60 Saetze');
+ok(P.rows.join()==='9,8,9','9/8/9 Uebungen');
+ok(P.gmaxB===2,'Tag B: nur zwei Glute-Max-Zeilen');
 ok(P.v2.join()==='18,19,19','Bisheriger Plan als P3_V2 erhalten (56 Saetze)');
-const c=P.cat;ok(c['Glute Max']===15&&c['Glute Med']===8&&c['Glute & Quad']===5&&c['Glute & Hams']===7&&c['Adduktoren']===4&&c['Beinbeuger']===3&&c['Beinstrecker']===2&&c['Rücken']===5&&c['Schultern']===5&&c['Brust']===2&&c['Bauch']===6,'Wochenvolumen pro Kategorie wie vereinbart: '+JSON.stringify(c));
-ok(P.twinOk&&P.twins===27,'Jede 3-Tage-Zeile hat eine Partnerzeile (gleiche Kategorie + Wdh.-Bereich), keine doppelt ('+P.twins+')');
+const c=P.cat;ok(c['Glute Max']===13&&c['Glute Med']===8&&c['Glute & Quad']===5&&c['Glute & Hams']===7&&c['Adduktoren']===4&&c['Beinbeuger']===3&&c['Beinstrecker']===2&&c['Rücken']===5&&c['Schultern']===5&&c['Brust']===2&&c['Bauch']===6,'Wochenvolumen pro Kategorie wie vereinbart: '+JSON.stringify(c));
+ok(P.twinOk&&P.twins===26,'Jede 3-Tage-Zeile hat eine Partnerzeile (gleiche Kategorie + Wdh.-Bereich), keine doppelt ('+P.twins+')');
 ok(P.order&&P.bauch,'Reihenfolge Glute Max > Glute Med > Rest > Oberkoerper > Bauch (2 Saetze) zuletzt');
 
 // 2. FLEXIBLE WOCHE
@@ -45,7 +46,7 @@ await fresh(base,{view:'training',week:2,cy:'cycle3',pt:'p4',openDays:{}});
 ok((await active())==='plan-p4'&&(await counts())==='0/8,0/8,0/8,0/7','W2 startet wie die Vorwoche mit 4 Tagen');
 await page.click('#plan-p3');await page.waitForTimeout(120);
 let d=await st();
-ok(!(await sheet())&&(await active())==='plan-p3'&&(await counts())==='0/9,0/9,0/9'&&d['wt__cycle3__w2']==='p3','Leere Woche -> 3 Tage ohne Rueckfrage, Wahl als wt__cycle3__w2 gespeichert');
+ok(!(await sheet())&&(await active())==='plan-p3'&&(await counts())==='0/9,0/8,0/9'&&d['wt__cycle3__w2']==='p3','Leere Woche -> 3 Tage ohne Rueckfrage, Wahl als wt__cycle3__w2 gespeichert');
 const exp3=await page.evaluate(M=>P3.map(d=>d.e.map(x=>M[x.t[0]][x.t[1]])),M);
 const got3=[await rows(0),await rows(1),await rows(2)];
 ok(JSON.stringify(got3)===JSON.stringify(exp3),'3-Tage-Woche uebernimmt alle Uebungen der Partnerzeilen aus der 4-Tage-Woche');
@@ -68,7 +69,7 @@ await page.click('#sheet .sheet-btn:not(.pri)');await page.waitForTimeout(80);
 d=await st();ok(d['p3cycle3__w2__d0__e6'].exercise==='Latzug Maschine (Panatta)'&&d['p3cycle3__w2__d2__e2'].base==='Kabel Abduktion Stehend','Wechsel in der 3-Tage-Woche gespeichert (ab jetzt / nur diese Woche)');
 // W3: Vorauswahl wie W2 (3 Tage)
 await page.click('.week-arrow >> nth=1');await page.waitForTimeout(100);
-ok((await active())==='plan-p3'&&(await counts())==='0/9,0/9,0/9','W3 startet wie die Vorwoche mit 3 Tagen');
+ok((await active())==='plan-p3'&&(await counts())==='0/9,0/8,0/9','W3 startet wie die Vorwoche mit 3 Tagen');
 let r=await rows(2);ok(r[2]==='Kabel Abduktion Stehend','W3: einmaliger Wechsel zurueckgenommen');
 // W3 auf 4 Tage
 await page.click('#plan-p4');await page.waitForTimeout(100);
@@ -76,7 +77,7 @@ ok(!(await sheet())&&(await counts())==='0/8,0/8,0/8,0/7','W3 auf 4 Tage umgeste
 const A=await rows(0),B=await rows(1);
 ok(B[2]==='Latzug Maschine (Panatta)','4-Tage-Woche uebernimmt "ab jetzt"-Wechsel aus der 3-Tage-Woche (Partnerzeile)');
 ok(B[1]==='Kabel Abduktion Stehend','"Nur diese Woche" aus der 3-Tage-Woche wirkt nicht weiter');
-ok(A[5]==='Leg Curls sitzend (Precor)'&&B[3]==='Rudermaschine (Panatta)'&&B[5]==='Butterfly Reverse Maschine','Zeilen ohne Partner (Beinbeuger Tag A, Ruecken/Schultern 2 Tag B) aus der letzten 4-Tage-Woche');
+ok(A[5]==='Leg Curls sitzend (Precor)'&&B[0]==='Kickback Maschine'&&B[3]==='Rudermaschine (Panatta)'&&B[5]==='Butterfly Reverse Maschine','Zeilen ohne Partner (Beinbeuger Tag A, Glute Max/Ruecken 2/Schultern 2 Tag B) aus der letzten 4-Tage-Woche');
 await rows(0);ok((await page.textContent('#ph-0-0')).includes('zuletzt: Z3 W2 · Tag A · 3-Tage'),'Vorwert in der 4-Tage-Woche aus der 3-Tage-Woche davor');
 // Zusatzsatz wandert mit
 await page.evaluate(()=>{setWeek(2);S.openDays={0:true};render()});await page.click('button[onclick="addSet(0,0)"]');await page.waitForTimeout(60);
@@ -106,7 +107,7 @@ await page.evaluate(()=>{setWeek(3);setView('overview')});await page.waitForTime
 ok((await page.textContent('.ov-ex >> nth=0')).includes('Start: 50 kg · Aktuell: 55 kg'),'Uebersicht (4 Tage) zeigt W2 aus der 3-Tage-Woche: '+(await page.textContent('.ov-ex >> nth=0')).replace(/\s+/g,' ').slice(0,90));
 await page.evaluate(()=>setView('training'));
 // Naechster Zyklus: Uebernahme aus der juengsten Woche, egal ob 3 oder 4 Tage
-await page.evaluate(()=>{S.data['p3cycle3__w12__d1__e5']={exercise:'Nordic Curls',extraSets:0,weight:'0',reps:['6','6','6']};S.data['wt__cycle3__w12']='p3';save();setCycle('cycle4');setWeek(1)});
+await page.evaluate(()=>{S.data['p3cycle3__w12__d1__e4']={exercise:'Nordic Curls',extraSets:0,weight:'0',reps:['6','6','6']};S.data['wt__cycle3__w12']='p3';save();setCycle('cycle4');setWeek(1)});
 await page.evaluate(()=>setPlan('p4'));
 const A4=await rows(0),C4=await rows(2);
 ok(C4[4]==='Nordic Curls'&&A4[5]==='Leg Curls sitzend (Precor)','Z4 W1 (4 Tage): Beinbeuger Tag C aus 3-Tage-W12, Tag A (ohne Partner) aus der letzten 4-Tage-Woche');
@@ -135,7 +136,7 @@ r=await rows(0);ok(r.length===8&&r[4]==='Adduktionsmaschine'&&r[5]==='Latzug (br
 await page.click('#plan-p4');await page.waitForTimeout(80);
 d=await st();ok(!d['wt__cycle2__w1']&&(await active())==='plan-p4','Zyklus mit Plan-Marker: Umschalter global wie bisher (kein Wochen-Marker)');
 await page.click('#cycle-cycle3');await page.click('#plan-p3');await page.waitForTimeout(80);
-ok((await counts())==='0/9,0/9,0/9','Leerer Zyklus 3: neuer 3-Tage-Plan');
+ok((await counts())==='0/9,0/8,0/9','Leerer Zyklus 3: neuer 3-Tage-Plan');
 await page.reload();await page.waitForTimeout(200);
 const d2=await st();ok(strip(d2).length>0&&JSON.stringify(Object.keys(d2).filter(k=>k.startsWith('p3cycle2')).map(k=>d2[k]))===JSON.stringify(Object.keys(v2).filter(k=>k.startsWith('p3cycle2')).map(k=>v2[k])),'Neustart: V2-Daten weiter unveraendert (idempotent)');
 // Backup ohne pv__v3 wird beim Einspielen markiert
@@ -144,6 +145,19 @@ const old={...v2};await page.fill('#bk-ta',JSON.stringify({app:'peach',v:1,date:
 page.once('dialog',x=>x.accept());await page.click('.bk-imp');await page.waitForTimeout(150);
 d=await st();ok(d.pv__p3cycle2===2&&d.pv__v3===1,'Backup vom alten Stand: 3-Tage-Zyklus beim Einspielen markiert');
 ok((await page.textContent('#bk-status')).includes('4 Einträge'),'Marker zaehlen nicht als Eintraege: '+(await page.textContent('#bk-status')));
+
+// 4b. Tag B aus der kurzen Fassung mit drei Glute-Max-Zeilen (02.10.2026, Version -01): Eintraege
+// rutschen per Kategorie an ihre Zeile, die gestrichene dritte Glute-Max-Zeile wird geparkt (Werte bleiben)
+const old9=['Hip Thrust Maschine','Glute Bridge Langhantel','Kickback Maschine','3D Abduktor Maschine','Glute Hyperextensions','Leg Curls stehend','High Row Maschine','Brustpresse (Panatta)','Pallof Press'];
+const b9={pv__done:1,pv__v3:1,wt__cycle3__w1:'p3'};
+old9.forEach((ex,i)=>{b9['p3cycle3__w1__d1__e'+i]={exercise:ex,extraSets:0,weight:String(30+i),reps:['10','10']}});
+await fresh(b9,{view:'training',week:1,cy:'p3cycle3',pt:'p3',openDays:{1:true}});
+d=await st();
+const rowsB=await page.$$eval('.day-body .ex-row',r=>r.map(x=>x.querySelector('.pick-btn-txt').textContent));
+ok(JSON.stringify(rowsB)===JSON.stringify(old9.filter((x,i)=>i!==2)),'Tag B zeigt die 8 Zeilen in richtiger Reihenfolge: '+rowsB.join(' | '));
+const parked=Object.keys(d).filter(k=>/^p3cycle3__w1__d1__e(\d+)$/.test(k)&&+k.split('__e')[1]>=8).map(k=>d[k]);
+ok(parked.length===1&&parked[0].exercise==='Kickback Maschine'&&parked[0].weight==='32','Gestrichene Zeile (Kickback Maschine) geparkt, Werte erhalten');
+ok(Object.keys(d).filter(k=>k.startsWith('p3cycle3__w1__d1__')).length===9,'Kein Eintrag verloren (9 von 9)');
 
 // 5. Tempo: 5 volle Zyklen, gemischte Wochen
 const big=await page.evaluate(()=>{const d={pv__done:1,pv__v3:1};for(let c=1;c<=5;c++)for(let w=1;w<=12;w++){const p3=(w%3===0);if(p3)d['wt__cycle'+c+'__w'+w]='p3';const pl=p3?P3:P4;pl.forEach((day,di)=>day.e.forEach((sl,ei)=>{d[(p3?'p3':'')+'cycle'+c+'__w'+w+'__d'+di+'__e'+ei]={exercise:EXERCISES[sl.c][ei%EXERCISES[sl.c].length],extraSets:0,weight:String(40+w),reps:Array.from({length:sl.s},()=>'10')}}))}return d});

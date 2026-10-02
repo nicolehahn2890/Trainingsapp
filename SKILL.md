@@ -610,30 +610,33 @@ trainiert. Tag A: Glute & Hams 2x4-8 am 27.09.2026 auf
 Wunsch ergaenzt — Tag A ist der SCHWERE Tag, deshalb 4-8 (z. B. RDL schwer). Tag A liegt damit
 bei ~11 anteiligen Po-Saetzen — obere Grenze pro Einheit.
 
-### 3 Tage (P3, Version 3 ab 02.10.2026) — 62 Saetze/Woche
+### 3 Tage (P3, Version 3 ab 02.10.2026) — 60 Saetze/Woche
 Wunsch 02.10.2026: 3-Tage-Woche flexibel statt fester 3-Tage-Zyklus, Volumen naeher an der
-4-Tage-Woche. Po/Beine wie in 4 Tagen (nur Beinbeuger 3 statt 4), Ruecken/Schultern je 5,
-Bauch weiter 2 pro Tag. Pro Einheit max. ~11 anteilige Po-Saetze (A 10,5 / B 10,5 / C 10).
+4-Tage-Woche. Po/Beine fast wie in 4 Tagen (Glute Max 13 statt 15, Beinbeuger 3 statt 4),
+Ruecken/Schultern je 5, Bauch weiter 2 pro Tag. Pro Einheit max. ~11 anteilige Po-Saetze
+(A 10,5 / B 8,5 / C 10). Tag B mit nur ZWEI Glute-Max-Zeilen — ausdruecklicher Wunsch
+02.10.2026: nie 3x Glute Max an einem Tag (die dritte Zeile 2x8-12 war nur in Version -01).
 Volle 69 Saetze in 3 Tagen bewusst NICHT (~23 Saetze/Einheit, ueber der Po-Grenze pro Einheit).
 In Klammern die Partnerzeile im 4-Tage-Plan (t).
-| Tag A – Po Kraft (22) | Tag B – Po & Beinrückseite (21) | Tag C – Hüfte & Sanduhr (19) |
+| Tag A – Po Kraft (22) | Tag B – Po & Beinrückseite (19) | Tag C – Hüfte & Sanduhr (19) |
 |---|---|---|
 | Glute Max 3x4-8 (A1) | Glute Max 3x6-10 (C1) | Glute Max 3x8-12 (D1) |
 | Glute Max 2x8-12 (A2) | Glute Max 2x8-12 (C2) | Glute Med 2x8-12 (D2) |
-| Glute Med 2x8-12 (A3) | Glute Max 2x8-12 (B1) | Glute Med 2x8-12 (B2) |
-| Glute & Quad 3x6-10 (A4) | Glute Med 2x8-12 (C3) | Glute & Quad 2x8-12 (D3) |
-| Glute & Hams 2x4-8 (A5) | Glute & Hams 3x6-10 (C4) | Glute & Hams 2x8-12 (D4) |
-| Adduktoren 2x8-12 (A7) | Beinbeuger 3x8-12 (C5) | Beinstrecker 2x8-12 (D5) |
-| Rücken 3x6-10 (B3) | Rücken 2x8-12 (C6) | Adduktoren 2x8-12 (D6) |
-| Schultern 3x8-12 (B5) | Brust 2x6-10 (B7) | Schultern 2x8-12 (C7) |
-| Bauch 2x8-12 (A8) | Bauch 2x8-12 (C8) | Bauch 2x8-12 (D7) |
+| Glute Med 2x8-12 (A3) | Glute Med 2x8-12 (C3) | Glute Med 2x8-12 (B2) |
+| Glute & Quad 3x6-10 (A4) | Glute & Hams 3x6-10 (C4) | Glute & Quad 2x8-12 (D3) |
+| Glute & Hams 2x4-8 (A5) | Beinbeuger 3x8-12 (C5) | Glute & Hams 2x8-12 (D4) |
+| Adduktoren 2x8-12 (A7) | Rücken 2x8-12 (C6) | Beinstrecker 2x8-12 (D5) |
+| Rücken 3x6-10 (B3) | Brust 2x6-10 (B7) | Adduktoren 2x8-12 (D6) |
+| Schultern 3x8-12 (B5) | Bauch 2x8-12 (C8) | Schultern 2x8-12 (C7) |
+| Bauch 2x8-12 (A8) | | Bauch 2x8-12 (D7) |
 
-Woche: Glute Max 15, Glute & Quad 5, Glute & Hams 7, Glute Med 8, Beinbeuger 3,
+Woche: Glute Max 13, Glute & Quad 5, Glute & Hams 7, Glute Med 8, Beinbeuger 3,
 Beinstrecker 2, Adduktoren 4, Ruecken 5, Schultern 5, Brust 2, Bauch 6.
-Pro Tag 22/21/19 Saetze (9/9/9 Uebungen). Keys p3cycle1-6, gleiche Regeln wie P4.
+Pro Tag 22/19/19 Saetze (9/8/9 Uebungen). Keys p3cycle1-6, gleiche Regeln wie P4.
 Tagesfarben: A Peach, B Pink, C Lime (D Sky nur im 4-Tage-Plan).
 Aenderung zu V2: Tag A + Glute & Hams 2x4-8, Ruecken und Schultern je 3 statt 2 Saetze;
-Tag B + Glute Max 2x8-12 (3. Zeile); Tag C unveraendert.
+Tag B und Tag C unveraendert. P4-Zeilen OHNE Partner: Tag A Beinbeuger, Tag B Glute Max,
+Ruecken 2x8-12, Schultern 2x8-12, Bauch (erben in 4-Tage-Wochen aus der letzten 4-Tage-Woche).
 
 ### 3 Tage Version 2 (P3_V2, 26.09.-02.10.2026) — nur fuer 3-Tage-Zyklen mit Marker 2
 56 Saetze: A 18 (GMax 3x4-8, GMax 2x8-12, GMed, G&Q 3x6-10, Adduktoren, Ruecken 2x6-10,
@@ -645,8 +648,8 @@ Ruecken 2x8-12, Brust 2x6-10, Bauch), C 19 (wie V3).
 Zyklus-Nummer enthaelt Wochen beider Arten; gespeichert wird weiter getrennt (p3-Praefix).
 Uebungen, Zusatzsaetze, Vorwerte, Steigerungs-Hinweis, Auto-Satz und Uebersicht laufen ueber
 die Partnerzeilen durch. Wochen mit Werten umstellen -> Rueckfrage, Werte bleiben gespeichert.
-Moegliche Dopplung: nutzt Rexi in zwei 4-Tage-Tagen dieselbe Uebung (z. B. Glute Med an Tag B
-und D), steht sie im 3-Tage-Tag C zweimal — dann eine wechseln (bewusst nicht automatisch).
+Moegliche Dopplung (nur 3-Tage-Tag C): die beiden Glute-Med-Zeilen holen ihre Uebung aus
+4-Tage-Tag D bzw. Tag B. Ist das dort dieselbe Uebung, steht sie in Tag C zweimal.
 
 ### Alte Plaene (P4_V1 / P3_V1, bis Sept. 2026) — nur fuer Zyklen mit pv__-Marker
 Stehen unveraendert in index.html (P4_V1: A Beine 9 / B Oberkoerper 9 / C 10 / D 10
@@ -744,7 +747,7 @@ eine Loesung (z. B. mehr Zyklen oder Zyklus-Archiv).
 
 ## Trainingsziele (Stand Sept. 2026)
 
-1. Grosser, runder, abstehender Po — Hauptfokus: Glute Max 15 Saetze direkt (3 und 4 Tage)
+1. Grosser, runder, abstehender Po — Hauptfokus: Glute Max 15 (4 Tage) / 13 (3 Tage) Saetze direkt
    + Glute & Quad 5 / Glute & Hams 7 fuer die gedehnte Position.
 2. Deutliche Huefte / Sanduhr: Glute Med 4x pro Woche (8 Saetze), Abduktion mit
    vorgeneigtem Oberkoerper fuer den oberen Po; dazu Lats + Seitheben (V-Form).
@@ -784,6 +787,11 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **3-Tage Tag B: nur zwei Glute-Max-Zeilen (02.10.2026, Version -02).** Wunsch: nicht 3x
+   Glute Max an einem Tag. Dritte Zeile (2x8-12, Partner 4-Tage Tag B) gestrichen -> 60 Saetze
+   (22/19/19), Glute Max 13/Woche. Kurz eingetragene Werte dieser Zeile parkt repairSlots
+   (bleiben gespeichert), der Rest rutscht per Kategorie. Test in flex-woche; alle Reihen gruen.
 
 NEU. **Flexible 3/4-Tage-Woche, 3-Tage-Plan V3, Uebungswechsel-Abfrage (02.10.2026, Version
    2026-10-02-01).** (1) "3 Tage"/"4 Tage" gelten pro Woche (wt__-Marker, weekPt/syncPt),

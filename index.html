@@ -500,13 +500,14 @@ const P4=[
   {c:"Bauch",s:2,r:[8,12]}
 ]}
 ];
-// 3-Tage-Plan Version 3 (ab 02.10.2026, 62 Saetze): Po und Beine wie in der 4-Tage-Woche (nur
-// Beinbeuger 3 statt 4), Ruecken/Schultern je 5, Bauch 2 pro Tag. Pro Einheit hoechstens ~11
-// anteilige Po-Saetze (A 10,5 / B 10,5 / C 10). Daten unter p3cycle-Keys.
+// 3-Tage-Plan Version 3 (ab 02.10.2026, 60 Saetze): Glute Max 13, Glute Med 8, Glute & Hams 7,
+// Ruecken/Schultern je 5, Bauch 2 pro Tag. Pro Einheit hoechstens ~11 anteilige Po-Saetze
+// (A 10,5 / B 8,5 / C 10). Tag B mit nur ZWEI Glute-Max-Zeilen (Wunsch 02.10.2026: nicht 3x
+// Glute Max an einem Tag — die dritte Zeile 2x8-12 war nur kurz drin). Daten unter p3cycle-Keys.
 // FLEXIBLE WOCHE: jede Woche ist 3 ODER 4 Tage (siehe weekPt). Jede Zeile hat eine Partnerzeile
 // t:[Tag,Zeile] im 4-Tage-Plan P4 — gleiche Kategorie, gleicher Wdh.-Bereich. Ueber sie teilen sich
 // 3- und 4-Tage-Wochen die Uebungsauswahl, Zusatzsaetze und den Verlauf (twinOf/slotEntry).
-// P4-Zeilen ohne Partner: Tag A Beinbeuger, Tag B Ruecken 2x8-12, Schultern 2x8-12, Bauch.
+// P4-Zeilen ohne Partner: Tag A Beinbeuger, Tag B Glute Max, Ruecken 2x8-12, Schultern 2x8-12, Bauch.
 const P3=[
 {l:"Tag A – Po Kraft",f:"4–8 Wdh. · Beinvorderseite · Rücken · Schultern",e:[
   {c:"Glute Max",s:3,r:[4,8],t:[0,0]},
@@ -522,7 +523,6 @@ const P3=[
 {l:"Tag B – Po & Beinrückseite",f:"6–10 Wdh. · Hüftbeuge · Beinbeuger",e:[
   {c:"Glute Max",s:3,r:[6,10],t:[2,0]},
   {c:"Glute Max",s:2,r:[8,12],t:[2,1]},
-  {c:"Glute Max",s:2,r:[8,12],t:[1,0]},
   {c:"Glute Med",s:2,r:[8,12],t:[2,2]},
   {c:"Glute & Hams",s:3,r:[6,10],t:[2,3]},
   {c:"Beinbeuger",s:3,r:[8,12],t:[2,4]},
@@ -816,7 +816,7 @@ function migPlanV2(){
   }catch{}
 }
 migPlanV2();
-// 3-TAGE-PLAN VERSION 3 (02.10.2026): neue Aufteilung (62 Saetze, Partnerzeilen zum 4-Tage-Plan).
+// 3-TAGE-PLAN VERSION 3 (02.10.2026): neue Aufteilung (60 Saetze, Partnerzeilen zum 4-Tage-Plan).
 // Regel 13: jeder 3-Tage-Zyklus, der schon mit dem bisherigen Plan (V2) Werte hat, bekommt
 // pv__p3cycleN=2 und zeigt weiter genau diese Aufteilung. pv__v3 = Markierung gelaufen; ein
 // Backup ohne pv__v3 wird beim Einspielen ebenso markiert. MUSS vor migOrderV2/repairSlots
@@ -1786,7 +1786,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeWeekPick();clo
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-10-02-01';
+const BUILD_ID='2026-10-02-02';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();
