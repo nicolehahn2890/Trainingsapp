@@ -891,7 +891,34 @@ function migOrderV2(){
     }
   }catch{}
 }
+// BEINBEUGER TAG C (4 Tage) 2 -> 3 SAETZE (02.10.2026). Satzzahlen stehen im Plan, nicht im Eintrag:
+// ohne Korrektur fehlte bereits trainierten Wochen mit 2 Saetzen ploetzlich ein Satz (kein ✓ mehr),
+// und wer per "+" schon auf 3 erhoeht hatte, bekaeme kuenftig 4. Darum einmalig: Wochen MIT Werten
+// behalten ihre Satzzahl (s0 = Basis-Saetze dieses Eintrags, nur wenn != 3), Zusatzsaetze werden so
+// umgerechnet, dass die Folgewochen mit 3 + bewusst hinzugefuegten Saetzen weiterlaufen.
+// Nur 4-Tage-Zyklen ohne Plan-Marker, Zeile Tag C e4, nur Beinbeuger-Eintraege. Laeuft VOR repairSlots
+// (sonst sortiert der naechste Start die Keys um den neuen Merker herum einmal neu). Merker pv__bb3.
+function migBBSets(data){
+  if(data.pv__bb3)return false;
+  for(const k in data){
+    const m=/^(cycle\d+)__w\d+__d2__e4$/.exec(k),v=data[k];
+    if(!m||data['pv__'+m[1]]||!v||typeof v!=='object')continue;
+    if(v.exercise&&CATOF[v.exercise]!=='Beinbeuger')continue; // nur Beinbeuger (Tag C liegt seit V2 fest)
+    const ms=2+(v.extraSets||0),x=Math.max(0,ms-3),nv={...v,extraSets:x};
+    if(hasVals(v)&&ms-x!==3)nv.s0=ms-x;
+    data[k]=nv;
+  }
+  data.pv__bb3=1;
+  return true;
+}
+function migBBStart(){
+  try{
+    if(S.data.pv__bb3)return;
+    if(migBBSets(S.data)&&Object.keys(S.data).some(k=>/__w\d+__d\d+__e\d+$/.test(k)))save();
+  }catch{}
+}
 migOrderV2();
+migBBStart();
 function repairSlots(){
   try{
     const before=JSON.stringify(S.data);
@@ -1046,7 +1073,9 @@ function carryMap(cy){
     // Flexible Wochen: dieselbe Zeile (Partnerzeilen) aus BEIDEN Plaenen der Quell-Nummer, die
     // juengste Woche gewinnt — so kommt die Auswahl aus 3- und 4-Tage-Wochen gleichermassen an.
     const byCanon={};
-    if(src)['','p3'].forEach(pre=>{
+    // Nur in flexiblen Quell-Zyklen — hat die Nummer einen alten Plan (Marker), entscheidet wie frueher
+    // allein der zuletzt trainierte Plan (sonst gewann eine aeltere Auswahl aus dem anderen Plan).
+    if(src&&flexCy(cyNum(src)))['','p3'].forEach(pre=>{
       const c=pre+'cycle'+cyNum(src);
       if(!by[c])return;
       for(const sk in by[c]){
@@ -1301,7 +1330,10 @@ function findLastExData(di,ei,currentExercise){
   const any=last(idx[exKey(currentExercise,'*')]);
   if(!any)return{};
   const same=last(idx[exKey(currentExercise,rr)]);
-  const hit=same&&same.cy===any.cy?same:any;
+  // Flexible Zyklen: 3- und 4-Tage-Wochen einer Zyklus-Nummer sind EIN Zyklus (sonst fiel der Wert aus
+  // der 3-Tage-Woche im gleichen Bereich weg und es kam nur ein Orientierungswert ohne Badge).
+  const an=cyNum(any.cy),sameCy=same&&(same.cy===any.cy||(flexCy(an)&&cyNum(same.cy)===an));
+  const hit=sameCy?same:any;
   return{...hit.d,_orient:hit.rr!==rr,_src:{pt:hit.pt,cy:hit.cy,w:hit.w,di:hit.di,rr:hit.rr}};
 }
 // Kurzlabel woher der Vorwert stammt, z. B. "Z1 W5 · Tag A" (bei anderem Plan zusaetzlich "3-Tage")
@@ -1323,7 +1355,7 @@ function exDone(di,ei){
   const exName=rawCur.exercise!==undefined?rawCur.exercise:inhEx(di,ei);
   if(!exName)return false;
   const xs=rawCur.extraSets!==undefined?rawCur.extraSets:(prevW.extraSets||0);
-  const ms=Math.min(5,ex.s+xs+autoExtraSets(di,ei));
+  const ms=Math.min(5,(rawCur.s0||ex.s)+xs+autoExtraSets(di,ei));
   const reps=rawCur.reps||[];
   let filled=0;
   for(let i=0;i<ms;i++){const v=reps[i];if(v!==''&&v!=null&&parseInt(v)>0)filled++}
@@ -1396,7 +1428,7 @@ function exState(di,ei){
   // Vergleichswert: letzter gespeicherter Wert DIESER Uebung (nicht einfach Vorwoche)
   const prv=findLastExData(di,ei,cur.exercise);
   const autoX=autoExtraSets(di,ei);
-  const ms=Math.min(5,ex.s+(cur.extraSets||0)+autoX);
+  const ms=Math.min(5,(rawCur.s0||ex.s)+(cur.extraSets||0)+autoX); // s0: Saetze, mit denen die Woche trainiert wurde (migBBSets)
   // NUR die Saetze der aktuellen Woche: ein spaeter entfernter Zusatzsatz darf nicht
   // als Rest im Vergleich haengen bleiben (sonst zaehlt eine geloeschte Zahl weiter mit).
   const reps=(cur.reps||[]).slice(0,ms);
@@ -1597,7 +1629,9 @@ function impBackup(){
   const cnt=o=>Object.keys(o).filter(k=>k.indexOf('pv__')!==0&&k.indexOf('wt__')!==0).length;
   const n=cnt(data),have=cnt(S.data);
   if(have>0&&!confirm('Achtung: Hier sind bereits '+have+' Einträge gespeichert. Wirklich mit dem Backup ('+n+' Einträge) überschreiben?'))return;
-  S.data=data;markLegacy(S.data);markV3(S.data);save();
+  // Gleiche Korrekturen wie beim Start (sonst zeigte ein aelteres Backup bis zum Neustart verschobene
+  // Zeilen, und Eingaben landeten im falschen Eintrag): Plan-Marker, Umbenennung, Reihenfolge, Zuordnung.
+  S.data=data;markLegacy(S.data);markV3(S.data);migLegCurl();migOrderV2();migBBSets(S.data);repairSlots();save();
   syncPt();saveUI();render();
   bkMsg('✓ Backup eingespielt – '+n+' Einträge wiederhergestellt!');
 }
@@ -1617,7 +1651,7 @@ function setPlan(pt){
   if(S.pt===pt)return;
   const n=cyNum(S.cy),flex=flexCy(n);
   const go=()=>{
-    if(flex){S.data[wtKey(n,S.week)]=pt;save()}
+    if(flex){S.data[wtKey(n,S.week)]=pt;if(loadFailed){_exIdx=null;_carry={};_wk={}}else save()} // unlesbare Daten nie ueberschreiben
     S.pt=pt;S.cy=(pt==='p3'?'p3':'')+'cycle'+n;S.openDays={};S.drop=null;saveUI();render();flashView();
   };
   const other=(pt==='p3'?'p3':'')+'cycle'+n;
@@ -1788,7 +1822,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeWeekPick();clo
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-10-02-03';
+const BUILD_ID='2026-10-02-04';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();

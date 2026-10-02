@@ -19,7 +19,9 @@ await page.reload();await page.waitForTimeout(300);
 const st=await page.evaluate(()=>JSON.parse(localStorage.getItem('peach_v4')));
 // Plan-Marker (pv__v3 seit 02.10.2026) sind keine Trainingsdaten
 const same=(a,b)=>{const ks=new Set([...Object.keys(a),...Object.keys(b)].filter(k=>k.indexOf('pv__')!==0||k==='pv__p3cycle1'));return [...ks].every(k=>JSON.stringify(a[k])===JSON.stringify(b[k]))};
-ok(same(st,d),'Alte Eintraege (liegend, sitzend, Beinstrecker, Einstellung) unveraendert');
+// Beinbeuger Tag C mit 2 Saetzen trainiert: behaelt seine Satzzahl (s0=2, Umstellung auf 3 Saetze am 02.10.2026)
+const dExp={...d,'cycle2__w1__d2__e4':{...d['cycle2__w1__d2__e4'],s0:2}};
+ok(same(st,dExp),'Alte Eintraege (liegend, sitzend, Beinstrecker, Einstellung) unveraendert (Beinbeuger merkt sich 2 Saetze)');
 const txt=async sel=>(await page.textContent(sel).catch(()=>''));
 ok((await txt('#pw-2-4 .pick-btn-txt'))==='Leg Curls sitzend','Z2 W2: alte Auswahl "Leg Curls sitzend" steht weiter in der Beinbeuger-Zeile');
 // Dropdowns

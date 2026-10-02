@@ -159,6 +159,8 @@ Workout:      [cycle]__w[week]__d[dayIdx]__e[exIdx]
               enthaelt eine Zyklus-Nummer Wochen BEIDER Arten (flexible Woche, siehe weekPt).
               Optionales Feld base: einmaliger Uebungswechsel ("nur diese Woche") — exercise wird
               gezeigt, base vererbt (exBase). Ohne base wird exercise vererbt.
+              Optionales Feld s0: Basis-Saetze, mit denen diese Woche trainiert wurde, wenn sie
+              vom heutigen Plan abweichen (exState/exDone nehmen s0||Plan-Saetze). Wird NICHT vererbt.
 Tipp-Notiz:   tip__ex__[Uebungsname]  (gilt ueber alle Wochen/Tage/Zyklen!)
               WICHTIG: Seit dem Notiz-Update ist das eine ZUSAETZLICHE eigene Notiz,
               KEIN Override mehr! Der Standard-Tipp aus TIPS wird IMMER angezeigt,
@@ -170,6 +172,7 @@ Plan-Marker:  pv__[cycle] = 1  -> dieser Zyklus zeigt den ALTEN Plan (P4_V1/P3_V
               pv__p3cycleN = 2 -> 3-Tage-Zyklus mit dem Plan V2 (P3_V2, 56 Saetze, bis 02.10.2026)
               pv__done  = 1  -> Markierung V1 ist gelaufen (Backups ohne pv__done werden
                                 beim Einspielen markiert). pv__v3 = 1 -> Markierung V2 gelaufen.
+                                pv__bb3 = 1 -> Beinbeuger-Umrechnung gelaufen (migBBSets).
                                 Alle pv__ zaehlen NICHT als Eintraege.
 Wochen-Art:   wt__cycleN__wW = 'p3'|'p4'  -> 3 oder 4 Tage fuer diese Woche (setPlan). Zaehlt
               NICHT als Eintrag. Nur in flexiblen Zyklen (flexCy) gesetzt.
@@ -186,6 +189,11 @@ planOf(cy)              p3-Praefix -> 3 Tage, sonst 4 Tage; Marker 1 -> P3_V1/P4
                         3 Tage) -> P3_V2, sonst der aktuelle Plan (P3/P4). JEDE Stelle, die einen
                         Plan-Platz braucht (repairSlots, repRange, srcLabel, carryMap), nimmt planOf(cy).
 isLegacy(cy)            true wenn S.data['pv__'+cy]===1;  pvOf(cy) = Marker-Wert (0 = aktueller Plan)
+migBBSets(data)         Einmalig 02.10.2026 (4 Tage Tag C Beinbeuger 2 -> 3 Saetze): Eintraege an
+/migBBStart             cycleN__wW__d2__e4 (ohne Plan-Marker, nur Beinbeuger) behalten ihre Satzzahl:
+                        Wochen MIT Werten bekommen s0 (falls != 3), extraSets wird umgerechnet (2+1 -> 3+0).
+                        Laeuft nach migOrderV2 und VOR repairSlots (sonst einmalige Key-Umsortierung) und
+                        in impBackup. Merker pv__bb3.
 markV3(data)/migPlanV3  Einmal-Markierung 02.10.2026: jeder 3-Tage-Zyklus OHNE Marker mit Werten bekommt
                         pv__=2 (behaelt P3_V2), danach pv__v3=1. Laeuft beim Start VOR migOrderV2/
                         repairSlots (Kopie peach_v4_pre_v3) und in impBackup.
@@ -231,7 +239,8 @@ ALIAS / rowFits(r,e,leg) Zeile der Kategorie r akzeptiert Uebung der Kategorie e
                         Alias NICHT: sonst blieb nach der neuen Glute-&-Hams-Zeile in Tag A ein
                         Beinbeuger-Eintrag darin liegen. Nie im Dropdown.
 carryMap(cy)            Uebungs-Uebernahme in einen neuen Zyklus (nur Nicht-Alt-Zyklen). ZUERST (seit
-                        02.10.2026) ueber Partnerzeilen (canon) aus BEIDEN Plaenen der Quell-Nummer, die
+                        02.10.2026, nur wenn die Quell-Nummer flexibel ist — flexCy) ueber Partnerzeilen
+                        (canon) aus BEIDEN Plaenen der Quell-Nummer, die
                         juengste Woche gewinnt; einmalige Wechsel zaehlen mit ihrer base. Dann pro Zeile
                         die Uebung aus dem ZULETZT TRAINIERTEN Zyklus mit kleinerer Nummer — egal ob
                         3 oder 4 Tage (juengster Eintrag nach exOrd; notfalls anderer Plan gleiche
@@ -254,7 +263,8 @@ setPlan(pt)             Header-Pills "3 Tage"/"4 Tage" (.plan-btn) — gelten fu
                         setzt wt__cycleN__wW (flexible Zyklen). Hat die Woche Werte im aktuellen Plan
                         und keine im anderen -> Abfrage "Woche N auf X Tage?" (Werte bleiben gespeichert).
                         Behaellt die Zyklus-Nummer, schliesst offene Tage/Dropdown, saveUI(). In alten
-                        Zyklen (flexCy false) wie frueher: globaler Umschalter ohne Marker.
+                        Zyklen (flexCy false) wie frueher: globaler Umschalter ohne Marker. Bei loadFailed
+                        (unlesbares peach_v4) nur im Speicher — nie speichern.
 parseWeight(w,inv)      Parst "25-27" -> 27 (oberer Wert), "27,5" -> 27.5 (Komma -> Punkt).
                         inv=true (assistierte Uebung): aus einer Spanne zaehlt der KLEINERE
                         Wert ("20-25" -> 20), weil weniger Hilfe die bessere Leistung ist.
@@ -275,7 +285,8 @@ findLastExData(di,ei,ex) Vorwert VOR der aktuellen Position, ueber BEIDE Plaene 
                         alle Wochen: (1) juengster Wert im GLEICHEN Rep-Bereich, sofern er aus
                         dem Zyklus des insgesamt juengsten Eintrags der Uebung stammt; (2) sonst
                         der juengste Wert egal welcher Bereich (_orient: nur Orientierung, kein
-                        Badge, Bereich im Hinweis). Pflicht-Test: Woche 1 und 2 eines neuen
+                        Badge, Bereich im Hinweis). "Gleicher Zyklus" heisst in flexiblen Zyklen gleiche
+                        Zyklus-NUMMER (3- und 4-Tage-Wochen sind ein Zyklus). Pflicht-Test: Woche 1 und 2 eines neuen
                         Zyklus zeigen bei leerer Woche 1 fuer JEDE Zeile denselben Vorwert. Liefert _src {pt,cy,w,di,rr} und _orient.
                         Index: exIndex() fuehrt jede Uebung zusaetzlich unter "Uebung||*".
 exOrd(cy,w,di,ei)       Reihenfolge-Wert eines Eintrags: Zyklus > Woche > Tag > Position
@@ -335,8 +346,10 @@ saveUI()                Merkt die aktuelle Position (view/week/cy/openDays) im K
 expBackup()             Backup: JSON {app:'peach',v:1,date,data:S.data} in die Zwischenablage,
                         Fallback: Text ins bk-ta-Feld + markieren. UI unten in der Uebersicht (bk-card).
 impBackup()             Import: akzeptiert das Wrapper-Format ODER rohes peach_v4-Objekt. Validiert
-                        Keys (__w_d_e / tip__ / set__), confirm() vor Ueberschreiben; alte Backups
-                        ohne pv__done werden markiert (markLegacy). pv__-Keys zaehlen nicht als Eintraege.
+                        Keys (__w_d_e / tip__ / set__), confirm() vor Ueberschreiben. Danach dieselben
+                        Korrekturen wie beim Start: markLegacy, markV3, migLegCurl, migOrderV2, migBBSets,
+                        repairSlots (seit 02.10.2026 — vorher zeigte ein aelteres Backup bis zum Neustart
+                        verschobene Zeilen). pv__/wt__-Keys zaehlen nicht als Eintraege.
 checkUpdate()           Auto-Update gegen iOS-Webapp-Cache: holt die AUSGELIEFERTE index.html von
                         der eigenen Domain (kein API-Limit) und vergleicht deren BUILD_ID mit der
                         eigenen — GLEICH/UNGLEICH, NIE groesser/kleiner. Bei Abweichung
@@ -563,6 +576,15 @@ Label "nur diese Woche" (.once-chip) in der Status-Zeile der Uebung.
     muessen die t-Angaben mitgezogen werden, sonst bekommt eine 3-Tage-Woche falsche Uebungen.
     Partnerzeilen gelten nur zwischen den AKTUELLEN Plaenen (canon/twinOf liefern bei pv__-Marker
     null). Eine neue Plan-Version braucht deshalb eigene Partnerzeilen oder keine.
+
+15. **Satzzahl einer Zeile aendern (z. B. 2 -> 3) braucht eine Umrechnung wie migBBSets.**
+    Die Satzzahl steht im Plan, nicht im Eintrag: sonst fehlt bereits trainierten Wochen ploetzlich
+    ein Satz (kein ✓), und mit "+" erhoehte Saetze zaehlen doppelt. Wochen mit Werten bekommen s0,
+    extraSets wird umgerechnet, einmalig mit pv__-Merker, VOR repairSlots, auch in impBackup.
+
+16. **Neue Start-Migrationen VOR repairSlots einhaengen.** repairSlots baut alle Workout-Keys neu
+    auf; wird danach noch ein Key ergaenzt, sortiert der naechste Start einmal um und speichert.
+    Vergleiche auf "unveraendert" in Tests inhaltlich (sortierte Keys), nicht ueber rohes JSON.
 
 ---
 
@@ -814,6 +836,19 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Fixes aus der unabhaengigen Code-Pruefung (02.10.2026, Version -04).** (1) Vorwert im
+   gleichen Rep-Bereich aus der anderen Wochenart desselben flexiblen Zyklus wurde ignoriert
+   (findLastExData verglich praefixierte Zyklen) -> nur Orientierung, kein Badge. (2) carryMap:
+   Partnerzeilen-Uebernahme nur bei flexibler Quell-Nummer (sonst gewann eine aeltere Wahl).
+   (3) impBackup laeuft durch alle Start-Korrekturen. (4) Beinbeuger Tag C 2 -> 3 Saetze:
+   migBBSets/s0 (trainierte Wochen behalten Satzzahl, "+"-Satz umgerechnet). (5) setPlan speichert
+   bei unlesbaren Daten nicht. Neuer Test tests/randfaelle.test.js; 13 Testreihen gruen.
+   BEWUSST NICHT GEAENDERT (bekannt, klein): alte Zyklen merken sich die 3/4-Tage-Ansicht nicht
+   mehr ueber einen Abstecher in einen flexiblen Zyklus; doppelte Uebung in einem Tag (Partner-
+   zeilen ohne Abgleich) wird von Hand getauscht; Abfrage-Fenster ohne Fokus-Falle (nur Tastatur);
+   repairSlots verwirft beim Start geleerte Zeilen ohne Werte (exercise '', aelteres Verhalten) —
+   die Zeile erbt danach wieder die Uebung der Vorwoche.
 
 NEU. **Abschluss-Check (02.10.2026).** Neuer Dauertest tests/gesamtcheck.test.js (49 Pruefungen:
    Konsistenz-Audit, Update eines realistischen Altstands ohne Datenverlust, alle 288 Ansichten
