@@ -10,6 +10,7 @@ iPhone werden dabei nie beruehrt.
 |---|---|
 | `badge-zeile.test.js` | Badge und ✓ stehen immer in der 2. Zeile unter der Uebungsauswahl (390 und 430 px), keine Leerzeile ohne Badge |
 | `flex-woche.test.js` | 3 oder 4 Tage pro Woche: 3-Tage-Plan V3 (60 Saetze, Partnerzeilen, Tag B nur 2x Glute Max), Uebernahme in beide Richtungen, Vorwerte/Steigerung/Auto-Satz/Uebersicht ueber beide Wochenarten, Rueckfrage beim Umstellen, alter 3-Tage-Plan (Marker 2) und alte Zyklen unveraendert, Tempo |
+| `gesamtcheck.test.js` | Grosser Durchlauf: Konsistenz-Audit (Uebungen, Tipps, Plaene, Partnerzeilen, max. 2x Glute Max pro Tag, Beinbeuger 1x/Woche), Update eines realistischen Altstands ohne Datenverlust, alle 288 Ansichten, kompletter Zyklus mit gemischten 3/4-Tage-Wochen bis Woche 12 und Uebergang, Layout 390/430 px, Backup-Rundreise |
 | `funktion.test.js` | Rendering aller 288 Ansichten, Layout, Eingaben, Saetze, Badges, Vergleichslogik, Auto-Zusatzsatz, Navigation, Tipps, Uebersicht, Backup, Robustheit |
 | `hersteller.test.js` | Leg Curls liegend / Beinstrecker mit Panatta und Precor, Leg Curls sitzend nur Precor; alte Namen bleiben erhalten, werden in neuen Zyklen nicht vorgeschlagen |
 | `planwechsel.test.js` | Alte Zyklen behalten ihren Plan, neue Zyklen den neuen, Uebernahme der Uebungen, Reihenfolge, Leg Curls nur unter Beinbeuger |
