@@ -768,6 +768,25 @@ eine Loesung (z. B. mehr Zyklen oder Zyklus-Archiv).
 
 Glute & Quad: Weite Fussstellung + erhoehte Ferse = Po. Enge Fussstellung + Tiefe = Quad.
 
+### Volumen-Check gegen die Ziele (02.10.2026, nach allen Plan-Aenderungen)
+Anteilig gezaehlt (Hauptmuskel 1, Mitarbeit 0,5; Po = Glute Max + Glute Med + halbe Saetze aus
+Glute & Quad, Glute & Hams, Adduktoren). Saetze pro Woche:
+| Muskel | 4 Tage | 3 Tage | Einordnung |
+|---|---|---|---|
+| Po gesamt | 31 | 29 | Hauptziel: oberes sinnvolles Ende (~25-30), mehr bringt kaum noch etwas |
+| Po pro Einheit | 10,5 / 4 / 8,5 / 8 | 10,5 / 8,5 / 10 | unter der Grenze ~11 pro Einheit |
+| Glute Med (direkt) | 8 | 8 | Huefte/Sanduhr: 4x pro Woche (4 Tage) bzw. 3 Einheiten |
+| Beinrueckseite | 10 (3 Beinbeuger + 7 Hueftbeuge) | 10 | definiert, nicht massig |
+| Beinvorderseite | 7 (5 Glute & Quad + 2 Beinstrecker) | 7 | bewusst moderat (nicht massig) |
+| Adduktoren | 4 | 4 | volle Innenseite, zusaetzlich aus Squats/Lunges |
+| Ruecken / Schultern | 7 / 7 | 5 / 5 | schlanker, trainierter Oberkoerper + V-Form |
+| Brust / Arme | 2 / indirekt | 2 / indirekt | minimal (Wunsch) |
+| Bauch | 8 | 6 | 2 pro Trainingstag (Wunsch) |
+Ergebnis: passt zu den Zielen, keine Aenderung empfohlen. Einziger Hinweis: werden UEBER LAENGERE
+ZEIT nur 3-Tage-Wochen trainiert, liegen Ruecken/Schultern mit 5 am unteren Ende — dann je 1 Satz
+mehr erwaegen. Ab jetzt entscheiden Steigerung (Gewicht/Reps), Ernaehrung (Protein, leichter
+Ueberschuss fuer Po-Aufbau) und Schlaf mehr als weitere Saetze.
+
 ---
 
 ## Tests (seit 26.09.2026)
@@ -795,6 +814,13 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Abschluss-Check (02.10.2026).** Neuer Dauertest tests/gesamtcheck.test.js (49 Pruefungen:
+   Konsistenz-Audit, Update eines realistischen Altstands ohne Datenverlust, alle 288 Ansichten
+   ohne undefined/NaN, kompletter Zyklus mit gemischten 3/4-Tage-Wochen bis W12 und Uebergang,
+   Layout 390/430 px, Backup-Rundreise). Volumen-Check gegen die Ziele (Abschnitt Trainingsziele).
+   Hinweis: repairSlots sortiert Keys beim Start nach Woche/Tag — Vergleiche auf "unveraendert"
+   deshalb inhaltlich (sortierte Keys), nicht ueber die rohe JSON-Reihenfolge. 12 Testreihen gruen.
 
 NEU. **Beinbeuger nur 1x pro Woche mit 3 Saetzen (02.10.2026, Version -03).** 4 Tage: Zeile in
    Tag A gestrichen, Tag C 3x8-12 (68 Saetze, 16/18/19/15); 3 Tage hatte es schon (Tag B).
@@ -1195,7 +1221,7 @@ NEU. **Nachtrag: Rep-Bereich gehoert in den Vergleichsschluessel:** Der erste Wu
    Gesamtsumme, parseWeight fuer Spannen/Komma, P3/Plan-Umschalter entfernt,
    Dropdown-Such-Fokus-Fix, REC-Stern im Dropdown, veraltete Duplikat-PDF geloescht.
 
-Konsistenz-Audit (zuletzt ausgefuehrt 02.10.2026; Partnerzeilen per Test flex-woche): alle 142 Uebungen haben Tipps, keine verwaisten
+Konsistenz-Audit (zuletzt ausgefuehrt 02.10.2026, laeuft jetzt automatisch in tests/gesamtcheck.test.js): alle 142 Uebungen haben Tipps, keine verwaisten
 Tipps/REC-Eintraege, keine Duplikate, Rep-Bereiche plausibel (4-8/6-10/8-12), jede im Plan
 verwendete Kategorie (P3/P4 UND P3_V1/P4_V1) existiert in EXERCISES und hat eine Farbe in CC,
 prog()/rcol()/autoExtraSets() per Funktionstest verifiziert.
