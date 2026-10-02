@@ -464,6 +464,12 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
   "3 Saetze · 4–8 Reps" — keine eigene Zeile (Wunsch: nichts vollgeschrieben/gequetscht).
 - Kleine Vorwerte unter den Rep-Feldern (.rep-prev) nur, wenn der Vorwert ueberhaupt Reps hat
   (hasPrevReps) — sonst stand dort "0 0 0".
+- Label "nur diese Woche" (.once-chip, gestrichelter weisser Pill) in der Status-Zeile (.ex-status),
+  wenn der Eintrag ein einmaliger Wechsel ist (Feld base). Die Status-Zeile zeigt sich auch nur mit Label.
+- Abfrage-Fenster (#sheet): Cream-Block unten mit Ink-Rahmen und hartem Schatten auf dunklem
+  Schleier (--scrim); Hauptaktion Peach (.sheet-btn.pri), Abbrechen als unterstrichener Text.
+  Genutzt fuer den Uebungswechsel und das Umstellen einer Woche mit Werten auf 3/4 Tage.
+- Plan-Pills "3 Tage"/"4 Tage" gelten fuer die angezeigte Woche (title "Gilt für diese Woche").
 - Tipp-Panel: Standard-Tipp (TIPS) immer sichtbar; eigene Notiz (tip__ex__) darunter mit
   Label "Deine Notiz" (.tip-note, .tip-note-lbl); Editor bearbeitet NUR die Notiz
 
