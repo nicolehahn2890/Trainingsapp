@@ -837,6 +837,11 @@ Fallback (manuell, ohne Session):
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
 
+NEU. **Tipp Panatta Super Crunch: Atmung + Bauchnabel (04.10.2026, Version 2026-10-04-01).**
+   Ausfuehrung ergaenzt: "In der Hebephase kraeftig ausatmen und dabei den Bauchnabel einziehen."
+   (forcierte Ausatmung aktiviert den Transversus, kein Gewicht reduzieren). Plan unveraendert —
+   Vacuum/Hollowing macht Rexi an Pausentagen zu Hause, NICHT in der App/im Gym-Plan.
+
 NEU. **Fixes aus der unabhaengigen Code-Pruefung (02.10.2026, Version -04).** (1) Vorwert im
    gleichen Rep-Bereich aus der anderen Wochenart desselben flexiblen Zyklus wurde ignoriert
    (findLastExData verglich praefixierte Zyklen) -> nur Orientierung, kein Badge. (2) carryMap:
