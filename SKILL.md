@@ -173,6 +173,7 @@ Plan-Marker:  pv__[cycle] = 1  -> dieser Zyklus zeigt den ALTEN Plan (P4_V1/P3_V
               pv__done  = 1  -> Markierung V1 ist gelaufen (Backups ohne pv__done werden
                                 beim Einspielen markiert). pv__v3 = 1 -> Markierung V2 gelaufen.
                                 pv__bb3 = 1 -> Beinbeuger-Umrechnung gelaufen (migBBSets).
+                                pv__gm3 = 1 -> Glute-Med-Umrechnung 3 Tage gelaufen (migGMSets).
                                 Alle pv__ zaehlen NICHT als Eintraege.
 Wochen-Art:   wt__cycleN__wW = 'p3'|'p4'  -> 3 oder 4 Tage fuer diese Woche (setPlan). Zaehlt
               NICHT als Eintrag. Nur in flexiblen Zyklen (flexCy) gesetzt.
@@ -194,6 +195,12 @@ migBBSets(data)         Einmalig 02.10.2026 (4 Tage Tag C Beinbeuger 2 -> 3 Saet
                         Wochen MIT Werten bekommen s0 (falls != 3), extraSets wird umgerechnet (2+1 -> 3+0).
                         Laeuft nach migOrderV2 und VOR repairSlots (sonst einmalige Key-Umsortierung) und
                         in impBackup. Merker pv__bb3.
+migGMSets(data)         Einmalig 04.10.2026 (3 Tage Tag A + Tag B Glute Med 2 -> 3 Saetze), gleiches
+/migGMStart             Vorgehen wie migBBSets: p3cycleN ohne Plan-Marker, Tag A/B, erkannt ueber die
+                        KATEGORIE (Glute Med, Eintraege ohne Uebung nur an e2) — so zaehlt auch ein
+                        Eintrag, den repairSlots erst danach einsortiert. Wochen MIT Werten bekommen s0
+                        (falls != 3), extraSets umgerechnet (2+1 -> 3+0). Laeuft nach migBBStart, VOR
+                        repairSlots, und in impBackup. Merker pv__gm3.
 markV3(data)/migPlanV3  Einmal-Markierung 02.10.2026: jeder 3-Tage-Zyklus OHNE Marker mit Werten bekommt
                         pv__=2 (behaelt P3_V2), danach pv__v3=1. Laeuft beim Start VOR migOrderV2/
                         repairSlots (Kopie peach_v4_pre_v3) und in impBackup.
@@ -492,8 +499,10 @@ der direkten Vorwoche) — NICHT: reps, weight
 Woche 1 eines neuen Zyklus: exercise aus dem vorherigen Zyklus (carryMap, erst Partnerzeile, dann
 Kategorie), extraSets starten bei 0. Nur Vorbelegung — gespeichert wird erst beim Eintragen (initKey).
 3/4-Tage-Wechsel: lief die Vorwoche im anderen Plan, kommen Uebung und extraSets von der
-Partnerzeile (slotEntry). 4-Tage-Zeilen ohne Partner (Tag B Glute Max, Ruecken 2x8-12,
-Schultern 2x8-12, Bauch) erben aus der letzten 4-Tage-Woche.
+Partnerzeile (slotEntry). 4-Tage-Zeilen ohne Partner (Tag A zweite Glute-Med-Zeile, Tag B Glute
+Max, Ruecken 2x8-12, Schultern 2x8-12, Bauch) erben aus der letzten 4-Tage-Woche. Zusatzsaetze
+gelten RELATIV zum Plan: Glute Med Tag A/B hat in 3 Tagen 3, in 4 Tagen 2 Saetze — ein "+" kommt in
+der anderen Wochenart als "+1" an (2+1 -> 3+1), nicht als gleiche Gesamtzahl.
 Einmaliger Wechsel ("nur diese Woche", Feld base): die Folgewoche erbt base, nicht exercise.
 Label "nur diese Woche" (.once-chip) in der Status-Zeile der Uebung.
 
@@ -605,7 +614,8 @@ Muskel und Einheit kein Zusatznutzen; Plotkin 2023/Kubo 2019: Hip Thrust + tiefe
 kniedominante Uebung; Maeo 2021: sitzender Beinbeuger > liegend). Grundsaetze:
 - REIHENFOLGE pro Tag (ausdruecklicher Wunsch): erst Glute Max, dann Glute Med, dann die
   restlichen Po-/Bein-Uebungen (Grunduebungen vor Isolation), dann Oberkoerper, Bauch zuletzt.
-- Pro Einheit hoechstens ~9 harte Po-Saetze; Glute Med 4x pro Woche (Wunsch: deutliche Huefte).
+- Pro Einheit hoechstens ~9 harte Po-Saetze; Glute Med 4x pro Woche (Wunsch: deutliche Huefte),
+  seit 04.10.2026 10 Saetze/Woche in beiden Wochenarten (Wunsch: mehr Glute Med, Fokus Huefte).
 - Adduktoren bleiben (2x2 Saetze). Neu: Beinbeuger + Beinstrecker fuer definierte Beine.
 - JEDER Tag endet mit Bauch, 2 Saetze (ausdruecklicher Wunsch).
 - KEINE Supersaetze (ausdruecklicher Wunsch) — alles normale Saetze.
@@ -616,21 +626,23 @@ Tagesnamen = Schwerpunkt, dazu Feld f (Fokus-Zeile) im Plan-Objekt: {l:"Tag A �
 f:"Po schwer (4–8) · Beinvorderseite · ...",e:[...]}. renderT zeigt f als .day-focus in einer
 eigenen Zeile unter Titel + Uebungs-Pill (volle Breite). Alte Plaene haben kein f.
 
-### 4 Tage (P4) — 68 Saetze/Woche
+### 4 Tage (P4) — 70 Saetze/Woche
 | Tag A – Po Kraft | Tag B – Oberkörper & Po | Tag C – Po & Beinrückseite | Tag D – Po-Volumen & Beine |
 |---|---|---|---|
 | Glute Max 3x4-8 | Glute Max 2x8-12 | Glute Max 3x6-10 | Glute Max 3x8-12 |
 | Glute Max 2x8-12 | Glute Med 2x8-12 | Glute Max 2x8-12 | Glute Med 2x8-12 |
 | Glute Med 2x8-12 | Rücken 3x6-10 | Glute Med 2x8-12 | Glute & Quad 2x8-12 |
-| Glute & Quad 3x6-10 | Rücken 2x8-12 | Glute & Hams 3x6-10 | Glute & Hams 2x8-12 |
-| Glute & Hams 2x4-8 | Schultern 3x8-12 | Beinbeuger 3x8-12 | Beinstrecker 2x8-12 |
-| Adduktoren 2x8-12 | Schultern 2x8-12 | Rücken 2x8-12 | Adduktoren 2x8-12 |
-| Bauch 2x8-12 | Brust 2x6-10 | Schultern 2x8-12 | Bauch 2x8-12 |
-| | Bauch 2x8-12 | Bauch 2x8-12 | |
+| Glute Med 2x8-12 | Rücken 2x8-12 | Glute & Hams 3x6-10 | Glute & Hams 2x8-12 |
+| Glute & Quad 3x6-10 | Schultern 3x8-12 | Beinbeuger 3x8-12 | Beinstrecker 2x8-12 |
+| Glute & Hams 2x4-8 | Schultern 2x8-12 | Rücken 2x8-12 | Adduktoren 2x8-12 |
+| Adduktoren 2x8-12 | Brust 2x6-10 | Schultern 2x8-12 | Bauch 2x8-12 |
+| Bauch 2x8-12 | Bauch 2x8-12 | Bauch 2x8-12 | |
 
-Woche: Glute Max 15, Glute & Quad 5, Glute & Hams 7, Glute Med 8, Beinbeuger 3,
+Woche: Glute Max 15, Glute & Quad 5, Glute & Hams 7, Glute Med 10, Beinbeuger 3,
 Beinstrecker 2, Adduktoren 4, Ruecken 7, Schultern 7, Brust 2, Bauch 8 (keine Arme im 4-Tage-Plan).
-Pro Tag 16/18/19/15 Saetze (7/8/8/7 Uebungen). BEINBEUGER NUR EINMAL PRO WOCHE mit 3 Saetzen
+Pro Tag 18/18/19/15 Saetze (8/8/8/7 Uebungen). Tag A: ZWEITE Glute-Med-Zeile 2x8-12 direkt nach der
+ersten (Wunsch 04.10.2026) — gedacht fuer eine andere Uebung/einen anderen Winkel als die erste
+(z. B. Abduktionsmaschine vorgeneigt + Kabel Abduktion stehend). Keine 3-Tage-Partnerzeile. BEINBEUGER NUR EINMAL PRO WOCHE mit 3 Saetzen
 (ausdruecklicher Wunsch 02.10.2026, gilt auch fuer 3 Tage): 4 Tage an Tag C, 3 Tage an Tag B.
 Die fruehere Beinbeuger-Zeile 2x8-12 in Tag A ist raus — Werte daraus parkt repairSlots. Tag B (Fokus "Rücken · Schultern"): zweite
 Ruecken-Zeile 2x8-12 (z. B. Rudern nach dem schweren Zug von oben) und zweite Schulter-Zeile
@@ -638,34 +650,38 @@ Ruecken-Zeile 2x8-12 (z. B. Rudern nach dem schweren Zug von oben) und zweite Sc
 Bizeps/Trizeps gestrichen (sonst zu viel). Arme werden ueber Rudern/Latzug/Brust indirekt mit
 trainiert. Tag A: Glute & Hams 2x4-8 am 27.09.2026 auf
 Wunsch ergaenzt — Tag A ist der SCHWERE Tag, deshalb 4-8 (z. B. RDL schwer). Tag A liegt damit
-bei ~11 anteiligen Po-Saetzen — obere Grenze pro Einheit.
+bei ~11 anteiligen Po-Saetzen — obere Grenze pro Einheit. Mit der zweiten Glute-Med-Zeile (04.10.)
+12,5 — bewusst so, weil die Grenze pro MUSKEL gilt (Glute Max 8,5, Glute Med 4 in Tag A).
 
-### 3 Tage (P3, Version 3 ab 02.10.2026) — 60 Saetze/Woche
+### 3 Tage (P3, Version 3 ab 02.10.2026) — 62 Saetze/Woche
 Wunsch 02.10.2026: 3-Tage-Woche flexibel statt fester 3-Tage-Zyklus, Volumen naeher an der
 4-Tage-Woche. Po/Beine fast wie in 4 Tagen (Glute Max 13 statt 15, Beinbeuger wie dort 3),
-Ruecken/Schultern je 5, Bauch weiter 2 pro Tag. Pro Einheit max. ~11 anteilige Po-Saetze
-(A 10,5 / B 8,5 / C 10). Tag B mit nur ZWEI Glute-Max-Zeilen — ausdruecklicher Wunsch
+Ruecken/Schultern je 5, Bauch weiter 2 pro Tag. Pro Einheit ~11 anteilige Po-Saetze
+(A 11,5 / B 9,5 / C 10). Glute Med seit 04.10.2026 in Tag A und Tag B mit 3 statt 2 Saetzen (Wunsch:
+mehr Glute Med, wie in 4 Tagen 10/Woche) — bewusst KEINE zusaetzliche Zeile, Tag A ist mit 9 Uebungen
+schon der laengste Tag. Umrechnung bereits trainierter Wochen: migGMSets. Tag B mit nur ZWEI Glute-Max-Zeilen — ausdruecklicher Wunsch
 02.10.2026: nie 3x Glute Max an einem Tag (die dritte Zeile 2x8-12 war nur in Version -01).
 Volle 69 Saetze in 3 Tagen bewusst NICHT (~23 Saetze/Einheit, ueber der Po-Grenze pro Einheit).
 In Klammern die Partnerzeile im 4-Tage-Plan (t).
-| Tag A – Po Kraft (22) | Tag B – Po & Beinrückseite (19) | Tag C – Hüfte & Sanduhr (19) |
+| Tag A – Po Kraft (23) | Tag B – Po & Beinrückseite (20) | Tag C – Hüfte & Sanduhr (19) |
 |---|---|---|
 | Glute Max 3x4-8 (A1) | Glute Max 3x6-10 (C1) | Glute Max 3x8-12 (D1) |
 | Glute Max 2x8-12 (A2) | Glute Max 2x8-12 (C2) | Glute Med 2x8-12 (D2) |
-| Glute Med 2x8-12 (A3) | Glute Med 2x8-12 (C3) | Glute Med 2x8-12 (B2) |
-| Glute & Quad 3x6-10 (A4) | Glute & Hams 3x6-10 (C4) | Glute & Quad 2x8-12 (D3) |
-| Glute & Hams 2x4-8 (A5) | Beinbeuger 3x8-12 (C5) | Glute & Hams 2x8-12 (D4) |
-| Adduktoren 2x8-12 (A6) | Rücken 2x8-12 (C6) | Beinstrecker 2x8-12 (D5) |
+| Glute Med 3x8-12 (A3) | Glute Med 3x8-12 (C3) | Glute Med 2x8-12 (B2) |
+| Glute & Quad 3x6-10 (A5) | Glute & Hams 3x6-10 (C4) | Glute & Quad 2x8-12 (D3) |
+| Glute & Hams 2x4-8 (A6) | Beinbeuger 3x8-12 (C5) | Glute & Hams 2x8-12 (D4) |
+| Adduktoren 2x8-12 (A7) | Rücken 2x8-12 (C6) | Beinstrecker 2x8-12 (D5) |
 | Rücken 3x6-10 (B3) | Brust 2x6-10 (B7) | Adduktoren 2x8-12 (D6) |
 | Schultern 3x8-12 (B5) | Bauch 2x8-12 (C8) | Schultern 2x8-12 (C7) |
-| Bauch 2x8-12 (A7) | | Bauch 2x8-12 (D7) |
+| Bauch 2x8-12 (A8) | | Bauch 2x8-12 (D7) |
 
-Woche: Glute Max 13, Glute & Quad 5, Glute & Hams 7, Glute Med 8, Beinbeuger 3,
+Woche: Glute Max 13, Glute & Quad 5, Glute & Hams 7, Glute Med 10, Beinbeuger 3,
 Beinstrecker 2, Adduktoren 4, Ruecken 5, Schultern 5, Brust 2, Bauch 6.
-Pro Tag 22/19/19 Saetze (9/8/9 Uebungen). Keys p3cycle1-6, gleiche Regeln wie P4.
+Pro Tag 23/20/19 Saetze (9/8/9 Uebungen). Partnerzeilen duerfen sich in der Satzzahl unterscheiden
+(Glute Med A3/C3: 3 Saetze hier, 2 im 4-Tage-Plan) — Kategorie und Wdh.-Bereich muessen gleich sein. Keys p3cycle1-6, gleiche Regeln wie P4.
 Tagesfarben: A Peach, B Pink, C Lime (D Sky nur im 4-Tage-Plan).
 Aenderung zu V2: Tag A + Glute & Hams 2x4-8, Ruecken und Schultern je 3 statt 2 Saetze;
-Tag B und Tag C unveraendert. P4-Zeilen OHNE Partner: Tag B Glute Max,
+Tag B und Tag C unveraendert. P4-Zeilen OHNE Partner: Tag A zweite Glute-Med-Zeile, Tag B Glute Max,
 Ruecken 2x8-12, Schultern 2x8-12, Bauch (erben in 4-Tage-Wochen aus der letzten 4-Tage-Woche).
 
 ### 3 Tage Version 2 (P3_V2, 26.09.-02.10.2026) — nur fuer 3-Tage-Zyklen mit Marker 2
@@ -779,7 +795,7 @@ eine Loesung (z. B. mehr Zyklen oder Zyklus-Archiv).
 
 1. Grosser, runder, abstehender Po — Hauptfokus: Glute Max 15 (4 Tage) / 13 (3 Tage) Saetze direkt
    + Glute & Quad 5 / Glute & Hams 7 fuer die gedehnte Position.
-2. Deutliche Huefte / Sanduhr: Glute Med 4x pro Woche (8 Saetze), Abduktion mit
+2. Deutliche Huefte / Sanduhr: Glute Med 4x pro Woche (10 Saetze seit 04.10.2026), Abduktion mit
    vorgeneigtem Oberkoerper fuer den oberen Po; dazu Lats + Seitheben (V-Form).
 3. Definierte, nicht massige Beine: Beinbeuger (sitzend bevorzugt) 3 Saetze, 1x pro Woche,
    Beinstrecker 2 Saetze, kniedominante Uebungen po-betont (langer Schritt, Oberkoerper vor).
@@ -790,21 +806,22 @@ eine Loesung (z. B. mehr Zyklen oder Zyklus-Archiv).
 
 Glute & Quad: Weite Fussstellung + erhoehte Ferse = Po. Enge Fussstellung + Tiefe = Quad.
 
-### Volumen-Check gegen die Ziele (02.10.2026, nach allen Plan-Aenderungen)
+### Volumen-Check gegen die Ziele (02.10.2026, aktualisiert 04.10.2026 nach Glute Med +2)
 Anteilig gezaehlt (Hauptmuskel 1, Mitarbeit 0,5; Po = Glute Max + Glute Med + halbe Saetze aus
 Glute & Quad, Glute & Hams, Adduktoren). Saetze pro Woche:
 | Muskel | 4 Tage | 3 Tage | Einordnung |
 |---|---|---|---|
-| Po gesamt | 31 | 29 | Hauptziel: oberes sinnvolles Ende (~25-30), mehr bringt kaum noch etwas |
-| Po pro Einheit | 10,5 / 4 / 8,5 / 8 | 10,5 / 8,5 / 10 | unter der Grenze ~11 pro Einheit |
-| Glute Med (direkt) | 8 | 8 | Huefte/Sanduhr: 4x pro Woche (4 Tage) bzw. 3 Einheiten |
+| Po gesamt | 33 | 31 | Hauptziel: oberes sinnvolles Ende (~25-30); das Plus ist bewusst Glute Med |
+| Po pro Einheit | 12,5 / 4 / 8,5 / 8 | 11,5 / 9,5 / 10 | ~11 pro Einheit; 4-Tage-Tag A darueber, aber pro Muskel (Glute Max 8,5 / Glute Med 4) klar darunter |
+| Glute Med (direkt) | 10 (4/2/2/2) | 10 (3/3/4) | Huefte/Sanduhr: 4x pro Woche (4 Tage) bzw. 3 Einheiten; mehr als ~10-12 bringt kaum noch etwas |
 | Beinrueckseite | 10 (3 Beinbeuger + 7 Hueftbeuge) | 10 | definiert, nicht massig |
 | Beinvorderseite | 7 (5 Glute & Quad + 2 Beinstrecker) | 7 | bewusst moderat (nicht massig) |
 | Adduktoren | 4 | 4 | volle Innenseite, zusaetzlich aus Squats/Lunges |
 | Ruecken / Schultern | 7 / 7 | 5 / 5 | schlanker, trainierter Oberkoerper + V-Form |
 | Brust / Arme | 2 / indirekt | 2 / indirekt | minimal (Wunsch) |
 | Bauch | 8 | 6 | 2 pro Trainingstag (Wunsch) |
-Ergebnis: passt zu den Zielen, keine Aenderung empfohlen. Einziger Hinweis: werden UEBER LAENGERE
+Ergebnis: passt zu den Zielen. Glute Med ist mit 10 jetzt am sinnvollen oberen Ende — weiter ueber
+Gewicht/Reps steigern statt ueber Saetze. Einziger Hinweis: werden UEBER LAENGERE
 ZEIT nur 3-Tage-Wochen trainiert, liegen Ruecken/Schultern mit 5 am unteren Ende — dann je 1 Satz
 mehr erwaegen. Ab jetzt entscheiden Steigerung (Gewicht/Reps), Ernaehrung (Protein, leichter
 Ueberschuss fuer Po-Aufbau) und Schlaf mehr als weitere Saetze.
@@ -841,6 +858,15 @@ NEU. **Tipp Panatta Super Crunch: Atmung + Bauchnabel (04.10.2026, Version 2026-
    Ausfuehrung ergaenzt: "In der Hebephase kraeftig ausatmen und dabei den Bauchnabel einziehen."
    (forcierte Ausatmung aktiviert den Transversus, kein Gewicht reduzieren). Plan unveraendert —
    Vacuum/Hollowing macht Rexi an Pausentagen zu Hause, NICHT in der App/im Gym-Plan.
+
+NEU. **Mehr Glute Med: 10 Saetze pro Woche (04.10.2026, Version 2026-10-04-02).** Wunsch: Fokus Huefte.
+   4 Tage: zweite Glute-Med-Zeile 2x8-12 in Tag A direkt nach der ersten (70 Saetze, 18/18/19/15),
+   ohne 3-Tage-Partner — P3-Tag-A-Partnerzeilen ab Glute & Quad um eins verschoben. 3 Tage: Glute Med
+   Tag A und Tag B 3 statt 2 Saetze (62 Saetze, 23/20/19); Umrechnung bereits trainierter Wochen per
+   migGMSets (s0, Zusatzsaetze 2+1 -> 3+0, Merker pv__gm3), auch beim Backup-Import. Eingetragene
+   4-Tage-Wochen sortiert repairSlots per Kategorie ein, die neue Zeile bleibt dort leer; im neuen Zyklus
+   wird sie ohne Dopplung vorbelegt. Neuer Test tests/glute-med.test.js; tag-a-erweiterung (jetzt alle
+   drei frueheren Tag-A-Fassungen), flex-woche, gesamtcheck, planwechsel, randfaelle angepasst.
 
 NEU. **Fixes aus der unabhaengigen Code-Pruefung (02.10.2026, Version -04).** (1) Vorwert im
    gleichen Rep-Bereich aus der anderen Wochenart desselben flexiblen Zyklus wurde ignoriert

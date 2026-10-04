@@ -41,13 +41,13 @@ await fresh({pv__done:1,pv__v3:1,pv__bb3:1},{view:'overview',week:4,cy:'cycle2',
 await page.fill('#bk-ta',JSON.stringify({app:'peach',v:1,date:'2026-10-01',data:bk}));await page.click('.bk-imp');await page.waitForTimeout(150);
 await page.evaluate(()=>{setView('training');setWeek(3);S.openDays={0:true};render()});await page.waitForTimeout(60);
 let r=await page.$$eval('.day-body .ex-row',x=>x.map(e=>[e.querySelector('.cat-badge').textContent,e.querySelector('.pick-btn-txt').textContent]));
-ok(r[5][1]==='Adduktionsmaschine'&&r[6][1]==='Panatta Super Crunch'&&r.length===7,'Import ohne Neustart: Tag A sofort richtig eingeordnet');
+ok(r[6][1]==='Adduktionsmaschine'&&r[7][1]==='Panatta Super Crunch'&&r.length===8,'Import ohne Neustart: Tag A sofort richtig eingeordnet');
 await page.evaluate(()=>{setWeek(4);S.openDays={0:true};render()});await page.waitForTimeout(60);
 r=await page.$$eval('.day-body .ex-row',x=>x.map(e=>e.querySelector('.pick-btn-txt').textContent));
-ok(r[5]==='Adduktionsmaschine'&&r[6]==='Panatta Super Crunch','W4 erbt die richtigen Uebungen');
-await page.fill('.ex-row:has(#pw-0-5) .w-input','50');await page.dispatchEvent('.ex-row:has(#pw-0-5) .w-input','change');
-let d=await st();ok(d['cycle2__w4__d0__e5']&&d['cycle2__w4__d0__e5'].exercise==='Adduktionsmaschine'&&d['cycle2__w4__d0__e5'].weight==='50','Eingabe landet im Adduktoren-Eintrag');
-ok(Object.keys(d).some(k=>/^cycle2__w3__d0__e([7-9])$/.test(k)&&d[k].exercise==='Leg Curls stehend'),'Leg Curls aus dem Backup geparkt (gespeichert)');
+ok(r[6]==='Adduktionsmaschine'&&r[7]==='Panatta Super Crunch','W4 erbt die richtigen Uebungen');
+await page.fill('.ex-row:has(#pw-0-6) .w-input','50');await page.dispatchEvent('.ex-row:has(#pw-0-6) .w-input','change');
+let d=await st();ok(d['cycle2__w4__d0__e6']&&d['cycle2__w4__d0__e6'].exercise==='Adduktionsmaschine'&&d['cycle2__w4__d0__e6'].weight==='50','Eingabe landet im Adduktoren-Eintrag');
+ok(Object.keys(d).some(k=>/^cycle2__w3__d0__e([8-9])$/.test(k)&&d[k].exercise==='Leg Curls stehend'),'Leg Curls aus dem Backup geparkt (gespeichert)');
 const snap=JSON.stringify(Object.keys(d).sort().map(k=>[k,d[k]]));await page.reload();await page.waitForTimeout(250);
 d=await st();ok(JSON.stringify(Object.keys(d).sort().map(k=>[k,d[k]]))===snap,'Neustart nach Import aendert nichts mehr');
 

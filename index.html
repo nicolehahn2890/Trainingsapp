@@ -459,6 +459,9 @@ const DAYBG=["#F4A45E","#F18FB6","#B6DD57","#8CCBE8"];
 // Beinbeuger NUR EINMAL pro Woche mit 3 Saetzen (Wunsch 02.10.2026): 4 Tage an Tag C, 3 Tage an
 // Tag B. Die fruehere Beinbeuger-Zeile in Tag A ist raus — dort schon eingetragene Werte parkt
 // repairSlots hinter dem Plan (bleiben gespeichert), Adduktoren/Bauch rutschen per Kategorie nach.
+// Glute Med 10 Saetze pro Woche (Wunsch 04.10.2026, Huefte/Sanduhr): 4 Tage mit zweiter Glute-Med-Zeile
+// 2x8-12 in Tag A (andere Uebung/anderer Winkel als die erste, keine 3-Tage-Partnerzeile), 3 Tage mit
+// 3 statt 2 Saetzen in Tag A und Tag B (Umrechnung trainierter Wochen: migGMSets).
 // WICHTIG: Zyklen, die schon mit dem alten Plan trainiert wurden, zeigen weiter P4_V1/P3_V1
 // (Marker pv__[Zyklus] in peach_v4, siehe planOf) — sonst lagen die positionsbasierten
 // Daten in den falschen Zeilen.
@@ -466,6 +469,7 @@ const P4=[
 {l:"Tag A – Po Kraft",f:"4–8 Wdh. · Beinvorderseite · Innenschenkel",e:[
   {c:"Glute Max",s:3,r:[4,8]},
   {c:"Glute Max",s:2,r:[8,12]},
+  {c:"Glute Med",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
   {c:"Glute & Quad",s:3,r:[6,10]},
   {c:"Glute & Hams",s:2,r:[4,8]},
@@ -502,30 +506,32 @@ const P4=[
   {c:"Bauch",s:2,r:[8,12]}
 ]}
 ];
-// 3-Tage-Plan Version 3 (ab 02.10.2026, 60 Saetze): Glute Max 13, Glute Med 8, Glute & Hams 7,
-// Ruecken/Schultern je 5, Bauch 2 pro Tag. Pro Einheit hoechstens ~11 anteilige Po-Saetze
-// (A 10,5 / B 8,5 / C 10). Tag B mit nur ZWEI Glute-Max-Zeilen (Wunsch 02.10.2026: nicht 3x
+// 3-Tage-Plan Version 3 (ab 02.10.2026, 62 Saetze): Glute Max 13, Glute Med 10 (seit 04.10.2026 3+3+4),
+// Glute & Hams 7, Ruecken/Schultern je 5, Bauch 2 pro Tag. Pro Einheit ~11 anteilige Po-Saetze
+// (A 11,5 / B 9,5 / C 10). Tag B mit nur ZWEI Glute-Max-Zeilen (Wunsch 02.10.2026: nicht 3x
 // Glute Max an einem Tag — die dritte Zeile 2x8-12 war nur kurz drin). Daten unter p3cycle-Keys.
 // FLEXIBLE WOCHE: jede Woche ist 3 ODER 4 Tage (siehe weekPt). Jede Zeile hat eine Partnerzeile
 // t:[Tag,Zeile] im 4-Tage-Plan P4 — gleiche Kategorie, gleicher Wdh.-Bereich. Ueber sie teilen sich
 // 3- und 4-Tage-Wochen die Uebungsauswahl, Zusatzsaetze und den Verlauf (twinOf/slotEntry).
-// P4-Zeilen ohne Partner: Tag B Glute Max, Ruecken 2x8-12, Schultern 2x8-12, Bauch.
+// P4-Zeilen ohne Partner: Tag A zweite Glute-Med-Zeile, Tag B Glute Max, Ruecken 2x8-12,
+// Schultern 2x8-12, Bauch. Partnerzeilen duerfen sich in der Satzzahl unterscheiden (Glute Med Tag A/B:
+// 3 Saetze in 3 Tagen, 2 in 4 Tagen) — vererbt werden nur die Zusatzsaetze.
 const P3=[
 {l:"Tag A – Po Kraft",f:"4–8 Wdh. · Beinvorderseite · Rücken · Schultern",e:[
   {c:"Glute Max",s:3,r:[4,8],t:[0,0]},
   {c:"Glute Max",s:2,r:[8,12],t:[0,1]},
-  {c:"Glute Med",s:2,r:[8,12],t:[0,2]},
-  {c:"Glute & Quad",s:3,r:[6,10],t:[0,3]},
-  {c:"Glute & Hams",s:2,r:[4,8],t:[0,4]},
-  {c:"Adduktoren",s:2,r:[8,12],t:[0,5]},
+  {c:"Glute Med",s:3,r:[8,12],t:[0,2]},
+  {c:"Glute & Quad",s:3,r:[6,10],t:[0,4]},
+  {c:"Glute & Hams",s:2,r:[4,8],t:[0,5]},
+  {c:"Adduktoren",s:2,r:[8,12],t:[0,6]},
   {c:"Rücken",s:3,r:[6,10],t:[1,2]},
   {c:"Schultern",s:3,r:[8,12],t:[1,4]},
-  {c:"Bauch",s:2,r:[8,12],t:[0,6]}
+  {c:"Bauch",s:2,r:[8,12],t:[0,7]}
 ]},
 {l:"Tag B – Po & Beinrückseite",f:"6–10 Wdh. · Hüftbeuge · Beinbeuger",e:[
   {c:"Glute Max",s:3,r:[6,10],t:[2,0]},
   {c:"Glute Max",s:2,r:[8,12],t:[2,1]},
-  {c:"Glute Med",s:2,r:[8,12],t:[2,2]},
+  {c:"Glute Med",s:3,r:[8,12],t:[2,2]},
   {c:"Glute & Hams",s:3,r:[6,10],t:[2,3]},
   {c:"Beinbeuger",s:3,r:[8,12],t:[2,4]},
   {c:"Rücken",s:2,r:[8,12],t:[2,5]},
@@ -917,8 +923,35 @@ function migBBStart(){
     if(migBBSets(S.data)&&Object.keys(S.data).some(k=>/__w\d+__d\d+__e\d+$/.test(k)))save();
   }catch{}
 }
+// GLUTE MED 3 TAGE, TAG A + TAG B 2 -> 3 SAETZE (04.10.2026) — gleiches Vorgehen wie migBBSets:
+// Wochen MIT Werten behalten ihre Satzzahl (s0, nur wenn != 3), Zusatzsaetze werden umgerechnet
+// (2+1 -> 3+0). Nur 3-Tage-Zyklen ohne Plan-Marker (V3), Tag A und Tag B (je genau eine Glute-Med-
+// Zeile, e2). Erkannt ueber die KATEGORIE, nicht die Position (Regel 11a) — so zaehlt auch ein Eintrag,
+// den repairSlots erst danach in die Zeile einsortiert; Eintraege ohne Uebung nur an e2.
+// Laeuft VOR repairSlots und in impBackup. Merker pv__gm3.
+function migGMSets(data){
+  if(data.pv__gm3)return false;
+  for(const k in data){
+    const m=/^(p3cycle\d+)__w\d+__d[01]__e(\d+)$/.exec(k),v=data[k];
+    if(!m||data['pv__'+m[1]]||!v||typeof v!=='object')continue;
+    if(v.exercise?CATOF[v.exercise]!=='Glute Med':m[2]!=='2')continue;
+    const ms=(v.s0||2)+(v.extraSets||0),x=Math.max(0,ms-3),nv={...v,extraSets:x};
+    delete nv.s0;
+    if(hasVals(v)&&ms-x!==3)nv.s0=ms-x;
+    data[k]=nv;
+  }
+  data.pv__gm3=1;
+  return true;
+}
+function migGMStart(){
+  try{
+    if(S.data.pv__gm3)return;
+    if(migGMSets(S.data)&&Object.keys(S.data).some(k=>/__w\d+__d\d+__e\d+$/.test(k)))save();
+  }catch{}
+}
 migOrderV2();
 migBBStart();
+migGMStart();
 function repairSlots(){
   try{
     const before=JSON.stringify(S.data);
@@ -1631,7 +1664,7 @@ function impBackup(){
   if(have>0&&!confirm('Achtung: Hier sind bereits '+have+' Einträge gespeichert. Wirklich mit dem Backup ('+n+' Einträge) überschreiben?'))return;
   // Gleiche Korrekturen wie beim Start (sonst zeigte ein aelteres Backup bis zum Neustart verschobene
   // Zeilen, und Eingaben landeten im falschen Eintrag): Plan-Marker, Umbenennung, Reihenfolge, Zuordnung.
-  S.data=data;markLegacy(S.data);markV3(S.data);migLegCurl();migOrderV2();migBBSets(S.data);repairSlots();save();
+  S.data=data;markLegacy(S.data);markV3(S.data);migLegCurl();migOrderV2();migBBSets(S.data);migGMSets(S.data);repairSlots();save();
   syncPt();saveUI();render();
   bkMsg('✓ Backup eingespielt – '+n+' Einträge wiederhergestellt!');
 }
@@ -1822,7 +1855,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeWeekPick();clo
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-10-04-01';
+const BUILD_ID='2026-10-04-02';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();

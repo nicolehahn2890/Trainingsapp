@@ -1,4 +1,4 @@
-// Flexible Woche (02.10.2026): 3 oder 4 Tage pro WOCHE, 3-Tage-Plan V3 (60 Saetze) mit Partnerzeilen
+// Flexible Woche (02.10.2026): 3 oder 4 Tage pro WOCHE, 3-Tage-Plan V3 (62 Saetze seit 04.10.2026) mit Partnerzeilen
 // zum 4-Tage-Plan, Uebernahme der Uebungen in beide Richtungen, Vorwerte/Steigerung/Auto-Satz/Uebersicht
 // ueber beide Wochenarten, Rueckfrage beim Umstellen einer Woche mit Werten, Schutz alter Zyklen
 // (Marker 2 fuer den bisherigen 3-Tage-Plan, globaler Umschalter in Zyklen mit Plan-Marker).
@@ -29,25 +29,25 @@ const P=await page.evaluate(()=>{
     p4bb:(()=>{const r=[];P4.forEach((d,di)=>d.e.forEach((x,ei)=>{if(x.c==='Beinbeuger')r.push(di,ei,x.s)}));return r.join('|')})(),
     p3bb:(()=>{const r=[];P3.forEach((d,di)=>d.e.forEach((x,ei)=>{if(x.c==='Beinbeuger')r.push(di,ei,x.s)}));return r.join('|')})()};
 });
-ok(P.sets.join()==='22,19,19'&&P.sets.reduce((a,x)=>a+x)===60,'3-Tage-Plan V3: 22/19/19 = 60 Saetze');
+ok(P.sets.join()==='23,20,19'&&P.sets.reduce((a,x)=>a+x)===62,'3-Tage-Plan V3: 23/20/19 = 62 Saetze');
 ok(P.rows.join()==='9,8,9','9/8/9 Uebungen');
 ok(P.gmaxB===2,'Tag B: nur zwei Glute-Max-Zeilen');
 ok(P.v2.join()==='18,19,19','Bisheriger Plan als P3_V2 erhalten (56 Saetze)');
-const c=P.cat;ok(c['Glute Max']===13&&c['Glute Med']===8&&c['Glute & Quad']===5&&c['Glute & Hams']===7&&c['Adduktoren']===4&&c['Beinbeuger']===3&&c['Beinstrecker']===2&&c['Rücken']===5&&c['Schultern']===5&&c['Brust']===2&&c['Bauch']===6,'Wochenvolumen pro Kategorie wie vereinbart: '+JSON.stringify(c));
+const c=P.cat;ok(c['Glute Max']===13&&c['Glute Med']===10&&c['Glute & Quad']===5&&c['Glute & Hams']===7&&c['Adduktoren']===4&&c['Beinbeuger']===3&&c['Beinstrecker']===2&&c['Rücken']===5&&c['Schultern']===5&&c['Brust']===2&&c['Bauch']===6,'Wochenvolumen pro Kategorie wie vereinbart: '+JSON.stringify(c));
 ok(P.twinOk&&P.twins===26,'Jede 3-Tage-Zeile hat eine Partnerzeile (gleiche Kategorie + Wdh.-Bereich), keine doppelt ('+P.twins+')');
-ok(P.p4sets.join()==='16,18,19,15'&&P.p4bb==='2|4|3','4-Tage-Plan: Beinbeuger nur Tag C mit 3 Saetzen, 16/18/19/15 = 68 Saetze');
+ok(P.p4sets.join()==='18,18,19,15'&&P.p4bb==='2|4|3','4-Tage-Plan: Beinbeuger nur Tag C mit 3 Saetzen, 18/18/19/15 = 70 Saetze');
 ok(P.p3bb==='1|4|3','3-Tage-Plan: Beinbeuger nur Tag B mit 3 Saetzen');
 ok(P.order&&P.bauch,'Reihenfolge Glute Max > Glute Med > Rest > Oberkoerper > Bauch (2 Saetze) zuletzt');
 
 // 2. FLEXIBLE WOCHE
 // 4-Tage-Woche 1 komplett, je Zeile eine eigene Uebung; Reps am oberen Ende (Steigerungs-Hinweis)
-const M=[['Hip Thrusts Langhantel','Kabel Kickback Stehend','Abduktionsmaschine','Split Squat Kurzhantel','RDL Langhantel','Adduktionsmaschine','Panatta Super Crunch'],
+const M=[['Hip Thrusts Langhantel','Kabel Kickback Stehend','Abduktionsmaschine','Kabel Abduktion Liegend','Split Squat Kurzhantel','RDL Langhantel','Adduktionsmaschine','Panatta Super Crunch'],
  ['Kickback Maschine','Kabel Abduktion Stehend','Latzug (breit)','Rudermaschine (Panatta)','KH Seitheben','Butterfly Reverse Maschine','Brustpresse (Panatta)','Crunches am Kabelzug'],
  ['Hip Thrust Maschine','Glute Bridge Langhantel','3D Abduktor Maschine','Glute Hyperextensions','Leg Curls stehend','High Row Maschine','Seitheben Kabel','Pallof Press'],
  ['Hip Thrusts Multipresse','Abduktionsmaschine stehend','Reverse Lunge','RDL Kurzhanteln','Beinstrecker Maschine (Panatta)','Adduktion Kabel Stehend','Dead Bug']];
 const base=await page.evaluate(M=>{const d={pv__done:1,pv__v3:1};P4.forEach((day,di)=>day.e.forEach((sl,ei)=>{d['cycle3__w1__d'+di+'__e'+ei]={exercise:M[di][ei],extraSets:0,weight:'50',reps:Array.from({length:sl.s},()=>String(sl.r[1]))}}));return d},M);
 await fresh(base,{view:'training',week:2,cy:'cycle3',pt:'p4',openDays:{}});
-ok((await active())==='plan-p4'&&(await counts())==='0/7,0/8,0/8,0/7','W2 startet wie die Vorwoche mit 4 Tagen');
+ok((await active())==='plan-p4'&&(await counts())==='0/8,0/8,0/8,0/7','W2 startet wie die Vorwoche mit 4 Tagen');
 await page.click('#plan-p3');await page.waitForTimeout(120);
 let d=await st();
 ok(!(await sheet())&&(await active())==='plan-p3'&&(await counts())==='0/9,0/8,0/9'&&d['wt__cycle3__w2']==='p3','Leere Woche -> 3 Tage ohne Rueckfrage, Wahl als wt__cycle3__w2 gespeichert');
@@ -77,11 +77,11 @@ ok((await active())==='plan-p3'&&(await counts())==='0/9,0/8,0/9','W3 startet wi
 let r=await rows(2);ok(r[2]==='Kabel Abduktion Stehend','W3: einmaliger Wechsel zurueckgenommen');
 // W3 auf 4 Tage
 await page.click('#plan-p4');await page.waitForTimeout(100);
-ok(!(await sheet())&&(await counts())==='0/7,0/8,0/8,0/7','W3 auf 4 Tage umgestellt');
+ok(!(await sheet())&&(await counts())==='0/8,0/8,0/8,0/7','W3 auf 4 Tage umgestellt');
 const A=await rows(0),B=await rows(1);
 ok(B[2]==='Latzug Maschine (Panatta)','4-Tage-Woche uebernimmt "ab jetzt"-Wechsel aus der 3-Tage-Woche (Partnerzeile)');
 ok(B[1]==='Kabel Abduktion Stehend','"Nur diese Woche" aus der 3-Tage-Woche wirkt nicht weiter');
-ok(A.length===7&&!A.includes('Leg Curls stehend')&&B[0]==='Kickback Maschine'&&B[3]==='Rudermaschine (Panatta)'&&B[5]==='Butterfly Reverse Maschine','Zeilen ohne Partner (Tag B Glute Max/Ruecken 2/Schultern 2) aus der letzten 4-Tage-Woche, Tag A ohne Beinbeuger');
+ok(A.length===8&&!A.includes('Leg Curls stehend')&&A[3]==='Kabel Abduktion Liegend'&&B[0]==='Kickback Maschine'&&B[3]==='Rudermaschine (Panatta)'&&B[5]==='Butterfly Reverse Maschine','Zeilen ohne Partner (Tag A 2. Glute Med, Tag B Glute Max/Ruecken 2/Schultern 2) aus der letzten 4-Tage-Woche, Tag A ohne Beinbeuger');
 await rows(0);ok((await page.textContent('#ph-0-0')).includes('zuletzt: Z3 W2 · Tag A · 3-Tage'),'Vorwert in der 4-Tage-Woche aus der 3-Tage-Woche davor');
 // Zusatzsatz wandert mit
 await page.evaluate(()=>{setWeek(2);S.openDays={0:true};render()});await page.click('button[onclick="addSet(0,0)"]');await page.waitForTimeout(60);
@@ -114,7 +114,7 @@ await page.evaluate(()=>setView('training'));
 await page.evaluate(()=>{S.data['p3cycle3__w12__d1__e4']={exercise:'Nordic Curls',extraSets:0,weight:'0',reps:['6','6','6']};S.data['wt__cycle3__w12']='p3';save();setCycle('cycle4');setWeek(1)});
 await page.evaluate(()=>setPlan('p4'));
 const A4=await rows(0),C4=await rows(2);
-ok(C4[4]==='Nordic Curls'&&A4[5]==='Adduktionsmaschine','Z4 W1 (4 Tage): Beinbeuger Tag C aus 3-Tage-W12, Tag A ohne Beinbeuger');
+ok(C4[4]==='Nordic Curls'&&A4[6]==='Adduktionsmaschine','Z4 W1 (4 Tage): Beinbeuger Tag C aus 3-Tage-W12, Tag A ohne Beinbeuger');
 ok((await rows(1))[2]==='Latzug Maschine (Panatta)','Z4 W1: "ab jetzt"-Wechsel aus der 3-Tage-Woche kommt im neuen Zyklus an');
 
 // 3. AUTO-ZUSATZSATZ ueber gemischte Wochen (4/3/4/3 Tage, gleiche Leistung)

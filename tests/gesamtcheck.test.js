@@ -65,9 +65,9 @@ ok(d.pv__v3===1&&!d.pv__p3cycle2&&!d.pv__cycle2,'Update: Markierung gelaufen, Zy
 ok(valCount(d)===valCount(old),'Update: keine Werte verloren ('+valCount(d)+' Eintraege mit Werten)');
 const sameKeys=pre=>Object.keys(old).filter(k=>k.startsWith(pre)).every(k=>JSON.stringify(old[k])===JSON.stringify(d[k]));
 ok(sameKeys('cycle1__')&&sameKeys('p3cycle1__')&&sameKeys('tip__')&&sameKeys('set__'),'Update: alte Zyklen, Notiz und Einstellung byte-gleich');
-ok(d['cycle2__w1__d0__e4'].exercise==='RDL Langhantel'&&d['cycle2__w1__d0__e5'].exercise==='Adduktionsmaschine'&&d['cycle2__w1__d0__e6'].exercise==='Panatta Super Crunch','Update: Z2 W1 Tag A eingeordnet (Adduktion/Bauch eine Zeile nach vorn)');
-ok(Object.keys(d).some(k=>/^cycle2__w1__d0__e([7-9]|\d\d)$/.test(k)&&d[k].exercise==='Leg Curls stehend'),'Update: Leg Curls aus Tag A geparkt (Werte gespeichert)');
-ok((await counts())==='7/7,8/8,8/8,7/7','Z2 W1: alle Tage vollstaendig ('+(await counts())+')');
+ok(!d['cycle2__w1__d0__e3']&&d['cycle2__w1__d0__e4'].exercise==='Split Squat Kurzhantel'&&d['cycle2__w1__d0__e5'].exercise==='RDL Langhantel'&&d['cycle2__w1__d0__e6'].exercise==='Adduktionsmaschine'&&d['cycle2__w1__d0__e7'].exercise==='Panatta Super Crunch','Update: Z2 W1 Tag A eingeordnet (2. Glute-Med-Zeile frei, Rest per Kategorie dahinter)');
+ok(Object.keys(d).some(k=>/^cycle2__w1__d0__e([8-9]|\d\d)$/.test(k)&&d[k].exercise==='Leg Curls stehend'),'Update: Leg Curls aus Tag A geparkt (Werte gespeichert)');
+ok((await counts())==='7/8,8/8,8/8,7/7','Z2 W1: alle Tage vollstaendig bis auf die neue 2. Glute-Med-Zeile ('+(await counts())+')');
 // Alte Zyklen: globaler Umschalter, alte Plaene, kein Wochen-Marker
 await page.click('#cycle-cycle1');await page.waitForTimeout(60);
 let t=await page.$$eval('.day-title',e=>e.map(x=>x.textContent).join('|'));ok(t.startsWith('Tag A – Beine'),'Z1 4 Tage: alter Plan');
@@ -86,9 +86,10 @@ ok(R.bad.length===0,'Alle '+R.n+' Ansichten (2 Plaene x 6 Zyklen x 12 Wochen x 2
 
 // ---------- 4. NEUER ZYKLUS 3 MIT GEMISCHTEN WOCHEN ----------
 await page.click('#cycle-cycle3');await page.evaluate(()=>setWeek(1));await page.waitForTimeout(60);
-ok((await active())==='plan-p4'&&(await counts())==='0/7,0/8,0/8,0/7','Z3 W1: neuer Zyklus startet mit 4 Tagen (wie zuletzt angezeigt)');
+ok((await active())==='plan-p4'&&(await counts())==='0/8,0/8,0/8,0/7','Z3 W1: neuer Zyklus startet mit 4 Tagen (wie zuletzt angezeigt)');
 let C=await rows(2);ok(C[4][0]==='Beinbeuger'&&C[4][1]==='Leg Curls sitzend (Precor)','Z3 W1: Beinbeuger Tag C aus Z2 uebernommen');
-let Aw=await rows(0);ok(Aw.length===7&&Aw[4][1]==='RDL Langhantel'&&Aw[5][1]==='Adduktionsmaschine','Z3 W1: Tag A uebernimmt RDL/Adduktion');
+let Aw=await rows(0);ok(Aw.length===8&&Aw[5][1]==='RDL Langhantel'&&Aw[6][1]==='Adduktionsmaschine','Z3 W1: Tag A uebernimmt RDL/Adduktion');
+ok(Aw[2][0]==='Glute Med'&&Aw[3][0]==='Glute Med'&&Aw[3][1]!=='– Übung wählen –'&&Aw[2][1]!==Aw[3][1],'Z3 W1: beide Glute-Med-Zeilen in Tag A vorbelegt, ohne Dopplung ('+Aw[2][1]+' / '+Aw[3][1]+')');
 // Woche 1 auf 3 Tage
 await page.click('#plan-p3');await page.waitForTimeout(60);
 ok(!(await sheet())&&(await counts())==='0/9,0/8,0/9','Z3 W1 -> 3 Tage (9/8/9)');
