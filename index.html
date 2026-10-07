@@ -496,8 +496,8 @@ const P4=[
   {c:"Schultern",s:2,r:[8,12]},
   {c:"Bauch",s:2,r:[8,12]}
 ]},
-{l:"Tag D – Po-Volumen & Beine",f:"8–12 Wdh. · Beinstrecker · Innenschenkel",e:[
-  {c:"Glute Max",s:3,r:[8,12]},
+{l:"Tag D – Po-Volumen & Beine",f:"4–8 + 8–12 Wdh. · Beinstrecker · Innenschenkel",e:[
+  {c:"Glute Max",s:3,r:[4,8]},
   {c:"Glute Med",s:2,r:[8,12]},
   {c:"Glute & Quad",s:2,r:[8,12]},
   {c:"Glute & Hams",s:2,r:[8,12]},
@@ -538,8 +538,8 @@ const P3=[
   {c:"Brust",s:2,r:[6,10],t:[1,6]},
   {c:"Bauch",s:2,r:[8,12],t:[2,7]}
 ]},
-{l:"Tag C – Hüfte & Sanduhr",f:"8–12 Wdh. · Glute Med doppelt · Beinstrecker",e:[
-  {c:"Glute Max",s:3,r:[8,12],t:[3,0]},
+{l:"Tag C – Hüfte & Sanduhr",f:"4–8 + 8–12 Wdh. · Glute Med doppelt · Beinstrecker",e:[
+  {c:"Glute Max",s:3,r:[4,8],t:[3,0]},
   {c:"Glute Med",s:2,r:[8,12],t:[3,1]},
   {c:"Glute Med",s:2,r:[8,12],t:[1,1]},
   {c:"Glute & Quad",s:2,r:[8,12],t:[3,2]},
@@ -949,9 +949,35 @@ function migGMStart(){
     if(migGMSets(S.data)&&Object.keys(S.data).some(k=>/__w\d+__d\d+__e\d+$/.test(k)))save();
   }catch{}
 }
+// GLUTE MAX 4-8 STATT 8-12: 4 Tage Tag D, 3 Tage Tag C (07.10.2026). Der Wdh.-Bereich steht im Plan,
+// nicht im Eintrag: ohne Korrektur liefen bereits trainierte 8-12-Wochen ploetzlich als 4-8 (Vorwerte,
+// Rep-Farben und Steigerungs-Hinweis falsch). Darum einmalig: Eintraege MIT Werten bekommen r0='8-12'
+// (Bereich, mit dem sie trainiert wurden — wie s0 bei den Saetzen). Nur Zyklen ohne Plan-Marker, erkannt
+// ueber die KATEGORIE (Regel 11a), Eintraege ohne Uebung nur an e0. Laeuft VOR repairSlots und in
+// impBackup. Merker pv__gx48.
+function migGXRange(data){
+  if(data.pv__gx48)return false;
+  for(const k in data){
+    const m=/^(p3)?(cycle\d+)__w\d+__d(\d+)__e(\d+)$/.exec(k),v=data[k];
+    if(!m||!v||typeof v!=='object')continue;
+    const cy=(m[1]||'')+m[2];
+    if(data['pv__'+cy]||+m[3]!==(m[1]?2:3))continue; // 3 Tage Tag C, 4 Tage Tag D
+    if(v.exercise?CATOF[v.exercise]!=='Glute Max':m[4]!=='0')continue;
+    if(hasVals(v)&&!v.r0)data[k]={...v,r0:'8-12'};
+  }
+  data.pv__gx48=1;
+  return true;
+}
+function migGXStart(){
+  try{
+    if(S.data.pv__gx48)return;
+    if(migGXRange(S.data)&&Object.keys(S.data).some(k=>/__w\d+__d\d+__e\d+$/.test(k)))save();
+  }catch{}
+}
 migOrderV2();
 migBBStart();
 migGMStart();
+migGXStart();
 function repairSlots(){
   try{
     const before=JSON.stringify(S.data);
@@ -1334,9 +1360,11 @@ function exIndex(){
     // Nur Eintraege mit echtem Inhalt (Gewicht oder mindestens eine Wiederholung)
     if(!d.weight&&!((d.reps||[]).some(r=>r!==''&&r!=null)))continue;
     const cy=(m[1]||'')+'cycle'+m[2],w=+m[3],di=+m[4],ei=+m[5],pt=m[1]?'p3':'p4';
-    const rr=repRange(cy,di,ei);
-    if(!rr)continue; // Platz gibt es im Plan nicht mehr -> kein sinnvoller Vergleich
-    const e={pt:pt,cy:cy,w:w,di:di,ei:ei,rr:rr,d:d,ord:exOrd(cy,w,di,ei)};
+    const pr=repRange(cy,di,ei);
+    if(!pr)continue; // Platz gibt es im Plan nicht mehr -> kein sinnvoller Vergleich
+    const rr=d.r0||pr; // r0: Bereich, mit dem die Woche trainiert wurde (migGXRange)
+    // pl/cn: Plan + Partnerzeilen-Kennung, einmal hier statt bei jedem Vorwert (findLastExData)
+    const e={pt:pt,cy:cy,n:+m[2],w:w,di:di,ei:ei,rr:rr,d:d,ord:exOrd(cy,w,di,ei),pl:planOf(cy),cn:canon(cy,di,ei)};
     const key=exKey(d.exercise,rr),all=exKey(d.exercise,'*');
     (idx[key]=idx[key]||[]).push(e);
     (idx[all]=idx[all]||[]).push(e); // alle Rep-Bereiche (fuer den Orientierungswert)
@@ -1365,14 +1393,26 @@ function exIndex(){
 // Bereich — und noch frueher kam ein gleicher Bereich aus einem alten Zyklus (Z1 W3, Juni).
 function findLastExData(di,ei,currentExercise){
   if(!currentExercise)return{};
-  const rr=repRange(S.cy,di,ei);
+  const rr=(S.data[mk(S.cy,S.week,di,ei)]||{}).r0||repRange(S.cy,di,ei);
   if(!rr)return{};
   const idx=exIndex(),wk=exOrd(S.cy,S.week,0,0); // Beginn der aktuellen Woche
   // Flexible Zyklen: 3- und 4-Tage-Wochen einer Zyklus-Nummer sind EIN Zyklus (sonst fiel der Wert aus
   // der 3-Tage-Woche im gleichen Bereich weg und es kam nur ein Orientierungswert ohne Badge).
-  const cyOf=(a,b)=>a===b||(flexCy(cyNum(b))&&cyNum(a)===cyNum(b));
-  const inCur=e=>cyOf(e.cy,S.cy);
-  const last=(l,f)=>{let h=null;for(const e of (l||[]))if(e.ord<wk&&(!f||f(e))&&(!h||e.ord>h.ord||(e.ord===h.ord&&e.pt===S.pt)))h=e;return h};
+  const fx={},isFx=n=>fx[n]!==undefined?fx[n]:(fx[n]=flexCy(n));
+  const sameCy=(e,h)=>e.cy===h.cy||(e.n===h.n&&isFx(h.n));
+  const cur={cy:S.cy,n:cyNum(S.cy)},inCur=e=>sameCy(e,cur);
+  // Juengster passender Eintrag vor der aktuellen Woche (Listen aufsteigend sortiert -> von hinten,
+  // Abbruch sobald aelter als der Fund bzw. als lo). Gleicher Stand in beiden Plaenen: aktueller Plan.
+  const last=(l,f,lo)=>{
+    let h=null;if(!l)return h;
+    for(let i=l.length-1;i>=0;i--){
+      const e=l[i];
+      if((h&&e.ord<h.ord)||(lo&&e.ord<lo))break;
+      if(e.ord>=wk||(f&&!f(e)))continue;
+      if(!h||(e.pt===S.pt&&h.pt!==S.pt))h=e;
+    }
+    return h;
+  };
   const all=idx[exKey(currentExercise,'*')],sameL=idx[exKey(currentExercise,rr)];
   const any=last(all);
   if(!any)return{};
@@ -1381,14 +1421,13 @@ function findLastExData(di,ei,currentExercise){
   if(same&&inCur(same))hit=same;
   else if(same){
     const ref=last(all,e=>!inCur(e)); // zuletzt trainierter Zyklus VOR dem aktuellen
-    if(ref&&cyOf(same.cy,ref.cy))hit=same;
+    if(ref&&sameCy(same,ref))hit=same;
   }
   if(hit===same){
     // Eigene Zeile bevorzugen (gleicher Plan + Platz oder Partnerzeile), auch wenn sie eine Woche
     // aelter ist als ein anderer Tag — aber nur aus demselben Zyklus wie der gefundene Wert.
     const c0=canon(S.cy,di,ei),pl=planOf(S.cy);
-    const mine=e=>(planOf(e.cy)===pl&&e.di===di&&e.ei===ei)||(!!c0&&canon(e.cy,e.di,e.ei)===c0);
-    const own=last(sameL,e=>cyOf(e.cy,hit.cy)&&mine(e));
+    const own=last(sameL,e=>sameCy(e,hit)&&((e.pl===pl&&e.di===di&&e.ei===ei)||(!!c0&&e.cn===c0)),hit.n*1e7);
     if(own)hit=own;
   }
   return{...hit.d,_orient:hit.rr!==rr,_src:{pt:hit.pt,cy:hit.cy,w:hit.w,di:hit.di,rr:hit.rr}};
@@ -1472,9 +1511,10 @@ function refreshDone(di,ei){
 // refreshProg (Live-Update ohne renderT) und weekStats (Fortschrittsbalken). So koennen
 // Badge, Hinweis und Balken nicht mehr auseinanderlaufen.
 function exState(di,ei){
-  const ex=plan()[di].e[ei];
   const k=mk(S.cy,S.week,di,ei);
   const rawCur=S.data[k]||{},prevWeekData=slotEntry(S.week-1,di,ei)||{};
+  // r0: Wdh.-Bereich, mit dem diese Woche trainiert wurde, wenn er vom heutigen Plan abweicht (migGXRange)
+  const ex0=plan()[di].e[ei],ex=rawCur.r0?{...ex0,r:rawCur.r0.split('-').map(Number)}:ex0;
   // Übung + extraSets aus Vorwoche übernehmen wenn aktuelle Woche noch leer
   // (Woche 1: Übung aus dem vorherigen Zyklus, siehe carryMap)
   const cur={
@@ -1525,6 +1565,7 @@ function incCand(st){
 function incDue(st){return incCand(st)&&!st.done&&!(cmpWeight(st.cur.weight,st.prv.weight,st.inv)>0)}
 function renderEx(ex,ei,di){
   const st=exState(di,ei);
+  ex=st.ex; // Plan-Zeile, ggf. mit dem Bereich, mit dem die Woche trainiert wurde (r0)
   const {cur,prv,ms,reps,hasPrev,p,srcL}=st;
   // Tipp-Key: übungsbasiert – gilt für alle Wochen/Tage/Zyklen
   const tk=cur.exercise?'tip__ex__'+cur.exercise:mkt(S.cy,S.week,di,ei);
@@ -1620,14 +1661,18 @@ function renderOv(){
     h+='<div class="ov-day"><div class="ov-day-lbl" style="background:'+dcol+'">'+esc(day.l)+'</div>';
     day.e.forEach((ex,ei)=>{
       // slotEntry: Wochen im anderen Plan (3/4 Tage) kommen ueber die Partnerzeile mit in den Verlauf
-      const ws=Array.from({length:12},(_,i)=>{const d=slotEntry(i+1,di,ei)||{};return{w:i+1,name:d.exercise||'',wt:parseWeight(d.weight,isAssist(d.exercise))||0}});
+      // rr: Wdh.-Bereich der Woche (r0 = mit altem Bereich trainiert, migGXRange)
+      const prr=ex.r[0]+'-'+ex.r[1];
+      const ws=Array.from({length:12},(_,i)=>{const d=slotEntry(i+1,di,ei)||{};return{w:i+1,name:d.exercise||'',rr:d.r0||prr,wt:parseWeight(d.weight,isAssist(d.exercise))||0}});
       const filled=ws.filter(x=>x.wt>0),nums=ws.map(x=>x.wt),mx=Math.max(...nums,1);
       // Angezeigt wird die ZULETZT trainierte Uebung dieses Platzes. Wurde die Uebung
       // im Zyklus gewechselt, darf der kg-Zugewinn NICHT ueber beide Uebungen gerechnet
       // werden (60 kg Langhantel -> 100 kg Maschine sind keine +40 kg Fortschritt).
+      // Gleiches gilt fuer einen geaenderten Wdh.-Bereich (8-12 -> 4-8 ist kein Kraftzuwachs).
       const name=filled.length?filled[filled.length-1].name:((ws.find(x=>x.name)||{}).name||'');
-      const usedNames=[...new Set(filled.map(x=>x.name).filter(Boolean))];
-      const sameEx=name?filled.filter(x=>x.name===name):filled;
+      const curRR=filled.length?filled[filled.length-1].rr:prr;
+      const isSame=x=>x.name===name&&x.rr===curRR;
+      const sameEx=name?filled.filter(isSame):filled;
       // Assistierte Uebung: Fortschritt heisst WENIGER Gegengewicht, also dreht sich
       // sowohl die kg-Bilanz als auch die Balkenhoehe um (niedrige Hilfe = hoher Balken).
       const inv=isAssist(name);
@@ -1637,12 +1682,12 @@ function renderOv(){
       const gain=sameEx.length>=2?(inv?sameEx[0].wt-sameEx[sameEx.length-1].wt:sameEx[sameEx.length-1].wt-sameEx[0].wt):null;
       const gainTxt=gain&&gain>0?(inv?'−'+gain.toFixed(1)+' kg Hilfe':'+'+gain.toFixed(1)+' kg'):'';
       // Hinweiszeile UNTER den Balken (auf dem iPhone gibt es keinen Hover-Tooltip)
-      const prevNames=usedNames.filter(n=>n!==name);
+      const prevNames=name?[...new Set(filled.filter(x=>x.name&&!isSame(x)).map(x=>x.name===name?x.rr.replace('-','–')+' Wdh.':x.name))]:[];
       const swapNote=(prevNames.length?'<div style="font-size:10px;color:var(--text-faint);margin-top:3px">Davor: '+esc(prevNames.join(', '))+' (grau, nicht eingerechnet)</div>':'')
         +(inv&&filled.length?'<div style="font-size:10px;color:var(--text-faint);margin-top:3px">Weniger Hilfe = mehr Kraft (höherer Balken)</div>':'');
       const bars=nums.map((v,i)=>{
         const isCur=(i+1)===S.week;
-        const other=!!(ws[i].name&&name&&ws[i].name!==name);
+        const other=!!(ws[i].name&&name&&!isSame(ws[i]));
         const fillCol=other?'var(--text-ghost)':(isCur?'var(--peach)':'var(--lilac)');
         const hPct=v>0?Math.max(8,Math.round(score(v)/mx*100)):0;
         return '<div class="ov-bar" title="W'+(i+1)+': '+(v||'–')+(inv?' kg Hilfe':' kg')+(ws[i].name?' · '+ws[i].name:'')+'"><div class="ov-bar-fill" style="height:'+hPct+'%;background:'+(v>0?fillCol:'transparent')+'"></div></div>';
@@ -1688,7 +1733,7 @@ function impBackup(){
   if(have>0&&!confirm('Achtung: Hier sind bereits '+have+' Einträge gespeichert. Wirklich mit dem Backup ('+n+' Einträge) überschreiben?'))return;
   // Gleiche Korrekturen wie beim Start (sonst zeigte ein aelteres Backup bis zum Neustart verschobene
   // Zeilen, und Eingaben landeten im falschen Eintrag): Plan-Marker, Umbenennung, Reihenfolge, Zuordnung.
-  S.data=data;markLegacy(S.data);markV3(S.data);migLegCurl();migOrderV2();migBBSets(S.data);migGMSets(S.data);repairSlots();save();
+  S.data=data;markLegacy(S.data);markV3(S.data);migLegCurl();migOrderV2();migBBSets(S.data);migGMSets(S.data);migGXRange(S.data);repairSlots();save();
   syncPt();saveUI();render();
   bkMsg('✓ Backup eingespielt – '+n+' Einträge wiederhergestellt!');
 }
@@ -1879,7 +1924,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeWeekPick();clo
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-10-07-02';
+const BUILD_ID='2026-10-07-03';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();

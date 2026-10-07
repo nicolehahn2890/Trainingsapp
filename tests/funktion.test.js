@@ -76,9 +76,10 @@ const pos=await page.evaluate(()=>[S.pt,S.cy,S.week]);ok('Navigation',pos.join()
 await page.click('#week-label');await page.keyboard.press('Escape');ok('Navigation',await page.$eval('#week-pick',e=>e.classList.contains('hidden')),'Esc schliesst Wochen-Auswahl');
 await page.click('#week-label');await page.click('.week-arrow >> nth=1');ok('Navigation',await page.$eval('#week-pick',e=>e.classList.contains('hidden')),'Pfeil schliesst Wochen-Auswahl');
 await page.click('.week-arrow >> nth=1');for(let i=0;i<5;i++)await page.click('.week-arrow >> nth=1');ok('Navigation',(await page.textContent('#week-label')).trim()==='W 12 / 12','Woche bleibt bei 12 stehen');
-await page.evaluate(()=>{S.openDays={0:true};render()});await page.click('.day-body .pick-btn >> nth=0');await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter');await page.waitForTimeout(80);
+// Tasten erst, wenn das Suchfeld den Fokus hat (togDrop setzt ihn nach 20 ms) — sonst gehen sie ins Leere
+await page.evaluate(()=>{S.openDays={0:true};render()});await page.click('.day-body .pick-btn >> nth=0');await page.waitForFunction(()=>!!(document.activeElement&&document.activeElement.closest('.drop-search')));await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter');await page.waitForTimeout(80);
 ok('Navigation',(await page.textContent('.day-body .pick-btn-txt >> nth=0'))!=='– Übung wählen –','Dropdown per Tastatur (Pfeil + Enter) waehlt Uebung');
-await page.click('.day-body .pick-btn >> nth=0');await page.keyboard.press('Escape');await page.waitForTimeout(60);ok('Navigation',(await page.$$('.dropdown')).length===0,'Esc schliesst Dropdown');
+await page.click('.day-body .pick-btn >> nth=0');await page.waitForFunction(()=>!!(document.activeElement&&document.activeElement.closest('.drop-search')));await page.keyboard.press('Escape');await page.waitForTimeout(60);ok('Navigation',(await page.$$('.dropdown')).length===0,'Esc schliesst Dropdown');
 await page.click('.day-body .pick-btn >> nth=0');await page.fill('.drop-search input','kickback maschine');await page.waitForTimeout(60);
 ok('Navigation',(await page.$$eval('.dropdown .drop-opt:not(.drop-empty-opt)',e=>e.map(x=>x.getAttribute('data-val')))).join()==='Kickback Maschine','Suche im Dropdown filtert');
 await page.keyboard.press('Escape');

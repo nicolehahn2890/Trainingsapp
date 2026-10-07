@@ -161,6 +161,9 @@ Workout:      [cycle]__w[week]__d[dayIdx]__e[exIdx]
               gezeigt, base vererbt (exBase). Ohne base wird exercise vererbt.
               Optionales Feld s0: Basis-Saetze, mit denen diese Woche trainiert wurde, wenn sie
               vom heutigen Plan abweichen (exState/exDone nehmen s0||Plan-Saetze). Wird NICHT vererbt.
+              Optionales Feld r0: Wdh.-Bereich ("8-12"), mit dem diese Woche trainiert wurde, wenn er vom
+              heutigen Plan abweicht (migGXRange). exIndex, findLastExData und exState (Anzeige "x–y Reps",
+              Rep-Farben, Steigerungs-Hinweis) nehmen r0||Plan-Bereich. Wird NICHT vererbt.
 Tipp-Notiz:   tip__ex__[Uebungsname]  (gilt ueber alle Wochen/Tage/Zyklen!)
               WICHTIG: Seit dem Notiz-Update ist das eine ZUSAETZLICHE eigene Notiz,
               KEIN Override mehr! Der Standard-Tipp aus TIPS wird IMMER angezeigt,
@@ -201,6 +204,10 @@ migGMSets(data)         Einmalig 04.10.2026 (3 Tage Tag A + Tag B Glute Med 2 ->
                         Eintrag, den repairSlots erst danach einsortiert. Wochen MIT Werten bekommen s0
                         (falls != 3), extraSets umgerechnet (2+1 -> 3+0). Laeuft nach migBBStart, VOR
                         repairSlots, und in impBackup. Merker pv__gm3.
+migGXRange(data)        Einmalig 07.10.2026 (Glute Max 8-12 -> 4-8: 4 Tage Tag D, 3 Tage Tag C). Zyklen ohne
+/migGXStart             Plan-Marker, erkannt ueber die KATEGORIE (Glute Max, ohne Uebung nur e0). Eintraege MIT
+                        Werten bekommen r0='8-12' (Verlauf bleibt im richtigen Bereich), leere laufen mit 4-8.
+                        Laeuft nach migGMStart, VOR repairSlots, und in impBackup. Merker pv__gx48.
 markV3(data)/migPlanV3  Einmal-Markierung 02.10.2026: jeder 3-Tage-Zyklus OHNE Marker mit Werten bekommt
                         pv__=2 (behaelt P3_V2), danach pv__v3=1. Laeuft beim Start VOR migOrderV2/
                         repairSlots (Kopie peach_v4_pre_v3) und in impBackup.
@@ -490,7 +497,7 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
 - Uebersicht: vertikale Kapsel-Balken (.ov-bar = Pill-Track, .ov-bar-fill von unten) —
   aktuelle Woche (S.week) Peach, andere Wochen Lilac, Wochen mit einer ANDEREN Uebung grau
   (--text-ghost). Titel = zuletzt trainierte Uebung; kg-Zugewinn und Start/Aktuell zaehlen nur
-  Wochen MIT DIESER Uebung, darunter die Zeile "Davor: … (grau, nicht eingerechnet)"
+  Wochen MIT DIESER Uebung UND diesem Wdh.-Bereich (r0), darunter die Zeile "Davor: … (grau, nicht eingerechnet)"
 - Animationen: fadeSlide (Ansicht/Tag aufklappen), dropIn (Dropdown nur beim Oeffnen, nicht bei Suche)
 - Einstellungs-Feld (gelbes Zahnrad-Chip + .set-input): erscheint sobald eine Uebung gewaehlt ist,
   zwischen ex-meta und reps-row. Speichert uebungsbasiert (set__ex__Name) via updSetting() — ohne renderT
@@ -609,6 +616,9 @@ Label "nur diese Woche" (.once-chip) in der Status-Zeile der Uebung.
     Die Satzzahl steht im Plan, nicht im Eintrag: sonst fehlt bereits trainierten Wochen ploetzlich
     ein Satz (kein ✓), und mit "+" erhoehte Saetze zaehlen doppelt. Wochen mit Werten bekommen s0,
     extraSets wird umgerechnet, einmalig mit pv__-Merker, VOR repairSlots, auch in impBackup.
+    Gleiches gilt fuer den Wdh.-BEREICH einer Zeile (z. B. 8-12 -> 4-8): der Bereich kommt aus dem Plan,
+    ohne Umrechnung stuenden alte 8-12-Werte im Verlauf als 4-8 (falsche Vorwerte, Farben, Hinweise).
+    Wochen mit Werten bekommen r0 (migGXRange). Partnerzeilen P3/P4 immer gemeinsam aendern.
 
 16. **Neue Start-Migrationen VOR repairSlots einhaengen.** repairSlots baut alle Workout-Keys neu
     auf; wird danach noch ein Key ergaenzt, sortiert der naechste Start einmal um und speichert.
@@ -648,7 +658,7 @@ eigenen Zeile unter Titel + Uebungs-Pill (volle Breite). Alte Plaene haben kein 
 ### 4 Tage (P4) — 70 Saetze/Woche
 | Tag A – Po Kraft | Tag B – Oberkörper & Po | Tag C – Po & Beinrückseite | Tag D – Po-Volumen & Beine |
 |---|---|---|---|
-| Glute Max 3x4-8 | Glute Max 2x8-12 | Glute Max 3x6-10 | Glute Max 3x8-12 |
+| Glute Max 3x4-8 | Glute Max 2x8-12 | Glute Max 3x6-10 | Glute Max 3x4-8 |
 | Glute Max 2x8-12 | Glute Med 2x8-12 | Glute Max 2x8-12 | Glute Med 2x8-12 |
 | Glute Med 2x8-12 | Rücken 3x6-10 | Glute Med 2x8-12 | Glute & Quad 2x8-12 |
 | Glute Med 2x8-12 | Rücken 2x8-12 | Glute & Hams 3x6-10 | Glute & Hams 2x8-12 |
@@ -659,7 +669,9 @@ eigenen Zeile unter Titel + Uebungs-Pill (volle Breite). Alte Plaene haben kein 
 
 Woche: Glute Max 15, Glute & Quad 5, Glute & Hams 7, Glute Med 10, Beinbeuger 3,
 Beinstrecker 2, Adduktoren 4, Ruecken 7, Schultern 7, Brust 2, Bauch 8 (keine Arme im 4-Tage-Plan).
-Pro Tag 18/18/19/15 Saetze (8/8/8/7 Uebungen). Tag A: ZWEITE Glute-Med-Zeile 2x8-12 direkt nach der
+Pro Tag 18/18/19/15 Saetze (8/8/8/7 Uebungen). Tag D: Glute Max 3x4-8 statt 3x8-12 (Wunsch 07.10.2026,
+schwerer Hueftstoss auch an Tag D), Fokus-Zeile "4–8 + 8–12 Wdh. · Beinstrecker · Innenschenkel".
+Glute Max pro Woche nach Bereich: 4-8 6, 6-10 3, 8-12 6. Tag A: ZWEITE Glute-Med-Zeile 2x8-12 direkt nach der
 ersten (Wunsch 04.10.2026) — gedacht fuer eine andere Uebung/einen anderen Winkel als die erste
 (z. B. Abduktionsmaschine vorgeneigt + Kabel Abduktion stehend). Keine 3-Tage-Partnerzeile. BEINBEUGER NUR EINMAL PRO WOCHE mit 3 Saetzen
 (ausdruecklicher Wunsch 02.10.2026, gilt auch fuer 3 Tage): 4 Tage an Tag C, 3 Tage an Tag B.
@@ -684,7 +696,7 @@ Volle 69 Saetze in 3 Tagen bewusst NICHT (~23 Saetze/Einheit, ueber der Po-Grenz
 In Klammern die Partnerzeile im 4-Tage-Plan (t).
 | Tag A – Po Kraft (23) | Tag B – Po & Beinrückseite (20) | Tag C – Hüfte & Sanduhr (19) |
 |---|---|---|
-| Glute Max 3x4-8 (A1) | Glute Max 3x6-10 (C1) | Glute Max 3x8-12 (D1) |
+| Glute Max 3x4-8 (A1) | Glute Max 3x6-10 (C1) | Glute Max 3x4-8 (D1) |
 | Glute Max 2x8-12 (A2) | Glute Max 2x8-12 (C2) | Glute Med 2x8-12 (D2) |
 | Glute Med 3x8-12 (A3) | Glute Med 3x8-12 (C3) | Glute Med 2x8-12 (B2) |
 | Glute & Quad 3x6-10 (A5) | Glute & Hams 3x6-10 (C4) | Glute & Quad 2x8-12 (D3) |
@@ -696,7 +708,9 @@ In Klammern die Partnerzeile im 4-Tage-Plan (t).
 
 Woche: Glute Max 13, Glute & Quad 5, Glute & Hams 7, Glute Med 10, Beinbeuger 3,
 Beinstrecker 2, Adduktoren 4, Ruecken 5, Schultern 5, Brust 2, Bauch 6.
-Pro Tag 23/20/19 Saetze (9/8/9 Uebungen). Partnerzeilen duerfen sich in der Satzzahl unterscheiden
+Pro Tag 23/20/19 Saetze (9/8/9 Uebungen). Tag C: Glute Max 3x4-8 statt 3x8-12 (Wunsch 07.10.2026, wie
+4-Tage Tag D), Fokus-Zeile "4–8 + 8–12 Wdh. · Glute Med doppelt · Beinstrecker". Glute Max pro Woche nach
+Bereich: 4-8 6, 6-10 3, 8-12 4. Partnerzeilen duerfen sich in der Satzzahl unterscheiden
 (Glute Med A3/C3: 3 Saetze hier, 2 im 4-Tage-Plan) — Kategorie und Wdh.-Bereich muessen gleich sein. Keys p3cycle1-6, gleiche Regeln wie P4.
 Tagesfarben: A Peach, B Pink, C Lime (D Sky nur im 4-Tage-Plan).
 Aenderung zu V2: Tag A + Glute & Hams 2x4-8, Ruecken und Schultern je 3 statt 2 Saetze;
@@ -872,6 +886,17 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Glute Max 4-8 statt 8-12: 4 Tage Tag D, 3 Tage Tag C (07.10.2026, Version 2026-10-07-03).**
+   Wunsch: auch an Tag D (bzw. 3-Tage Tag C, Partnerzeile) schwer. Saetze und Volumen unveraendert, nur der
+   Bereich. Bereits trainierte 8-12-Wochen behalten ihren Bereich ueber das neue Feld r0 (migGXRange, Merker
+   pv__gx48, auch beim Backup-Import) — Anzeige, Vorwerte, Farben und Steigerungs-Hinweis dieser Wochen bleiben
+   bei 8-12; neue Wochen vergleichen im 4-8-Bereich (ohne eigenen 4-8-Wert mit dem 4-8-Satz von Tag A der
+   Vorwoche). Uebersicht: Wochen mit anderem Bereich wie eine andere Uebung (grau, nicht im kg-Zugewinn,
+   "Davor: 8–12 Wdh."). findLastExData beschleunigt (Suche von hinten, Plan/Partner-Kennung im Index vorberechnet;
+   vorher ~3x langsameres Rendern). Test funktion: Tasten erst nach Fokus im Dropdown-Suchfeld (Rennen mit
+   dem 20-ms-Fokus in togDrop, trat mit langsamerem Rendern ~1 von 6 Laeufen auf). Neuer Test
+   tests/glute-max-48.test.js; randfaelle Fall 1 auf Tag A 8-12 umgestellt. Alle 17 Testreihen gruen.
 
 NEU. **Vergleich mit der Vorwoche statt mit einem anderen Tag derselben Woche (07.10.2026, Version
    2026-10-07-02).** Wunsch: dieselbe Uebung im gleichen Bereich an zwei Tagen einer Woche soll mit der

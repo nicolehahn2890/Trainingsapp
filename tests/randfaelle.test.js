@@ -17,15 +17,16 @@ const E=(ex,w,reps,x)=>({exercise:ex,extraSets:x||0,weight:String(w),reps});
 const HT='Hip Thrusts Langhantel';
 
 // 1. Vorwert gleicher Bereich aus der 3-Tage-Woche
+// (Tag A zweite Glute-Max-Zeile 8-12 <-> 3-Tage Tag A 8-12; bis 07.10.2026 lief das ueber Tag D, der jetzt 4-8 hat)
 await fresh({pv__done:1,pv__v3:1,pv__bb3:1,wt__cycle3__w2:'p3',
-  'cycle3__w1__d0__e0':E(HT,140,['8','8','8']),'cycle3__w1__d3__e0':E(HT,120,['12','12','12']),
-  'p3cycle3__w2__d0__e0':E(HT,145,['8','8','8']),'p3cycle3__w2__d2__e0':E(HT,125,['12','12','12']),
-  'cycle3__w3__d0__e0':E(HT,150,['8','7','7'])},{view:'training',week:3,cy:'cycle3',pt:'p4',openDays:{3:true}});
-const h1=(await page.textContent('#ph-3-0')).trim();
-ok(h1.includes('zuletzt: Z3 W2 · Tag C · 3-Tage')&&!h1.includes('4–8'),'W3 Tag D (8-12): Vorwert aus 3-Tage-W2 im gleichen Bereich ('+h1+')');
-ok((await page.$eval('#pw-3-0',e=>e.closest('.ex-row').textContent)).includes('(zuletzt 125)'),'Gewichtshinweis 125 (nicht 150 aus dem 4-8-Satz)');
-ok(await page.$eval('#ih-3-0',e=>!e.classList.contains('hidden')).catch(()=>false),'"Gewicht steigern" (12 von 8-12 im 1. Satz)');
-ok(await page.evaluate(()=>!exState(3,0).noCmp),'Vergleich aktiv (kein reiner Orientierungswert)');
+  'cycle3__w1__d0__e0':E(HT,140,['8','8','8']),'cycle3__w1__d0__e1':E(HT,120,['12','12']),
+  'p3cycle3__w2__d0__e0':E(HT,145,['8','8','8']),'p3cycle3__w2__d0__e1':E(HT,125,['12','12']),
+  'cycle3__w3__d0__e0':E(HT,150,['8','7','7'])},{view:'training',week:3,cy:'cycle3',pt:'p4',openDays:{0:true}});
+const h1=(await page.textContent('#ph-0-1')).trim();
+ok(h1.includes('zuletzt: Z3 W2 · Tag A · 3-Tage')&&!h1.includes('4–8'),'W3 Tag A (8-12): Vorwert aus 3-Tage-W2 im gleichen Bereich ('+h1+')');
+ok((await page.$eval('#pw-0-1',e=>e.closest('.ex-row').textContent)).includes('(zuletzt 125)'),'Gewichtshinweis 125 (nicht 150 aus dem 4-8-Satz)');
+ok(await page.$eval('#ih-0-1',e=>!e.classList.contains('hidden')).catch(()=>false),'"Gewicht steigern" (12 von 8-12 im 1. Satz)');
+ok(await page.evaluate(()=>!exState(0,1).noCmp),'Vergleich aktiv (kein reiner Orientierungswert)');
 
 // 2. Quell-Nummer mit altem 3-Tage-Plan (Marker 2): juengste Auswahl gewinnt
 const d2={pv__done:1,pv__v3:1,pv__bb3:1,pv__p3cycle2:2};
