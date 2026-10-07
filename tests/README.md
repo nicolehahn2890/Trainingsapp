@@ -18,6 +18,7 @@ iPhone werden dabei nie beruehrt.
 | `uebungswechsel.test.js` | Uebungswechsel ab Woche 2: "Nur diese Woche" / "Ab jetzt im Zyklus", Label, Abbrechen, keine Frage in Woche 1 / bei leerer Vorwoche / gleicher Uebung, naechster Zyklus nimmt die Standard-Uebung |
 | `verlauf-planwechsel.test.js` | Echter Verlauf: 4 Tage Z1 W1-3 -> 3 Tage Z1 W1-12 -> 4 Tage Z2 |
 | `verlauf-woche1-2.test.js` | Woche 1 und 2 zeigen denselben Vorwert (gleicher Rep-Bereich zuerst) |
+| `vorwert-zyklusstart.test.js` | Woche 1 eines neuen Zyklus nach Training an anderen Tagen: Vorwert bleibt im gleichen Rep-Bereich aus dem Zyklus davor (nicht Tag A 4-8, nicht das eben getippte Gewicht der Zeile darueber), eigene Einheit zaehlt nie, Woche 2 gegen Woche 1, Plan-Wechsel-Regel unveraendert |
 | `randfaelle.test.js` | Fixes aus der Code-Pruefung 02.10.2026: Vorwert gleicher Bereich ueber 3/4-Tage-Wochen, Uebernahme bei altem 3-Tage-Plan, Backup-Import ohne Neustart richtig, Beinbeuger-Umstellung 2 -> 3 Saetze (s0), unlesbare Daten beim Umschalten |
 | `steigerung.test.js` | Hinweis "Gewicht steigern" nach der Peach-Regel, nicht beim Vorblaettern mit leerer Vorwoche, weg sobald die Uebung fertig ist |
 | `tag-a-erweiterung.test.js` | 4-Tage Tag A mit 2x Glute Med, ohne Beinbeuger (seit 04.10.2026): Wochen aus allen drei frueheren Fassungen (7er mit Beinbeuger, 8er, 7er vom 02.10.) werden per Kategorie einsortiert, neue Zeile bleibt frei, Beinbeuger-Werte geparkt (kein Verlust), Tag C Beinbeuger 3 Saetze |

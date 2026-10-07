@@ -289,12 +289,16 @@ prog(cr,pr,cw,pw,ex)    'w'|'r'|'s'|'d' Fortschritts-Status. ex nur noetig um as
                         Gewicht -> immer 'd'); Reps als DURCHSCHNITT pro ausgefuelltem Satz.
 findLastExData(di,ei,ex) Vorwert VOR der aktuellen Position, ueber BEIDE Plaene (exOrd: Zyklus >
                         Woche > Tag > Position; Gleichstand -> aktueller Plan). EINE Regel fuer
-                        alle Wochen: (1) juengster Wert im GLEICHEN Rep-Bereich, sofern er aus
-                        dem Zyklus des insgesamt juengsten Eintrags der Uebung stammt; (2) sonst
-                        der juengste Wert egal welcher Bereich (_orient: nur Orientierung, kein
-                        Badge, Bereich im Hinweis). "Gleicher Zyklus" heisst in flexiblen Zyklen gleiche
-                        Zyklus-NUMMER (3- und 4-Tage-Wochen sind ein Zyklus). Pflicht-Test: Woche 1 und 2 eines neuen
-                        Zyklus zeigen bei leerer Woche 1 fuer JEDE Zeile denselben Vorwert. Liefert _src {pt,cy,w,di,rr} und _orient.
+                        alle Wochen: (1) juengster Wert im GLEICHEN Rep-Bereich aus dem AKTUELLEN
+                        Zyklus; (2) sonst gleicher Bereich aus dem zuletzt trainierten Zyklus DAVOR —
+                        bestimmt NUR ueber Eintraege vor dem aktuellen Zyklus (ref); (3) sonst der
+                        juengste Wert egal welcher Bereich (_orient: nur Orientierung, kein
+                        Badge, Bereich im Hinweis). Die eigene Einheit (gleiche Woche + gleicher Tag)
+                        zaehlt nie als Vorwert. "Gleicher Zyklus" heisst in flexiblen Zyklen gleiche
+                        Zyklus-NUMMER (3- und 4-Tage-Wochen sind ein Zyklus). Pflicht-Tests: Woche 1 und 2 eines neuen
+                        Zyklus zeigen bei leerer Woche 1 fuer JEDE Zeile denselben Vorwert; und Eintraege in
+                        Woche 1 in ANDEREN Bereichen aendern keinen Vorwert im gleichen Bereich
+                        (tests/vorwert-zyklusstart). Liefert _src {pt,cy,w,di,rr} und _orient.
                         Index: exIndex() fuehrt jede Uebung zusaetzlich unter "Uebung||*".
 exOrd(cy,w,di,ei)       Reihenfolge-Wert eines Eintrags: Zyklus > Woche > Tag > Position
 repRange(cy,di,ei)      Rep-Bereich eines Plan-Platzes als String ("4-8"); '' wenn es den Platz
@@ -390,11 +394,18 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
   Dieselbe Uebung laeuft im 4-8er Slot mit deutlich mehr Gewicht als im 8-12er Slot (z. B.
   Hip Thrusts 134 kg vs. 115 kg) — ohne diese Trennung zieht der 8-12er Slot den viel zu
   hohen 4-8er Vorwert und meldet dauerhaft "weniger". VERGLICHEN wird deshalb nur im gleichen
-  Bereich — und nur, wenn dieser Wert aus dem zuletzt trainierten Zyklus der Uebung stammt.
-  Sonst (z. B. im neuen Plan mit geaenderten Bereichen) zeigt die App den juengsten Wert aus
-  einem anderen Bereich NUR zur Orientierung (Bereich im Hinweis, kein Badge). Die Regel gilt
-  fuer ALLE Wochen gleich (siehe findLastExData). FEHLER bis 26.09.2026: stattdessen griff der Rueckfall auf den
-  anderen Plan und zeigte im neuen Zyklus Werte aus Z2 W3 (4-Tage, Juli) statt aus W11.
+  Bereich — und nur, wenn dieser Wert aus dem aktuellen Zyklus oder dem zuletzt trainierten
+  Zyklus DAVOR stammt. Sonst (z. B. im neuen Plan mit geaenderten Bereichen) zeigt die App den
+  juengsten Wert aus einem anderen Bereich NUR zur Orientierung (Bereich im Hinweis, kein Badge).
+  Die Regel gilt fuer ALLE Wochen gleich (siehe findLastExData). FEHLER bis 26.09.2026: stattdessen
+  griff der Rueckfall auf den anderen Plan und zeigte im neuen Zyklus Werte aus Z2 W3 (4-Tage, Juli)
+  statt aus W11. FEHLER bis 07.10.2026: "zuletzt trainierter Zyklus" wurde ueber den juengsten
+  Eintrag INSGESAMT bestimmt — sobald in Woche 1 Tag A eingetragen war, galt der Zyklus davor als
+  veraltet und Tag C Hip Thrust 6-10 zeigte den 4-8-Wert von Tag A derselben Woche, die 8-12-Zeile
+  sogar das eben getippte Gewicht der Zeile darueber. Jetzt: Bezugszyklus nur aus Eintraegen VOR dem
+  aktuellen Zyklus, eigene Einheit (gleiche Woche + Tag) nie als Vorwert.
+- Gleiche Uebung im gleichen Bereich an ZWEI Tagen einer Woche (z. B. Glute Med 8-12 Tag B + Tag C):
+  Tag C vergleicht mit Tag B derselben Woche (letzter Wert der Uebung) — so seit Sept. 2026 gewollt.
   Der Bereich kommt aus dem Plan via repRange(), nicht aus den
   gespeicherten Daten — Eintraege an Plan-Positionen, die es nicht mehr gibt, fallen raus.
 - Deshalb kann es auch in Woche 1 (und im neuen Zyklus) Vorwerte geben. Die frueheren Guards
@@ -853,6 +864,17 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Vorwert in Woche 1 nach anderen Tagen derselben Woche (07.10.2026, Version 2026-10-07-01).**
+   Screenshot Z2 W1 Tag C: Hip Thrust 6-10 zeigte "(zuletzt 145) · Z2 W1 · Tag A · 4–8 Wdh.", die
+   8-12-Zeile "(zuletzt 142) · Z2 W1 · Tag C · 6–10 Wdh." — das eben getippte Gewicht der Zeile
+   darueber (ohne Reps). Ursache: findLastExData bestimmte den "zuletzt trainierten Zyklus" ueber den
+   juengsten Eintrag insgesamt; nach Tag A in Woche 1 war das der neue Zyklus, der gleiche Bereich aus
+   dem Zyklus davor fiel als "veraltet" raus. Fix: (1) gleicher Bereich aus dem aktuellen Zyklus, sonst
+   aus dem zuletzt trainierten Zyklus davor (Bezug nur ueber Eintraege vor dem aktuellen Zyklus),
+   (2) die eigene Einheit (gleiche Woche + Tag) zaehlt nie als Vorwert. Plan-Wechsel-Regel (gleicher
+   Bereich aus aelterem Zyklus -> Orientierung) unveraendert. Neuer Test tests/vorwert-zyklusstart.test.js;
+   alle 15 Testreihen gruen.
 
 NEU. **Tipp Panatta Super Crunch: Atmung + Bauchnabel (04.10.2026, Version 2026-10-04-01).**
    Ausfuehrung ergaenzt: "In der Hebephase kraeftig ausatmen und dabei den Bauchnabel einziehen."
