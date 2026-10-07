@@ -263,6 +263,11 @@ carryMap(cy)            Uebungs-Uebernahme in einen neuen Zyklus (nur Nicht-Alt-
                         Zyklus schon eine gespeicherte Uebung haben, bekommen nichts, ihre Uebungen
                         gelten aber als vergeben (neue 2. Ruecken-Zeile != 1. Ruecken-Zeile). Cache _carry
                         (vor save() deklariert, in save() geleert).
+                        Folge: aendert sich der Wdh.-Bereich einer Zeile, kann sich ihre VORAUSWAHL im
+                        noch nicht trainierten Zyklus aendern (07.10.2026: Tag D 4-8 schlaegt die 4-8-
+                        Uebung des Vorzyklus vor, z. B. Hip Thrust LH statt eines 8-12-Kickbacks) — der
+                        Nutzerin immer dazusagen. carryMap liest den Bereich der Quellzeile aus dem Plan,
+                        nicht aus r0 (nur bei nicht-flexiblen Quellzyklen mit r0-Wochen relevant).
 migOrderV2()            Einmal-Korrektur fuer die Reihenfolge-Umstellung innerhalb von V2 (26.09.):
                         Tag-Gruppen in Nicht-Alt-Zyklen, die komplett zur ERSTEN V2-Reihenfolge
                         passen und nicht zur aktuellen, werden per Tabelle V2_REORDER umsortiert.
@@ -314,8 +319,11 @@ exOrd(cy,w,di,ei)       Reihenfolge-Wert eines Eintrags: Zyklus > Woche > Tag > 
 repRange(cy,di,ei)      Rep-Bereich eines Plan-Platzes als String ("4-8"); '' wenn es den Platz
                         im Plan nicht (mehr) gibt — solche Eintraege bleiben aus dem Index raus.
 exKey(ex,rr)            Index-Schluessel "Uebung||4-8"
-exIndex()               Baut/cached den Index exKey -> Eintraege (aufsteigend). Cache
+exIndex()               Baut/cached den Index exKey -> Eintraege (aufsteigend nach exOrd). Cache
                         _exIdx wird in save() verworfen — jede Datenaenderung geht durch save().
+                        Bereich je Eintrag = r0 || Plan. Vorberechnet je Eintrag: n (Zyklus-Nummer),
+                        pl (planOf) und cn (canon) — findLastExData sucht damit von hinten mit
+                        Abbruch (last()); ohne das renderte die App ~3x langsamer (07.10.2026).
 srcLabel(src)           "Z1 W5 · Tag A" (stammt der Wert aus dem anderen Plan, zusaetzlich "3-Tage"/"4-Tage")
 rcol(v,r)               Performance-Farbe, mit der das ganze Rep-Feld gefuellt wird (leer -> weiss)
 esc(s)                  HTML-escape
@@ -394,12 +402,13 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
 ```
 
 ### Vergleichslogik (wichtig!)
-- Fortschrittsvergleich nutzt findLastExData() — vergleicht mit letztem Wert DIESER Uebung
-- Der Vorwert haengt an UEBUNG + REP-BEREICH, NICHT am Platz im Plan: gesucht wird ueber alle
-  Zyklen, Wochen, Tage und Positionen. Eine Uebung, die von Tag A nach Tag D wandert, vier
-  Wochen pausiert oder erst im neuen Zyklus wiederkommt, behaelt ihren Vorwert. Beruecksichtigt
-  werden nur Eintraege VOR der aktuellen Position (exOrd: Zyklus > Woche > Tag > Position),
-  spaetere Wochen/Tage werden nie als "Vorwert" angezeigt.
+- Fortschrittsvergleich nutzt findLastExData() — vergleicht mit dem letzten Wert DIESER Uebung
+  im gleichen Wdh.-Bereich aus einer FRUEHEREN WOCHE, die eigene Zeile zuerst (siehe VORWOCHE).
+- Der Vorwert haengt an UEBUNG + REP-BEREICH: gesucht wird ueber alle Zyklen, Wochen, Tage und
+  Positionen. Eine Uebung, die von Tag A nach Tag D wandert, vier Wochen pausiert oder erst im
+  neuen Zyklus wiederkommt, behaelt ihren Vorwert. Beruecksichtigt werden nur Eintraege aus
+  Wochen VOR der aktuellen (exOrd < Beginn der aktuellen Woche; exOrd: Zyklus > Woche > Tag >
+  Position) — die laufende Woche und spaetere Wochen sind nie "Vorwert".
 - WICHTIG: Der Rep-Bereich gehoert ZWINGEND zum Vergleichsschluessel (exKey "Uebung||4-8").
   Dieselbe Uebung laeuft im 4-8er Slot mit deutlich mehr Gewicht als im 8-12er Slot (z. B.
   Hip Thrusts 134 kg vs. 115 kg) — ohne diese Trennung zieht der 8-12er Slot den viel zu
@@ -413,7 +422,9 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
   Eintrag INSGESAMT bestimmt — sobald in Woche 1 Tag A eingetragen war, galt der Zyklus davor als
   veraltet und Tag C Hip Thrust 6-10 zeigte den 4-8-Wert von Tag A derselben Woche, die 8-12-Zeile
   sogar das eben getippte Gewicht der Zeile darueber. Jetzt: Bezugszyklus nur aus Eintraegen VOR dem
-  aktuellen Zyklus, eigene Einheit (gleiche Woche + Tag) nie als Vorwert.
+  aktuellen Zyklus, die laufende Woche zaehlt nie.
+  Der Bereich kommt aus dem Plan via repRange() — ausser der Eintrag traegt r0 (mit einem anderen
+  Bereich trainiert, migGXRange). Eintraege an Plan-Positionen, die es nicht mehr gibt, fallen raus.
 - VORWOCHE STATT GLEICHE WOCHE (Wunsch 07.10.2026): Rexi macht dieselbe Uebung im gleichen Bereich
   an zwei Tagen einer Woche (z. B. Glute Med 8-12 Tag B + Tag C). Innerhalb einer Woche muss NICHT
   gesteigert werden — deshalb zaehlt die aktuelle Woche nie als Vorwert, und die eigene Zeile hat
@@ -421,8 +432,8 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
   Partnerzeile). Fiel die eigene Zeile letzte Woche aus, zaehlt ihr letzter Wert im selben Zyklus.
   Nur wenn die Zeile die Uebung im Zyklus noch nie hatte, kommt der juengste Wert eines anderen
   Tages (aus frueheren Wochen). Bis 07.10.2026 verglich Tag C mit Tag B derselben Woche.
-  Der Bereich kommt aus dem Plan via repRange(), nicht aus den
-  gespeicherten Daten — Eintraege an Plan-Positionen, die es nicht mehr gibt, fallen raus.
+  Folge fuer den Steigerungs-Hinweis: er braucht einen Vorwert aus der Vorwoche — kommt der eigene
+  Wert aus der vorletzten Woche (z. B. Zeile ohne Partner nach einer 3-Tage-Woche), erscheint keiner.
 - Deshalb kann es auch in Woche 1 (und im neuen Zyklus) Vorwerte geben. Die frueheren Guards
   `if(S.week>1)` in renderT/renderEx sind durch `hasPrev` ersetzt.
 - **WOCHE 1 = KEIN VERGLEICH (Zyklus-Start).** In Woche 1 jedes Zyklus steigt Rexi bewusst mit
@@ -438,7 +449,11 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
   4-Tage-Zyklus 2 der Wert aus 4-Tage Z1 W3 vom Juni statt aus 3-Tage Z1 W12). Kommt der Wert
   aus dem anderen Plan, nennt das Label "3-Tage"/"4-Tage". Grenze: Wechselt man den Plan
   MITTEN in einer Zyklus-Nummer und startet dort wieder bei Woche 1, ist die Reihenfolge der
-  beiden Plaene innerhalb dieser Nummer nicht eindeutig (betrifft nur alte Wochen).
+  beiden Plaene innerhalb dieser Nummer nicht eindeutig (betrifft nur alte Wochen). Konkret bei
+  Rexi: Zyklus 1 (4-Tage W1-3 Juni, 3-Tage W1-12 Juli-Sept., beide mit Marker) — beim
+  Zurueckblaettern kann "zuletzt" dort aus der jeweils anderen Wochenart kommen, und die eigene
+  Zeile hat keinen Vorrang (nicht flexibel). Bewusst NICHT korrigiert (nur Altdaten; Pruefung
+  07.10.2026: in flexiblen Zyklen 0 Abweichungen auf 15.000 Zufallspositionen).
 - Wenn Uebung gewechselt wird, startet Vergleich frisch
 - Gewicht: parseWeight() unterstuetzt Bereiche wie "25-27" (nimmt oberen Wert 27) und Komma wie "27,5". Auch renderOv (Uebersicht) nutzt parseWeight() — nie parseFloat(), das gibt bei "42-45" nur 42 zurueck.
 - ASSISTIERTE UEBUNGEN (Set ASSIST, aktuell die beiden "Assistierter Klimmzug"-Varianten):
@@ -626,6 +641,19 @@ Label "nur diese Woche" (.once-chip) in der Status-Zeile der Uebung.
 
 ---
 
+## ARBEITSWEISE (Feedback 07.10.2026)
+
+Rexi will keine Bugs mehr und keine unnoetige Komplexitaet ("Was ist daran so schwer, ich wollte doch
+einfach fuer 2 Uebungen die Wiederholungsbereiche aendern").
+- KLEINE WUENSCHE KLEIN UMSETZEN. Ein anderer Wdh.-Bereich ist eine Zahl im Plan (P3 + P4 als
+  Partnerzeilen gemeinsam). Absicherungen/Migrationen (s0, r0 …) NUR, wenn betroffene Daten wirklich
+  existieren — vorher kurz fragen, ob die Zeile im LAUFENDEN Zyklus schon trainiert wurde
+  (07.10.2026: sie war erst in Woche 1, Tag D noch nicht trainiert — migGXRange war unnoetig, ist
+  aber geprueft und wirkungslos auf ihre Daten).
+- Nebeneffekte (z. B. andere Vorauswahl durch carryMap) aktiv und kurz nennen.
+- Vor jedem Deploy: Testsuite gruen; bei Logik-Aenderungen den Vorher/Nachher-Vergleich (Abschnitt
+  Tests). Erst melden, wenn das geprueft ist — nicht in mehreren Runden nachbessern.
+
 ## TEXT-STIL (ausdruecklicher Wunsch, 26.09.2026)
 
 Alle Beschriftungen kurz, sachlich, ohne KI-Ton: keine ausschweifenden Saetze, keine
@@ -804,7 +832,8 @@ Spezial: 3D Abduktor Maschine, Belt Squat, Belt Squat RDL, Beinpresse 45 Grad, R
 - Weniger Gewicht = 'Weniger', auch bei mehr Reps (Gewicht wird zuerst verglichen)
 - Reps werden als Durchschnitt pro Satz verglichen, nicht satzweise und nicht als Summe
   (Reihenfolge der Saetze egal, zusaetzliche oder noch leere Saetze verfaelschen nichts)
-- Vergleich basiert auf letztem Wert dieser Uebung, nicht einfach Vorwoche
+- Vergleich mit dem letzten Wert dieser Uebung im gleichen Wdh.-Bereich aus einer FRUEHEREN Woche:
+  eigene Zeile zuerst (Tag B mit Tag B der Vorwoche), die laufende Woche zaehlt nie (Wunsch 07.10.2026)
 - STEIGERUNGSREGEL (Peach-Handbuch): Obergrenze im 1. Satz erreicht/ueberschritten -> naechstes
   Mal mehr Gewicht (App zeigt "▲ Gewicht steigern"); sonst Gewicht halten und mehr Reps schaffen.
 
@@ -869,6 +898,17 @@ Breite, simulierte Daten, echte Nutzerdaten werden nie beruehrt). **Vor JEDEM De
 lassen — am Ende muss "ALLE TESTS GRUEN" stehen.** Neue Funktionen/Bugfixes bekommen einen
 eigenen Test (Datei tests/<thema>.test.js, Exit-Code 1 bei Fehler). Details: tests/README.md.
 Blockierte Google Fonts im Sandbox-Netz sind kein Fehler; gezaehlt werden nur JS-Exceptions.
+run.sh startet jeden Test zweimal (Ausgabe + Exit-Code) — ein sporadischer "ABBRUCH" in der Ausgabe
+bei trotzdem "ALLE TESTS GRUEN" ist NICHT egal: Ursache suchen (07.10.2026: Rennen in funktion.test.js,
+Tasten im Dropdown vor dem Fokus — togDrop setzt den Fokus erst nach 20 ms; Tests muessen nach dem
+Oeffnen per waitForFunction auf den Fokus im .drop-search-Feld warten).
+Bei Aenderungen an Vorwert-/Vergleichslogik zusaetzlich ein VORHER/NACHHER-VERGLEICH: alte
+(git show <commit>:index.html) und neue index.html mit realistischen Daten nebeneinander laden
+(Zyklus 1 alt mit Markern, Zyklus 2 in Woche 1/2, 3/4-Tage-Wechsel, gleiche Uebung an mehreren
+Tagen), fuer jede Zeile Uebung/Vorwert/Quelle/Badge/Hinweis vergleichen — JEDER Unterschied muss
+durch die gewollte Aenderung erklaert sein, gespeicherte Daten muessen gleich bleiben.
+Achtung beim Aufraeumen von Testservern: NICHT `pkill -f "http.server …"` — das trifft die eigene
+Shell (Exit 144). Server mit `&` starten, PID merken (`P=$!`), `kill $P`.
 
 ---
 
@@ -887,6 +927,17 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Pruefung aller Aenderungen vom 07.10.2026 + SKILL-Abgleich (ohne App-Aenderung).** (1) Vorher/
+   Nachher-Vergleich (3275d42 vs. a4de686) mit Rexi-aehnlichen Daten (Z1 alt, Z2 W1 mit Tag A/B fertig,
+   Tag C angefangen; Variante W2 als 3-Tage-Woche): 0 JS-Fehler, alle Unterschiede durch die gewollten
+   Regeln erklaert, gespeicherte Daten gleich (einzige Ausnahme: andere Tag-D-Vorauswahl durch 4-8,
+   siehe carryMap). (2) Unabhaengige Code-Pruefung: last()-Neufassung gegen naive Referenz auf 15.000
+   Zufallspositionen 0 Abweichungen; migGXRange auf 12 Zufallsdatensaetzen korrekt und idempotent;
+   ~1.500 Ansichten ohne Fehler/undefined/NaN; Tempo wie vorher. Keine Bugs. Bekannt und bewusst
+   gelassen: Vorwert-Reihenfolge in alten Zyklen mit gleicher Nummer (siehe Vergleichslogik, Grenze).
+   (3) SKILL.md auf den Stand gebracht: Vergleichslogik/Progressionssystem (fruehere Wochen, eigene
+   Zeile), exIndex, carryMap-Folge, Tests (Vorher/Nachher, Fokus-Rennen), neuer Abschnitt ARBEITSWEISE.
 
 NEU. **Fokus-Zeilen ohne Wdh.-Bereiche (07.10.2026, Version 2026-10-07-04).** Wunsch: die Bereiche unter
    den Tagesnamen ("4–8 Wdh. · …") braucht es nicht — sie stehen an jeder Uebung. Entfernt in P4, P3 und
