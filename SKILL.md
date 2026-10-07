@@ -287,14 +287,17 @@ prog(cr,pr,cw,pw,ex)    'w'|'r'|'s'|'d' Fortschritts-Status. ex nur noetig um as
                         Uebungen zu erkennen (dort dreht sich die Gewichtsrichtung um).
                         Gewicht schlaegt Reps (weniger
                         Gewicht -> immer 'd'); Reps als DURCHSCHNITT pro ausgefuelltem Satz.
-findLastExData(di,ei,ex) Vorwert VOR der aktuellen Position, ueber BEIDE Plaene (exOrd: Zyklus >
+findLastExData(di,ei,ex) Vorwert aus einer FRUEHEREN WOCHE (die aktuelle Woche zaehlt nie — Wunsch
+                        07.10.2026), ueber BEIDE Plaene (exOrd: Zyklus >
                         Woche > Tag > Position; Gleichstand -> aktueller Plan). EINE Regel fuer
                         alle Wochen: (1) juengster Wert im GLEICHEN Rep-Bereich aus dem AKTUELLEN
                         Zyklus; (2) sonst gleicher Bereich aus dem zuletzt trainierten Zyklus DAVOR —
                         bestimmt NUR ueber Eintraege vor dem aktuellen Zyklus (ref); (3) sonst der
                         juengste Wert egal welcher Bereich (_orient: nur Orientierung, kein
-                        Badge, Bereich im Hinweis). Die eigene Einheit (gleiche Woche + gleicher Tag)
-                        zaehlt nie als Vorwert. "Gleicher Zyklus" heisst in flexiblen Zyklen gleiche
+                        Badge, Bereich im Hinweis). Bei (1)/(2) gewinnt die EIGENE Zeile (gleicher Plan +
+                        Platz oder Partnerzeile via canon) aus demselben Zyklus wie der Fund, auch wenn ein
+                        anderer Tag juenger ist: Tag B vergleicht mit Tag B, Tag C mit Tag C (auch wenn
+                        Tag C letzte Woche ausfiel). "Gleicher Zyklus" heisst in flexiblen Zyklen gleiche
                         Zyklus-NUMMER (3- und 4-Tage-Wochen sind ein Zyklus). Pflicht-Tests: Woche 1 und 2 eines neuen
                         Zyklus zeigen bei leerer Woche 1 fuer JEDE Zeile denselben Vorwert; und Eintraege in
                         Woche 1 in ANDEREN Bereichen aendern keinen Vorwert im gleichen Bereich
@@ -404,8 +407,13 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
   veraltet und Tag C Hip Thrust 6-10 zeigte den 4-8-Wert von Tag A derselben Woche, die 8-12-Zeile
   sogar das eben getippte Gewicht der Zeile darueber. Jetzt: Bezugszyklus nur aus Eintraegen VOR dem
   aktuellen Zyklus, eigene Einheit (gleiche Woche + Tag) nie als Vorwert.
-- Gleiche Uebung im gleichen Bereich an ZWEI Tagen einer Woche (z. B. Glute Med 8-12 Tag B + Tag C):
-  Tag C vergleicht mit Tag B derselben Woche (letzter Wert der Uebung) — so seit Sept. 2026 gewollt.
+- VORWOCHE STATT GLEICHE WOCHE (Wunsch 07.10.2026): Rexi macht dieselbe Uebung im gleichen Bereich
+  an zwei Tagen einer Woche (z. B. Glute Med 8-12 Tag B + Tag C). Innerhalb einer Woche muss NICHT
+  gesteigert werden — deshalb zaehlt die aktuelle Woche nie als Vorwert, und die eigene Zeile hat
+  Vorrang: Tag B vergleicht mit Tag B, Tag C mit Tag C der Vorwoche (bei 3/4-Tage-Wechsel mit der
+  Partnerzeile). Fiel die eigene Zeile letzte Woche aus, zaehlt ihr letzter Wert im selben Zyklus.
+  Nur wenn die Zeile die Uebung im Zyklus noch nie hatte, kommt der juengste Wert eines anderen
+  Tages (aus frueheren Wochen). Bis 07.10.2026 verglich Tag C mit Tag B derselben Woche.
   Der Bereich kommt aus dem Plan via repRange(), nicht aus den
   gespeicherten Daten — Eintraege an Plan-Positionen, die es nicht mehr gibt, fallen raus.
 - Deshalb kann es auch in Woche 1 (und im neuen Zyklus) Vorwerte geben. Die frueheren Guards
@@ -864,6 +872,14 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Vergleich mit der Vorwoche statt mit einem anderen Tag derselben Woche (07.10.2026, Version
+   2026-10-07-02).** Wunsch: dieselbe Uebung im gleichen Bereich an zwei Tagen einer Woche soll mit der
+   Vorwoche verglichen werden, weil innerhalb einer Woche nicht gesteigert werden muss. findLastExData:
+   die aktuelle Woche zaehlt nie als Vorwert; die eigene Zeile (gleicher Platz oder Partnerzeile) hat
+   Vorrang vor juengeren Werten anderer Tage im selben Zyklus. Neuer Test tests/vorwert-vorwoche.test.js
+   (gegen den alten Stand 9 Fehler); vorwert-zyklusstart verschaerft (Tag C/D aendern sich durch Tag A/B
+   derselben Woche gar nicht mehr). Alle 16 Testreihen gruen.
 
 NEU. **Vorwert in Woche 1 nach anderen Tagen derselben Woche (07.10.2026, Version 2026-10-07-01).**
    Screenshot Z2 W1 Tag C: Hip Thrust 6-10 zeigte "(zuletzt 145) · Z2 W1 · Tag A · 4–8 Wdh.", die

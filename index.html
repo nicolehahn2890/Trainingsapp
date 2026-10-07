@@ -1344,17 +1344,19 @@ function exIndex(){
   for(const n in idx)idx[n].sort((a,b)=>a.ord-b.ord);
   _exIdx=idx;return idx;
 }
-// Vorwert einer Zeile: letzter Wert dieser Uebung VOR der aktuellen Position, ueber BEIDE Plaene
+// Vorwert einer Zeile: letzter Wert dieser Uebung aus einer FRUEHEREN WOCHE, ueber BEIDE Plaene
 // (3 und 4 Tage; Reihenfolge Zyklus > Woche > Tag > Position, bei Gleichstand der aktuelle Plan).
+// Die aktuelle Woche zaehlt NIE (Wunsch 07.10.2026): innerhalb einer Woche muss nicht gesteigert
+// werden — wer dieselbe Uebung an Tag B und Tag C macht, vergleicht jeden Tag mit der Vorwoche.
 // Regel — fuer JEDE Woche gleich, damit Woche 1 und 2 nicht auseinanderlaufen:
 //  1. Gleicher Rep-Bereich (4-8 laeuft mit viel mehr Gewicht als 8-12) aus dem AKTUELLEN Zyklus.
-//  2. Sonst gleicher Bereich aus dem zuletzt trainierten Zyklus DAVOR. Welcher das ist, bestimmen
-//     nur Eintraege vor dem aktuellen Zyklus — was diese Woche schon in anderen Bereichen
-//     eingetragen ist, aendert daran nichts.
+//  2. Sonst gleicher Bereich aus dem zuletzt trainierten Zyklus DAVOR (Bezug nur ueber Eintraege
+//     vor dem aktuellen Zyklus).
 //  3. Sonst der juengste Wert in einem anderen Bereich — nur zur Orientierung (_orient: kein
 //     Badge, Bereich steht im Hinweis).
-// Die eigene Einheit (gleiche Woche, gleicher Tag) zaehlt nie als Vorwert: die zweite Zeile mit
-// derselben Uebung vergleicht mit ihrer Vorwoche, nicht mit der Zeile darueber von heute.
+// Steht die Uebung an mehreren Tagen, gewinnt die EIGENE Zeile (gleicher Tag + Platz, bei 3/4-Tage-
+// Wochen die Partnerzeile) — Tag B vergleicht mit Tag B, Tag C mit Tag C. Fiel die eigene Zeile letzte
+// Woche aus, zaehlt ihr letzter Wert im selben Zyklus; erst ohne den der juengste Wert eines anderen Tages.
 // Fehler davor (07.10.2026): Regel 2 lief ueber den juengsten Eintrag INSGESAMT. Sobald in Woche 1
 // Tag A trainiert war, galt der Zyklus davor als veraltet: Tag C Hip Thrust 6-10 zeigte den 4-8-Wert
 // von Tag A, die 8-12-Zeile das eben getippte Gewicht der 6-10-Zeile darueber.
@@ -1365,22 +1367,29 @@ function findLastExData(di,ei,currentExercise){
   if(!currentExercise)return{};
   const rr=repRange(S.cy,di,ei);
   if(!rr)return{};
-  const idx=exIndex(),cur=exOrd(S.cy,S.week,di,ei);
+  const idx=exIndex(),wk=exOrd(S.cy,S.week,0,0); // Beginn der aktuellen Woche
   // Flexible Zyklen: 3- und 4-Tage-Wochen einer Zyklus-Nummer sind EIN Zyklus (sonst fiel der Wert aus
   // der 3-Tage-Woche im gleichen Bereich weg und es kam nur ein Orientierungswert ohne Badge).
   const cyOf=(a,b)=>a===b||(flexCy(cyNum(b))&&cyNum(a)===cyNum(b));
   const inCur=e=>cyOf(e.cy,S.cy);
-  const today=e=>e.cy===S.cy&&e.w===S.week&&e.di===di;
-  const last=(l,f)=>{let h=null;for(const e of (l||[]))if(e.ord<cur&&!today(e)&&(!f||f(e))&&(!h||e.ord>h.ord||(e.ord===h.ord&&e.pt===S.pt)))h=e;return h};
-  const all=idx[exKey(currentExercise,'*')];
+  const last=(l,f)=>{let h=null;for(const e of (l||[]))if(e.ord<wk&&(!f||f(e))&&(!h||e.ord>h.ord||(e.ord===h.ord&&e.pt===S.pt)))h=e;return h};
+  const all=idx[exKey(currentExercise,'*')],sameL=idx[exKey(currentExercise,rr)];
   const any=last(all);
   if(!any)return{};
-  const same=last(idx[exKey(currentExercise,rr)]);
+  const same=last(sameL);
   let hit=any;
   if(same&&inCur(same))hit=same;
   else if(same){
     const ref=last(all,e=>!inCur(e)); // zuletzt trainierter Zyklus VOR dem aktuellen
     if(ref&&cyOf(same.cy,ref.cy))hit=same;
+  }
+  if(hit===same){
+    // Eigene Zeile bevorzugen (gleicher Plan + Platz oder Partnerzeile), auch wenn sie eine Woche
+    // aelter ist als ein anderer Tag — aber nur aus demselben Zyklus wie der gefundene Wert.
+    const c0=canon(S.cy,di,ei),pl=planOf(S.cy);
+    const mine=e=>(planOf(e.cy)===pl&&e.di===di&&e.ei===ei)||(!!c0&&canon(e.cy,e.di,e.ei)===c0);
+    const own=last(sameL,e=>cyOf(e.cy,hit.cy)&&mine(e));
+    if(own)hit=own;
   }
   return{...hit.d,_orient:hit.rr!==rr,_src:{pt:hit.pt,cy:hit.cy,w:hit.w,di:hit.di,rr:hit.rr}};
 }
@@ -1870,7 +1879,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeWeekPick();clo
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-10-07-01';
+const BUILD_ID='2026-10-07-02';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();

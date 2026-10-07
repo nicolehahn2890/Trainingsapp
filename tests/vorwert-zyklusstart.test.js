@@ -54,13 +54,12 @@ const rows=await page.$$eval('.day-body .ex-row',rs=>rs.map(x=>({w:(x.querySelec
 console.log('  Anzeige:',rows[0].w,'|',rows[0].h,'||',rows[1].w,'|',rows[1].h);
 ok(rows[0].w==='(zuletzt 152)'&&!/Tag A/.test(rows[0].h)&&!/Wdh/.test(rows[0].h),'Anzeige 6-10: "(zuletzt 152)", keine Herkunft Tag A, kein fremder Bereich');
 ok(rows[1].w==='(zuletzt 137)'&&!/Z2 W1/.test(rows[1].h),'Anzeige 8-12: "(zuletzt 137)", nicht aus Z2 W1');
-// Woche 1 bleibt stabil: hatte eine Zeile in Tag C/D einen Vorwert im GLEICHEN Bereich, darf das Training von
-// Tag A/B (andere Bereiche) ihn nicht durch einen Orientierungswert ersetzen. Neuer Wert im gleichen Bereich
-// aus dieser Woche (gleiche Uebung an Tag B) ist richtig.
+// Woche 1 bleibt stabil: die aktuelle Woche zaehlt nie als Vorwert (Wunsch 07.10.2026) — das Training von
+// Tag A/B aendert an Tag C/D gar nichts.
 const after=await grab();
 let diff=0;
-before.forEach((x,i)=>{const y=after[i];if(x.di<2)return;if(x.t!==y.t)console.log('  ',x.t,'->',y.t);if(x.has&&!x.orient&&y.orient){diff++;console.log('  FALSCH',x.t,'->',y.t)}});
-ok(diff===0,'Tag C/D: kein Vorwert im gleichen Bereich wird durch einen Wert aus einem anderen Bereich ersetzt');
+before.forEach((x,i)=>{const y=after[i];if(x.di<2)return;if(x.t!==y.t){diff++;console.log('  DIFF',x.t,'->',y.t)}});
+ok(diff===0,'Tag C/D zeigen nach dem Training von Tag A/B in derselben Woche exakt dieselben Vorwerte');
 
 // Woche 2: Vergleich gegen Woche 1 desselben Zyklus (gleicher Bereich)
 await page.evaluate(()=>{const k=mk(S.cy,1,2,0);S.data[k]={...S.data[k],reps:['8','8','7']};S.data[mk(S.cy,1,2,1)]={...S.data[mk(S.cy,1,2,1)],weight:'130',reps:['10','10']};save();S.week=2;render()});
