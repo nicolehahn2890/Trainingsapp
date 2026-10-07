@@ -466,7 +466,7 @@ const DAYBG=["#F4A45E","#F18FB6","#B6DD57","#8CCBE8"];
 // (Marker pv__[Zyklus] in peach_v4, siehe planOf) — sonst lagen die positionsbasierten
 // Daten in den falschen Zeilen.
 const P4=[
-{l:"Tag A – Po Kraft",f:"4–8 Wdh. · Beinvorderseite · Innenschenkel",e:[
+{l:"Tag A – Po Kraft",f:"Beinvorderseite · Innenschenkel",e:[
   {c:"Glute Max",s:3,r:[4,8]},
   {c:"Glute Max",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
@@ -486,7 +486,7 @@ const P4=[
   {c:"Brust",s:2,r:[6,10]},
   {c:"Bauch",s:2,r:[8,12]}
 ]},
-{l:"Tag C – Po & Beinrückseite",f:"6–10 Wdh. · Hüftbeuge · Beinbeuger",e:[
+{l:"Tag C – Po & Beinrückseite",f:"Hüftbeuge · Beinbeuger",e:[
   {c:"Glute Max",s:3,r:[6,10]},
   {c:"Glute Max",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
@@ -496,7 +496,7 @@ const P4=[
   {c:"Schultern",s:2,r:[8,12]},
   {c:"Bauch",s:2,r:[8,12]}
 ]},
-{l:"Tag D – Po-Volumen & Beine",f:"4–8 + 8–12 Wdh. · Beinstrecker · Innenschenkel",e:[
+{l:"Tag D – Po-Volumen & Beine",f:"Beinstrecker · Innenschenkel",e:[
   {c:"Glute Max",s:3,r:[4,8]},
   {c:"Glute Med",s:2,r:[8,12]},
   {c:"Glute & Quad",s:2,r:[8,12]},
@@ -517,7 +517,7 @@ const P4=[
 // Schultern 2x8-12, Bauch. Partnerzeilen duerfen sich in der Satzzahl unterscheiden (Glute Med Tag A/B:
 // 3 Saetze in 3 Tagen, 2 in 4 Tagen) — vererbt werden nur die Zusatzsaetze.
 const P3=[
-{l:"Tag A – Po Kraft",f:"4–8 Wdh. · Beinvorderseite · Rücken · Schultern",e:[
+{l:"Tag A – Po Kraft",f:"Beinvorderseite · Rücken · Schultern",e:[
   {c:"Glute Max",s:3,r:[4,8],t:[0,0]},
   {c:"Glute Max",s:2,r:[8,12],t:[0,1]},
   {c:"Glute Med",s:3,r:[8,12],t:[0,2]},
@@ -528,7 +528,7 @@ const P3=[
   {c:"Schultern",s:3,r:[8,12],t:[1,4]},
   {c:"Bauch",s:2,r:[8,12],t:[0,7]}
 ]},
-{l:"Tag B – Po & Beinrückseite",f:"6–10 Wdh. · Hüftbeuge · Beinbeuger",e:[
+{l:"Tag B – Po & Beinrückseite",f:"Hüftbeuge · Beinbeuger",e:[
   {c:"Glute Max",s:3,r:[6,10],t:[2,0]},
   {c:"Glute Max",s:2,r:[8,12],t:[2,1]},
   {c:"Glute Med",s:3,r:[8,12],t:[2,2]},
@@ -538,7 +538,7 @@ const P3=[
   {c:"Brust",s:2,r:[6,10],t:[1,6]},
   {c:"Bauch",s:2,r:[8,12],t:[2,7]}
 ]},
-{l:"Tag C – Hüfte & Sanduhr",f:"4–8 + 8–12 Wdh. · Glute Med doppelt · Beinstrecker",e:[
+{l:"Tag C – Hüfte & Sanduhr",f:"Glute Med doppelt · Beinstrecker",e:[
   {c:"Glute Max",s:3,r:[4,8],t:[3,0]},
   {c:"Glute Med",s:2,r:[8,12],t:[3,1]},
   {c:"Glute Med",s:2,r:[8,12],t:[1,1]},
@@ -556,7 +556,7 @@ P3.forEach((day,di)=>day.e.forEach((sl,ei)=>{if(sl.t)TWIN4[sl.t[0]+'|'+sl.t[1]]=
 // 3-Tage-Plan Version 2 (26.09.-02.10.2026, 56 Saetze) — nur noch fuer 3-Tage-Zyklen, die damit
 // trainiert wurden (Marker pv__p3cycleN=2, siehe markV3/planOf).
 const P3_V2=[
-{l:"Tag A – Po Kraft",f:"4–8 Wdh. · Beinvorderseite · Innenschenkel",e:[
+{l:"Tag A – Po Kraft",f:"Beinvorderseite · Innenschenkel",e:[
   {c:"Glute Max",s:3,r:[4,8]},
   {c:"Glute Max",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
@@ -566,7 +566,7 @@ const P3_V2=[
   {c:"Schultern",s:2,r:[8,12]},
   {c:"Bauch",s:2,r:[8,12]}
 ]},
-{l:"Tag B – Po & Beinrückseite",f:"6–10 Wdh. · Hüftbeuge · Beinbeuger",e:[
+{l:"Tag B – Po & Beinrückseite",f:"Hüftbeuge · Beinbeuger",e:[
   {c:"Glute Max",s:3,r:[6,10]},
   {c:"Glute Max",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
@@ -576,7 +576,7 @@ const P3_V2=[
   {c:"Brust",s:2,r:[6,10]},
   {c:"Bauch",s:2,r:[8,12]}
 ]},
-{l:"Tag C – Hüfte & Sanduhr",f:"8–12 Wdh. · Glute Med doppelt · Beinstrecker",e:[
+{l:"Tag C – Hüfte & Sanduhr",f:"Glute Med doppelt · Beinstrecker",e:[
   {c:"Glute Max",s:3,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
   {c:"Glute Med",s:2,r:[8,12]},
@@ -1924,7 +1924,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeWeekPick();clo
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-10-07-03';
+const BUILD_ID='2026-10-07-04';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();

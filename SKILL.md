@@ -652,7 +652,8 @@ kniedominante Uebung; Maeo 2021: sitzender Beinbeuger > liegend). Grundsaetze:
 - Athena (FPS) wurde geprueft und bewusst NICHT uebernommen (Aufbau gefiel nicht).
 Saetze sind Startwerte — Auto-Zusatzsatz und +-Button steigern gezielt.
 Tagesnamen = Schwerpunkt, dazu Feld f (Fokus-Zeile) im Plan-Objekt: {l:"Tag A – Po Kraft",
-f:"Po schwer (4–8) · Beinvorderseite · ...",e:[...]}. renderT zeigt f als .day-focus in einer
+f:"Beinvorderseite · Innenschenkel",e:[...]}. Die Fokus-Zeile nennt NUR Schwerpunkte, KEINE
+Wdh.-Bereiche (Wunsch 07.10.2026: "brauche ich nicht" — die Bereiche stehen an jeder Uebung). renderT zeigt f als .day-focus in einer
 eigenen Zeile unter Titel + Uebungs-Pill (volle Breite). Alte Plaene haben kein f.
 
 ### 4 Tage (P4) — 70 Saetze/Woche
@@ -670,7 +671,7 @@ eigenen Zeile unter Titel + Uebungs-Pill (volle Breite). Alte Plaene haben kein 
 Woche: Glute Max 15, Glute & Quad 5, Glute & Hams 7, Glute Med 10, Beinbeuger 3,
 Beinstrecker 2, Adduktoren 4, Ruecken 7, Schultern 7, Brust 2, Bauch 8 (keine Arme im 4-Tage-Plan).
 Pro Tag 18/18/19/15 Saetze (8/8/8/7 Uebungen). Tag D: Glute Max 3x4-8 statt 3x8-12 (Wunsch 07.10.2026,
-schwerer Hueftstoss auch an Tag D), Fokus-Zeile "4–8 + 8–12 Wdh. · Beinstrecker · Innenschenkel".
+schwerer Hueftstoss auch an Tag D), Fokus-Zeile "Beinstrecker · Innenschenkel".
 Glute Max pro Woche nach Bereich: 4-8 6, 6-10 3, 8-12 6. Tag A: ZWEITE Glute-Med-Zeile 2x8-12 direkt nach der
 ersten (Wunsch 04.10.2026) — gedacht fuer eine andere Uebung/einen anderen Winkel als die erste
 (z. B. Abduktionsmaschine vorgeneigt + Kabel Abduktion stehend). Keine 3-Tage-Partnerzeile. BEINBEUGER NUR EINMAL PRO WOCHE mit 3 Saetzen
@@ -709,7 +710,7 @@ In Klammern die Partnerzeile im 4-Tage-Plan (t).
 Woche: Glute Max 13, Glute & Quad 5, Glute & Hams 7, Glute Med 10, Beinbeuger 3,
 Beinstrecker 2, Adduktoren 4, Ruecken 5, Schultern 5, Brust 2, Bauch 6.
 Pro Tag 23/20/19 Saetze (9/8/9 Uebungen). Tag C: Glute Max 3x4-8 statt 3x8-12 (Wunsch 07.10.2026, wie
-4-Tage Tag D), Fokus-Zeile "4–8 + 8–12 Wdh. · Glute Med doppelt · Beinstrecker". Glute Max pro Woche nach
+4-Tage Tag D), Fokus-Zeile "Glute Med doppelt · Beinstrecker". Glute Max pro Woche nach
 Bereich: 4-8 6, 6-10 3, 8-12 4. Partnerzeilen duerfen sich in der Satzzahl unterscheiden
 (Glute Med A3/C3: 3 Saetze hier, 2 im 4-Tage-Plan) — Kategorie und Wdh.-Bereich muessen gleich sein. Keys p3cycle1-6, gleiche Regeln wie P4.
 Tagesfarben: A Peach, B Pink, C Lime (D Sky nur im 4-Tage-Plan).
@@ -886,6 +887,10 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Fokus-Zeilen ohne Wdh.-Bereiche (07.10.2026, Version 2026-10-07-04).** Wunsch: die Bereiche unter
+   den Tagesnamen ("4–8 Wdh. · …") braucht es nicht — sie stehen an jeder Uebung. Entfernt in P4, P3 und
+   P3_V2 (z. B. "Beinvorderseite · Innenschenkel"). Test in glute-max-48 (Plan + Anzeige).
 
 NEU. **Glute Max 4-8 statt 8-12: 4 Tage Tag D, 3 Tage Tag C (07.10.2026, Version 2026-10-07-03).**
    Wunsch: auch an Tag D (bzw. 3-Tage Tag C, Partnerzeile) schwer. Saetze und Volumen unveraendert, nur der

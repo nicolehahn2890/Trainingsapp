@@ -18,10 +18,11 @@ const vor=(di,ei)=>page.evaluate(([di,ei])=>{const s=exState(di,ei);return{w:s.p
 
 // 1. PLAENE
 await page.goto(PEACH_URL);
-const pl=await page.evaluate(()=>({d:P4[3].e[0],c:P3[2].e[0],dl:P4[3].f,cl:P3[2].f,aOld:P4_V1[3].e[0].r.join('-')}));
+const pl=await page.evaluate(()=>({d:P4[3].e[0],c:P3[2].e[0],fs:[...P4,...P3,...P3_V2].map(x=>x.f||'')}));
 ok(pl.d.c==='Glute Max'&&pl.d.s===3&&pl.d.r.join('-')==='4-8','4 Tage Tag D: Glute Max 3x4-8');
 ok(pl.c.c==='Glute Max'&&pl.c.s===3&&pl.c.r.join('-')==='4-8'&&pl.c.t.join()==='3,0','3 Tage Tag C: Glute Max 3x4-8, Partner 4-Tage Tag D');
-ok(pl.dl.startsWith('4–8 + 8–12')&&pl.cl.startsWith('4–8 + 8–12'),'Fokus-Zeilen nennen 4–8 + 8–12');
+// Fokus-Zeilen unter den Tagesnamen ohne Wdh.-Bereiche (Wunsch 07.10.2026)
+ok(pl.fs.every(f=>f&&!/Wdh|\d/.test(f)),'Fokus-Zeilen ohne Wdh.-Bereiche: '+pl.fs.join(' | '));
 
 // 2. UMRECHNUNG: Nicoles Zyklus 2 — W1 4 Tage, W2 3 Tage (Tag D/Tag C mit 8-12 trainiert), W3 4 Tage leer.
 // Alter Zyklus 1 (Marker) bleibt unberuehrt.
@@ -40,6 +41,10 @@ ok(!d['cycle1__w12__d3__e0'].r0&&d['cycle1__w12__d3__e0'].weight==='118','Alter 
 ok(d['cycle2__w1__d3__e0'].weight==='115'&&d['cycle2__w1__d3__e0'].reps.join()==='12,11,10','Werte unveraendert');
 const snap=sorted(d);await page.reload();await page.waitForTimeout(250);
 ok(sorted(await st())===snap,'Neustart aendert nichts mehr (Umrechnung nur einmal)');
+
+// Anzeige: keine Zahlen in den Fokus-Zeilen der Tage
+const foc=await page.$$eval('.day-focus',e=>e.map(x=>x.textContent));
+ok(foc.length===4&&foc.every(f=>!/Wdh|\d/.test(f)),'Tages-Kopf zeigt keine Wdh.-Bereiche: '+foc.join(' | '));
 
 // 3. ANZEIGE + VORWERT
 let v=await vor(3,0);console.log('  W3 Tag D:',v.r,v.w,v.src,v.orient?'(Orientierung '+v.rr+')':'');
