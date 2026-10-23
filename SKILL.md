@@ -38,7 +38,8 @@ auf main einmalig eine Sicherheitsfreigabe verlangen; dann kurz bestaetigen lass
 - Live-URL: https://nicolehahn2890.github.io/Trainingsapp/
 - Repository: github.com/nicolehahn2890/Trainingsapp
 - Technologie: Standalone HTML-Datei (kein Framework, kein Build-Schritt)
-- Repo-Dateien: index.html (App), apple-touch-icon.png (Home-Screen-Icon),
+- Repo-Dateien: index.html (App), apple-touch-icon.png (Home-Screen-Icon), rex-apfel.webp +
+  rex-apfel-kopf.webp (Maskottchen Rex, siehe App-Ebene "Rex"),
   manifest.json (display:browser — Icon oeffnet Safari, NICHT standalone!),
   Peach_Project.pdf (Original-Handbuch des Trainers, 41 Seiten — nicht aendern), SKILL.md
   (diese Datei), tests/ (Browser-Tests, siehe Abschnitt Tests)
@@ -67,15 +68,49 @@ auf main einmalig eine Sicherheitsfreigabe verlangen; dann kurz bestaetigen lass
   runde Pills. KEIN Verlauf (gradient), KEIN Glow, KEIN Blur.
 - ALLE Tokens liegen als CSS-Variablen in EINEM `:root` (kein :root.light/.dark mehr).
 - **NIEMALS Hex-Farben hart in CSS-Klassen schreiben — immer `var(--...)`.** In JS-HTML-
-  Strings Tokens als `var(--peach)` etc. nutzen; nur die datengetriebenen Farben (Kategorie
-  CC, Tagesfarbe DAYBG, pbadge/rcol-Performance) sind als Hex in JS hinterlegt.
+  Strings Tokens als `var(--accent)` etc. nutzen; nur die Kategorie-Farben CC sind als Hex in JS
+  hinterlegt (DAYBG, pbadge und rcol laufen seit 23.10.2026 ueber Tokens, siehe App-Ebene "Rex").
 - "Press"-Interaktion: Buttons mit Klasse `nb-shadow` ruecken auf :active um translate(2px,2px)
   und ihr Schatten kollabiert auf --sh-press (1px). Neue Schatten-Buttons brauchen diese Klasse.
-- Fokus-Ring (a11y): globales `:focus-visible` = 3px solid var(--focus) (Peach) + 2px Offset,
+- Fokus-Ring (a11y): globales `:focus-visible` = 3px solid var(--accent) (Rex-Pink) + 2px Offset,
   mit !important — NICHT durch outline:none uebersteuern, der Ring soll ueberall erscheinen.
 - Disabled-Buttons: globales `button:disabled` = flach & cream (var(--cream)-Hintergrund,
   var(--text-dim) Text+Rahmen, kein Schatten, kein Press-Transform, cursor not-allowed).
 - Badges (.cat-badge Kategorie, .pbadge Fortschritt): 12px (von 10px erhoeht — Lesbarkeit).
+
+### App-Ebene "Rex" (Maskottchen, seit 23.10.2026) — Designsystem bleibt Basis
+Ausdruecklicher Wunsch: Das Peach-Designsystem (Neobrutalism, Claude-Design-Projekt "Peach Project -
+Neobrutalism") wird NICHT angefasst und bleibt die Grundlage. Nur die App bekommt den mittleren Rex
+aus Florians Motiv ("Apfel", Po von hinten) als Maskottchen und dazu passende Farben.
+- Im `:root` stehen OBEN unveraendert die Tokens des Designsystems (--peach, --pink, --lilac, --sky,
+  --yellow, --bg, --green, --prog-* ...). Diese Werte NIE aendern (tests/rex-maskottchen prueft das).
+  DARUNTER im selben :root die App-Ebene: Rex-Farben (Werte wie im Rexy-System) und Rollen-Tokens.
+  CSS und JS nutzen die ROLLEN, nicht die Basis-Farben direkt.
+- Rex-Farben: --rex-pink #F6409F, --rex-cyan #22E3F0, --rex-yellow #FAF22E, --rex-lime #B5F23D,
+  --rex-green #4FD06A, --rex-blue #4D9DF5, --rex-red #FF5C5C, --rex-rose #FA9ECC / --rex-rose-pale
+  #FDE7F2 (hell/dunkel-Abstufung der Rex-Haut).
+- Rollen: --header-bg (rose) · --page-bg (rose-pale, body) · --head-accent (Cyan: aktiver Tab, aktive
+  Plan-Pill, Logo-Pill — Wunsch: nie Pink auf Pink) · --arrow-bg (Cyan, Wochenpfeile) · --accent
+  (Rex-Pink: Knoepfe im Inhalt, Dropdown-Auswahl, Sheet-Hauptknopf, Wochenbalken, aktuelle Woche in der
+  Uebersicht, Fokus-Ring) · --highlight (Rex-Gelb: Zahnrad, offener Tipp, Banner Woche 12) ·
+  --day-a..d (A Lila, B Rex-Pink, C Rex-Gelb, D Rex-Cyan) · --bar-past (rose: andere Wochen in der
+  Uebersicht + "hat Werte" in der Wochenwahl) · --st-up/-reps/-same/-down (Status, knallig wie Rexy:
+  gruen/blau/neongelb/rot — Rep-Felder rcol, Badges, Erledigt-Haken, voller Wochenbalken, Speicher-
+  Warnung). Backup-Karte --rex-cyan, Satz-hinzufuegen --rex-lime.
+- Bewusst unveraendert: Kategorie-Farben CC, Cream-Flaechen, Felder, Text-Rampe, Fonts, Rahmen,
+  Schatten, Radien, Layout. Gruene TEXTE (kg-Zugewinn/"Aktuell" in der Uebersicht) bleiben --green
+  (#6FC36A) — das knallige Rexy-Gruen waere als Text auf Cream zu blass.
+- Peach-Orange kommt in der App nicht mehr vor (Wunsch: Tag A Lila statt Pastell-Orange). Lila nur
+  noch als Tag A — Kopf/Seite in Lila waren "zu lila, nicht im Rex-Bild".
+- Bilder (aus dem Rexy-Designsystem, Artefakt "Rexy - Neobrutalism", Gruppe Rexe, unveraendert
+  uebernommen): rex-apfel.webp (500x720, ganzer Rex) und rex-apfel-kopf.webp (300x300, Kopf).
+  Regeln wie in Rexy: immer im ink-Rahmen (--bw; ganzer Rex --r-md, Kopf rund), NIE freistellen
+  (der Hintergrund gehoert zum Motiv; Freisteller schnitt die Fuesse ab), nicht umfaerben, spiegeln
+  oder neu zuschneiden, KEIN Schriftzug ("APFEL-PO" ausdruecklich nicht). Nur der Apfel-Rex.
+- Platzierung (sparsam): Kopf im Header (.logo-badge 44px rund, statt Pixel-Pfirsich) und ganzer Rex
+  links in der Wochen-Karte (.wp-rex 68px). Die Wochen-Karte ist wie bisher nur sichtbar, wenn es in
+  der Woche Vergleiche gibt (Woche 1 nie) — der Rex kommt mit ihr. NICHT unten an die Tagesliste haengen
+  (wirkte "angehaengt") und NICHT in die Uebersicht ("das ganze Bild nochmal wirkt zu viel").
 
 ### Fonts
 - Display (Logo, Screen-Titel, Tag-Titel, grosse Zahlen): **Archivo Black**, UPPERCASE,
@@ -83,7 +118,7 @@ auf main einmalig eine Sicherheitsfreigabe verlangen; dann kurz bestaetigen lass
 - Body / UI: **Space Grotesk** (Gewichte 400–700; NICHT 800 — sonst faux-bold) → `--font-sans`
 - Beide via Google Fonts CDN im <head>. Alle Inputs bleiben 16px (iOS-Anti-Zoom).
 
-### Farb-Tokens (Auszug — vollstaendige Liste im :root von index.html)
+### Farb-Tokens des Designsystems (Basis, Werte nie aendern — die App nutzt die Rollen oben)
 Ink (Rahmen / Schatten / Text auf Bloecken): --ink #181016
 Bright-Palette: --peach #F4A45E (Primaer), --pink #F18FB6, --lilac #B49DF2 (Header),
   --lime #B6DD57, --sky #8CCBE8, --yellow #F5CB44, --cream #FBF3E7
@@ -93,8 +128,9 @@ Radien: --r-sm 10 / --r-md 12 / --r-lg 16 / --r-xl 20 / --r-pill 999. Rahmenbrei
 Schatten (solid Ink, kein Blur): --sh-xs 2px / --sh-sm 3px / --sh-card 4px /
   --sh-header 0 3px / --sh-drop 5px / --sh-press 1px.
 
-### Tagesfarben (DAYBG — je Tag-Card eine Farbe)
-Tag A Peach #F4A45E · Tag B Pink #F18FB6 · Tag C Lime #B6DD57 · Tag D Sky #8CCBE8
+### Tagesfarben (DAYBG — je Tag-Card eine Farbe, Tokens --day-a..d)
+Tag A Lila #B49DF2 · Tag B Rex-Pink #F6409F · Tag C Rex-Gelb #FAF22E · Tag D Rex-Cyan #22E3F0
+(bis 23.10.2026: Peach / Pink #F18FB6 / Lime / Sky)
 Die Tages-Count-Pill ist ink mit der Tagesfarbe als Textfarbe (✓-Praefix wenn komplett);
 in der Uebersicht ist das Tages-Label eine Pille in der jeweiligen Tagesfarbe.
 
@@ -104,20 +140,24 @@ in der Uebersicht ist das Tages-Label eine Pille in der jeweiligen Tagesfarbe.
   Trizeps #93B6E0, Bauch #D6D080, Beinbeuger #D7A0E8 (Orchidee), Beinstrecker #F9B98A (Apricot)
 
 ### Fortschritts-Farben (pbadge = solide Pill; rcol = ganzes Rep-Feld gefuellt)
-  Gruen #6FC36A = Gewicht gesteigert (--prog-up)
-  Blau  #5EA8E0 = Mehr Reps (--prog-reps)
-  Gelb  #F5CB44 = Gleiche Leistung (--prog-same)
-  Rot   #EC6A6A = Weniger als Vorwoche (--prog-down)
+In der App seit 23.10.2026 die knalligen Rexy-Werte ueber --st-* (Wunsch: "zu pastellig"); die
+Designsystem-Tokens --prog-* (#6FC36A / #5EA8E0 / #F5CB44 / #EC6A6A) bleiben unveraendert stehen.
+  Gruen    #4FD06A = Gewicht gesteigert / Rep-Feld an der Obergrenze (--st-up)
+  Blau     #4D9DF5 = Mehr Reps (--st-reps)
+  Neongelb #FAF22E = Gleiche Leistung / Rep-Feld im Bereich (--st-same, gleich wie das Zahnrad)
+  Rot      #FF5C5C = Weniger als Vorwoche / Rep-Feld darunter (--st-down)
 
 ### Marke / Assets
-Logo: Pixel-Art-Pfirsich SVG 16x16 (crispEdges), eingefasst in einen 40px Cream-Kreis-Block.
-Favicon: Pfirsich-Emoji als SVG-Data-URI im <head>.
-Home-Screen-Icon: apple-touch-icon.png (180x180), verlinkt mit apple-mobile-web-app-title.
-  Neues Neobrutalism-Motiv: Pixel-Pfirsich in einem Cream-Kreis mit 7px Ink-Rahmen + hartem
-  Schatten auf Lilac-Hintergrund (#B49DF2) — spiegelt den Header. Vollflaechig (kein
-  transparenter Rand), iOS rundet die Ecken selbst. Erzeugt durch Rendern eines kleinen
-  Icon-HTML mit Puppeteer (Viewport 180x180, dsf 1) -> Screenshot als PNG.
-theme-color-Meta + manifest sind jetzt hell (#B49DF2 / #E9DEF8).
+Logo (seit 23.10.2026): Rex-Kopf (rex-apfel-kopf.webp) rund im 44px-ink-Rahmen mit --sh-xs.
+  Der Pixel-Pfirsich (16x16-SVG) ist aus der App raus, bleibt aber im Designsystem (assets/peach-logo.svg).
+Favicon: Pfirsich-Emoji als SVG-Data-URI im <head> (unveraendert).
+Home-Screen-Icon: apple-touch-icon.png (180x180), verlinkt mit apple-mobile-web-app-title und
+  ?v=rex (Cache-Bremse fuer das neue Motiv; bei einem neuen Icon den Wert aendern, auch im Manifest).
+  Motiv seit 23.10.2026: Rex-Kopf in einem Kreis mit 7px Ink-Rahmen + hartem 7px-Schatten auf
+  Rosa (#FA9ECC) — spiegelt den Header. Vollflaechig (kein transparenter Rand), iOS rundet die Ecken
+  selbst. Erzeugt durch Rendern eines kleinen Icon-HTML mit Playwright (Viewport 180x180, dsf 3) ->
+  Screenshot, mit Lanczos auf 180x180 verkleinert. (Davor: Pixel-Pfirsich im Cream-Kreis auf Lilac.)
+theme-color-Meta + manifest: theme_color #FA9ECC (Kopf), background_color #FDE7F2 (Seite).
 WICHTIG (localStorage!): Seit iOS 16.4 oeffnet Apple JEDES Home-Screen-Lesezeichen
 standardmaessig als eigenstaendige Web-App mit EIGENEM (leerem) localStorage-Container —
 auch ohne apple-mobile-web-app-capable. Die Trainingsdaten liegen aber in Safari!
@@ -336,7 +376,7 @@ togWeekPick(ev)         Tipp auf "W x / 12" (#week-label, jetzt ein Button) oeff
                         Tipp daneben, Esc und den Pfeilen). Die Pfeile bleiben zusaetzlich.
 toggleDay(di)           Accordion: andere Tage schliessen sich automatisch (setzt S.animDay fuer Animation)
 onDS(di,ei,v)           Dropdown-Suche — stellt nach renderT() Fokus + Cursor im Suchfeld wieder her
-dsKey(di,ei,e)          Tastatur im Dropdown-Suchfeld: Pfeile bewegen .hl-Highlight (Peach), Enter
+dsKey(di,ei,e)          Tastatur im Dropdown-Suchfeld: Pfeile bewegen .hl-Highlight (--accent), Enter
                         waehlt, Esc schliesst — reines DOM-Update, kein renderT
 updSetting(di,ei,v)     Speichert Maschinen-Einstellung unter set__ex__[Name] — KEIN renderT!
                         Leerer Wert loescht den Key. Feld (.set-input, Zahnrad-Symbol) erscheint
@@ -507,10 +547,11 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
 - Beide werden bei Rep-Eingabe LIVE per refreshDone() aktualisiert (gezieltes DOM-Update, kein renderT)
 - Rep-Feld (.rep-inp): leer = weiss; ausgefuellt wird das GANZE Feld mit der Performance-Farbe
   gefuellt (rcol: rot unter Bereich, gelb im Bereich, gruen am/ueber Top), Text bleibt ink
-- Fortschritt-Block (.week-progress): Cream-Block mit grosser %-Zahl (Archivo Black) + Kapsel-Bar
-  (Peach-Fuellung, gruen bei 100%)
+- Fortschritt-Block (.week-progress, Flex): links der ganze Rex (.wp-rex, 68px, ink-Rahmen), rechts
+  (.wp-main) grosse %-Zahl (Archivo Black) + Kapsel-Bar (--accent Rex-Pink, gruen --st-up bei 100%).
+  refreshWeekBar zieht nur die ids nach (wp-box/wp-pct/wp-bar/wp-sub), der Rex bleibt stehen.
 - Uebersicht: vertikale Kapsel-Balken (.ov-bar = Pill-Track, .ov-bar-fill von unten) —
-  aktuelle Woche (S.week) Peach, andere Wochen Lilac, Wochen mit einer ANDEREN Uebung grau
+  aktuelle Woche (S.week) --accent, andere Wochen --bar-past (rosa), Wochen mit einer ANDEREN Uebung grau
   (--text-ghost). Titel = zuletzt trainierte Uebung; kg-Zugewinn und Start/Aktuell zaehlen nur
   Wochen MIT DIESER Uebung UND diesem Wdh.-Bereich (r0), darunter die Zeile "Davor: … (grau, nicht eingerechnet)"
 - Animationen: fadeSlide (Ansicht/Tag aufklappen), dropIn (Dropdown nur beim Oeffnen, nicht bei Suche)
@@ -528,7 +569,7 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
 - Label "nur diese Woche" (.once-chip, gestrichelter weisser Pill) in der Status-Zeile (.ex-status),
   wenn der Eintrag ein einmaliger Wechsel ist (Feld base). Die Status-Zeile zeigt sich auch nur mit Label.
 - Abfrage-Fenster (#sheet): Cream-Block unten mit Ink-Rahmen und hartem Schatten auf dunklem
-  Schleier (--scrim); Hauptaktion Peach (.sheet-btn.pri), Abbrechen als unterstrichener Text.
+  Schleier (--scrim); Hauptaktion --accent (.sheet-btn.pri), Abbrechen als unterstrichener Text.
   Genutzt fuer den Uebungswechsel und das Umstellen einer Woche mit Werten auf 3/4 Tage.
 - Plan-Pills "3 Tage"/"4 Tage" gelten fuer die angezeigte Woche (title "Gilt für diese Woche").
 - Tipp-Panel: Standard-Tipp (TIPS) immer sichtbar; eigene Notiz (tip__ex__) darunter mit
@@ -741,7 +782,7 @@ Pro Tag 23/20/19 Saetze (9/8/9 Uebungen). Tag C: Glute Max 3x4-8 statt 3x8-12 (W
 4-Tage Tag D), Fokus-Zeile "Glute Med doppelt · Beinstrecker". Glute Max pro Woche nach
 Bereich: 4-8 6, 6-10 3, 8-12 4. Partnerzeilen duerfen sich in der Satzzahl unterscheiden
 (Glute Med A3/C3: 3 Saetze hier, 2 im 4-Tage-Plan) — Kategorie und Wdh.-Bereich muessen gleich sein. Keys p3cycle1-6, gleiche Regeln wie P4.
-Tagesfarben: A Peach, B Pink, C Lime (D Sky nur im 4-Tage-Plan).
+Tagesfarben: A Lila, B Rex-Pink, C Rex-Gelb (D Rex-Cyan nur im 4-Tage-Plan).
 Aenderung zu V2: Tag A + Glute & Hams 2x4-8, Ruecken und Schultern je 3 statt 2 Saetze;
 Tag B und Tag C unveraendert. P4-Zeilen OHNE Partner: Tag A zweite Glute-Med-Zeile, Tag B Glute Max,
 Ruecken 2x8-12, Schultern 2x8-12, Bauch (erben in 4-Tage-Wochen aus der letzten 4-Tage-Woche).
@@ -851,7 +892,7 @@ Rexi macht KEINE Deload-Woche. Woche 12 ist eine ganz normale Trainingswoche und
 genauso verglichen wie Woche 2-11 (Badge, Hinweis, Wochenbalken). NIEMALS wieder eine
 Deload-Empfehlung (50-60 % Gewicht, 2 Saetze o. ae.) einbauen und Woche 12 nicht als
 Orientierungs-Quelle ueberspringen — sie ist der echte letzte Wert vor dem neuen Zyklus.
-Banner in Woche 12: gelber Block (var(--yellow)), 2,5px Ink-Rahmen, harte Schatten
+Banner in Woche 12: gelber Block (var(--highlight), Rex-Neongelb), 2,5px Ink-Rahmen, harte Schatten
 (--sh-card), Titel "🏁 Letzte Woche von Zyklus N" in Archivo Black. Text EIN Satz: "Danach geht
 es mit Zyklus X weiter." bzw. (alter Zyklus -> naechster neu) "Danach startet Zyklus X mit dem
 neuen Plan – deine Übungen werden übernommen."  Nach Zyklus 6
@@ -933,6 +974,18 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Rex als Maskottchen + Rex-Farben (23.10.2026, Version 2026-10-23-02).** Wunsch: der mittlere Rex
+   ("Apfel", Motiv von Florian) als Maskottchen, Farben daran angepasst — das Peach-Designsystem bleibt
+   unveraendert Basis (siehe Abschnitt App-Ebene "Rex"). Umsetzung: Rex-Kopf statt Pixel-Pfirsich im
+   Header, ganzer Rex links in der Wochen-Karte; Kopf rosa / Seite hellrosa, Knoepfe im Kopf Cyan, Akzent
+   im Inhalt Rex-Pink, Tage Lila / Rex-Pink / Rex-Gelb / Rex-Cyan, Status-Farben knallig wie Rexy, neues
+   Home-Screen-Icon (Rex-Kopf auf Rosa, ?v=rex), theme-color/Manifest angepasst (display bleibt browser).
+   Bilder 1:1 aus dem Rexy-Designsystem. Verworfen auf dem Weg (nicht wieder vorschlagen): Freisteller
+   (Fuesse fehlten), Rex-Karte unter den Tagen ("angehaengt"), Rex im Kopf der Uebersicht ("zu viel"),
+   Kopf Tuerkis ("zu knallig"), Kopf/Seite Lila ("nicht im Rex-Bild"), Pink auf Pink im Kopf.
+   Keine Logik- oder Datenaenderung. Neuer Test tests/rex-maskottchen.test.js (u. a. Basis-Tokens
+   unveraendert, 375/390/430 px; gegen den alten Stand rot); alle 19 Testreihen gruen.
 
 NEU. **B-Stance RDL statt Single-Leg RDL (23.10.2026, Version 2026-10-23-01).** Wunsch: B-Stance RDL als
    Auswahl in Glute & Hams, Single-Leg RDL raus. Neue Uebung mit ausfuehrlichem Tipp (Stand + Ausfuehrung, Reps
