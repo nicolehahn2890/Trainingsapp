@@ -1326,7 +1326,15 @@ function renderT(){
   document.getElementById('view-training').innerHTML=h;
 }
 
-// Rex-Moment "Training geschafft" (Reaktion "Puh") am Ende des offenen Tages, sobald alle Uebungen
+// Rex-Reaktionen fuer "Training geschafft" (Rexy-Kit). Wechseln pro Training, nicht pro Render: gleiches
+// Training = gleiches Gesicht; Zaehler Zyklus*12 + Woche + Tag -> zwei Trainings nacheinander nie gleich
+// (auch ueber Wochen- und Zyklusgrenzen, 3 und 4 Tage). Wow bleibt dem Banner Woche 12 vorbehalten.
+const REX_DONE=['rex-puh.webp','rex-happy.webp','rex-love.webp','rex-wink.webp'];
+function rexDoneImg(di){
+  const cn=parseInt(cyBase().replace('cycle',''))||1;
+  return REX_DONE[(cn*12+S.week+di)%REX_DONE.length];
+}
+// Rex-Moment "Training geschafft" am Ende des offenen Tages, sobald alle Uebungen
 // eingetragen sind. Gesteigert zaehlt wie weekStats. Offen ist immer nur ein Tag -> hoechstens einer.
 // Auch in Woche 12 neben dem Wow-Banner: bewusste Ausnahme von Rexys "hoechstens ein Rex-Moment pro Ansicht" (Wunsch).
 function rexDayHTML(di){
@@ -1339,7 +1347,7 @@ function rexDayHTML(di){
     cmp++;if(st.p==='w'||st.p==='r')imp++;
   });
   if(done<total)return '';
-  return '<div class="rex-moment"><img src="rex-puh.webp" alt="" width="64" height="64" decoding="async"/>'
+  return '<div class="rex-moment"><img src="'+rexDoneImg(di)+'" alt="" width="64" height="64" decoding="async"/>'
     +'<div class="rm-text"><span class="rm-ttl">Training geschafft</span><span class="rm-sub">'+total+' von '+total+' Übungen eingetragen'+(cmp?', '+imp+' davon gesteigert':'')+'.</span></div></div>';
 }
 // Live nachziehen (KEIN renderT); _h merkt sich den Stand, damit das Bild nicht bei jeder Eingabe neu laedt
@@ -1964,7 +1972,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeWeekPick();clo
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-10-23-09';
+const BUILD_ID='2026-10-23-10';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();

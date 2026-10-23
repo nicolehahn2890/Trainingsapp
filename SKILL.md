@@ -39,7 +39,8 @@ auf main einmalig eine Sicherheitsfreigabe verlangen; dann kurz bestaetigen lass
 - Repository: github.com/nicolehahn2890/Trainingsapp
 - Technologie: Standalone HTML-Datei (kein Framework, kein Build-Schritt)
 - Repo-Dateien: index.html (App), apple-touch-icon.png (Home-Screen-Icon = Rexy-App-Icon), rex-sanduhr.webp
-  (Maskottchen Rex im Kopf, siehe App-Ebene "Rex"), rex-puh.webp / rex-wow.webp (Rex-Reaktionen, siehe Rex-Momente),
+  (Maskottchen Rex im Kopf, siehe App-Ebene "Rex"), rex-puh/-happy/-love/-wink/-wow.webp (Rex-Reaktionen, siehe
+  Rex-Momente),
   manifest.json (display:browser — Icon oeffnet Safari, NICHT standalone!),
   Peach_Project.pdf (Original-Handbuch des Trainers, 41 Seiten — nicht aendern), SKILL.md
   (diese Datei), tests/ (Browser-Tests, siehe Abschnitt Tests)
@@ -144,15 +145,23 @@ Rexy ordnet Sanduhr die Zielfarbe Gelb zu; der App-Akzent bleibt bewusst Rex-Pin
   .rex-moment = Block mit ink-Rahmen, --r-lg, --sh-card, Reaktion 64 px links (alt leer), Titel Bowlby One SC
   16px, ein Satz Inter 14px/500. Hoechstens EINER pro Ansicht — einzige Ausnahme Woche 12 (siehe 1.). Nur an
   zwei Stellen:
-  1. "Training geschafft" (rex-puh.webp, auf --block-bg) am Ende des OFFENEN Tages (#rm-[di] in .day-body),
+  1. "Training geschafft" (auf --block-bg) am Ende des OFFENEN Tages (#rm-[di] in .day-body),
      sobald alle Uebungen erledigt sind (exDone): "8 von 8 Übungen eingetragen, 4 davon gesteigert." (Teil
      "davon gesteigert" nur mit Vergleich; gezaehlt wie weekStats). rexDayHTML(di) baut ihn, refreshRex(di)
      zieht ihn LIVE nach (aus refreshDone UND refreshProg, KEIN renderT; el._h verhindert Neuladen des Bildes).
      Offen ist immer nur ein Tag (toggleDay) -> hoechstens einer. AUCH in Woche 12 (Wunsch, Version -09):
-     dort stehen dann bewusst zwei Rexe — "Puh" im Tag und "Wow" im Banner. Nicht wieder abschalten.
+     dort stehen dann bewusst zwei Rexe — "Training geschafft" im Tag und "Wow" im Banner. Nicht wieder abschalten.
+     Gesicht WECHSELT (Wunsch, Version -10: "nicht immer das gleiche"): REX_DONE = Puh, Happy, Love, Wink;
+     rexDoneImg(di) waehlt REX_DONE[(Zyklusnummer*12 + Woche + Tag) % 4]. Pro TRAINING fest (neu zeichnen,
+     Tag zu/auf, spaeter wieder ansehen -> gleiches Gesicht), zwei Trainings nacheinander nie gleich — auch
+     ueber Wochen-/Zyklusgrenzen und in 3- wie 4-Tage-Wochen (Abstand letzter Tag -> erster Tag = 1 oder 2).
+     Bewusst NICHT im Wechsel: Wow (gehoert dem Banner Woche 12, sonst doppelt), Let's go (vor dem Training),
+     Sleepy (Ruhetag), Lachflash (Lachtraene sieht klein aus wie der Schweisstropfen von Puh). Kein Zufall pro
+     Render (renderT laeuft oft, das Gesicht wuerde springen).
   2. Banner Woche 12 (#cy-end, rex-wow.webp, auf --highlight), siehe Zyklus-Ende-Banner.
-  Bilder: Rexy-Reaktionen E05-puh / E07-wow (1254 px, freigestellt) mit Lanczos auf 192x192 (64 px @3x)
-  verkleinert, WebP. Nie auf Pink stellen (Rex-Haut verschwindet), nie umfaerben.
+  Bilder: Rexy-Reaktionen E05-puh, E01-happy, E03-love, E02-wink, E07-wow (1254 px, freigestellt) mit Lanczos
+  auf 192x192 (64 px @3x) verkleinert, WebP (rex-puh/-happy/-love/-wink/-wow.webp). Nie auf Pink stellen
+  (Rex-Haut verschwindet), nie umfaerben.
   Verworfen (nicht wieder vorschlagen): runder Rex-Kopf im Header ("erkennt man nicht"), Rex-Karte unter
   den Tagen ("angehaengt"), Rex im Kopf der Uebersicht ("zu viel"), Rex in der Wochen-Karte (doppelt),
   Apfel-Rex (Verwechslung), Freisteller im Kopf (wirkt verloren), Freisteller vor gelbem Block mit Kopf
@@ -1052,6 +1061,12 @@ claude.ai. Frontmatter (name, description) dabei unveraendert lassen.
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Wechselnde Rex-Gesichter bei "Training geschafft" (23.10.2026, Version 2026-10-23-10).** Wunsch: nicht
+   immer dasselbe Gesicht. REX_DONE = Puh, Happy, Love, Wink (Rexy-Kit E05/E01/E03/E02, 192 px WebP),
+   rexDoneImg(di) waehlt pro Training (Zyklus*12 + Woche + Tag), stabil beim Neuzeichnen, nie zweimal
+   hintereinander gleich. tests/rex-maskottchen prueft Gesicht je Training, Stabilitaet, Wechsel ueber zwei
+   Zyklen mit 3/4-Tage-Wochen und das Laden aller Bilder.
 
 NEU. **"Training geschafft" auch in Woche 12 (23.10.2026, Version 2026-10-23-09).** Wunsch: der Puh-Rex soll
    auch in Woche 12 kommen — bewusste Ausnahme von Rexys "hoechstens ein Rex-Moment pro Ansicht" (dort steht

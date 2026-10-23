@@ -4,8 +4,9 @@
 // Sanduhr-Rex als gerahmte Comic-Kachel im Kopf (Flos Hintergrund, 112 px / 104 px bis 380 px / 84 px ab
 // 425 px), Kopf rosa mit tuerkisen Knoepfen, Seite hellrosa, Bloecke in Kit-Creme, Tagesfarben (A Kit-Lila)
 // + Pill-Schrift, Rexy-Kategorie- und Status-Farben, Stern als Gold-Scheibe, Fokus-Ring ink,
-// Wochen-Karte OHNE Rex-Bild (Woche 1 ohne Karte), Rex-Reaktionen ("Puh" bei komplettem Tag, live; "Wow"
-// im Banner Woche 12, dort als Ausnahme zusaetzlich "Puh"), Uebersicht OHNE Bild mit tuerkisen Vorwochen,
+// Wochen-Karte OHNE Rex-Bild (Woche 1 ohne Karte), Rex-Reaktionen ("Training geschafft" bei komplettem Tag,
+// live, Gesicht wechselt pro Training: Puh/Happy/Love/Wink, nie zweimal hintereinander; "Wow" im Banner
+// Woche 12, dort als Ausnahme zusaetzlich "Training geschafft"), Uebersicht OHNE Bild mit tuerkisen Vorwochen,
 // theme-color, Rexy-App-Icon/Manifest (display:browser!), kein Ueberlauf auf 375/390/430 px.
 // Peach-App Browser-Test — Aufruf ueber tests/run.sh (startet den lokalen Server).
 const { chromium } = (()=>{try{return require('playwright')}catch(e){return require('/opt/node22/lib/node_modules/playwright')}})();
@@ -94,19 +95,32 @@ for(const W of [390,375,430]){
       const rm=document.querySelector('#rm-0 .rex-moment'),img=rm&&rm.querySelector('img');
       return{before:before,txt:rm?rm.innerText:'',src:img&&img.getAttribute('src'),pill:document.getElementById('dc-0').textContent};
     });
-    ok(rmLive.src==='rex-puh.webp'&&/TRAINING GESCHAFFT/i.test(rmLive.txt)&&/Übungen eingetragen/.test(rmLive.txt)&&rmLive.pill.startsWith('✓'),'Tag A komplett: Rex-Moment "Puh" erscheint live ('+JSON.stringify(rmLive)+')');
+    // Zyklus 2, Woche 2, Tag A: (2*12+2+0) % 4 = 2 -> Love
+    ok(rmLive.src==='rex-love.webp'&&/TRAINING GESCHAFFT/i.test(rmLive.txt)&&/Übungen eingetragen/.test(rmLive.txt)&&rmLive.pill.startsWith('✓'),'Tag A komplett: Rex-Moment erscheint live, Gesicht dieses Trainings "Love" ('+JSON.stringify(rmLive)+')');
     await page.waitForTimeout(150);
     const rmImg=await page.evaluate(()=>{const i=document.querySelector('#rm-0 img'),r=i.getBoundingClientRect(),m=i.closest('.rex-moment');return{nw:i.naturalWidth,w:Math.round(r.width),h:Math.round(r.height),bg:getComputedStyle(m).backgroundColor,n:document.querySelectorAll('.rex-moment').length}});
     ok(rmImg.nw===192&&rmImg.w===64&&rmImg.h===64&&rmImg.bg===rgb(CREAM)&&rmImg.n===1,'Rex-Moment: Reaktion 64 px auf Kit-Creme, genau einer ('+JSON.stringify(rmImg)+')');
+    // Gesichter wechseln pro Training, nicht pro Render: neu zeichnen und Tag zu/auf -> gleiches Gesicht
+    const same=await page.evaluate(()=>{renderT();const a=document.querySelector('#rm-0 img').getAttribute('src');toggleDay(0);toggleDay(0);return[a,document.querySelector('#rm-0 img').getAttribute('src')]});
+    ok(same[0]==='rex-love.webp'&&same[1]==='rex-love.webp','Gleiches Training behaelt sein Gesicht ('+same.join(' / ')+')');
+    // Zwei Zyklen mit gemischten 3/4-Tage-Wochen: nie zweimal hintereinander dasselbe Gesicht, alle vier kommen vor, nie Wow
+    const rot=await page.evaluate(()=>{const w0=S.week,c0=S.cy,seq=[];
+      for(const cy of ['cycle2','cycle3'])for(let w=1;w<=12;w++){S.cy=cy;S.week=w;const D=w%3?4:3;for(let di=0;di<D;di++)seq.push(rexDoneImg(di))}
+      S.week=w0;S.cy=c0;let rep=0;for(let i=1;i<seq.length;i++)if(seq[i]===seq[i-1])rep++;
+      return{n:seq.length,rep:rep,set:[...new Set(seq)].sort()}});
+    ok(rot.rep===0&&rot.set.join(',')==='rex-happy.webp,rex-love.webp,rex-puh.webp,rex-wink.webp','Gesichter wechseln: '+rot.n+' Trainings, '+rot.rep+' direkte Wiederholungen, Auswahl '+rot.set.join(' '));
+    const faces=await page.evaluate(async()=>Promise.all(REX_DONE.map(f=>new Promise(r=>{const i=new Image();i.onload=()=>r(i.naturalWidth);i.onerror=()=>r(0);i.src=f}))));
+    ok(faces.every(w=>w===192),'Alle Gesichter laden (192 px): '+faces.join(' '));
     // Woche 12: Banner mit "Wow"; ist der offene Tag komplett, kommt als Ausnahme zusaetzlich "Puh" (Wunsch)
     await page.evaluate(()=>{setWeek(12)});await page.waitForTimeout(150);
     const w12=await page.evaluate(()=>{const b=document.getElementById('cy-end'),i=b&&b.querySelector('img');return{n:document.querySelectorAll('.rex-moment').length,puh:document.getElementById('rm-0').children.length,src:i&&i.getAttribute('src'),nw:i?i.naturalWidth:0,bg:b&&getComputedStyle(b).backgroundColor,txt:b?b.innerText:''}});
-    ok(w12.n===1&&w12.puh===0&&w12.src==='rex-wow.webp'&&w12.nw===192&&w12.bg===rgb(YELLOW)&&/LETZTE WOCHE VON ZYKLUS 2/i.test(w12.txt)&&!/🏁/.test(w12.txt),'Woche 12: Banner mit "Wow"-Rex, Tag noch offen -> kein "Puh" ('+JSON.stringify(w12)+')');
+    ok(w12.n===1&&w12.puh===0&&w12.src==='rex-wow.webp'&&w12.nw===192&&w12.bg===rgb(YELLOW)&&/LETZTE WOCHE VON ZYKLUS 2/i.test(w12.txt)&&!/🏁/.test(w12.txt),'Woche 12: Banner mit "Wow"-Rex, Tag noch offen -> kein Rex-Moment im Tag ('+JSON.stringify(w12)+')');
     // Hip Thrust mit 110 kg: Zugewinn in der Uebersicht (unten) bleibt +10 kg. KEIN renderT: "Puh" muss live kommen
     await page.evaluate(()=>{const n=plan()[0].e.length;for(let ei=0;ei<n;ei++){if(!exState(0,ei).cur.exercise)selEx(0,ei,(EXERCISES[plan()[0].e[ei].c]||[])[0]);const st=exState(0,ei);updW(0,ei,ei?'20':'110');for(let i=0;i<st.ms;i++)updRep(0,ei,i,'8')}});
     await page.waitForTimeout(150);
     const w12b=await page.evaluate(()=>{const p=document.querySelector('#rm-0 .rex-moment img');return{n:document.querySelectorAll('.rex-moment').length,puh:p&&p.getAttribute('src'),nw:p?p.naturalWidth:0,wow:!!document.querySelector('#cy-end img[src="rex-wow.webp"]'),pill:document.getElementById('dc-0').textContent}});
-    ok(w12b.n===2&&w12b.puh==='rex-puh.webp'&&w12b.nw===192&&w12b.wow&&w12b.pill.startsWith('✓'),'Woche 12: Tag komplett -> "Puh" live zusaetzlich zum Wow-Banner (Ausnahme) ('+JSON.stringify(w12b)+')');
+    // Zyklus 2, Woche 12, Tag A: (2*12+12+0) % 4 = 0 -> Puh
+    ok(w12b.n===2&&w12b.puh==='rex-puh.webp'&&w12b.nw===192&&w12b.wow&&w12b.pill.startsWith('✓'),'Woche 12: Tag komplett -> Rex-Moment live zusaetzlich zum Wow-Banner (Ausnahme) ('+JSON.stringify(w12b)+')');
     await page.evaluate(()=>{setWeek(2)});await page.waitForTimeout(150);
   }
   // 8. Wochen-Karte: sichtbar mit Vergleich, OHNE Rex-Bild (der Rex steht im Kopf)
@@ -132,7 +146,7 @@ for(const W of [390,375,430]){
 }
 // 10. Dateien + Manifest: Icon 180x180, Manifest bleibt display:browser (sonst sind die Daten auf dem iPhone scheinbar weg)
 const ctx=await b.newContext();const st={r:{}};
-for(const f of ['rex-sanduhr.webp','rex-puh.webp','rex-wow.webp','apple-touch-icon.png?v=rexy','manifest.json'])st.r[f]=(await ctx.request.get(BASE+f)).status();
+for(const f of ['rex-sanduhr.webp','rex-puh.webp','rex-happy.webp','rex-love.webp','rex-wink.webp','rex-wow.webp','apple-touch-icon.png?v=rexy','manifest.json'])st.r[f]=(await ctx.request.get(BASE+f)).status();
 const m=JSON.parse(await (await ctx.request.get(BASE+'manifest.json')).text());
 const png=await (await ctx.request.get(BASE+'apple-touch-icon.png?v=rexy')).body(); // PNG-Kopf: Breite/Hoehe ab Byte 16
 ok(Object.values(st.r).every(s=>s===200),'Rex-Bilder, Icon und Manifest werden ausgeliefert ('+JSON.stringify(st.r)+')');
