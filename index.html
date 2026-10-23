@@ -1327,10 +1327,9 @@ function renderT(){
 }
 
 // Rex-Moment "Training geschafft" (Reaktion "Puh") am Ende des offenen Tages, sobald alle Uebungen
-// eingetragen sind. Gesteigert zaehlt wie weekStats. Nicht in Woche 12: dort steht schon der Wow-Rex
-// im Banner (Rexy: hoechstens ein Rex-Moment pro Ansicht; offen ist immer nur ein Tag).
+// eingetragen sind. Gesteigert zaehlt wie weekStats. Offen ist immer nur ein Tag -> hoechstens einer.
+// Auch in Woche 12 neben dem Wow-Banner: bewusste Ausnahme von Rexys "hoechstens ein Rex-Moment pro Ansicht" (Wunsch).
 function rexDayHTML(di){
-  if(S.week===12)return '';
   const day=plan()[di],total=day.e.length;let done=0,cmp=0,imp=0;
   day.e.forEach((ex,ei)=>{
     if(exDone(di,ei))done++;
@@ -1965,7 +1964,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeWeekPick();clo
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-10-23-08';
+const BUILD_ID='2026-10-23-09';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();

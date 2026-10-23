@@ -5,7 +5,7 @@
 // 425 px), Kopf rosa mit tuerkisen Knoepfen, Seite hellrosa, Bloecke in Kit-Creme, Tagesfarben (A Kit-Lila)
 // + Pill-Schrift, Rexy-Kategorie- und Status-Farben, Stern als Gold-Scheibe, Fokus-Ring ink,
 // Wochen-Karte OHNE Rex-Bild (Woche 1 ohne Karte), Rex-Reaktionen ("Puh" bei komplettem Tag, live; "Wow"
-// im Banner Woche 12, dort kein "Puh"), Uebersicht OHNE Bild mit tuerkisen Vorwochen,
+// im Banner Woche 12, dort als Ausnahme zusaetzlich "Puh"), Uebersicht OHNE Bild mit tuerkisen Vorwochen,
 // theme-color, Rexy-App-Icon/Manifest (display:browser!), kein Ueberlauf auf 375/390/430 px.
 // Peach-App Browser-Test — Aufruf ueber tests/run.sh (startet den lokalen Server).
 const { chromium } = (()=>{try{return require('playwright')}catch(e){return require('/opt/node22/lib/node_modules/playwright')}})();
@@ -98,13 +98,15 @@ for(const W of [390,375,430]){
     await page.waitForTimeout(150);
     const rmImg=await page.evaluate(()=>{const i=document.querySelector('#rm-0 img'),r=i.getBoundingClientRect(),m=i.closest('.rex-moment');return{nw:i.naturalWidth,w:Math.round(r.width),h:Math.round(r.height),bg:getComputedStyle(m).backgroundColor,n:document.querySelectorAll('.rex-moment').length}});
     ok(rmImg.nw===192&&rmImg.w===64&&rmImg.h===64&&rmImg.bg===rgb(CREAM)&&rmImg.n===1,'Rex-Moment: Reaktion 64 px auf Kit-Creme, genau einer ('+JSON.stringify(rmImg)+')');
-    // Woche 12: Banner mit "Wow", kein "Puh" (hoechstens ein Rex-Moment pro Ansicht)
+    // Woche 12: Banner mit "Wow"; ist der offene Tag komplett, kommt als Ausnahme zusaetzlich "Puh" (Wunsch)
     await page.evaluate(()=>{setWeek(12)});await page.waitForTimeout(150);
-    // Hip Thrust mit 110 kg: Zugewinn in der Uebersicht (unten) bleibt +10 kg
-    await page.evaluate(()=>{const n=plan()[0].e.length;for(let ei=0;ei<n;ei++){if(!exState(0,ei).cur.exercise)selEx(0,ei,(EXERCISES[plan()[0].e[ei].c]||[])[0]);const st=exState(0,ei);updW(0,ei,ei?'20':'110');for(let i=0;i<st.ms;i++)updRep(0,ei,i,'8')}renderT()});
+    const w12=await page.evaluate(()=>{const b=document.getElementById('cy-end'),i=b&&b.querySelector('img');return{n:document.querySelectorAll('.rex-moment').length,puh:document.getElementById('rm-0').children.length,src:i&&i.getAttribute('src'),nw:i?i.naturalWidth:0,bg:b&&getComputedStyle(b).backgroundColor,txt:b?b.innerText:''}});
+    ok(w12.n===1&&w12.puh===0&&w12.src==='rex-wow.webp'&&w12.nw===192&&w12.bg===rgb(YELLOW)&&/LETZTE WOCHE VON ZYKLUS 2/i.test(w12.txt)&&!/🏁/.test(w12.txt),'Woche 12: Banner mit "Wow"-Rex, Tag noch offen -> kein "Puh" ('+JSON.stringify(w12)+')');
+    // Hip Thrust mit 110 kg: Zugewinn in der Uebersicht (unten) bleibt +10 kg. KEIN renderT: "Puh" muss live kommen
+    await page.evaluate(()=>{const n=plan()[0].e.length;for(let ei=0;ei<n;ei++){if(!exState(0,ei).cur.exercise)selEx(0,ei,(EXERCISES[plan()[0].e[ei].c]||[])[0]);const st=exState(0,ei);updW(0,ei,ei?'20':'110');for(let i=0;i<st.ms;i++)updRep(0,ei,i,'8')}});
     await page.waitForTimeout(150);
-    const w12=await page.evaluate(()=>{const b=document.getElementById('cy-end'),i=b&&b.querySelector('img');return{n:document.querySelectorAll('.rex-moment').length,src:i&&i.getAttribute('src'),nw:i?i.naturalWidth:0,bg:b&&getComputedStyle(b).backgroundColor,txt:b?b.innerText:'',pill:document.getElementById('dc-0').textContent}});
-    ok(w12.n===1&&w12.src==='rex-wow.webp'&&w12.nw===192&&w12.bg===rgb(YELLOW)&&/LETZTE WOCHE VON ZYKLUS 2/i.test(w12.txt)&&!/🏁/.test(w12.txt)&&w12.pill.startsWith('✓'),'Woche 12: Banner mit "Wow"-Rex, kein "Puh" trotz komplettem Tag ('+JSON.stringify(w12)+')');
+    const w12b=await page.evaluate(()=>{const p=document.querySelector('#rm-0 .rex-moment img');return{n:document.querySelectorAll('.rex-moment').length,puh:p&&p.getAttribute('src'),nw:p?p.naturalWidth:0,wow:!!document.querySelector('#cy-end img[src="rex-wow.webp"]'),pill:document.getElementById('dc-0').textContent}});
+    ok(w12b.n===2&&w12b.puh==='rex-puh.webp'&&w12b.nw===192&&w12b.wow&&w12b.pill.startsWith('✓'),'Woche 12: Tag komplett -> "Puh" live zusaetzlich zum Wow-Banner (Ausnahme) ('+JSON.stringify(w12b)+')');
     await page.evaluate(()=>{setWeek(2)});await page.waitForTimeout(150);
   }
   // 8. Wochen-Karte: sichtbar mit Vergleich, OHNE Rex-Bild (der Rex steht im Kopf)

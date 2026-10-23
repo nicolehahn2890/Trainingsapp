@@ -142,12 +142,14 @@ Rexy ordnet Sanduhr die Zielfarbe Gelb zu; der App-Akzent bleibt bewusst Rex-Pin
   eine Zeile. Kopfhoehe 196-198 px auf 375/390 px — wie vor dem Umbau.
 - Rex-Momente (seit Version -07, Wunsch: Reaktionen aus dem Marketing-Kit): wie Rexy RexMoment (mood) —
   .rex-moment = Block mit ink-Rahmen, --r-lg, --sh-card, Reaktion 64 px links (alt leer), Titel Bowlby One SC
-  16px, ein Satz Inter 14px/500. Hoechstens EINER pro Ansicht. Nur an zwei Stellen:
+  16px, ein Satz Inter 14px/500. Hoechstens EINER pro Ansicht — einzige Ausnahme Woche 12 (siehe 1.). Nur an
+  zwei Stellen:
   1. "Training geschafft" (rex-puh.webp, auf --block-bg) am Ende des OFFENEN Tages (#rm-[di] in .day-body),
      sobald alle Uebungen erledigt sind (exDone): "8 von 8 Übungen eingetragen, 4 davon gesteigert." (Teil
      "davon gesteigert" nur mit Vergleich; gezaehlt wie weekStats). rexDayHTML(di) baut ihn, refreshRex(di)
      zieht ihn LIVE nach (aus refreshDone UND refreshProg, KEIN renderT; el._h verhindert Neuladen des Bildes).
-     Offen ist immer nur ein Tag (toggleDay) -> hoechstens einer. NICHT in Woche 12 (dort steht der Wow-Rex).
+     Offen ist immer nur ein Tag (toggleDay) -> hoechstens einer. AUCH in Woche 12 (Wunsch, Version -09):
+     dort stehen dann bewusst zwei Rexe — "Puh" im Tag und "Wow" im Banner. Nicht wieder abschalten.
   2. Banner Woche 12 (#cy-end, rex-wow.webp, auf --highlight), siehe Zyklus-Ende-Banner.
   Bilder: Rexy-Reaktionen E05-puh / E07-wow (1254 px, freigestellt) mit Lanczos auf 192x192 (64 px @3x)
   verkleinert, WebP. Nie auf Pink stellen (Rex-Haut verschwindet), nie umfaerben.
@@ -963,7 +965,8 @@ Orientierungs-Quelle ueberspringen — sie ist der echte letzte Wert vor dem neu
 Banner in Woche 12 (#cy-end): Rex-Moment auf gelbem Block (var(--highlight), Rex-Neongelb) mit der Rex-
 Reaktion "Wow" (rex-wow.webp, 64 px links), 2,5px Ink-Rahmen, harte Schatten (--sh-card), --r-lg, Titel
 "Letzte Woche von Zyklus N" in Bowlby One SC 16px (die Zielflagge 🏁 ist seit Version -07 weg: der Rex
-ersetzt sie, Rexy: keine Emoji als Schmuck). In Woche 12 gibt es deshalb KEIN "Training geschafft". Text EIN Satz: "Danach geht
+ersetzt sie, Rexy: keine Emoji als Schmuck). "Training geschafft" erscheint in Woche 12 trotzdem (Ausnahme,
+Wunsch Version -09). Text EIN Satz: "Danach geht
 es mit Zyklus X weiter." bzw. (alter Zyklus -> naechster neu) "Danach startet Zyklus X mit dem
 neuen Plan – deine Übungen werden übernommen."  Nach Zyklus 6
 geht es auf "1 (neu)" — dort steht aber der alte Plan (Marker): spaetestens dann braucht es
@@ -1049,6 +1052,11 @@ claude.ai. Frontmatter (name, description) dabei unveraendert lassen.
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **"Training geschafft" auch in Woche 12 (23.10.2026, Version 2026-10-23-09).** Wunsch: der Puh-Rex soll
+   auch in Woche 12 kommen — bewusste Ausnahme von Rexys "hoechstens ein Rex-Moment pro Ansicht" (dort steht
+   schon der Wow-Banner). rexDayHTML ohne Woche-12-Sperre; tests/rex-maskottchen prueft Woche 12 jetzt: erst nur
+   Wow, nach dem letzten Satz live zusaetzlich Puh. Session-Branch claude/sharp-albattani-vvd6nq auf GitHub geloescht.
 
 NEU. **Projektdateien abgeglichen + Skill-ZIP (23.10.2026, Version 2026-10-23-08).** Keine Funktions- oder
    Designaenderung. Nach dem Rexy-Kit-Abgleich nachgezogen: SKILL.md (Disabled-Buttons auf --block-bg) und
