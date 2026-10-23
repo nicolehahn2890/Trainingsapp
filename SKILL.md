@@ -38,8 +38,8 @@ auf main einmalig eine Sicherheitsfreigabe verlangen; dann kurz bestaetigen lass
 - Live-URL: https://nicolehahn2890.github.io/Trainingsapp/
 - Repository: github.com/nicolehahn2890/Trainingsapp
 - Technologie: Standalone HTML-Datei (kein Framework, kein Build-Schritt)
-- Repo-Dateien: index.html (App), apple-touch-icon.png (Home-Screen-Icon), rex-apfel.webp +
-  rex-apfel-kopf.webp (Maskottchen Rex, siehe App-Ebene "Rex"),
+- Repo-Dateien: index.html (App), apple-touch-icon.png (Home-Screen-Icon), rex-apfel-frei.webp
+  (Maskottchen Rex im Kopf, siehe App-Ebene "Rex"),
   manifest.json (display:browser — Icon oeffnet Safari, NICHT standalone!),
   Peach_Project.pdf (Original-Handbuch des Trainers, 41 Seiten — nicht aendern), SKILL.md
   (diese Datei), tests/ (Browser-Tests, siehe Abschnitt Tests)
@@ -72,7 +72,7 @@ auf main einmalig eine Sicherheitsfreigabe verlangen; dann kurz bestaetigen lass
   hinterlegt (DAYBG, pbadge und rcol laufen seit 23.10.2026 ueber Tokens, siehe App-Ebene "Rex").
 - "Press"-Interaktion: Buttons mit Klasse `nb-shadow` ruecken auf :active um translate(2px,2px)
   und ihr Schatten kollabiert auf --sh-press (1px). Neue Schatten-Buttons brauchen diese Klasse.
-- Fokus-Ring (a11y): globales `:focus-visible` = 3px solid var(--accent) (Rex-Pink) + 2px Offset,
+- Fokus-Ring (a11y): globales `:focus-visible` = 3px solid var(--ink) + 3px Offset (wie Rexy),
   mit !important — NICHT durch outline:none uebersteuern, der Ring soll ueberall erscheinen.
 - Disabled-Buttons: globales `button:disabled` = flach & cream (var(--cream)-Hintergrund,
   var(--text-dim) Text+Rahmen, kein Schatten, kein Press-Transform, cursor not-allowed).
@@ -81,36 +81,50 @@ auf main einmalig eine Sicherheitsfreigabe verlangen; dann kurz bestaetigen lass
 ### App-Ebene "Rex" (Maskottchen, seit 23.10.2026) — Designsystem bleibt Basis
 Ausdruecklicher Wunsch: Das Peach-Designsystem (Neobrutalism, Claude-Design-Projekt "Peach Project -
 Neobrutalism") wird NICHT angefasst und bleibt die Grundlage. Nur die App bekommt den mittleren Rex
-aus Florians Motiv ("Apfel", Po von hinten) als Maskottchen und dazu passende Farben.
+aus Florians Motiv ("Apfel", Po von hinten) als Maskottchen und den Look des Rexy-Systems (Artefakt
+"Rexy - Neobrutalism", Gymcreator) — Wunsch: "stimmig zu 100 % mit dem Artefakt".
 - Im `:root` stehen OBEN unveraendert die Tokens des Designsystems (--peach, --pink, --lilac, --sky,
-  --yellow, --bg, --green, --prog-* ...). Diese Werte NIE aendern (tests/rex-maskottchen prueft das).
-  DARUNTER im selben :root die App-Ebene: Rex-Farben (Werte wie im Rexy-System) und Rollen-Tokens.
-  CSS und JS nutzen die ROLLEN, nicht die Basis-Farben direkt.
+  --yellow, --bg, --green, --prog-*, --cat-* ...). Diese Werte NIE aendern (tests/rex-maskottchen
+  prueft das). DARUNTER im selben :root die App-Ebene: Rex-Farben (Werte wie im Rexy-System) und
+  Rollen-Tokens. CSS und JS nutzen die ROLLEN, nicht die Basis-Farben direkt.
 - Rex-Farben: --rex-pink #F6409F, --rex-cyan #22E3F0, --rex-yellow #FAF22E, --rex-lime #B5F23D,
   --rex-green #4FD06A, --rex-blue #4D9DF5, --rex-red #FF5C5C, --rex-rose #FA9ECC / --rex-rose-pale
-  #FDE7F2 (hell/dunkel-Abstufung der Rex-Haut).
+  #FDE7F2 (hell/dunkel-Abstufung der Rex-Haut). Dazu --bw-bold 3px und --sh-pop (5px pinker Versatz),
+  beide nur fuer die Wortmarke.
 - Rollen: --header-bg (rose) · --page-bg (rose-pale, body) · --head-accent (Cyan: aktiver Tab, aktive
-  Plan-Pill, Logo-Pill — Wunsch: nie Pink auf Pink) · --arrow-bg (Cyan, Wochenpfeile) · --accent
-  (Rex-Pink: Knoepfe im Inhalt, Dropdown-Auswahl, Sheet-Hauptknopf, Wochenbalken, aktuelle Woche in der
-  Uebersicht, Fokus-Ring) · --highlight (Rex-Gelb: Zahnrad, offener Tipp, Banner Woche 12) ·
-  --day-a..d (A Lila, B Rex-Pink, C Rex-Gelb, D Rex-Cyan) · --bar-past (rose: andere Wochen in der
-  Uebersicht + "hat Werte" in der Wochenwahl) · --st-up/-reps/-same/-down (Status, knallig wie Rexy:
-  gruen/blau/neongelb/rot — Rep-Felder rcol, Badges, Erledigt-Haken, voller Wochenbalken, Speicher-
-  Warnung). Backup-Karte --rex-cyan, Satz-hinzufuegen --rex-lime.
-- Bewusst unveraendert: Kategorie-Farben CC, Cream-Flaechen, Felder, Text-Rampe, Fonts, Rahmen,
-  Schatten, Radien, Layout. Gruene TEXTE (kg-Zugewinn/"Aktuell" in der Uebersicht) bleiben --green
-  (#6FC36A) — das knallige Rexy-Gruen waere als Text auf Cream zu blass.
+  Plan-Pill — Wunsch: nie Pink auf Pink) · --arrow-bg (Cyan, Wochenpfeile) · --accent (Rex-Pink: Knoepfe
+  im Inhalt, Dropdown-Auswahl, Sheet-Hauptknopf, Wochenbalken, aktuelle Woche in der Uebersicht,
+  Scrollbalken) · --highlight (Rex-Gelb: Zahnrad, offener Tipp, Banner Woche 12) · --day-a..d (A Lila,
+  B Rex-Pink, C Rex-Gelb, D Rex-Cyan) · --bar-past (Cyan: andere Wochen in der Uebersicht + "hat Werte"
+  in der Wochenwahl — rosa wirkte "zu girly") · --st-up/-reps/-same/-down (Status, knallig wie Rexy:
+  gruen/blau/neongelb/rot — Rep-Felder rcol, Badges, Erledigt-Haken, voller Wochenbalken, Zugewinn-Pill,
+  Speicher-Warnung). Backup-Karte --rex-cyan, Satz-hinzufuegen --rex-lime.
+- Angeglichen an die Rexy-Bausteine: Wortmarke (siehe Marke), Fokus-Ring ink 3px mit 3px Abstand (ein
+  pinker Ring verschwand auf Tag B), Tages-Pill wie CountPill (ink, Schrift in der Kartenfarbe, auf Lila/
+  Pink cream — DAYTXT; tabellarische Ziffern), Kategorie-Farben CC mit den Rexy-Werten, Empfehlungs-Stern
+  als Gold-Scheibe mit ink-Rahmen (.rec-star, steht HINTER dem Namen — Tests pruefen startsWith),
+  Vorwerte unter den Rep-Feldern --text-dim, Rep-Feld 48px, Picker min. 42px, Zahnrad-Scheibe 30px,
+  +-Knopf 20px, Uebungszeilen --sh-sm, kg-Zugewinn als gruene Pill (.gain-pill), "Aktuell" in ink.
+  Picker-Text bewusst 500 statt Rexy 700: fett wurden mehr Uebungsnamen abgeschnitten (37 von 142 bei
+  390 px sind es mit und ohne 500 — vorbestehend, das Feld teilt sich die Zeile mit dem Badge).
+- Bewusst NICHT uebernommen (App-Inhalt, Wuensche von Rexi): Badge-Texte ("↑ Gewicht" statt "Mehr
+  Gewicht"), Badge-Groesse 12px, Wochen-Label "W 4 / 12", Tagestitel 14px, Disabled-Stil der Wochen-
+  pfeile (Tests klicken ueber Woche 1/12 hinaus). Gruene TEXTE bleiben --green (#6FC36A).
 - Peach-Orange kommt in der App nicht mehr vor (Wunsch: Tag A Lila statt Pastell-Orange). Lila nur
   noch als Tag A — Kopf/Seite in Lila waren "zu lila, nicht im Rex-Bild".
-- Bilder (aus dem Rexy-Designsystem, Artefakt "Rexy - Neobrutalism", Gruppe Rexe, unveraendert
-  uebernommen): rex-apfel.webp (500x720, ganzer Rex) und rex-apfel-kopf.webp (300x300, Kopf).
-  Regeln wie in Rexy: immer im ink-Rahmen (--bw; ganzer Rex --r-md, Kopf rund), NIE freistellen
-  (der Hintergrund gehoert zum Motiv; Freisteller schnitt die Fuesse ab), nicht umfaerben, spiegeln
-  oder neu zuschneiden, KEIN Schriftzug ("APFEL-PO" ausdruecklich nicht). Nur der Apfel-Rex.
-- Platzierung (sparsam): Kopf im Header (.logo-badge 44px rund, statt Pixel-Pfirsich) und ganzer Rex
-  links in der Wochen-Karte (.wp-rex 68px). Die Wochen-Karte ist wie bisher nur sichtbar, wenn es in
-  der Woche Vergleiche gibt (Woche 1 nie) — der Rex kommt mit ihr. NICHT unten an die Tagesliste haengen
-  (wirkte "angehaengt") und NICHT in die Uebersicht ("das ganze Bild nochmal wirkt zu viel").
+- Bild: rex-apfel-frei.webp (198x330, WebP mit Alpha) = der mittlere Rex aus Rexis EIGENEM Freisteller
+  aller drei Rexe (23.10.2026), unveraendert ausgeschnitten und verkleinert, KEIN Schriftzug ("APFEL-PO"
+  ausdruecklich nicht). Nicht selbst freistellen (der erste eigene Versuch schnitt die Fuesse ab).
+  Die gerahmten Rexy-Ausschnitte (rex-apfel.webp / rex-apfel-kopf.webp) sind raus; das Home-Screen-
+  Icon wurde vorher aus dem Kopf-Ausschnitt gerendert und bleibt.
+- Platzierung: NUR im Kopf. Oben die Wortmarke, darunter links der freigestellte Rex (.hdr-rex,
+  drop-shadow 2px ink), der auf der Unterkante des Kopfs steht (margin-bottom = -padding-bottom),
+  rechts die Bedienung (.controls: Plan-Pills, Wochenwahl, Zyklus). Schmale iPhones (< 425 px): Bedienung
+  in 3 Zeilen, Rex 112 px hoch (fuellt die Spalte); ab 425 px 2 Zeilen, Rex 84 px; ab 600 px eine Zeile
+  (Plan, Zyklus, Wochenwahl rechts). Kopfhoehe 198 px auf 390 px — wie vor dem Umbau.
+  Verworfen (nicht wieder vorschlagen): runder Rex-Kopf im Header ("erkennt man nicht"), Rex-Karte unter
+  den Tagen ("angehaengt"), Rex im Kopf der Uebersicht ("zu viel"), Rex in der Wochen-Karte (doppelt,
+  seit der Rex gross im Kopf steht).
 
 ### Fonts
 - Display (Logo, Screen-Titel, Tag-Titel, grosse Zahlen): **Archivo Black**, UPPERCASE,
@@ -135,9 +149,10 @@ Die Tages-Count-Pill ist ink mit der Tagesfarbe als Textfarbe (✓-Praefix wenn 
 in der Uebersicht ist das Tages-Label eine Pille in der jeweiligen Tagesfarbe.
 
 ### Kategorie-Farben (CC) — solide Pill, 2px Ink-Rahmen, schwarzer Uppercase-Text
-  Glute Max #EE8FB4, Glute Med #B49DF2, Adduktoren #7FD1C1, Glute & Quad #E8B86A, Glute & Hams #A7D98C
-  Ruecken #84C3E0, Brust #F0A0A0, Schultern #C2DB7E, Bizeps #E6C57E
-  Trizeps #93B6E0, Bauch #D6D080, Beinbeuger #D7A0E8 (Orchidee), Beinstrecker #F9B98A (Apricot)
+Seit 23.10.2026 die Rexy-Werte (kraeftiger; die Designsystem-Tokens --cat-* bleiben unveraendert):
+  Glute Max #FA86B6, Glute Med #B99FFA, Adduktoren #43D9BE, Glute & Quad #F4A437, Glute & Hams #84DE70
+  Ruecken #5DCDFA, Brust #FB9797, Schultern #BEE349, Bizeps #F7D979
+  Trizeps #94B8F8, Bauch #DED754, Beinbeuger #E29CF2, Beinstrecker #FDA57C
 
 ### Fortschritts-Farben (pbadge = solide Pill; rcol = ganzes Rep-Feld gefuellt)
 In der App seit 23.10.2026 die knalligen Rexy-Werte ueber --st-* (Wunsch: "zu pastellig"); die
@@ -148,8 +163,11 @@ Designsystem-Tokens --prog-* (#6FC36A / #5EA8E0 / #F5CB44 / #EC6A6A) bleiben unv
   Rot      #FF5C5C = Weniger als Vorwoche / Rep-Feld darunter (--st-down)
 
 ### Marke / Assets
-Logo (seit 23.10.2026): Rex-Kopf (rex-apfel-kopf.webp) rund im 44px-ink-Rahmen mit --sh-xs.
-  Der Pixel-Pfirsich (16x16-SVG) ist aus der App raus, bleibt aber im Designsystem (assets/peach-logo.svg).
+Logo (seit 23.10.2026): Wortmarke wie im Rexy-System — "PEACH" (ohne "Project", Wunsch) als gelbes
+  Schild (.wordmark: Archivo Black 20px, --rex-yellow, 3px ink-Rahmen --bw-bold, --r-sm, pinker
+  Druckversatz --sh-pop 5px), darunter der freigestellte Rex (siehe App-Ebene). Die Unterzeile
+  "Trainings-App" ist weg. Der Pixel-Pfirsich (16x16-SVG) ist aus der App raus, bleibt aber im
+  Designsystem (assets/peach-logo.svg).
 Favicon: Pfirsich-Emoji als SVG-Data-URI im <head> (unveraendert).
 Home-Screen-Icon: apple-touch-icon.png (180x180), verlinkt mit apple-mobile-web-app-title und
   ?v=rex (Cache-Bremse fuer das neue Motiv; bei einem neuen Icon den Wert aendern, auch im Manifest).
@@ -537,21 +555,21 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
 - Spart Scrollen auf dem iPhone
 - Alle Eingabefelder (w-input, rep-inp, drop-search input, tip-ta, set-input) haben font-size 16px —
   verhindert Auto-Zoom auf iOS! Nicht verkleinern.
-- Touch-Ziele vergroessert: week-arrow 38px, add-set-btn 38px, pick-btn min-height 40px, rep-inp 46px breit
+- Touch-Ziele vergroessert: week-arrow 38px, add-set-btn 38px, pick-btn min-height 42px, rep-inp 48px breit
 
 ### UI-Status-Elemente (Neobrutalism)
-- Tages-Pill im day-header (`#dc-[di]`, Klasse day-count): "x/y Uebungen" — ink-Pille mit der
-  Tagesfarbe als Textfarbe; ✓-Praefix wenn alle Uebungen erledigt (refreshDone setzt nur den Text)
+- Tages-Pill im day-header (`#dc-[di]`, Klasse day-count): "x/y Uebungen" — ink-Pille, Schrift in der
+  Tagesfarbe, auf Lila (A) und Pink (B) cream (DAYTXT, wie Rexy CountPill); ✓-Praefix wenn alle
+  Uebungen erledigt (refreshDone setzt nur den Text)
 - Erledigt-Haken pro Uebung (`#done-[di]-[ei]`, Klasse done-chip): gruener Kreis mit Ink-Rahmen,
   sichtbar wenn exDone() — Toggle via hidden-Klasse
 - Beide werden bei Rep-Eingabe LIVE per refreshDone() aktualisiert (gezieltes DOM-Update, kein renderT)
 - Rep-Feld (.rep-inp): leer = weiss; ausgefuellt wird das GANZE Feld mit der Performance-Farbe
   gefuellt (rcol: rot unter Bereich, gelb im Bereich, gruen am/ueber Top), Text bleibt ink
-- Fortschritt-Block (.week-progress, Flex): links der ganze Rex (.wp-rex, 68px, ink-Rahmen), rechts
-  (.wp-main) grosse %-Zahl (Archivo Black) + Kapsel-Bar (--accent Rex-Pink, gruen --st-up bei 100%).
-  refreshWeekBar zieht nur die ids nach (wp-box/wp-pct/wp-bar/wp-sub), der Rex bleibt stehen.
+- Fortschritt-Block (.week-progress): Cream-Block mit grosser %-Zahl (Archivo Black) + Kapsel-Bar
+  (--accent Rex-Pink, gruen --st-up bei 100%). Kein Rex-Bild (der Rex steht im Kopf).
 - Uebersicht: vertikale Kapsel-Balken (.ov-bar = Pill-Track, .ov-bar-fill von unten) —
-  aktuelle Woche (S.week) --accent, andere Wochen --bar-past (rosa), Wochen mit einer ANDEREN Uebung grau
+  aktuelle Woche (S.week) --accent, andere Wochen --bar-past (Cyan), Wochen mit einer ANDEREN Uebung grau
   (--text-ghost). Titel = zuletzt trainierte Uebung; kg-Zugewinn und Start/Aktuell zaehlen nur
   Wochen MIT DIESER Uebung UND diesem Wdh.-Bereich (r0), darunter die Zeile "Davor: … (grau, nicht eingerechnet)"
 - Animationen: fadeSlide (Ansicht/Tag aufklappen), dropIn (Dropdown nur beim Oeffnen, nicht bei Suche)
@@ -974,6 +992,17 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Rexy-Look: Wortmarke PEACH, freigestellter Rex im Kopf (23.10.2026, Version 2026-10-23-03).**
+   Wunsch: Ueberschrift wie im Rexy-Artefakt (statt "Gymcreator" nur "PEACH"), Rexis eigener Freisteller
+   des mittleren Rex in den Kopf (der runde Kopf war nicht erkennbar), Vorwochen in der Uebersicht tuerkis
+   statt hellrosa ("zu girly"), Rest mit dem Artefakt abgleichen ("stimmig zu 100 %"). Umsetzung: Wortmarke,
+   Kopf neu geordnet (Rex links unter der Wortmarke, steht auf der Unterkante, 112/84 px; Plan-Pills +
+   Wochenwahl in einer Zeile, Zyklus darunter; Kopfhoehe wie vorher), Rex aus der Wochen-Karte raus (sonst
+   doppelt), gerahmte Rex-Bilder aus dem Repo entfernt; Rexy-Angleichungen (Fokus-Ring ink, Tages-Pill-
+   Schrift, Kategorie-Farben, Stern-Scheibe, Vorwerte lesbarer, Rep-Feld 48px, Zugewinn-Pill u. a., siehe
+   App-Ebene). Pfeile der Wochenwahl mit Screenreader-Namen. tests/rex-maskottchen neu gefasst (375/390/
+   430 px, Basis-Tokens inkl. --cat-* unveraendert); alle Testreihen gruen.
 
 NEU. **Rex als Maskottchen + Rex-Farben (23.10.2026, Version 2026-10-23-02).** Wunsch: der mittlere Rex
    ("Apfel", Motiv von Florian) als Maskottchen, Farben daran angepasst — das Peach-Designsystem bleibt

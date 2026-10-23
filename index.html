@@ -63,12 +63,14 @@
   --highlight:var(--rex-yellow);  /* Zahnrad, offener Tipp, Banner Woche 12 */
   --day-a:var(--lilac);--day-b:var(--rex-pink);--day-c:var(--rex-yellow);--day-d:var(--rex-cyan);
   --page-bg:var(--rex-rose-pale); /* Seitenhintergrund */
-  --bar-past:var(--rex-rose);     /* andere Wochen: Balken der Uebersicht, Wochenwahl "hat Werte" */
+  --bar-past:var(--rex-cyan);     /* andere Wochen: Balken der Uebersicht, Wochenwahl "hat Werte" (nicht rosa — zu girly) */
+  --bw-bold:3px;                  /* nur Wortmarke (wie Rexy border-w-bold) */
+  --sh-pop:5px 5px 0 var(--rex-pink); /* pinker Druckversatz, nur Wortmarke (wie Rexy shadow-pop) */
 }
 body{background:var(--page-bg);color:var(--text);font-family:var(--font-sans);min-height:100vh;-webkit-tap-highlight-color:transparent;}
 ::-webkit-scrollbar{width:10px;}
 ::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--scroll);border:2px solid var(--ink);border-radius:999px;}
+::-webkit-scrollbar-thumb{background:var(--accent);border:2px solid var(--ink);border-radius:999px;}
 input,textarea,button{font-family:inherit;}
 /* The neobrutalism press: nudge toward the shadow, collapse it. */
 button{cursor:pointer;transition:transform var(--dur-fast) var(--ease),box-shadow var(--dur-fast) var(--ease),background var(--dur-base),color var(--dur-base),border-color var(--dur-base);}
@@ -77,9 +79,10 @@ button.nb-shadow:active{box-shadow:var(--sh-press)!important;}
 /* Disabled buttons: flat & cream — no shadow, no press */
 button:disabled{background:var(--cream)!important;color:var(--text-dim)!important;border-color:var(--text-dim)!important;box-shadow:none!important;cursor:not-allowed;}
 button:disabled:active{transform:none;}
-/* Keyboard focus — hard accent ring (Rex-Pink) on every focusable element (a11y).
+/* Keyboard focus — hard ink ring on every focusable element (a11y), wie im Rexy-System:
+   ink hat auf jeder Farbflaeche genug Kontrast (ein pinker Ring verschwand auf Tag B).
    !important so it also wins over outline:none in component styles. */
-:focus-visible{outline:3px solid var(--accent)!important;outline-offset:2px;}
+:focus-visible{outline:3px solid var(--ink)!important;outline-offset:3px;}
 @keyframes fadeSlide{from{transform:translateY(8px)}to{transform:translateY(0)}}
 @keyframes dropIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 .fade-in{animation:fadeSlide var(--dur-anim) var(--ease);}
@@ -89,14 +92,18 @@ button:disabled:active{transform:none;}
 #header{background:var(--header-bg);padding:13px 16px 11px;border-bottom:var(--bw) solid var(--ink);position:sticky;top:0;z-index:50;box-shadow:var(--sh-header);--text:#181016;--text-dim:#5E4C55;--surface:#FBF3E7;--field-bg:#FFF;--on-accent:#181016;}
 .header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px;}
 .header-right{display:flex;gap:6px;align-items:center;}
-.logo{display:flex;align-items:center;gap:9px;}
-.logo-badge{width:44px;height:44px;flex-shrink:0;display:block;overflow:hidden;background:var(--rex-pink);border:var(--bw) solid var(--ink);border-radius:50%;box-shadow:var(--sh-xs);}
-/* Rex-Kopf (Rexy-Ausschnitt rex-apfel-kopf.webp): rund im ink-Rahmen, nie freigestellt */
-.logo-rex{display:block;width:100%;height:100%;object-fit:cover;}
-.logo-title{font-family:var(--font-display);font-weight:400;font-size:18px;letter-spacing:-0.5px;text-transform:uppercase;color:var(--ink);line-height:1.05;}
-.logo-sub{display:inline-block;background:var(--head-accent);color:var(--ink);font-size:11px;font-weight:600;border:2px solid var(--ink);border-radius:999px;padding:1px 8px;margin-top:4px;}
-@media(max-width:430px){.logo-sub{display:none}.logo-title{font-size:16px}.tab-btn{padding:8px 12px}}
-.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+/* Wortmarke wie im Rexy-System: gelbes Schild, 3px ink-Rahmen, pinker Druckversatz */
+.wordmark{display:inline-block;font-family:var(--font-display);font-size:20px;line-height:1;letter-spacing:-0.5px;text-transform:uppercase;color:var(--ink);background:var(--rex-yellow);border:var(--bw-bold) solid var(--ink);border-radius:var(--r-sm);box-shadow:var(--sh-pop);padding:7px 11px;white-space:nowrap;}
+@media(max-width:430px){.tab-btn{padding:8px 12px}}
+/* Darunter: freigestellter Apfel-Rex links (steht auf der Unterkante des Kopfs), rechts die Bedienung */
+.header-main{display:flex;align-items:center;gap:10px;}
+/* Schmale iPhones: Bedienung in 3 Zeilen -> Rex fuellt die Spalte (112 px); ab 425 px reichen 2 Zeilen -> 84 px */
+.hdr-rex{display:block;flex-shrink:0;height:112px;width:auto;align-self:flex-end;margin-bottom:-11px;filter:drop-shadow(2px 2px 0 var(--ink));}
+@media(min-width:425px){.hdr-rex{height:84px}}
+.controls{flex:1;min-width:0;display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.plan-group,.cycle-group{display:flex;gap:4px;flex-wrap:wrap;align-items:center;}
+/* Breit genug fuer eine Zeile: Plan, Zyklus, Wochenwahl rechts */
+@media(min-width:600px){.cycle-group{order:1}.week-nav{order:2}}
 .tab-btn{padding:8px 15px;border-radius:999px;border:var(--bw) solid var(--ink);font-size:13px;font-weight:700;}
 .tab-btn.active{background:var(--head-accent);color:var(--ink);box-shadow:var(--sh-sm);}
 .tab-btn.inactive{background:var(--surface);color:var(--text);}
@@ -120,8 +127,7 @@ button:disabled:active{transform:none;}
 #content{padding:16px 16px 40px;max-width:680px;margin:0 auto;}
 
 /* ===== Fortschritt block ===== */
-.week-progress{display:flex;align-items:center;gap:14px;background:var(--surface);border:var(--bw) solid var(--ink);border-radius:var(--r-lg);padding:12px 16px 12px 12px;margin-bottom:16px;box-shadow:var(--sh-sm);}
-.wp-main{flex:1;min-width:0;}
+.week-progress{background:var(--surface);border:var(--bw) solid var(--ink);border-radius:var(--r-lg);padding:12px 16px;margin-bottom:16px;box-shadow:var(--sh-sm);}
 .wp-top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:9px;}
 .wp-title{font-family:var(--font-display);text-transform:uppercase;font-size:13px;letter-spacing:-0.5px;color:var(--text);}
 .wp-pct{font-family:var(--font-display);font-size:26px;letter-spacing:-1px;color:var(--text);line-height:1;}
@@ -137,13 +143,13 @@ button:disabled:active{transform:none;}
 .day-header .day-title{flex:1 1 0;min-width:0;}
 .day-focus{flex-basis:100%;font-family:var(--font-sans);font-size:12px;font-weight:600;line-height:1.35;color:var(--ink);opacity:.78;}
 .day-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
-.day-count{font-family:var(--font-display);font-size:11px;padding:5px 11px;border-radius:999px;background:var(--ink);border:2px solid var(--ink);white-space:nowrap;letter-spacing:-0.3px;}
+.day-count{font-family:var(--font-display);font-size:11px;padding:5px 11px;border-radius:999px;background:var(--ink);border:2px solid var(--ink);white-space:nowrap;letter-spacing:-0.3px;font-variant-numeric:tabular-nums;}
 .day-chevron{color:var(--ink);font-size:14px;font-weight:700;}
 .day-body{padding:0 12px 12px;}
 .day-body.anim{animation:fadeSlide var(--dur-anim) var(--ease);}
 
 /* ===== Exercise rows (cream blocks) ===== */
-.ex-row{background:var(--cream);border:var(--bw) solid var(--ink);border-radius:var(--r-lg);padding:12px 14px;margin-bottom:10px;box-shadow:var(--sh-xs);}
+.ex-row{background:var(--cream);border:var(--bw) solid var(--ink);border-radius:var(--r-lg);padding:12px 14px;margin-bottom:10px;box-shadow:var(--sh-sm);}
 .ex-row-top{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
 .cat-badge{font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;border:2px solid var(--ink);color:var(--ink);white-space:nowrap;letter-spacing:0.4px;text-transform:uppercase;}
 /* Badge + Erledigt-Haken immer in eigener 2. Zeile (sonst stand ein kurzes "= Gleich" neben der Auswahl); leer = unsichtbar */
@@ -152,7 +158,7 @@ button:disabled:active{transform:none;}
 .once-chip{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;border:2px dashed var(--ink);background:var(--field-bg);color:var(--ink);white-space:nowrap;}
 .done-chip{width:22px;height:22px;border-radius:50%;background:var(--st-up);border:2px solid var(--ink);color:var(--ink);font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
 .picker-wrap{flex:1;min-width:140px;position:relative;}
-.pick-btn{width:100%;min-height:40px;background:var(--field-bg);border:var(--bw) solid var(--ink);border-radius:var(--r-sm);color:var(--text-dim);font-size:14px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:6px;text-align:left;}
+.pick-btn{width:100%;min-height:42px;background:var(--field-bg);border:var(--bw) solid var(--ink);border-radius:var(--r-sm);color:var(--text-dim);font-size:14px;font-weight:500;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:6px;text-align:left;}
 .pick-btn.has-val{color:var(--text);}
 .pick-btn-txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
 .pick-btn-arr{color:var(--text-dim);font-size:10px;flex-shrink:0;}
@@ -167,6 +173,8 @@ button:disabled:active{transform:none;}
 .drop-opt.sel{font-weight:700;background:var(--accent);color:var(--ink);}
 .drop-empty-opt{color:var(--text-dim);}
 .drop-no-results{padding:10px 12px;color:var(--text-faint);font-size:12px;}
+/* Empfehlungs-Stern wie Rexy: Gold-Scheibe mit ink-Rahmen und ink-Stern (gold allein ist auf Cream zu blass) */
+.rec-star{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;margin-left:6px;vertical-align:middle;border-radius:50%;background:var(--gold);border:2px solid var(--ink);color:var(--ink);font-size:11px;line-height:1;}
 .pbadge{font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;border:2px solid var(--ink);color:var(--ink);white-space:nowrap;}
 .ex-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
 .sets-info{color:var(--text-mid);font-size:12px;}
@@ -176,14 +184,14 @@ button:disabled:active{transform:none;}
 .w-input{width:78px;background:var(--field-bg);border:var(--bw) solid var(--ink);border-radius:var(--r-sm);color:var(--text);font-size:16px;font-weight:700;padding:7px 8px;outline:none;}
 .w-input:focus,.rep-inp:focus,.drop-search input:focus,.tip-ta:focus,.set-input:focus,.bk-ta:focus{box-shadow:var(--sh-xs)!important;}
 .setting-row{display:flex;align-items:center;gap:7px;margin-bottom:8px;}
-.set-lbl{flex-shrink:0;cursor:default;width:26px;height:26px;border-radius:50%;background:var(--highlight);border:2px solid var(--ink);display:inline-flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink);}
+.set-lbl{flex-shrink:0;cursor:default;width:30px;height:30px;border-radius:50%;background:var(--highlight);border:2px solid var(--ink);display:inline-flex;align-items:center;justify-content:center;font-size:14px;color:var(--ink);}
 .set-input{flex:1;min-width:0;background:var(--field-bg);border:var(--bw) solid var(--ink);border-radius:var(--r-sm);color:var(--text);font-size:16px;padding:7px 9px;outline:none;}
 .reps-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
 .rep-col{display:flex;flex-direction:column;align-items:center;gap:2px;}
 .rep-lbl{color:var(--text);font-size:10px;font-weight:600;}
-.rep-inp{width:46px;text-align:center;background:var(--field-bg);border:var(--bw) solid var(--ink);border-radius:var(--r-sm);color:var(--text);font-size:16px;font-weight:700;padding:8px 2px;outline:none;}
-.rep-prev{color:var(--text-faint);font-size:10px;}
-.add-set-btn{width:38px;height:38px;border-radius:50%;background:var(--rex-lime);border:var(--bw) solid var(--ink);color:var(--ink);font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:var(--sh-xs);}
+.rep-inp{width:48px;text-align:center;background:var(--field-bg);border:var(--bw) solid var(--ink);border-radius:var(--r-sm);color:var(--text);font-size:16px;font-weight:700;padding:8px 2px;outline:none;}
+.rep-prev{color:var(--text-dim);font-size:10px;font-weight:500;}
+.add-set-btn{width:38px;height:38px;border-radius:50%;background:var(--rex-lime);border:var(--bw) solid var(--ink);color:var(--ink);font-size:20px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:var(--sh-xs);}
 .phint{margin-top:8px;font-size:11px;color:var(--text-dim);}
 
 /* ===== Tips ===== */
@@ -219,9 +227,8 @@ button:disabled:active{transform:none;}
 .ov-bars{display:flex;align-items:flex-end;gap:4px;height:48px;}
 .ov-bar{flex:1;height:100%;border:2px solid var(--ink);border-radius:999px;background:var(--bar-empty);overflow:hidden;display:flex;align-items:flex-end;}
 .ov-bar-fill{width:100%;border-radius:999px;transition:height .3s;}
-/* ===== Rex (Maskottchen): ganzes Motiv rex-apfel.webp in der Wochen-Karte, immer im ink-Rahmen, nie freigestellt ===== */
-.wp-rex{width:68px;flex-shrink:0;border:var(--bw) solid var(--ink);border-radius:var(--r-md);overflow:hidden;background:var(--rex-pink);box-shadow:var(--sh-xs);}
-.wp-rex img{display:block;width:100%;height:auto;aspect-ratio:500/720;}
+/* kg-Zugewinn als gruene Pill (Status immer als Flaeche mit ink-Text, wie Rexy) */
+.gain-pill{font-size:11px;font-weight:700;padding:1px 8px;border-radius:999px;border:2px solid var(--ink);background:var(--st-up);color:var(--ink);white-space:nowrap;}
 .hidden{display:none!important;}
 /* ===== Abfrage-Fenster (Uebungswechsel, 3/4 Tage umstellen) ===== */
 .sheet-bg{position:fixed;inset:0;z-index:300;background:var(--scrim);display:flex;align-items:flex-end;justify-content:center;padding:16px 16px max(16px,env(safe-area-inset-bottom));}
@@ -238,34 +245,34 @@ button:disabled:active{transform:none;}
 <div style="max-width:680px;margin:0 auto;">
 <div id="header">
   <div class="header-top">
-    <div class="logo">
-      <span class="logo-badge"><img class="logo-rex" src="rex-apfel-kopf.webp" alt="" width="300" height="300" decoding="async"/></span>
-      <div><div class="logo-title">Peach Project</div><div class="logo-sub">Trainings-App</div></div>
-    </div>
+    <span class="wordmark">Peach</span>
     <div class="header-right">
       <button class="tab-btn nb-shadow active" id="btn-training" onclick="setView('training')">Training</button>
       <button class="tab-btn nb-shadow inactive" id="btn-overview" onclick="setView('overview')">Übersicht</button>
     </div>
   </div>
-  <div class="controls">
-    <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;">
-      <button class="plan-btn nb-shadow" id="plan-p3" onclick="setPlan('p3')" title="Gilt für diese Woche">3 Tage</button>
-      <button class="plan-btn nb-shadow active" id="plan-p4" onclick="setPlan('p4')" title="Gilt für diese Woche">4 Tage</button>
-    </div>
-    <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;">
-      <span class="cycle-lbl">Zyklus</span>
-      <button class="cycle-btn nb-shadow active" id="cycle-cycle1" onclick="setCycle('cycle1')" aria-label="Zyklus 1">1</button>
-      <button class="cycle-btn nb-shadow" id="cycle-cycle2" onclick="setCycle('cycle2')" aria-label="Zyklus 2">2</button>
-      <button class="cycle-btn nb-shadow" id="cycle-cycle3" onclick="setCycle('cycle3')" aria-label="Zyklus 3">3</button>
-      <button class="cycle-btn nb-shadow" id="cycle-cycle4" onclick="setCycle('cycle4')" aria-label="Zyklus 4">4</button>
-      <button class="cycle-btn nb-shadow" id="cycle-cycle5" onclick="setCycle('cycle5')" aria-label="Zyklus 5">5</button>
-      <button class="cycle-btn nb-shadow" id="cycle-cycle6" onclick="setCycle('cycle6')" aria-label="Zyklus 6">6</button>
-    </div>
-    <div class="week-nav">
-      <button class="week-arrow nb-shadow" onclick="changeWeek(-1)">&#8249;</button>
-      <button class="week-label" id="week-label" onclick="togWeekPick(event)" aria-haspopup="true" aria-expanded="false" title="Woche direkt wählen">W 1 / 12</button>
-      <button class="week-arrow nb-shadow" onclick="changeWeek(1)">&#8250;</button>
-      <div class="week-pick hidden" id="week-pick"></div>
+  <div class="header-main">
+    <img class="hdr-rex" src="rex-apfel-frei.webp" alt="" width="198" height="330" decoding="async"/>
+    <div class="controls">
+      <div class="plan-group">
+        <button class="plan-btn nb-shadow" id="plan-p3" onclick="setPlan('p3')" title="Gilt für diese Woche">3 Tage</button>
+        <button class="plan-btn nb-shadow active" id="plan-p4" onclick="setPlan('p4')" title="Gilt für diese Woche">4 Tage</button>
+      </div>
+      <div class="week-nav">
+        <button class="week-arrow nb-shadow" onclick="changeWeek(-1)" aria-label="Vorherige Woche">&#8249;</button>
+        <button class="week-label" id="week-label" onclick="togWeekPick(event)" aria-haspopup="true" aria-expanded="false" title="Woche direkt wählen">W 1 / 12</button>
+        <button class="week-arrow nb-shadow" onclick="changeWeek(1)" aria-label="Nächste Woche">&#8250;</button>
+        <div class="week-pick hidden" id="week-pick"></div>
+      </div>
+      <div class="cycle-group">
+        <span class="cycle-lbl">Zyklus</span>
+        <button class="cycle-btn nb-shadow active" id="cycle-cycle1" onclick="setCycle('cycle1')" aria-label="Zyklus 1">1</button>
+        <button class="cycle-btn nb-shadow" id="cycle-cycle2" onclick="setCycle('cycle2')" aria-label="Zyklus 2">2</button>
+        <button class="cycle-btn nb-shadow" id="cycle-cycle3" onclick="setCycle('cycle3')" aria-label="Zyklus 3">3</button>
+        <button class="cycle-btn nb-shadow" id="cycle-cycle4" onclick="setCycle('cycle4')" aria-label="Zyklus 4">4</button>
+        <button class="cycle-btn nb-shadow" id="cycle-cycle5" onclick="setCycle('cycle5')" aria-label="Zyklus 5">5</button>
+        <button class="cycle-btn nb-shadow" id="cycle-cycle6" onclick="setCycle('cycle6')" aria-label="Zyklus 6">6</button>
+      </div>
     </div>
   </div>
 </div>
@@ -435,9 +442,12 @@ const TIPS={
 "Lateral Lunge":"Seitlicher Ausfallschritt: großer Schritt zur Seite, Gewicht auf das Schrittbein, das andere Bein bleibt gestreckt.\nAusführung: Hüfte nach hinten-unten schieben, der Fuß des gestreckten Beins bleibt flach am Boden – die Innenseite zieht deutlich. Über die Ferse zurückdrücken. Freie Variante des Cossack Squat, gut mit KH oder Kettlebell vor der Brust.",
 "RDL Maschine":"⚙ Einstellung: Starthöhe der Griffe etwa auf Mitte Schienbein – volle Hamstring-Dehnung ohne runden Rücken muss möglich sein.\nAusführung: Hüftgelenk-Scharnier – Rücken neutral, Hüfte nach hinten schieben, langsam absenken bis zur starken Dehnung in den Hamstrings – das ist der entscheidende Reiz für Po und Beinrückseite. Oben durch die Fersen drücken und Po aktiv anspannen. Die Maschinenführung macht schwere Gewichte sicher – nutze das für Stretch-Hypertrophie."
 };
-const CC={"Glute Max":"#EE8FB4","Glute Med":"#B49DF2","Adduktoren":"#7FD1C1","Glute & Quad":"#E8B86A","Glute & Hams":"#A7D98C","Beinbeuger":"#D7A0E8","Beinstrecker":"#F9B98A","Rücken":"#84C3E0","Brust":"#F0A0A0","Schultern":"#C2DB7E","Bizeps":"#E6C57E","Trizeps":"#93B6E0","Bauch":"#D6D080"};
+// Kategorie-Farben (Muskelgruppen) — Werte wie im Rexy-System (kraeftiger als die Designsystem-Basis)
+const CC={"Glute Max":"#FA86B6","Glute Med":"#B99FFA","Adduktoren":"#43D9BE","Glute & Quad":"#F4A437","Glute & Hams":"#84DE70","Beinbeuger":"#E29CF2","Beinstrecker":"#FDA57C","Rücken":"#5DCDFA","Brust":"#FB9797","Schultern":"#BEE349","Bizeps":"#F7D979","Trizeps":"#94B8F8","Bauch":"#DED754"};
 // Tagesfarbe pro Tag-Card — Tokens --day-a..d (App-Ebene Rex: A lilac, B Rex-Pink, C Rex-Gelb, D Rex-Cyan)
 const DAYBG=["var(--day-a)","var(--day-b)","var(--day-c)","var(--day-d)"];
+// Schrift der Tages-Pill (ink-Flaeche) wie Rexy CountPill: Kartenfarbe, auf Lila/Pink cream (dort auf ink zu dunkel)
+const DAYTXT=["var(--cream)","var(--cream)","var(--day-c)","var(--day-d)"];
 // TRAININGSPLAENE — Version 2 (ab Sept. 2026): Peach-Aufbau mit vollem Po-Fokus.
 // Wochenvolumen am oberen Ende dessen, was laut Studienlage noch wirkt (Po ~25-30 anteilige
 // Saetze/Woche), pro Einheit hoechstens ~9 harte Po-Saetze. Reihenfolge pro Tag (Wunsch):
@@ -1276,14 +1286,14 @@ function renderT(){
   // refreshWeekBar ihn live nachziehen kann, ohne neu zu rendern.
   {
     const w=weekStats();
-    h+='<div class="week-progress'+(w.tot?'':' hidden')+'" id="wp-box"><div class="wp-rex"><img src="rex-apfel.webp" alt="" width="500" height="720"/></div><div class="wp-main"><div class="wp-top"><span class="wp-title">Woche '+S.week+'</span><span class="wp-pct" id="wp-pct">'+w.pct+'%</span></div><div class="wp-bar-wrap"><div class="wp-bar" id="wp-bar" style="width:'+w.pct+'%;background:'+(w.pct>=100?'var(--st-up)':'var(--accent)')+(w.pct>0&&w.pct<100?';border-right:2px solid var(--ink)':'')+'"></div></div><div class="wp-sub" id="wp-sub">'+w.imp+'/'+w.tot+' Übungen gesteigert</div></div></div>';
+    h+='<div class="week-progress'+(w.tot?'':' hidden')+'" id="wp-box"><div class="wp-top"><span class="wp-title">Woche '+S.week+'</span><span class="wp-pct" id="wp-pct">'+w.pct+'%</span></div><div class="wp-bar-wrap"><div class="wp-bar" id="wp-bar" style="width:'+w.pct+'%;background:'+(w.pct>=100?'var(--st-up)':'var(--accent)')+(w.pct>0&&w.pct<100?';border-right:2px solid var(--ink)':'')+'"></div></div><div class="wp-sub" id="wp-sub">'+w.imp+'/'+w.tot+' Übungen gesteigert</div></div>';
   }
   pl.forEach((day,di)=>{
     const op=S.openDays[di]===true;
     const total=day.e.length;let done=0;day.e.forEach((ex,ei)=>{if(exDone(di,ei))done++});
     const dcol=DAYBG[di%4];
     // Titel = Schwerpunkt des Tages, darunter (nur neue Plaene) die Fokus-Zeile day.f
-    h+='<div class="day-card" style="background:'+dcol+'"><button class="day-header" onclick="toggleDay('+di+')"><span class="day-title">'+esc(day.l)+'</span><span class="day-right"><span class="day-count" id="dc-'+di+'" style="color:'+dcol+'">'+(done===total?'✓ ':'')+done+'/'+total+' Übungen</span><span class="day-chevron">'+(op?'▲':'▼')+'</span></span>'+(day.f?'<span class="day-focus">'+esc(day.f)+'</span>':'')+'</button>';
+    h+='<div class="day-card" style="background:'+dcol+'"><button class="day-header" onclick="toggleDay('+di+')"><span class="day-title">'+esc(day.l)+'</span><span class="day-right"><span class="day-count" id="dc-'+di+'" style="color:'+DAYTXT[di%4]+'">'+(done===total?'✓ ':'')+done+'/'+total+' Übungen</span><span class="day-chevron">'+(op?'▲':'▼')+'</span></span>'+(day.f?'<span class="day-focus">'+esc(day.f)+'</span>':'')+'</button>';
     if(op){h+='<div class="day-body'+(S.animDay===di?' anim':'')+'">';day.e.forEach((ex,ei)=>{h+=renderEx(ex,ei,di)});h+='</div>'}
     h+='</div>';
   });
@@ -1573,7 +1583,7 @@ function renderEx(ex,ei,di){
     filt.forEach(o=>{
       const s=cur.exercise===o;
       const rec=REC.has(o);
-      oh+='<div class="drop-opt'+(s?' sel':'')+'" onclick="selEx('+di+','+ei+',this.getAttribute(\'data-val\'))" data-val="'+esc(o)+'">'+esc(o)+(rec?' <span style="color:var(--gold);font-size:11px" title="Empfohlen für deine Ziele">★</span>':'')+'</div>';
+      oh+='<div class="drop-opt'+(s?' sel':'')+'" onclick="selEx('+di+','+ei+',this.getAttribute(\'data-val\'))" data-val="'+esc(o)+'">'+esc(o)+(rec?' <span class="rec-star" title="Empfohlen für deine Ziele" aria-label="Empfohlen für deine Ziele">★</span>':'')+'</div>';
     });
     if(!filt.length)oh+='<div class="drop-no-results">Keine Treffer</div>';
     dh='<div class="dropdown'+(S.dropAnim?' anim':'')+'" id="dd-'+di+'-'+ei+'"><div class="drop-search"><input id="ds-'+di+'-'+ei+'" type="text" placeholder="Suchen…" value="'+esc(S.dropSearch)+'" oninput="onDS('+di+','+ei+',this.value)" onkeydown="dsKey('+di+','+ei+',event)"/></div><div class="drop-list">'+oh+'</div></div>';
@@ -1682,7 +1692,7 @@ function renderOv(){
         const hPct=v>0?Math.max(8,Math.round(score(v)/mx*100)):0;
         return '<div class="ov-bar" title="W'+(i+1)+': '+(v||'–')+(inv?' kg Hilfe':' kg')+(ws[i].name?' · '+ws[i].name:'')+'"><div class="ov-bar-fill" style="height:'+hPct+'%;background:'+(v>0?fillCol:'transparent')+'"></div></div>';
       }).join('');
-      h+='<div class="ov-ex"><div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px"><span style="font-weight:700;color:var(--text)">'+(name?esc(name):'<span style="color:var(--text-faint)">—</span>')+'</span><div style="display:flex;gap:12px;align-items:center"><span style="color:var(--text-mid);font-size:11px">'+esc(ex.c)+'</span>'+(gainTxt?'<span style="color:var(--green);font-weight:700">'+gainTxt+'</span>':'')+'</div></div><div class="ov-bars">'+bars+'</div><div style="display:flex;justify-content:space-between;margin-top:4px"><span style="font-size:10px;color:var(--text-faint)">W1</span><span style="font-size:10px;color:var(--text-faint)">W12</span></div>'+(sameEx.length?'<div style="font-size:11px;color:var(--text-dim);margin-top:4px">Start: <b style="color:var(--text)">'+sameEx[0].wt+' kg</b>'+(sameEx.length>1?' · Aktuell: <b style="color:var(--green)">'+sameEx[sameEx.length-1].wt+' kg</b>':'')+'</div>':'')+swapNote+'</div>';
+      h+='<div class="ov-ex"><div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px"><span style="font-weight:700;color:var(--text)">'+(name?esc(name):'<span style="color:var(--text-faint)">—</span>')+'</span><div style="display:flex;gap:12px;align-items:center"><span style="color:var(--text-mid);font-size:11px">'+esc(ex.c)+'</span>'+(gainTxt?'<span class="gain-pill">'+gainTxt+'</span>':'')+'</div></div><div class="ov-bars">'+bars+'</div><div style="display:flex;justify-content:space-between;margin-top:4px"><span style="font-size:10px;color:var(--text-faint)">W1</span><span style="font-size:10px;color:var(--text-faint)">W12</span></div>'+(sameEx.length?'<div style="font-size:11px;color:var(--text-dim);margin-top:4px">Start: <b style="color:var(--text)">'+sameEx[0].wt+' kg</b>'+(sameEx.length>1?' · Aktuell: <b style="color:var(--text)">'+sameEx[sameEx.length-1].wt+' kg</b>':'')+'</div>':'')+swapNote+'</div>';
     });
     h+='</div>';
   });
@@ -1914,7 +1924,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeWeekPick();clo
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-10-23-02';
+const BUILD_ID='2026-10-23-03';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();
