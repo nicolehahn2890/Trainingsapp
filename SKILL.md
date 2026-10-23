@@ -38,8 +38,8 @@ auf main einmalig eine Sicherheitsfreigabe verlangen; dann kurz bestaetigen lass
 - Live-URL: https://nicolehahn2890.github.io/Trainingsapp/
 - Repository: github.com/nicolehahn2890/Trainingsapp
 - Technologie: Standalone HTML-Datei (kein Framework, kein Build-Schritt)
-- Repo-Dateien: index.html (App), apple-touch-icon.png (Home-Screen-Icon), rex-sanduhr.webp
-  (Maskottchen Rex im Kopf, siehe App-Ebene "Rex"),
+- Repo-Dateien: index.html (App), apple-touch-icon.png (Home-Screen-Icon = Rexy-App-Icon), rex-sanduhr.webp
+  (Maskottchen Rex im Kopf, siehe App-Ebene "Rex"), rex-puh.webp / rex-wow.webp (Rex-Reaktionen, siehe Rex-Momente),
   manifest.json (display:browser — Icon oeffnet Safari, NICHT standalone!),
   Peach_Project.pdf (Original-Handbuch des Trainers, 41 Seiten — nicht aendern), SKILL.md
   (diese Datei), tests/ (Browser-Tests, siehe Abschnitt Tests)
@@ -71,6 +71,7 @@ auf main einmalig eine Sicherheitsfreigabe verlangen; dann kurz bestaetigen lass
 - **NIEMALS Hex-Farben hart in CSS-Klassen schreiben — immer `var(--...)`.** In JS-HTML-
   Strings Tokens als `var(--accent)` etc. nutzen; nur die Kategorie-Farben CC sind als Hex in JS
   hinterlegt (DAYBG, pbadge und rcol laufen seit 23.10.2026 ueber Tokens, siehe App-Ebene "Rex").
+  Vorbestehende Ausnahme: .tip-panel #FFFDF7.
 - "Press"-Interaktion: Buttons mit Klasse `nb-shadow` ruecken auf :active um translate(2px,2px)
   und ihr Schatten kollabiert auf --sh-press (1px). Neue Schatten-Buttons brauchen diese Klasse.
 - Fokus-Ring (a11y): globales `:focus-visible` = 3px solid var(--ink) + 3px Offset (wie Rexy),
@@ -88,23 +89,31 @@ Bis Version -03 stand dort der mittlere Apfel-Rex — Verwechslung, gemeint war 
 Rexy ordnet Sanduhr die Zielfarbe Gelb zu; der App-Akzent bleibt bewusst Rex-Pink ("sonst ist alles super").
 - Im `:root` stehen OBEN unveraendert die Tokens des Designsystems (--peach, --pink, --lilac, --sky,
   --yellow, --bg, --green, --prog-*, --cat-* ...). Diese Werte NIE aendern (tests/rex-maskottchen
-  prueft das). DARUNTER im selben :root die App-Ebene: Rex-Farben (Werte wie im Rexy-System) und
-  Rollen-Tokens. CSS und JS nutzen die ROLLEN, nicht die Basis-Farben direkt.
-- Rex-Farben: --rex-pink #F6409F, --rex-cyan #22E3F0, --rex-yellow #FAF22E, --rex-lime #B5F23D,
-  --rex-green #4FD06A, --rex-blue #4D9DF5, --rex-red #FF5C5C, --rex-rose #FA9ECC / --rex-rose-pale
-  #FDE7F2 (hell/dunkel-Abstufung der Rex-Haut). Dazu --bw-bold 3px und --sh-pop (5px pinker Versatz),
-  beide nur fuer die Wortmarke.
+  prueft das). DARUNTER im selben :root die App-Ebene: Rex-Farben und -Schriften (Werte wie im Rexy-
+  System) und Rollen-Tokens. CSS und JS nutzen die ROLLEN, nicht die Basis-Farben direkt.
+- Rex-Farben (seit Version -07 die Werte aus dem Rexy-Marketing-Kit, das Artefakt wurde angepasst):
+  --rex-pink #FF199B, --rex-cyan #00DDE8, --rex-yellow #F5FF00, --rex-lime #C8FF00, --rex-violet #9B5CFF
+  (im Kit "lilac"), --rex-cream #FFF9E5, --rex-gold #FFC23D, --rex-green #4FD06A, --rex-blue #4D9DF5,
+  --rex-red #FF5C5C. App-eigen (nicht im Kit): --rex-rose #FA9ECC / --rex-rose-pale #FDE7F2 (hell/dunkel-
+  Abstufung der Rex-Haut fuer Kopf und Seite). Dazu --bw-bold 3px und --sh-pop (5px pinker Versatz), beide
+  nur fuer die Wortmarke. (Bis Version -06: Pink #F6409F, Cyan #22E3F0, Gelb #FAF22E, Lime #B5F23D.)
+  Ink bleibt das Basis-Token #181016 (Rexy #101010, kein sichtbarer Unterschied).
+- Rex-Schriften: --rex-font-display (Bowlby One SC) und --rex-font-sans (Inter), siehe Fonts.
 - Rollen: --header-bg (rose) · --page-bg (rose-pale, body) · --head-accent (Cyan: aktiver Tab, aktive
   Plan-Pill — Wunsch: nie Pink auf Pink) · --arrow-bg (Cyan, Wochenpfeile) · --accent (Rex-Pink: Knoepfe
   im Inhalt, Dropdown-Auswahl, Sheet-Hauptknopf, Wochenbalken, aktuelle Woche in der Uebersicht,
-  Scrollbalken) · --highlight (Rex-Gelb: Zahnrad, offener Tipp, Banner Woche 12) · --day-a..d (A Lila,
-  B Rex-Pink, C Rex-Gelb, D Rex-Cyan) · --bar-past (Cyan: andere Wochen in der Uebersicht + "hat Werte"
+  Scrollbalken) · --highlight (Rex-Gelb: Zahnrad, offener Tipp, Banner Woche 12) · --block-bg (Kit-Creme:
+  Uebungszeilen, Wochen-Karte, Uebersichtskarten, Sheets, Aufklapplisten, Pills im Kopf, Disabled; ersetzt
+  --surface/--cream/--drop-bg in CSS und JS) · --day-a..d (A Kit-Lila --rex-violet, B Rex-Pink, C Rex-Gelb,
+  D Rex-Cyan) · --bar-past (Cyan: andere Wochen in der Uebersicht + "hat Werte"
   in der Wochenwahl — rosa wirkte "zu girly") · --st-up/-reps/-same/-down (Status, knallig wie Rexy:
   gruen/blau/neongelb/rot — Rep-Felder rcol, Badges, Erledigt-Haken, voller Wochenbalken, Zugewinn-Pill,
-  Speicher-Warnung). Backup-Karte --rex-cyan, Satz-hinzufuegen --rex-lime.
+  Speicher-Warnung). Backup-Karte --rex-cyan, Satz-hinzufuegen --rex-lime, Stern --rex-gold, Creme-
+  Schrift auf ink (aktiver Zyklus, aktuelle Woche in der Wochenwahl) --rex-cream.
 - Angeglichen an die Rexy-Bausteine: Wortmarke (siehe Marke), Fokus-Ring ink 3px mit 3px Abstand (ein
-  pinker Ring verschwand auf Tag B), Tages-Pill wie CountPill (ink, Schrift IMMER in der Kartenfarbe —
-  auch auf Lila/Pink, NICHT cream wie bei Rexy: Wunsch 23.10.2026; tabellarische Ziffern), Kategorie-Farben
+  pinker Ring verschwand auf Tag B), Tages-Pill wie CountPill (ink, Inter 700 11px, Schrift IMMER in der
+  Kartenfarbe — auch auf Lila/Pink, NICHT cream wie bei Rexy: Wunsch 23.10.2026; tabellarische Ziffern),
+  Fokus-Zeile unter dem Tagesnamen in vollem ink (mit opacity .78 kam sie auf Lila/Pink unter 4,5:1), Kategorie-Farben
   CC mit den Rexy-Werten, Empfehlungs-Stern
   als Gold-Scheibe mit ink-Rahmen (.rec-star, steht HINTER dem Namen — Tests pruefen startsWith),
   Vorwerte unter den Rep-Feldern --text-dim, Rep-Feld 48px, Picker min. 42px, Zahnrad-Scheibe 30px,
@@ -117,44 +126,67 @@ Rexy ordnet Sanduhr die Zielfarbe Gelb zu; der App-Akzent bleibt bewusst Rex-Pin
   pfeile (Tests klicken ueber Woche 1/12 hinaus). Gruene TEXTE gibt es nicht mehr (Zugewinn = gruene
   Pill, "Aktuell" in ink) — --green ist ungenutzt, bleibt aber als Basis-Token stehen.
 - Peach-Orange kommt in der App nicht mehr vor (Wunsch: Tag A Lila statt Pastell-Orange). Lila nur
-  noch als Tag A — Kopf/Seite in Lila waren "zu lila, nicht im Rex-Bild".
+  noch als Tag A — Kopf/Seite in Lila waren "zu lila, nicht im Rex-Bild". Seit Version -07 das Kit-Lila
+  #9B5CFF (Rexis Wahl; vorher Basis --lilac #B49DF2). Rexy selbst hat A Pink, B Cyan, C Gelb, D Lime, E Lila —
+  die App behaelt bewusst ihre Reihenfolge.
 - Bild: rex-sanduhr.webp (250x360) = der Rexy-Ausschnitt rex-sanduhr.webp (Flos Hintergrund: Gelb, Cyan-
   Kanten, Rasterpunkte; KEIN Schriftzug — "SANDUHR"/"APFEL-PO" ausdruecklich nicht), nur verkleinert. Regel wie
   Rexy: immer im ink-Rahmen. Rexis eigener Freisteller aller drei Rexe existiert (Upload 23.10.2026), wird in
   der App aber NICHT genutzt: mit Hintergrund wirkt es poppiger (Rexis Wahl). Nicht selbst freistellen.
-- Platzierung: NUR im Kopf. Oben die Wortmarke, darunter links der Sanduhr-Rex als gerahmte Comic-Kachel
+- Platzierung: Der Sanduhr-Rex steht NUR im Kopf und bleibt dort UNVERAENDERT (Wunsch 23.10.2026: "gefaellt
+  mir so gut" — beim Abgleich mit dem Rexy-Artefakt nicht anfassen). Oben die Wortmarke, darunter links der
+  Sanduhr-Rex als gerahmte Comic-Kachel
   (.hdr-rex: --bw ink-Rahmen, --r-md, --sh-sm, object-fit cover, Fallback --rex-yellow), rechts die
   Bedienung (.controls: Plan-Pills, Wochenwahl, Zyklus). Kachelhoehe 112 px (Bedienung in 3 Zeilen), 104 px
   bis 380 px Breite (sonst passt die Zyklus-Zeile nicht daneben), 84 px ab 425 px (2 Zeilen); ab 600 px
-  eine Zeile. Kopfhoehe 198 px auf 375/390 px — wie vor dem Umbau.
+  eine Zeile. Kopfhoehe 196-198 px auf 375/390 px — wie vor dem Umbau.
+- Rex-Momente (seit Version -07, Wunsch: Reaktionen aus dem Marketing-Kit): wie Rexy RexMoment (mood) —
+  .rex-moment = Block mit ink-Rahmen, --r-lg, --sh-card, Reaktion 64 px links (alt leer), Titel Bowlby One SC
+  16px, ein Satz Inter 14px/500. Hoechstens EINER pro Ansicht. Nur an zwei Stellen:
+  1. "Training geschafft" (rex-puh.webp, auf --block-bg) am Ende des OFFENEN Tages (#rm-[di] in .day-body),
+     sobald alle Uebungen erledigt sind (exDone): "8 von 8 Übungen eingetragen, 4 davon gesteigert." (Teil
+     "davon gesteigert" nur mit Vergleich; gezaehlt wie weekStats). rexDayHTML(di) baut ihn, refreshRex(di)
+     zieht ihn LIVE nach (aus refreshDone UND refreshProg, KEIN renderT; el._h verhindert Neuladen des Bildes).
+     Offen ist immer nur ein Tag (toggleDay) -> hoechstens einer. NICHT in Woche 12 (dort steht der Wow-Rex).
+  2. Banner Woche 12 (#cy-end, rex-wow.webp, auf --highlight), siehe Zyklus-Ende-Banner.
+  Bilder: Rexy-Reaktionen E05-puh / E07-wow (1254 px, freigestellt) mit Lanczos auf 192x192 (64 px @3x)
+  verkleinert, WebP. Nie auf Pink stellen (Rex-Haut verschwindet), nie umfaerben.
   Verworfen (nicht wieder vorschlagen): runder Rex-Kopf im Header ("erkennt man nicht"), Rex-Karte unter
   den Tagen ("angehaengt"), Rex im Kopf der Uebersicht ("zu viel"), Rex in der Wochen-Karte (doppelt),
   Apfel-Rex (Verwechslung), Freisteller im Kopf (wirkt verloren), Freisteller vor gelbem Block mit Kopf
   ueber der Kante (ohne Flos Hintergrund).
 
-### Fonts
-- Display (Logo, Screen-Titel, Tag-Titel, grosse Zahlen): **Archivo Black**, UPPERCASE,
-  letter-spacing -0.5 bis -1px → Token `--font-display`
-- Body / UI: **Space Grotesk** (Gewichte 400–700; NICHT 800 — sonst faux-bold) → `--font-sans`
-- Beide via Google Fonts CDN im <head>. Alle Inputs bleiben 16px (iOS-Anti-Zoom).
+### Fonts (seit Version -07 wie Rexy)
+- Display (Logo, Screen-Titel, Tag-Titel, grosse Zahlen, Rex-Moment-Titel): **Bowlby One SC**, UPPERCASE,
+  letter-spacing 0 (wie Rexy; mit den alten -0.5 bis -1px klebten die Buchstaben) → App-Token
+  `--rex-font-display`. Nur ein Schnitt (400). Das F reicht unter die Grundlinie: zweizeilige grosse Titel
+  brauchen Zeilenhoehe 1.3 (.ov-title), sonst stossen Ue-Punkte daran.
+- Body / UI: **Inter** (Gewichte 400–700; NICHT 800 — sonst faux-bold) → App-Token `--rex-font-sans`.
+  Auch die Tages-Pill (wie Rexy CountPill).
+- Bungee (Rexy --font-alt) ist nur fuer Marketing, nie in der App.
+- Beide via Google Fonts CDN im <head> (family=Bowlby+One+SC&family=Inter:wght@400;500;600;700).
+  Alle Inputs bleiben 16px (iOS-Anti-Zoom).
+- Die Basis-Tokens --font-display (Archivo Black) und --font-sans (Space Grotesk) stehen unveraendert im
+  Designsystem-Teil, werden aber nicht mehr genutzt und nicht mehr geladen.
 
 ### Farb-Tokens des Designsystems (Basis, Werte nie aendern — die App nutzt die Rollen oben)
 Ink (Rahmen / Schatten / Text auf Bloecken): --ink #181016
 Bright-Palette: --peach #F4A45E (Primaer), --pink #F18FB6, --lilac #B49DF2 (Header),
   --lime #B6DD57, --sky #8CCBE8, --yellow #F5CB44, --cream #FBF3E7
 Seite: --bg #E9DEF8 (Lavendel). Felder: weiss #FFF mit Ink-Rahmen.
-"(Primaer)", "(Header)" und "Lavendel" beschreiben das DESIGNSYSTEM. Die App nutzt von den Basis-Farben nur
-  noch --ink, --cream/--surface (Bloecke, Abfrage-Fenster, Disabled), --lilac (Tag A), --gold (Stern), die
-  Text-Rampe und --field-bg. Kopf, Seite, Akzent, Status und Tag B-D kommen aus der App-Ebene "Rex";
-  --peach, --pink, --lime, --sky, --yellow, --green, --bg, --focus, --cat-* und --prog-* sind ungenutzt.
+"(Primaer)", "(Header)" und "Lavendel" beschreiben das DESIGNSYSTEM. Die App nutzt von den Basis-Farben seit
+  Version -07 nur noch --ink, die Text-Rampe, --field-bg und --scrim. Kopf, Seite, Bloecke (--block-bg),
+  Akzent, Status, Stern und alle Tage kommen aus der App-Ebene "Rex"; --peach, --pink, --lilac, --lime, --sky,
+  --yellow, --cream, --surface, --drop-bg, --gold, --green, --bg, --focus, --cat-* und --prog-* sind ungenutzt.
 Text-Rampe: #181016 → #45343D → #5E4C55 → #7E6C76 → #A2929C
 Radien: --r-sm 10 / --r-md 12 / --r-lg 16 / --r-xl 20 / --r-pill 999. Rahmenbreite --bw 2,5px.
 Schatten (solid Ink, kein Blur): --sh-xs 2px / --sh-sm 3px / --sh-card 4px /
   --sh-header 0 3px / --sh-drop 5px / --sh-press 1px.
 
 ### Tagesfarben (DAYBG — je Tag-Card eine Farbe, Tokens --day-a..d)
-Tag A Lila #B49DF2 · Tag B Rex-Pink #F6409F · Tag C Rex-Gelb #FAF22E · Tag D Rex-Cyan #22E3F0
-(bis 23.10.2026: Peach / Pink #F18FB6 / Lime / Sky)
+Tag A Kit-Lila #9B5CFF · Tag B Rex-Pink #FF199B · Tag C Rex-Gelb #F5FF00 · Tag D Rex-Cyan #00DDE8
+(Version -02 bis -06: Lila #B49DF2 / #F6409F / #FAF22E / #22E3F0; bis 23.10.2026: Peach / Pink #F18FB6 / Lime / Sky)
+Kontrast ink auf Lila 4,8:1, auf Pink 5,2:1 (AA) — deshalb keine Deckkraft auf Text in Tageskarten.
 Die Tages-Count-Pill ist ink mit der Tagesfarbe als Textfarbe (✓-Praefix wenn komplett);
 in der Uebersicht ist das Tages-Label eine Pille in der jeweiligen Tagesfarbe.
 
@@ -169,28 +201,29 @@ In der App seit 23.10.2026 die knalligen Rexy-Werte ueber --st-* (Wunsch: "zu pa
 Designsystem-Tokens --prog-* (#6FC36A / #5EA8E0 / #F5CB44 / #EC6A6A) bleiben unveraendert stehen.
   Gruen    #4FD06A = Gewicht gesteigert / Rep-Feld an der Obergrenze (--st-up)
   Blau     #4D9DF5 = Mehr Reps (--st-reps)
-  Neongelb #FAF22E = Gleiche Leistung / Rep-Feld im Bereich (--st-same, gleich wie das Zahnrad)
+  Neongelb #F5FF00 = Gleiche Leistung / Rep-Feld im Bereich (--st-same, gleich wie das Zahnrad)
   Rot      #FF5C5C = Weniger als Vorwoche / Rep-Feld darunter (--st-down)
 
 ### Marke / Assets
 Logo (seit 23.10.2026): Wortmarke wie im Rexy-System — "PEACH" (ohne "Project", Wunsch) als gelbes
-  Schild (.wordmark: Archivo Black 20px, --rex-yellow, 3px ink-Rahmen --bw-bold, --r-sm, pinker
-  Druckversatz --sh-pop 5px), darunter der Sanduhr-Rex als Kachel (siehe App-Ebene). Die Unterzeile
+  Schild (.wordmark: Bowlby One SC 20px, letter-spacing 0, --rex-yellow, 3px ink-Rahmen --bw-bold, --r-sm,
+  pinker Druckversatz --sh-pop 5px), darunter der Sanduhr-Rex als Kachel (siehe App-Ebene). Die Unterzeile
   "Trainings-App" ist weg. Der Pixel-Pfirsich (16x16-SVG) ist aus der App raus, bleibt aber im
   Designsystem (assets/peach-logo.svg).
-Favicon: Pfirsich-Emoji als SVG-Data-URI im <head> (unveraendert).
+Favicon: Pfirsich-Emoji als SVG-Data-URI im <head> (unveraendert; Rexy wuerde es aus dem App-Icon
+  verkleinern — nur auf Wunsch aendern).
 App-Name ausserhalb der Wortmarke weiter "Peach Project": <title> "Peach Project – Trainings-App"
   (Safari-Tab), apple-mobile-web-app-title (Name unter dem Home-Bildschirm-Symbol) und manifest
   name/short_name. Nur aendern, wenn Rexi es will — ein schon abgelegtes Symbol behaelt Name und Bild,
   bis sie es neu ablegt.
 Home-Screen-Icon: apple-touch-icon.png (180x180), verlinkt mit apple-mobile-web-app-title und
-  ?v=sanduhr (Cache-Bremse fuer das neue Motiv; bei einem neuen Icon den Wert aendern, auch im Manifest).
-  Motiv seit 23.10.2026 (Version -04): Sanduhr-Kopf (Rexy rex-sanduhr-kopf.webp, mit Hintergrund) in einem
-  Kreis mit 7px Ink-Rahmen + hartem 7px-Schatten auf
-  Rosa (#FA9ECC) — spiegelt den Header. Vollflaechig (kein transparenter Rand), iOS rundet die Ecken
-  selbst. Erzeugt durch Rendern eines kleinen Icon-HTML mit Playwright (Viewport 180x180, dsf 3) ->
-  Screenshot, mit Lanczos auf 180x180 verkleinert. (Davor: Apfel-Kopf ?v=rex, davor Pixel-Pfirsich auf Lilac.)
-  Verworfen: Freisteller gross auf Gelb, ganzer Rex aus gelbem Block (Rexi: Kopf im Ring).
+  ?v=rexy (Cache-Bremse fuer das neue Motiv; bei einem neuen Icon den Wert aendern, auch im Manifest).
+  Motiv seit Version -07 (Wunsch): das Rexy-App-Icon aus dem Marketing-Kit (rexy-app-icon-1024.png: Rex-Kopf
+  nach rechts auf Cyan mit gelbem Block, randlos) — nur mit Lanczos auf 180x180 verkleinert, nicht neu
+  gezeichnet, keine Schrift, keine eigenen Ecken (iOS rundet selbst). Rexi muss das Symbol auf dem iPhone neu
+  ablegen, damit es erscheint.
+  (Davor: Version -04 bis -06 Sanduhr-Kopf im Tinten-Ring auf Rosa ?v=sanduhr, davor Apfel-Kopf ?v=rex,
+  davor Pixel-Pfirsich auf Lilac.) Verworfen: Freisteller gross auf Gelb, ganzer Rex aus gelbem Block.
 theme-color-Meta + manifest: theme_color #FA9ECC (Kopf), background_color #FDE7F2 (Seite).
 WICHTIG (localStorage!): Seit iOS 16.4 oeffnet Apple JEDES Home-Screen-Lesezeichen
 standardmaessig als eigenstaendige Web-App mit EIGENEM (leerem) localStorage-Container —
@@ -582,8 +615,9 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
 - Beide werden bei Rep-Eingabe LIVE per refreshDone() aktualisiert (gezieltes DOM-Update, kein renderT)
 - Rep-Feld (.rep-inp): leer = weiss; ausgefuellt wird das GANZE Feld mit der Performance-Farbe
   gefuellt (rcol: rot unter Bereich, gelb im Bereich, gruen am/ueber Top), Text bleibt ink
-- Fortschritt-Block (.week-progress): Cream-Block mit grosser %-Zahl (Archivo Black) + Kapsel-Bar
+- Fortschritt-Block (.week-progress): Cream-Block mit grosser %-Zahl (Bowlby One SC) + Kapsel-Bar
   (--accent Rex-Pink, gruen --st-up bei 100%). Kein Rex-Bild (der Rex steht im Kopf).
+- Rex-Moment "Training geschafft" (#rm-[di]) am Ende des offenen, kompletten Tages — siehe App-Ebene "Rex".
 - Uebersicht: vertikale Kapsel-Balken (.ov-bar = Pill-Track, .ov-bar-fill von unten) —
   aktuelle Woche (S.week) --accent, andere Wochen --bar-past (Cyan), Wochen mit einer ANDEREN Uebung grau
   (--text-ghost). Titel = zuletzt trainierte Uebung; kg-Zugewinn und Start/Aktuell zaehlen nur
@@ -926,8 +960,10 @@ Rexi macht KEINE Deload-Woche. Woche 12 ist eine ganz normale Trainingswoche und
 genauso verglichen wie Woche 2-11 (Badge, Hinweis, Wochenbalken). NIEMALS wieder eine
 Deload-Empfehlung (50-60 % Gewicht, 2 Saetze o. ae.) einbauen und Woche 12 nicht als
 Orientierungs-Quelle ueberspringen — sie ist der echte letzte Wert vor dem neuen Zyklus.
-Banner in Woche 12: gelber Block (var(--highlight), Rex-Neongelb), 2,5px Ink-Rahmen, harte Schatten
-(--sh-card), Titel "🏁 Letzte Woche von Zyklus N" in Archivo Black. Text EIN Satz: "Danach geht
+Banner in Woche 12 (#cy-end): Rex-Moment auf gelbem Block (var(--highlight), Rex-Neongelb) mit der Rex-
+Reaktion "Wow" (rex-wow.webp, 64 px links), 2,5px Ink-Rahmen, harte Schatten (--sh-card), --r-lg, Titel
+"Letzte Woche von Zyklus N" in Bowlby One SC 16px (die Zielflagge 🏁 ist seit Version -07 weg: der Rex
+ersetzt sie, Rexy: keine Emoji als Schmuck). In Woche 12 gibt es deshalb KEIN "Training geschafft". Text EIN Satz: "Danach geht
 es mit Zyklus X weiter." bzw. (alter Zyklus -> naechster neu) "Danach startet Zyklus X mit dem
 neuen Plan – deine Übungen werden übernommen."  Nach Zyklus 6
 geht es auf "1 (neu)" — dort steht aber der alte Plan (Marker): spaetestens dann braucht es
@@ -1013,6 +1049,17 @@ claude.ai. Frontmatter (name, description) dabei unveraendert lassen.
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Rexy-Kit-Werte: Farben, Schriften, App-Icon, Rex-Reaktionen (23.10.2026, Version 2026-10-23-07).**
+   Das Artefakt "Rexy - Neobrutalism" wurde auf das Marketing-Kit umgestellt; Wunsch: App anpassen, den
+   Sanduhr-Rex im Kopf NICHT aendern. Umsetzung in der App-Ebene (Basis-Tokens unveraendert): Rex-Farben auf
+   die Kit-Werte (Pink #FF199B, Cyan #00DDE8, Gelb #F5FF00, Lime #C8FF00), neu Kit-Lila #9B5CFF fuer Tag A
+   (Rexis Wahl), Kit-Creme #FFF9E5 fuer alle Bloecke (Rolle --block-bg), Kit-Gold #FFC23D fuer den Stern;
+   Schriften Bowlby One SC + Inter statt Archivo Black + Space Grotesk (letter-spacing 0, Tages-Pill in
+   Inter wie CountPill, .ov-title Zeilenhoehe 1.3); Fokus-Zeile der Tageskarten ohne Deckkraft (Kontrast).
+   Home-Screen-Icon = Rexy-App-Icon (?v=rexy). Rex-Momente: "Training geschafft" mit Reaktion Puh am Ende
+   des offenen, kompletten Tages (live), Banner Woche 12 mit Reaktion Wow statt 🏁. tests/rex-maskottchen
+   erweitert (Schriften, Creme, Stern-Gold, Rex-Momente live + Woche 12, neue Bilder); alle Testreihen gruen.
 
 NEU. **Projektdateien abgeglichen + Skill-ZIP (23.10.2026, Version 2026-10-23-06).** Keine Funktions- oder
    Designaenderung. SKILL.md gegen den Code geprueft: Wochenwahl "hat Werte" ist Cyan (stand noch Lila),

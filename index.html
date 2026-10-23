@@ -6,12 +6,12 @@
 <title>Peach Project – Trainings-App</title>
 <meta name="theme-color" content="#FA9ECC"/>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%91%3C/text%3E%3C/svg%3E"/>
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=sanduhr"/>
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=rexy"/>
 <link rel="manifest" href="manifest.json"/>
 <meta name="apple-mobile-web-app-title" content="Peach Project"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Bowlby+One+SC&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 /* ================= NEOBRUTALISM · LIGHT ONLY ================= */
@@ -50,10 +50,13 @@
   --ease:cubic-bezier(.2,.8,.2,1);--dur-fast:0.08s;--dur-base:0.12s;--dur-anim:0.22s;--dur-drop:0.14s;--dur-bar:0.45s;
   /* ===== App-Ebene "Rex" (Maskottchen, 23.10.2026) =====
      Alles oberhalb = Peach-Designsystem, bleibt unveraendert. Hier nur die Anpassung der App:
-     Rex-Farben aus Flos Motiv (gleiche Werte wie im Rexy-System) und die Rollen, die die App nutzt. */
-  --rex-pink:#F6409F;--rex-cyan:#22E3F0;--rex-yellow:#FAF22E;--rex-lime:#B5F23D;
+     Rex-Farben und Schriften wie im Rexy-System (Werte aus dem Marketing-Kit) und die Rollen, die die App nutzt. */
+  --rex-pink:#FF199B;--rex-cyan:#00DDE8;--rex-yellow:#F5FF00;--rex-lime:#C8FF00;--rex-violet:#9B5CFF;
+  --rex-cream:#FFF9E5;--rex-gold:#FFC23D;
   --rex-rose:#FA9ECC;--rex-rose-pale:#FDE7F2;   /* hell/dunkel-Abstufung der Rex-Haut fuer Kopf und Seite */
   --rex-green:#4FD06A;--rex-blue:#4D9DF5;--rex-red:#FF5C5C;
+  --rex-font-display:'Bowlby One SC','Inter',system-ui,sans-serif;  /* nur ein Schnitt, immer Grossbuchstaben */
+  --rex-font-sans:'Inter',system-ui,-apple-system,sans-serif;
   /* Status (Rep-Felder, Fortschritts-Badges, Erledigt-Haken, voller Wochenbalken) — knallig wie im Rexy-System */
   --st-up:var(--rex-green);--st-reps:var(--rex-blue);--st-same:var(--rex-yellow);--st-down:var(--rex-red);
   --accent:var(--rex-pink);       /* Hauptaktionen im Inhalt: Knoepfe, Auswahl, Wochenbalken, Scrollbalken */
@@ -61,13 +64,14 @@
   --head-accent:var(--rex-cyan);  /* aktive Knoepfe im Kopf (Tab, Plan-Pill) — Cyan, nie Pink auf Pink */
   --arrow-bg:var(--rex-cyan);     /* Pfeile der Wochenwahl */
   --highlight:var(--rex-yellow);  /* Zahnrad, offener Tipp, Banner Woche 12 */
-  --day-a:var(--lilac);--day-b:var(--rex-pink);--day-c:var(--rex-yellow);--day-d:var(--rex-cyan);
+  --block-bg:var(--rex-cream);    /* Bloecke: Zeilen, Karten, Sheets, Aufklapplisten, Pills, Disabled */
+  --day-a:var(--rex-violet);--day-b:var(--rex-pink);--day-c:var(--rex-yellow);--day-d:var(--rex-cyan);
   --page-bg:var(--rex-rose-pale); /* Seitenhintergrund */
   --bar-past:var(--rex-cyan);     /* andere Wochen: Balken der Uebersicht, Wochenwahl "hat Werte" (nicht rosa — zu girly) */
   --bw-bold:3px;                  /* nur Wortmarke (wie Rexy border-w-bold) */
   --sh-pop:5px 5px 0 var(--rex-pink); /* pinker Druckversatz, nur Wortmarke (wie Rexy shadow-pop) */
 }
-body{background:var(--page-bg);color:var(--text);font-family:var(--font-sans);min-height:100vh;-webkit-tap-highlight-color:transparent;}
+body{background:var(--page-bg);color:var(--text);font-family:var(--rex-font-sans);min-height:100vh;-webkit-tap-highlight-color:transparent;}
 ::-webkit-scrollbar{width:10px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--accent);border:2px solid var(--ink);border-radius:999px;}
@@ -77,7 +81,7 @@ button{cursor:pointer;transition:transform var(--dur-fast) var(--ease),box-shado
 button:active{transform:translate(2px,2px);}
 button.nb-shadow:active{box-shadow:var(--sh-press)!important;}
 /* Disabled buttons: flat & cream — no shadow, no press */
-button:disabled{background:var(--cream)!important;color:var(--text-dim)!important;border-color:var(--text-dim)!important;box-shadow:none!important;cursor:not-allowed;}
+button:disabled{background:var(--block-bg)!important;color:var(--text-dim)!important;border-color:var(--text-dim)!important;box-shadow:none!important;cursor:not-allowed;}
 button:disabled:active{transform:none;}
 /* Keyboard focus — hard ink ring on every focusable element (a11y), wie im Rexy-System:
    ink hat auf jeder Farbflaeche genug Kontrast (ein pinker Ring verschwand auf Tag B).
@@ -89,11 +93,11 @@ button:disabled:active{transform:none;}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}}
 
 /* ===== Header (solid block, --header-bg) ===== */
-#header{background:var(--header-bg);padding:13px 16px 11px;border-bottom:var(--bw) solid var(--ink);position:sticky;top:0;z-index:50;box-shadow:var(--sh-header);--text:#181016;--text-dim:#5E4C55;--surface:#FBF3E7;--field-bg:#FFF;--on-accent:#181016;}
+#header{background:var(--header-bg);padding:13px 16px 11px;border-bottom:var(--bw) solid var(--ink);position:sticky;top:0;z-index:50;box-shadow:var(--sh-header);--text:#181016;--text-dim:#5E4C55;--field-bg:#FFF;--on-accent:#181016;}
 .header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px;}
 .header-right{display:flex;gap:6px;align-items:center;}
 /* Wortmarke wie im Rexy-System: gelbes Schild, 3px ink-Rahmen, pinker Druckversatz */
-.wordmark{display:inline-block;font-family:var(--font-display);font-size:20px;line-height:1;letter-spacing:-0.5px;text-transform:uppercase;color:var(--ink);background:var(--rex-yellow);border:var(--bw-bold) solid var(--ink);border-radius:var(--r-sm);box-shadow:var(--sh-pop);padding:7px 11px;white-space:nowrap;}
+.wordmark{display:inline-block;font-family:var(--rex-font-display);font-size:20px;line-height:1;letter-spacing:0;text-transform:uppercase;color:var(--ink);background:var(--rex-yellow);border:var(--bw-bold) solid var(--ink);border-radius:var(--r-sm);box-shadow:var(--sh-pop);padding:7px 11px;white-space:nowrap;}
 @media(max-width:430px){.tab-btn{padding:8px 12px}}
 /* Darunter: Sanduhr-Rex links als gerahmte Comic-Kachel (Flos Hintergrund, wie Rexy), rechts die Bedienung */
 .header-main{display:flex;align-items:center;gap:10px;}
@@ -108,31 +112,31 @@ button:disabled:active{transform:none;}
 @media(min-width:600px){.cycle-group{order:1}.week-nav{order:2}}
 .tab-btn{padding:8px 15px;border-radius:999px;border:var(--bw) solid var(--ink);font-size:13px;font-weight:700;}
 .tab-btn.active{background:var(--head-accent);color:var(--ink);box-shadow:var(--sh-sm);}
-.tab-btn.inactive{background:var(--surface);color:var(--text);}
+.tab-btn.inactive{background:var(--block-bg);color:var(--text);}
 .cycle-btn{padding:7px 0;min-width:32px;text-align:center;border-radius:999px;font-size:12px;font-weight:700;border:var(--bw) solid var(--ink);background:transparent;color:var(--ink);}
 .cycle-lbl{font-size:12px;font-weight:700;color:var(--ink);margin-right:2px;}
-.cycle-btn.active{background:var(--ink);color:var(--cream);box-shadow:var(--sh-xs);}
-.plan-btn{padding:7px 13px;border-radius:999px;font-size:12px;font-weight:700;border:var(--bw) solid var(--ink);background:var(--surface);color:var(--ink);}
+.cycle-btn.active{background:var(--ink);color:var(--rex-cream);box-shadow:var(--sh-xs);}
+.plan-btn{padding:7px 13px;border-radius:999px;font-size:12px;font-weight:700;border:var(--bw) solid var(--ink);background:var(--block-bg);color:var(--ink);}
 .plan-btn.active{background:var(--head-accent);color:var(--ink);box-shadow:var(--sh-xs);}
 .week-nav{margin-left:auto;display:flex;align-items:center;gap:6px;position:relative;}
 .week-arrow{width:38px;height:38px;border-radius:50%;background:var(--arrow-bg);border:var(--bw) solid var(--ink);color:var(--ink);font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:var(--sh-xs);}
-.week-label{font-size:13px;font-weight:700;min-width:64px;text-align:center;background:var(--surface);color:var(--text);border:var(--bw) solid var(--ink);border-radius:999px;padding:6px 10px;cursor:pointer;box-shadow:var(--sh-xs);}
+.week-label{font-size:13px;font-weight:700;min-width:64px;text-align:center;background:var(--block-bg);color:var(--text);border:var(--bw) solid var(--ink);border-radius:999px;padding:6px 10px;cursor:pointer;box-shadow:var(--sh-xs);}
 .week-label::after{content:' \25BE';font-size:11px;}
-.week-pick{position:absolute;right:0;top:calc(100% + 8px);z-index:60;background:var(--surface);border:var(--bw) solid var(--ink);border-radius:var(--r-lg);box-shadow:var(--sh-drop);padding:10px;display:grid;grid-template-columns:repeat(4,44px);gap:6px;animation:dropIn .15s ease-out;}
-.week-pick-ttl{grid-column:1/-1;font-family:var(--font-display);text-transform:uppercase;font-size:12px;letter-spacing:-0.3px;color:var(--ink);margin-bottom:2px;}
+.week-pick{position:absolute;right:0;top:calc(100% + 8px);z-index:60;background:var(--block-bg);border:var(--bw) solid var(--ink);border-radius:var(--r-lg);box-shadow:var(--sh-drop);padding:10px;display:grid;grid-template-columns:repeat(4,44px);gap:6px;animation:dropIn .15s ease-out;}
+.week-pick-ttl{grid-column:1/-1;font-family:var(--rex-font-display);text-transform:uppercase;font-size:12px;letter-spacing:0;color:var(--ink);margin-bottom:2px;}
 .wk-btn{height:40px;border-radius:999px;border:2px solid var(--ink);background:var(--field-bg);color:var(--ink);font-size:14px;font-weight:700;}
 .wk-btn.has{background:var(--bar-past);}
-.wk-btn.cur{background:var(--ink);color:var(--cream);}
+.wk-btn.cur{background:var(--ink);color:var(--rex-cream);}
 .week-pick-leg{grid-column:1/-1;display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--text-dim);margin-top:2px;}
 .wk-dot{width:12px;height:12px;border-radius:50%;background:var(--bar-past);border:2px solid var(--ink);display:inline-block;}
 
 #content{padding:16px 16px 40px;max-width:680px;margin:0 auto;}
 
 /* ===== Fortschritt block ===== */
-.week-progress{background:var(--surface);border:var(--bw) solid var(--ink);border-radius:var(--r-lg);padding:12px 16px;margin-bottom:16px;box-shadow:var(--sh-sm);}
+.week-progress{background:var(--block-bg);border:var(--bw) solid var(--ink);border-radius:var(--r-lg);padding:12px 16px;margin-bottom:16px;box-shadow:var(--sh-sm);}
 .wp-top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:9px;}
-.wp-title{font-family:var(--font-display);text-transform:uppercase;font-size:13px;letter-spacing:-0.5px;color:var(--text);}
-.wp-pct{font-family:var(--font-display);font-size:26px;letter-spacing:-1px;color:var(--text);line-height:1;}
+.wp-title{font-family:var(--rex-font-display);text-transform:uppercase;font-size:13px;letter-spacing:0;color:var(--text);}
+.wp-pct{font-family:var(--rex-font-display);font-size:26px;letter-spacing:0;color:var(--text);line-height:1;}
 .wp-bar-wrap{height:16px;border:2px solid var(--ink);border-radius:999px;background:var(--bar-empty);overflow:hidden;}
 .wp-bar{height:100%;border-radius:999px;transition:width var(--dur-bar);}
 .wp-sub{margin-top:9px;font-size:12px;color:var(--text-mid);}
@@ -140,18 +144,26 @@ button:disabled:active{transform:none;}
 /* ===== Day cards (bright colour blocks) ===== */
 .day-card{border:var(--bw) solid var(--ink);border-radius:var(--r-xl);margin-bottom:12px;overflow:visible;box-shadow:var(--sh-card);}
 .day-header{width:100%;background:none;border:none;padding:15px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;color:var(--ink);text-align:left;border-radius:var(--r-xl);}
-.day-title{font-family:var(--font-display);text-transform:uppercase;font-size:14px;letter-spacing:-0.5px;color:var(--ink);}
+.day-title{font-family:var(--rex-font-display);text-transform:uppercase;font-size:14px;letter-spacing:0;color:var(--ink);}
 .day-header{flex-wrap:wrap;row-gap:6px;}
 .day-header .day-title{flex:1 1 0;min-width:0;}
-.day-focus{flex-basis:100%;font-family:var(--font-sans);font-size:12px;font-weight:600;line-height:1.35;color:var(--ink);opacity:.78;}
+/* Volles ink ohne Deckkraft: auf Lila und Pink kaeme die Zeile sonst unter 4,5:1 */
+.day-focus{flex-basis:100%;font-family:var(--rex-font-sans);font-size:12px;font-weight:600;line-height:1.35;color:var(--ink);}
 .day-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
-.day-count{font-family:var(--font-display);font-size:11px;padding:5px 11px;border-radius:999px;background:var(--ink);border:2px solid var(--ink);white-space:nowrap;letter-spacing:-0.3px;font-variant-numeric:tabular-nums;}
+/* Tages-Pill wie Rexy CountPill: Inter 700, Schrift in der Kartenfarbe */
+.day-count{font-family:var(--rex-font-sans);font-size:11px;font-weight:700;padding:5px 11px;border-radius:999px;background:var(--ink);border:2px solid var(--ink);white-space:nowrap;font-variant-numeric:tabular-nums;}
 .day-chevron{color:var(--ink);font-size:14px;font-weight:700;}
 .day-body{padding:0 12px 12px;}
 .day-body.anim{animation:fadeSlide var(--dur-anim) var(--ease);}
+/* Rex-Moment wie Rexy RexMoment (mood): Reaktion 64 px links, Titel + ein Satz. Hoechstens einer pro Ansicht. */
+.rex-moment{display:flex;align-items:center;gap:14px;padding:12px 14px;background:var(--block-bg);color:var(--ink);border:var(--bw) solid var(--ink);border-radius:var(--r-lg);box-shadow:var(--sh-card);}
+.rex-moment img{width:64px;height:64px;flex-shrink:0;display:block;object-fit:contain;}
+.rm-text{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1;}
+.rm-ttl{font-family:var(--rex-font-display);text-transform:uppercase;font-size:16px;line-height:20px;}
+.rm-sub{font-size:14px;line-height:21px;font-weight:500;}
 
 /* ===== Exercise rows (cream blocks) ===== */
-.ex-row{background:var(--cream);border:var(--bw) solid var(--ink);border-radius:var(--r-lg);padding:12px 14px;margin-bottom:10px;box-shadow:var(--sh-sm);}
+.ex-row{background:var(--block-bg);border:var(--bw) solid var(--ink);border-radius:var(--r-lg);padding:12px 14px;margin-bottom:10px;box-shadow:var(--sh-sm);}
 .ex-row-top{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
 .cat-badge{font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;border:2px solid var(--ink);color:var(--ink);white-space:nowrap;letter-spacing:0.4px;text-transform:uppercase;}
 /* Badge + Erledigt-Haken immer in eigener 2. Zeile (sonst stand ein kurzes "= Gleich" neben der Auswahl); leer = unsichtbar */
@@ -164,7 +176,7 @@ button:disabled:active{transform:none;}
 .pick-btn.has-val{color:var(--text);}
 .pick-btn-txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
 .pick-btn-arr{color:var(--text-dim);font-size:10px;flex-shrink:0;}
-.dropdown{position:absolute;left:0;right:0;z-index:200;background:var(--drop-bg);border:var(--bw) solid var(--ink);border-radius:var(--r-md);box-shadow:var(--sh-drop);overflow:hidden;}
+.dropdown{position:absolute;left:0;right:0;z-index:200;background:var(--block-bg);border:var(--bw) solid var(--ink);border-radius:var(--r-md);box-shadow:var(--sh-drop);overflow:hidden;}
 .dropdown.anim{animation:dropIn var(--dur-drop) var(--ease);}
 .drop-search{padding:8px 8px 4px;}
 .drop-search input{width:100%;background:var(--field-bg);border:2px solid var(--ink);border-radius:var(--r-sm);color:var(--text);font-size:16px;padding:8px 10px;outline:none;}
@@ -176,13 +188,13 @@ button:disabled:active{transform:none;}
 .drop-empty-opt{color:var(--text-dim);}
 .drop-no-results{padding:10px 12px;color:var(--text-faint);font-size:12px;}
 /* Empfehlungs-Stern wie Rexy: Gold-Scheibe mit ink-Rahmen und ink-Stern (gold allein ist auf Cream zu blass) */
-.rec-star{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;margin-left:6px;vertical-align:middle;border-radius:50%;background:var(--gold);border:2px solid var(--ink);color:var(--ink);font-size:11px;line-height:1;}
+.rec-star{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;margin-left:6px;vertical-align:middle;border-radius:50%;background:var(--rex-gold);border:2px solid var(--ink);color:var(--ink);font-size:11px;line-height:1;}
 .pbadge{font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;border:2px solid var(--ink);color:var(--ink);white-space:nowrap;}
 .ex-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
 .sets-info{color:var(--text-mid);font-size:12px;}
 .inc-hint{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:999px;border:2px solid var(--ink);background:var(--field-bg);color:var(--ink);font-size:11px;font-weight:700;white-space:nowrap;}
 .w-wrap{display:flex;align-items:center;gap:6px;}
-.w-label{color:var(--text);font-size:12px;background:var(--surface);border:2px solid var(--ink);border-radius:999px;padding:2px 8px;}
+.w-label{color:var(--text);font-size:12px;background:var(--block-bg);border:2px solid var(--ink);border-radius:999px;padding:2px 8px;}
 .w-input{width:78px;background:var(--field-bg);border:var(--bw) solid var(--ink);border-radius:var(--r-sm);color:var(--text);font-size:16px;font-weight:700;padding:7px 8px;outline:none;}
 .w-input:focus,.rep-inp:focus,.drop-search input:focus,.tip-ta:focus,.set-input:focus,.bk-ta:focus{box-shadow:var(--sh-xs)!important;}
 .setting-row{display:flex;align-items:center;gap:7px;margin-bottom:8px;}
@@ -197,7 +209,7 @@ button:disabled:active{transform:none;}
 .phint{margin-top:8px;font-size:11px;color:var(--text-dim);}
 
 /* ===== Tips ===== */
-.tip-toggle{background:var(--cream);border:2px solid var(--ink);border-radius:999px;color:var(--ink);font-size:12px;font-weight:700;padding:6px 12px;display:inline-flex;align-items:center;gap:5px;margin-top:8px;}
+.tip-toggle{background:var(--block-bg);border:2px solid var(--ink);border-radius:999px;color:var(--ink);font-size:12px;font-weight:700;padding:6px 12px;display:inline-flex;align-items:center;gap:5px;margin-top:8px;}
 .tip-toggle.open{background:var(--highlight);box-shadow:var(--sh-xs);}
 .tip-i{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;border:1.5px solid var(--ink);font-size:9px;font-weight:700;}
 .tip-custom{color:var(--text-soft);font-size:10px;font-weight:600;}
@@ -206,26 +218,27 @@ button:disabled:active{transform:none;}
 .tip-note{margin-top:9px;padding-top:9px;border-top:1.5px dashed var(--ink);}
 .tip-note-lbl{color:var(--text-soft);font-size:11px;font-weight:700;margin-bottom:4px;}
 .tip-ta{width:100%;margin-top:4px;background:var(--field-bg);border:var(--bw) solid var(--ink);border-radius:var(--r-sm);color:var(--text);font-size:16px;line-height:1.6;padding:8px 10px;resize:vertical;outline:none;}
-.tip-edit-btn{margin-top:8px;background:var(--cream);border:2px solid var(--ink);border-radius:999px;color:var(--ink);font-size:12px;font-weight:600;padding:6px 12px;}
+.tip-edit-btn{margin-top:8px;background:var(--block-bg);border:2px solid var(--ink);border-radius:999px;color:var(--ink);font-size:12px;font-weight:600;padding:6px 12px;}
 .tip-acts{display:flex;gap:8px;margin-top:7px;align-items:center;}
 .tip-save{background:var(--accent);border:2px solid var(--ink);border-radius:999px;color:var(--ink);font-size:12px;font-weight:700;padding:8px 16px;box-shadow:var(--sh-xs);}
-.tip-cancel{background:var(--surface);border:2px solid var(--ink);border-radius:999px;color:var(--ink);font-size:12px;font-weight:600;padding:8px 13px;}
+.tip-cancel{background:var(--block-bg);border:2px solid var(--ink);border-radius:999px;color:var(--ink);font-size:12px;font-weight:600;padding:8px 13px;}
 .tip-reset{background:none;border:none;color:var(--text-dim);font-size:12px;padding:8px;margin-left:auto;text-decoration:underline;}
 
 /* ===== Übersicht ===== */
-.ov-title{font-family:var(--font-display);text-transform:uppercase;font-size:34px;letter-spacing:-1px;line-height:1.05;margin-bottom:6px;color:var(--text);}
+/* Zeilenhoehe 1.3 statt Rexy 34/34: das F von Bowlby One SC reicht unter die Grundlinie, sonst stossen die Ue-Punkte daran */
+.ov-title{font-family:var(--rex-font-display);text-transform:uppercase;font-size:34px;letter-spacing:0;line-height:1.3;margin-bottom:6px;color:var(--text);}
 .bk-card{background:var(--rex-cyan);border:var(--bw) solid var(--ink);border-radius:var(--r-xl);padding:16px;margin-top:24px;box-shadow:var(--sh-card);}
-.bk-title{font-family:var(--font-display);text-transform:uppercase;font-size:15px;letter-spacing:-0.5px;margin-bottom:6px;color:var(--ink);}
+.bk-title{font-family:var(--rex-font-display);text-transform:uppercase;font-size:15px;letter-spacing:0;margin-bottom:6px;color:var(--ink);}
 .bk-sub{color:var(--ink);font-size:12px;line-height:1.6;margin-bottom:12px;}
 .bk-btn{background:var(--accent);border:var(--bw) solid var(--ink);border-radius:999px;color:var(--ink);font-size:13px;font-weight:700;padding:10px 16px;box-shadow:var(--sh-sm);}
-.bk-btn.bk-imp{background:var(--cream);margin-top:10px;}
+.bk-btn.bk-imp{background:var(--block-bg);margin-top:10px;}
 .bk-status{display:block;margin-top:10px;font-size:12px;font-weight:600;color:var(--ink);min-height:16px;}
 .ver-line{text-align:center;margin:14px 0 4px;font-size:12px;color:var(--text-dim);letter-spacing:0.3px;}
 .bk-ta{width:100%;margin-top:12px;background:var(--field-bg);border:var(--bw) solid var(--ink);border-radius:var(--r-sm);color:var(--text);font-size:16px;padding:8px 10px;outline:none;resize:vertical;}
 .ov-sub{color:var(--text);font-size:13px;margin-bottom:20px;line-height:1.6;}
 .ov-day{margin-bottom:24px;}
-.ov-day-lbl{display:inline-block;font-family:var(--font-display);text-transform:uppercase;font-size:13px;letter-spacing:-0.5px;color:var(--ink);border:var(--bw) solid var(--ink);border-radius:999px;padding:5px 12px;margin-bottom:12px;}
-.ov-ex{background:var(--cream);border:var(--bw) solid var(--ink);border-radius:var(--r-xl);padding:12px 14px;margin-bottom:10px;box-shadow:var(--sh-card);}
+.ov-day-lbl{display:inline-block;font-family:var(--rex-font-display);text-transform:uppercase;font-size:13px;letter-spacing:0;color:var(--ink);border:var(--bw) solid var(--ink);border-radius:999px;padding:5px 12px;margin-bottom:12px;}
+.ov-ex{background:var(--block-bg);border:var(--bw) solid var(--ink);border-radius:var(--r-xl);padding:12px 14px;margin-bottom:10px;box-shadow:var(--sh-card);}
 .ov-bars{display:flex;align-items:flex-end;gap:4px;height:48px;}
 .ov-bar{flex:1;height:100%;border:2px solid var(--ink);border-radius:999px;background:var(--bar-empty);overflow:hidden;display:flex;align-items:flex-end;}
 .ov-bar-fill{width:100%;border-radius:999px;transition:height .3s;}
@@ -234,8 +247,8 @@ button:disabled:active{transform:none;}
 .hidden{display:none!important;}
 /* ===== Abfrage-Fenster (Uebungswechsel, 3/4 Tage umstellen) ===== */
 .sheet-bg{position:fixed;inset:0;z-index:300;background:var(--scrim);display:flex;align-items:flex-end;justify-content:center;padding:16px 16px max(16px,env(safe-area-inset-bottom));}
-.sheet{width:100%;max-width:440px;background:var(--cream);border:var(--bw) solid var(--ink);border-radius:var(--r-xl);box-shadow:var(--sh-drop);padding:16px;animation:dropIn var(--dur-drop) var(--ease);}
-.sheet-ttl{font-family:var(--font-display);text-transform:uppercase;font-size:15px;letter-spacing:-0.5px;color:var(--ink);margin-bottom:6px;}
+.sheet{width:100%;max-width:440px;background:var(--block-bg);border:var(--bw) solid var(--ink);border-radius:var(--r-xl);box-shadow:var(--sh-drop);padding:16px;animation:dropIn var(--dur-drop) var(--ease);}
+.sheet-ttl{font-family:var(--rex-font-display);text-transform:uppercase;font-size:15px;letter-spacing:0;color:var(--ink);margin-bottom:6px;}
 .sheet-txt{font-size:14px;line-height:1.5;color:var(--text);margin-bottom:6px;}
 .sheet-btn{display:block;width:100%;min-height:46px;margin-top:10px;border:var(--bw) solid var(--ink);border-radius:999px;background:var(--field-bg);color:var(--ink);font-size:14px;font-weight:700;box-shadow:var(--sh-sm);}
 .sheet-btn.pri{background:var(--accent);}
@@ -1295,7 +1308,7 @@ function renderT(){
     const dcol=DAYBG[di%4];
     // Titel = Schwerpunkt des Tages, darunter (nur neue Plaene) die Fokus-Zeile day.f
     h+='<div class="day-card" style="background:'+dcol+'"><button class="day-header" onclick="toggleDay('+di+')"><span class="day-title">'+esc(day.l)+'</span><span class="day-right"><span class="day-count" id="dc-'+di+'" style="color:'+dcol+'">'+(done===total?'✓ ':'')+done+'/'+total+' Übungen</span><span class="day-chevron">'+(op?'▲':'▼')+'</span></span>'+(day.f?'<span class="day-focus">'+esc(day.f)+'</span>':'')+'</button>';
-    if(op){h+='<div class="day-body'+(S.animDay===di?' anim':'')+'">';day.e.forEach((ex,ei)=>{h+=renderEx(ex,ei,di)});h+='</div>'}
+    if(op){h+='<div class="day-body'+(S.animDay===di?' anim':'')+'">';day.e.forEach((ex,ei)=>{h+=renderEx(ex,ei,di)});h+='<div id="rm-'+di+'">'+rexDayHTML(di)+'</div></div>'}
     h+='</div>';
   });
   S.animDay=null;
@@ -1304,12 +1317,37 @@ function renderT(){
     const nextCy=cn<CYCLES.length?String(cn+1):'1 (neu)';
     const nextN=cn<CYCLES.length?cn+1:1,nextKey=(S.pt==='p3'?'p3':'')+'cycle'+nextN;
     const nextTxt=pvOf(S.cy)&&!pvOf(nextKey)?'Danach startet Zyklus '+nextN+' mit dem neuen Plan – deine Übungen werden übernommen.':'Danach geht es mit Zyklus '+nextCy+' weiter.';
-    h+='<div style="background:var(--highlight);border:var(--bw) solid var(--ink);border-radius:var(--r-xl);padding:16px 18px;margin-top:8px;box-shadow:var(--sh-card)">'
-      +'<div style="font-family:var(--font-display);text-transform:uppercase;font-size:15px;letter-spacing:-0.5px;color:var(--ink);margin-bottom:6px">🏁 Letzte Woche von Zyklus '+cn+'</div>'
-      +'<p style="color:var(--ink);font-size:13px;line-height:1.6;margin:0">'+nextTxt+'</p>'
+    // Banner als Rex-Moment mit der Reaktion "Wow" (Meilenstein) statt der Zielflagge
+    h+='<div class="rex-moment" id="cy-end" style="background:var(--highlight);margin-top:8px">'
+      +'<img src="rex-wow.webp" alt="" width="64" height="64" decoding="async"/>'
+      +'<div class="rm-text"><span class="rm-ttl">Letzte Woche von Zyklus '+cn+'</span><span class="rm-sub">'+nextTxt+'</span></div>'
       +'</div>';
   }
   document.getElementById('view-training').innerHTML=h;
+}
+
+// Rex-Moment "Training geschafft" (Reaktion "Puh") am Ende des offenen Tages, sobald alle Uebungen
+// eingetragen sind. Gesteigert zaehlt wie weekStats. Nicht in Woche 12: dort steht schon der Wow-Rex
+// im Banner (Rexy: hoechstens ein Rex-Moment pro Ansicht; offen ist immer nur ein Tag).
+function rexDayHTML(di){
+  if(S.week===12)return '';
+  const day=plan()[di],total=day.e.length;let done=0,cmp=0,imp=0;
+  day.e.forEach((ex,ei)=>{
+    if(exDone(di,ei))done++;
+    const st=exState(di,ei);
+    if(!st.cur.exercise||!st.hasPrev||st.noCmp)return;
+    if(!st.reps.some(v=>v!==''&&v!=null&&parseInt(v)>0))return;
+    cmp++;if(st.p==='w'||st.p==='r')imp++;
+  });
+  if(done<total)return '';
+  return '<div class="rex-moment"><img src="rex-puh.webp" alt="" width="64" height="64" decoding="async"/>'
+    +'<div class="rm-text"><span class="rm-ttl">Training geschafft</span><span class="rm-sub">'+total+' von '+total+' Übungen eingetragen'+(cmp?', '+imp+' davon gesteigert':'')+'.</span></div></div>';
+}
+// Live nachziehen (KEIN renderT); _h merkt sich den Stand, damit das Bild nicht bei jeder Eingabe neu laedt
+function refreshRex(di){
+  const el=document.getElementById('rm-'+di);if(!el)return;
+  const h=rexDayHTML(di);
+  if(el._h!==h){el._h=h;el.innerHTML=h}
 }
 
 function autoExtraSets(di,ei){
@@ -1496,6 +1534,7 @@ function refreshProg(di,ei){
     if(el)el.style.background=rcol(st.reps[i],st.ex.r)||'var(--field-bg)';
   }
   refreshWeekBar();
+  refreshRex(di);
 }
 // Aktualisiert Tages-Pill + Erledigt-Haken gezielt im DOM (KEIN renderT — Fokus bleibt erhalten)
 function refreshDone(di,ei){
@@ -1507,6 +1546,7 @@ function refreshDone(di,ei){
   if(el){
     el.textContent=(done===total?'✓ ':'')+done+'/'+total+' Übungen';
   }
+  refreshRex(di);
 }
 // Zustand einer Uebungszeile an EINER Stelle berechnet — genutzt von renderEx (Aufbau),
 // refreshProg (Live-Update ohne renderT) und weekStats (Fortschrittsbalken). So koennen
@@ -1623,11 +1663,11 @@ function renderEx(ex,ei,di){
     const repBg=c?c:'var(--field-bg)';
     rh+='<div class="rep-col"><span class="rep-lbl">S'+(i+1)+'</span><input class="rep-inp" id="rp-'+di+'-'+ei+'-'+i+'" type="text" inputmode="numeric" value="'+esc(reps[i]||'')+'" placeholder="–" style="background:'+repBg+'" oninput="updRep('+di+','+ei+','+i+',this.value)" onchange="updRep('+di+','+ei+','+i+',this.value)"/>'+(prevLabel!==''?'<span class="rep-prev" style="'+(pr==null||pr===''?'color:var(--text-ghost)':'')+'">'+prevLabel+'</span>':'')+'</div>';
   }
-  if(xs>0)rh+='<button class="add-set-btn nb-shadow" style="background:var(--surface)" onclick="removeSet('+di+','+ei+')">−</button>';
+  if(xs>0)rh+='<button class="add-set-btn nb-shadow" style="background:var(--block-bg)" onclick="removeSet('+di+','+ei+')">−</button>';
   if(ms<5)rh+='<button class="add-set-btn nb-shadow" onclick="addSet('+di+','+ei+')">+</button>';
 
   const incH=incCand(st)?'<span class="inc-hint'+(incDue(st)?'':' hidden')+'" id="ih-'+di+'-'+ei+'">'+(st.inv?'▼ Hilfe senken':'▲ Gewicht steigern')+'</span>':'';
-  const autoLabel=autoTriggered?'<span style="color:var(--gold);font-size:10px;margin-left:6px">⚡ +1 Satz (3 Wo. kein Fortschritt)</span>':'';
+  const autoLabel=autoTriggered?'<span style="color:var(--rex-gold);font-size:10px;margin-left:6px">⚡ +1 Satz (3 Wo. kein Fortschritt)</span>':'';
 
   let fil=0;for(let i=0;i<ms;i++){const v=reps[i];if(v!==''&&v!=null&&parseInt(v)>0)fil++}
   const doneAll=!!cur.exercise&&fil>=ms;
@@ -1925,7 +1965,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeWeekPick();clo
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-10-23-06';
+const BUILD_ID='2026-10-23-07';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();
