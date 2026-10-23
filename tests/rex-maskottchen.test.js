@@ -1,7 +1,7 @@
 // Rex als Maskottchen + Rexy-Look (23.10.2026): App-Ebene "Rex" ueber dem unveraenderten
 // Peach-Designsystem. Prueft: Basis-Tokens (Designsystem) unveraendert, Wortmarke "PEACH" wie Rexy
 // (gelbes Schild, 3px-Rahmen, pinker Druckversatz), Sanduhr-Rex als gerahmte Comic-Kachel im Kopf
-// (Flos Hintergrund, 112 px schmal / 84 px ab 425 px), Kopf rosa mit tuerkisen Knoepfen, Seite hellrosa,
+// (Flos Hintergrund, 112 px / 104 px bis 380 px / 84 px ab 425 px), Kopf rosa mit tuerkisen Knoepfen, Seite hellrosa,
 // Tagesfarben + Pill-Schrift, Rexy-Kategorie- und Status-Farben, Stern als Gold-Scheibe, Fokus-Ring ink,
 // Wochen-Karte OHNE Rex-Bild (Woche 1 ohne Karte), Uebersicht OHNE Bild mit tuerkisen Vorwochen,
 // theme-color, Icon/Manifest (display:browser!), kein Ueberlauf auf 375/390/430 px.
@@ -44,7 +44,7 @@ for(const W of [390,375,430]){
     ok(hdr[0]===rgb(ROSE)&&hdr[1]===rgb(ROSE_PALE)&&hdr[2].toUpperCase()===ROSE,'Kopf rosa, Seite hellrosa, theme-color gleich ('+hdr.join(' / ')+')');
     const hb=await page.evaluate(()=>['btn-training','plan-p4'].map(id=>getComputedStyle(document.getElementById(id)).backgroundColor).concat([...document.querySelectorAll('.week-arrow')].map(e=>getComputedStyle(e).backgroundColor)));
     ok(hb.every(c=>c===rgb(CYAN)),'Kopf-Knoepfe tuerkis ('+hb.join(' | ')+')');
-    // 4. Tagesfarben A-D und Tages-Pill wie Rexy CountPill (Lila/Pink -> cream, sonst Kartenfarbe)
+    // 4. Tagesfarben A-D; Tages-Pill (ink) mit Schrift IMMER in der Kartenfarbe, auch auf Lila/Pink (Wunsch 23.10.2026)
     const days=await page.$$eval('.day-card',els=>els.map(e=>getComputedStyle(e).backgroundColor));
     ok(days.join('|')===[rgb(LILAC),rgb(PINK),rgb(YELLOW),rgb(CYAN)].join('|'),'Tagesfarben A-D ('+days.join(' | ')+')');
     const pills=await page.evaluate(()=>[0,1,2,3].map(i=>getComputedStyle(document.getElementById('dc-'+i)).color));

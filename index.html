@@ -56,7 +56,7 @@
   --rex-green:#4FD06A;--rex-blue:#4D9DF5;--rex-red:#FF5C5C;
   /* Status (Rep-Felder, Fortschritts-Badges, Erledigt-Haken, voller Wochenbalken) — knallig wie im Rexy-System */
   --st-up:var(--rex-green);--st-reps:var(--rex-blue);--st-same:var(--rex-yellow);--st-down:var(--rex-red);
-  --accent:var(--rex-pink);       /* Hauptaktionen im Inhalt: Knoepfe, Auswahl, Wochenbalken, Fokus */
+  --accent:var(--rex-pink);       /* Hauptaktionen im Inhalt: Knoepfe, Auswahl, Wochenbalken, Scrollbalken */
   --header-bg:var(--rex-rose);    /* Kopfbereich */
   --head-accent:var(--rex-cyan);  /* aktive Knoepfe im Kopf (Tab, Plan-Pill) — Cyan, nie Pink auf Pink */
   --arrow-bg:var(--rex-cyan);     /* Pfeile der Wochenwahl */
@@ -1925,7 +1925,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeWeekPick();clo
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-10-23-05';
+const BUILD_ID='2026-10-23-06';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();

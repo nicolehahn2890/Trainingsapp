@@ -63,9 +63,10 @@ auf main einmalig eine Sicherheitsfreigabe verlangen; dann kurz bestaetigen lass
   Der runde Sonne/Mond-Button, applyTheme()/toggleTheme(), der Key peach_theme, der
   theme-color-Wechsel und der theme-State wurden komplett entfernt. NIEMALS wieder einen
   .light/.dark-Branch oder Theme-Umschalter einbauen.
-- Design-Sprache: flache, knallige Farb-BLOECKE auf hellem Lavendel-Hintergrund,
-  fast-schwarze INK-Rahmen ueberall, harte Offset-Schatten OHNE Blur, dicke 2,5px-Rahmen,
-  runde Pills. KEIN Verlauf (gradient), KEIN Glow, KEIN Blur.
+- Design-Sprache: flache, knallige Farb-BLOECKE auf hellem Hintergrund (Designsystem: Lavendel;
+  App seit 23.10.2026: Rex-Hellrosa, siehe App-Ebene "Rex"), fast-schwarze INK-Rahmen ueberall,
+  harte Offset-Schatten OHNE Blur, dicke 2,5px-Rahmen, runde Pills. KEIN Verlauf (gradient),
+  KEIN Glow, KEIN Blur.
 - ALLE Tokens liegen als CSS-Variablen in EINEM `:root` (kein :root.light/.dark mehr).
 - **NIEMALS Hex-Farben hart in CSS-Klassen schreiben — immer `var(--...)`.** In JS-HTML-
   Strings Tokens als `var(--accent)` etc. nutzen; nur die Kategorie-Farben CC sind als Hex in JS
@@ -107,12 +108,14 @@ Rexy ordnet Sanduhr die Zielfarbe Gelb zu; der App-Akzent bleibt bewusst Rex-Pin
   CC mit den Rexy-Werten, Empfehlungs-Stern
   als Gold-Scheibe mit ink-Rahmen (.rec-star, steht HINTER dem Namen — Tests pruefen startsWith),
   Vorwerte unter den Rep-Feldern --text-dim, Rep-Feld 48px, Picker min. 42px, Zahnrad-Scheibe 30px,
-  +-Knopf 20px, Uebungszeilen --sh-sm, kg-Zugewinn als gruene Pill (.gain-pill), "Aktuell" in ink.
+  +-Zeichen 20px (Knopf bleibt 38px), Uebungszeilen --sh-sm, kg-Zugewinn als gruene Pill (.gain-pill),
+  "Aktuell" in ink.
   Picker-Text bewusst 500 statt Rexy 700: fett wurden mehr Uebungsnamen abgeschnitten (37 von 142 bei
   390 px sind es mit und ohne 500 — vorbestehend, das Feld teilt sich die Zeile mit dem Badge).
 - Bewusst NICHT uebernommen (App-Inhalt, Wuensche von Rexi): Badge-Texte ("↑ Gewicht" statt "Mehr
   Gewicht"), Badge-Groesse 12px, Wochen-Label "W 4 / 12", Tagestitel 14px, Disabled-Stil der Wochen-
-  pfeile (Tests klicken ueber Woche 1/12 hinaus). Gruene TEXTE bleiben --green (#6FC36A).
+  pfeile (Tests klicken ueber Woche 1/12 hinaus). Gruene TEXTE gibt es nicht mehr (Zugewinn = gruene
+  Pill, "Aktuell" in ink) — --green ist ungenutzt, bleibt aber als Basis-Token stehen.
 - Peach-Orange kommt in der App nicht mehr vor (Wunsch: Tag A Lila statt Pastell-Orange). Lila nur
   noch als Tag A — Kopf/Seite in Lila waren "zu lila, nicht im Rex-Bild".
 - Bild: rex-sanduhr.webp (250x360) = der Rexy-Ausschnitt rex-sanduhr.webp (Flos Hintergrund: Gelb, Cyan-
@@ -140,6 +143,10 @@ Ink (Rahmen / Schatten / Text auf Bloecken): --ink #181016
 Bright-Palette: --peach #F4A45E (Primaer), --pink #F18FB6, --lilac #B49DF2 (Header),
   --lime #B6DD57, --sky #8CCBE8, --yellow #F5CB44, --cream #FBF3E7
 Seite: --bg #E9DEF8 (Lavendel). Felder: weiss #FFF mit Ink-Rahmen.
+"(Primaer)", "(Header)" und "Lavendel" beschreiben das DESIGNSYSTEM. Die App nutzt von den Basis-Farben nur
+  noch --ink, --cream/--surface (Bloecke, Abfrage-Fenster, Disabled), --lilac (Tag A), --gold (Stern), die
+  Text-Rampe und --field-bg. Kopf, Seite, Akzent, Status und Tag B-D kommen aus der App-Ebene "Rex";
+  --peach, --pink, --lime, --sky, --yellow, --green, --bg, --focus, --cat-* und --prog-* sind ungenutzt.
 Text-Rampe: #181016 → #45343D → #5E4C55 → #7E6C76 → #A2929C
 Radien: --r-sm 10 / --r-md 12 / --r-lg 16 / --r-xl 20 / --r-pill 999. Rahmenbreite --bw 2,5px.
 Schatten (solid Ink, kein Blur): --sh-xs 2px / --sh-sm 3px / --sh-card 4px /
@@ -172,6 +179,10 @@ Logo (seit 23.10.2026): Wortmarke wie im Rexy-System — "PEACH" (ohne "Project"
   "Trainings-App" ist weg. Der Pixel-Pfirsich (16x16-SVG) ist aus der App raus, bleibt aber im
   Designsystem (assets/peach-logo.svg).
 Favicon: Pfirsich-Emoji als SVG-Data-URI im <head> (unveraendert).
+App-Name ausserhalb der Wortmarke weiter "Peach Project": <title> "Peach Project – Trainings-App"
+  (Safari-Tab), apple-mobile-web-app-title (Name unter dem Home-Bildschirm-Symbol) und manifest
+  name/short_name. Nur aendern, wenn Rexi es will — ein schon abgelegtes Symbol behaelt Name und Bild,
+  bis sie es neu ablegt.
 Home-Screen-Icon: apple-touch-icon.png (180x180), verlinkt mit apple-mobile-web-app-title und
   ?v=sanduhr (Cache-Bremse fuer das neue Motiv; bei einem neuen Icon den Wert aendern, auch im Manifest).
   Motiv seit 23.10.2026 (Version -04): Sanduhr-Kopf (Rexy rex-sanduhr-kopf.webp, mit Hintergrund) in einem
@@ -394,7 +405,7 @@ autoExtraSets(di,ei)    0 oder 1. Braucht 3 stagnierende WOCHENVERGLEICHE ('s'/'
                         gleicher Uebung -> greift fruehestens in WOCHE 5 (W2vsW1 + W3vsW2 + W4vsW3).
                         Der Guard "if(S.week<4)return 0" ist nur ein Early-Out. Verifiziert per Test.
 togWeekPick(ev)         Tipp auf "W x / 12" (#week-label, jetzt ein Button) oeffnet #week-pick: Raster
-                        1-12, Ink = aktuelle Woche, Lila (.has) = Woche hat im Zyklus schon Werte
+                        1-12, Ink = aktuelle Woche, Cyan (.has, --bar-past) = Woche hat im Zyklus schon Werte
                         (weekHasData). setWeek(w) springt direkt, closeWeekPick() schliesst (auch bei
                         Tipp daneben, Esc und den Pfeilen). Die Pfeile bleiben zusaetzlich.
 toggleDay(di)           Accordion: andere Tage schliessen sich automatisch (setzt S.animDay fuer Animation)
@@ -994,9 +1005,21 @@ Fallback (manuell, ohne Session):
 3. Strg+A > Entf > Strg+V > Commit changes
 4. ~2 Min warten > Live-URL pruefen
 
+Skill aktualisieren: Der Skill "peach-project" in claude.ai ist eine KOPIE dieser Datei und aktualisiert
+sich nicht von selbst aus dem Repo. Nach Aenderungen an SKILL.md Rexi eine ZIP geben (Ordner peach-project/
+mit dieser SKILL.md darin, z. B. `zip -r peach-project.zip peach-project`) — sie ersetzt damit den Skill in
+claude.ai. Frontmatter (name, description) dabei unveraendert lassen.
+
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Projektdateien abgeglichen + Skill-ZIP (23.10.2026, Version 2026-10-23-06).** Keine Funktions- oder
+   Designaenderung. SKILL.md gegen den Code geprueft: Wochenwahl "hat Werte" ist Cyan (stand noch Lila),
+   keine gruenen Texte mehr, Designsystem-Angaben (Lavendel, Lila-Header, Peach-Primaer) als Basis gekennzeichnet
+   plus Liste der Basis-Farben, die die App noch nutzt, App-Name/Home-Bildschirm, Regel "Skill aktualisieren".
+   Kommentare nachgezogen: index.html (--accent ohne "Fokus", der Ring ist ink), tests/rex-maskottchen
+   (Pill-Schrift, 104-px-Kachel). Rexi bekam die Skill-ZIP zum Ersetzen in claude.ai.
 
 NEU. **Tages-Pill-Schrift immer in der Kartenfarbe (23.10.2026, Version 2026-10-23-05).** Auf Lila (Tag A) und
    Pink (Tag B) stand "8/8 Übungen" cremeweiss (Rexy-Regel aus Version -03) — Wunsch: wie bei Tag C/D immer die
