@@ -11,7 +11,7 @@ const PEACH_URL=process.env.PEACH_URL||'http://127.0.0.1:8765/index.html';
 const BASE=PEACH_URL.replace(/index\.html$/,'');
 let fails=0;const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)fails++};
 const rgb=h=>'rgb('+[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)).join(', ')+')';
-const PINK='#F6409F',CYAN='#22E3F0',YELLOW='#FAF22E',GREEN='#4FD06A',ROSE='#FA9ECC',ROSE_PALE='#FDE7F2',LILAC='#B49DF2',INK='#181016',CREAM='#FBF3E7';
+const PINK='#F6409F',CYAN='#22E3F0',YELLOW='#FAF22E',GREEN='#4FD06A',ROSE='#FA9ECC',ROSE_PALE='#FDE7F2',LILAC='#B49DF2',INK='#181016';
 (async()=>{const b=await chromium.launch();const errs=[];
 // Zyklus 2 (aktueller 4-Tage-Plan): Hip Thrust (Tag A, 4-8) in Woche 1 und 2 -> Woche 2 hat einen Vergleich
 const d={pv__done:1,pv__v3:1,pv__bb3:1,pv__gm3:1,pv__gx48:1,
@@ -48,7 +48,7 @@ for(const W of [390,375,430]){
     const days=await page.$$eval('.day-card',els=>els.map(e=>getComputedStyle(e).backgroundColor));
     ok(days.join('|')===[rgb(LILAC),rgb(PINK),rgb(YELLOW),rgb(CYAN)].join('|'),'Tagesfarben A-D ('+days.join(' | ')+')');
     const pills=await page.evaluate(()=>[0,1,2,3].map(i=>getComputedStyle(document.getElementById('dc-'+i)).color));
-    ok(pills.join('|')===[rgb(CREAM),rgb(CREAM),rgb(YELLOW),rgb(CYAN)].join('|'),'Tages-Pills: cream auf Lila/Pink, sonst Kartenfarbe ('+pills.join(' | ')+')');
+    ok(pills.join('|')===[rgb(LILAC),rgb(PINK),rgb(YELLOW),rgb(CYAN)].join('|'),'Tages-Pills: Schrift immer in der Kartenfarbe, auch auf Lila/Pink ('+pills.join(' | ')+')');
     // 5. Status-Farben knallig (Rexy): Rep-Felder 6 = im Bereich (gelb), 8 = Obergrenze (gruen), 3 = darunter (rot)
     const reps=await page.evaluate(()=>[0,1,2].map(i=>getComputedStyle(document.getElementById('rp-0-0-'+i)).backgroundColor));
     ok(reps.join('|')===[rgb(YELLOW),rgb(GREEN),rgb('#FF5C5C')].join('|'),'Rep-Felder Neongelb / Gruen / Rot ('+reps.join(' | ')+')');

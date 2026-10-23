@@ -102,8 +102,9 @@ Rexy ordnet Sanduhr die Zielfarbe Gelb zu; der App-Akzent bleibt bewusst Rex-Pin
   gruen/blau/neongelb/rot — Rep-Felder rcol, Badges, Erledigt-Haken, voller Wochenbalken, Zugewinn-Pill,
   Speicher-Warnung). Backup-Karte --rex-cyan, Satz-hinzufuegen --rex-lime.
 - Angeglichen an die Rexy-Bausteine: Wortmarke (siehe Marke), Fokus-Ring ink 3px mit 3px Abstand (ein
-  pinker Ring verschwand auf Tag B), Tages-Pill wie CountPill (ink, Schrift in der Kartenfarbe, auf Lila/
-  Pink cream — DAYTXT; tabellarische Ziffern), Kategorie-Farben CC mit den Rexy-Werten, Empfehlungs-Stern
+  pinker Ring verschwand auf Tag B), Tages-Pill wie CountPill (ink, Schrift IMMER in der Kartenfarbe —
+  auch auf Lila/Pink, NICHT cream wie bei Rexy: Wunsch 23.10.2026; tabellarische Ziffern), Kategorie-Farben
+  CC mit den Rexy-Werten, Empfehlungs-Stern
   als Gold-Scheibe mit ink-Rahmen (.rec-star, steht HINTER dem Namen — Tests pruefen startsWith),
   Vorwerte unter den Rep-Feldern --text-dim, Rep-Feld 48px, Picker min. 42px, Zahnrad-Scheibe 30px,
   +-Knopf 20px, Uebungszeilen --sh-sm, kg-Zugewinn als gruene Pill (.gain-pill), "Aktuell" in ink.
@@ -562,8 +563,8 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
 - Touch-Ziele vergroessert: week-arrow 38px, add-set-btn 38px, pick-btn min-height 42px, rep-inp 48px breit
 
 ### UI-Status-Elemente (Neobrutalism)
-- Tages-Pill im day-header (`#dc-[di]`, Klasse day-count): "x/y Uebungen" — ink-Pille, Schrift in der
-  Tagesfarbe, auf Lila (A) und Pink (B) cream (DAYTXT, wie Rexy CountPill); ✓-Praefix wenn alle
+- Tages-Pill im day-header (`#dc-[di]`, Klasse day-count): "x/y Uebungen" — ink-Pille, Schrift IMMER in
+  der Tagesfarbe (style color = DAYBG, auch Lila/Pink — Wunsch; cream war "weisse Schrift"); ✓-Praefix wenn alle
   Uebungen erledigt (refreshDone setzt nur den Text)
 - Erledigt-Haken pro Uebung (`#done-[di]-[ei]`, Klasse done-chip): gruener Kreis mit Ink-Rahmen,
   sichtbar wenn exDone() — Toggle via hidden-Klasse
@@ -996,6 +997,10 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Tages-Pill-Schrift immer in der Kartenfarbe (23.10.2026, Version 2026-10-23-05).** Auf Lila (Tag A) und
+   Pink (Tag B) stand "8/8 Übungen" cremeweiss (Rexy-Regel aus Version -03) — Wunsch: wie bei Tag C/D immer die
+   Farbe der Karte. DAYTXT entfernt, Pill nutzt wieder DAYBG. Kontrast auf ink: Pink 5,5:1, Lila ~8:1 (AA erfuellt).
 
 NEU. **Sanduhr-Rex statt Apfel-Rex, mit Hintergrund (23.10.2026, Version 2026-10-23-04).** Rexi hatte sich
    beim Rex vertan: gemeint ist der RECHTE (Sanduhr), ohne Schriftzug. Kopf: Sanduhr-Rex als gerahmte Comic-

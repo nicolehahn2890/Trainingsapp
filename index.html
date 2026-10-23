@@ -446,10 +446,9 @@ const TIPS={
 };
 // Kategorie-Farben (Muskelgruppen) — Werte wie im Rexy-System (kraeftiger als die Designsystem-Basis)
 const CC={"Glute Max":"#FA86B6","Glute Med":"#B99FFA","Adduktoren":"#43D9BE","Glute & Quad":"#F4A437","Glute & Hams":"#84DE70","Beinbeuger":"#E29CF2","Beinstrecker":"#FDA57C","Rücken":"#5DCDFA","Brust":"#FB9797","Schultern":"#BEE349","Bizeps":"#F7D979","Trizeps":"#94B8F8","Bauch":"#DED754"};
-// Tagesfarbe pro Tag-Card — Tokens --day-a..d (App-Ebene Rex: A lilac, B Rex-Pink, C Rex-Gelb, D Rex-Cyan)
+// Tagesfarbe pro Tag-Card — Tokens --day-a..d (App-Ebene Rex: A lilac, B Rex-Pink, C Rex-Gelb, D Rex-Cyan).
+// Die Tages-Pill (ink) zeigt ihre Schrift IMMER in derselben Farbe wie die Karte — auch auf Lila/Pink (Wunsch).
 const DAYBG=["var(--day-a)","var(--day-b)","var(--day-c)","var(--day-d)"];
-// Schrift der Tages-Pill (ink-Flaeche) wie Rexy CountPill: Kartenfarbe, auf Lila/Pink cream (dort auf ink zu dunkel)
-const DAYTXT=["var(--cream)","var(--cream)","var(--day-c)","var(--day-d)"];
 // TRAININGSPLAENE — Version 2 (ab Sept. 2026): Peach-Aufbau mit vollem Po-Fokus.
 // Wochenvolumen am oberen Ende dessen, was laut Studienlage noch wirkt (Po ~25-30 anteilige
 // Saetze/Woche), pro Einheit hoechstens ~9 harte Po-Saetze. Reihenfolge pro Tag (Wunsch):
@@ -1295,7 +1294,7 @@ function renderT(){
     const total=day.e.length;let done=0;day.e.forEach((ex,ei)=>{if(exDone(di,ei))done++});
     const dcol=DAYBG[di%4];
     // Titel = Schwerpunkt des Tages, darunter (nur neue Plaene) die Fokus-Zeile day.f
-    h+='<div class="day-card" style="background:'+dcol+'"><button class="day-header" onclick="toggleDay('+di+')"><span class="day-title">'+esc(day.l)+'</span><span class="day-right"><span class="day-count" id="dc-'+di+'" style="color:'+DAYTXT[di%4]+'">'+(done===total?'✓ ':'')+done+'/'+total+' Übungen</span><span class="day-chevron">'+(op?'▲':'▼')+'</span></span>'+(day.f?'<span class="day-focus">'+esc(day.f)+'</span>':'')+'</button>';
+    h+='<div class="day-card" style="background:'+dcol+'"><button class="day-header" onclick="toggleDay('+di+')"><span class="day-title">'+esc(day.l)+'</span><span class="day-right"><span class="day-count" id="dc-'+di+'" style="color:'+dcol+'">'+(done===total?'✓ ':'')+done+'/'+total+' Übungen</span><span class="day-chevron">'+(op?'▲':'▼')+'</span></span>'+(day.f?'<span class="day-focus">'+esc(day.f)+'</span>':'')+'</button>';
     if(op){h+='<div class="day-body'+(S.animDay===di?' anim':'')+'">';day.e.forEach((ex,ei)=>{h+=renderEx(ex,ei,di)});h+='</div>'}
     h+='</div>';
   });
@@ -1926,7 +1925,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeWeekPick();clo
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-10-23-04';
+const BUILD_ID='2026-10-23-05';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();
