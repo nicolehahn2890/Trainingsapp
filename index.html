@@ -459,7 +459,7 @@ const TIPS={
 };
 // Kategorie-Farben (Muskelgruppen) — Werte wie im Rexy-System (kraeftiger als die Designsystem-Basis)
 const CC={"Glute Max":"#FA86B6","Glute Med":"#B99FFA","Adduktoren":"#43D9BE","Glute & Quad":"#F4A437","Glute & Hams":"#84DE70","Beinbeuger":"#E29CF2","Beinstrecker":"#FDA57C","Rücken":"#5DCDFA","Brust":"#FB9797","Schultern":"#BEE349","Bizeps":"#F7D979","Trizeps":"#94B8F8","Bauch":"#DED754"};
-// Tagesfarbe pro Tag-Card — Tokens --day-a..d (App-Ebene Rex: A lilac, B Rex-Pink, C Rex-Gelb, D Rex-Cyan).
+// Tagesfarbe pro Tag-Card — Tokens --day-a..d (App-Ebene Rex: A Kit-Lila, B Rex-Pink, C Rex-Gelb, D Rex-Cyan).
 // Die Tages-Pill (ink) zeigt ihre Schrift IMMER in derselben Farbe wie die Karte — auch auf Lila/Pink (Wunsch).
 const DAYBG=["var(--day-a)","var(--day-b)","var(--day-c)","var(--day-d)"];
 // TRAININGSPLAENE — Version 2 (ab Sept. 2026): Peach-Aufbau mit vollem Po-Fokus.
@@ -1965,7 +1965,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeWeekPick();clo
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-10-23-07';
+const BUILD_ID='2026-10-23-08';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();

@@ -76,7 +76,7 @@ auf main einmalig eine Sicherheitsfreigabe verlangen; dann kurz bestaetigen lass
   und ihr Schatten kollabiert auf --sh-press (1px). Neue Schatten-Buttons brauchen diese Klasse.
 - Fokus-Ring (a11y): globales `:focus-visible` = 3px solid var(--ink) + 3px Offset (wie Rexy),
   mit !important — NICHT durch outline:none uebersteuern, der Ring soll ueberall erscheinen.
-- Disabled-Buttons: globales `button:disabled` = flach & cream (var(--cream)-Hintergrund,
+- Disabled-Buttons: globales `button:disabled` = flach & cream (var(--block-bg)-Hintergrund = Kit-Creme,
   var(--text-dim) Text+Rahmen, kein Schatten, kein Press-Transform, cursor not-allowed).
 - Badges (.cat-badge Kategorie, .pbadge Fortschritt): 12px (von 10px erhoeht — Lesbarkeit).
 
@@ -1049,6 +1049,10 @@ claude.ai. Frontmatter (name, description) dabei unveraendert lassen.
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Projektdateien abgeglichen + Skill-ZIP (23.10.2026, Version 2026-10-23-08).** Keine Funktions- oder
+   Designaenderung. Nach dem Rexy-Kit-Abgleich nachgezogen: SKILL.md (Disabled-Buttons auf --block-bg) und
+   Kommentar in index.html (Tag A Kit-Lila). Rexi bekam die Skill-ZIP zum Ersetzen in claude.ai.
 
 NEU. **Rexy-Kit-Werte: Farben, Schriften, App-Icon, Rex-Reaktionen (23.10.2026, Version 2026-10-23-07).**
    Das Artefakt "Rexy - Neobrutalism" wurde auf das Marketing-Kit umgestellt; Wunsch: App anpassen, den
