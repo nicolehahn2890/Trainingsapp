@@ -6,7 +6,7 @@
 <title>Peach Project – Trainings-App</title>
 <meta name="theme-color" content="#FA9ECC"/>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%91%3C/text%3E%3C/svg%3E"/>
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=rex"/>
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=sanduhr"/>
 <link rel="manifest" href="manifest.json"/>
 <meta name="apple-mobile-web-app-title" content="Peach Project"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -95,11 +95,13 @@ button:disabled:active{transform:none;}
 /* Wortmarke wie im Rexy-System: gelbes Schild, 3px ink-Rahmen, pinker Druckversatz */
 .wordmark{display:inline-block;font-family:var(--font-display);font-size:20px;line-height:1;letter-spacing:-0.5px;text-transform:uppercase;color:var(--ink);background:var(--rex-yellow);border:var(--bw-bold) solid var(--ink);border-radius:var(--r-sm);box-shadow:var(--sh-pop);padding:7px 11px;white-space:nowrap;}
 @media(max-width:430px){.tab-btn{padding:8px 12px}}
-/* Darunter: freigestellter Apfel-Rex links (steht auf der Unterkante des Kopfs), rechts die Bedienung */
+/* Darunter: Sanduhr-Rex links als gerahmte Comic-Kachel (Flos Hintergrund, wie Rexy), rechts die Bedienung */
 .header-main{display:flex;align-items:center;gap:10px;}
-/* Schmale iPhones: Bedienung in 3 Zeilen -> Rex fuellt die Spalte (112 px); ab 425 px reichen 2 Zeilen -> 84 px */
-.hdr-rex{display:block;flex-shrink:0;height:112px;width:auto;align-self:flex-end;margin-bottom:-11px;filter:drop-shadow(2px 2px 0 var(--ink));}
+/* Schmale iPhones: Bedienung in 3 Zeilen -> Kachel fuellt die Spalte (112 px); ab 425 px reichen 2 Zeilen -> 84 px */
+.hdr-rex{display:block;flex-shrink:0;height:112px;width:auto;aspect-ratio:250/360;object-fit:cover;border:var(--bw) solid var(--ink);border-radius:var(--r-md);box-shadow:var(--sh-sm);background:var(--rex-yellow);}
 @media(min-width:425px){.hdr-rex{height:84px}}
+/* iPhone SE/mini (375 px): Kachel etwas kleiner, sonst passt die Zyklus-Zeile nicht neben sie */
+@media(max-width:380px){.hdr-rex{height:104px}}
 .controls{flex:1;min-width:0;display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
 .plan-group,.cycle-group{display:flex;gap:4px;flex-wrap:wrap;align-items:center;}
 /* Breit genug fuer eine Zeile: Plan, Zyklus, Wochenwahl rechts */
@@ -252,7 +254,7 @@ button:disabled:active{transform:none;}
     </div>
   </div>
   <div class="header-main">
-    <img class="hdr-rex" src="rex-apfel-frei.webp" alt="" width="198" height="330" decoding="async"/>
+    <img class="hdr-rex" src="rex-sanduhr.webp" alt="" width="250" height="360" decoding="async"/>
     <div class="controls">
       <div class="plan-group">
         <button class="plan-btn nb-shadow" id="plan-p3" onclick="setPlan('p3')" title="Gilt für diese Woche">3 Tage</button>
@@ -1924,7 +1926,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeWeekPick();clo
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-10-23-03';
+const BUILD_ID='2026-10-23-04';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();

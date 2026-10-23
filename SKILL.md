@@ -38,7 +38,7 @@ auf main einmalig eine Sicherheitsfreigabe verlangen; dann kurz bestaetigen lass
 - Live-URL: https://nicolehahn2890.github.io/Trainingsapp/
 - Repository: github.com/nicolehahn2890/Trainingsapp
 - Technologie: Standalone HTML-Datei (kein Framework, kein Build-Schritt)
-- Repo-Dateien: index.html (App), apple-touch-icon.png (Home-Screen-Icon), rex-apfel-frei.webp
+- Repo-Dateien: index.html (App), apple-touch-icon.png (Home-Screen-Icon), rex-sanduhr.webp
   (Maskottchen Rex im Kopf, siehe App-Ebene "Rex"),
   manifest.json (display:browser — Icon oeffnet Safari, NICHT standalone!),
   Peach_Project.pdf (Original-Handbuch des Trainers, 41 Seiten — nicht aendern), SKILL.md
@@ -80,9 +80,11 @@ auf main einmalig eine Sicherheitsfreigabe verlangen; dann kurz bestaetigen lass
 
 ### App-Ebene "Rex" (Maskottchen, seit 23.10.2026) — Designsystem bleibt Basis
 Ausdruecklicher Wunsch: Das Peach-Designsystem (Neobrutalism, Claude-Design-Projekt "Peach Project -
-Neobrutalism") wird NICHT angefasst und bleibt die Grundlage. Nur die App bekommt den mittleren Rex
-aus Florians Motiv ("Apfel", Po von hinten) als Maskottchen und den Look des Rexy-Systems (Artefakt
-"Rexy - Neobrutalism", Gymcreator) — Wunsch: "stimmig zu 100 % mit dem Artefakt".
+Neobrutalism") wird NICHT angefasst und bleibt die Grundlage. Nur die App bekommt den RECHTEN Rex
+aus Florians Motiv ("Sanduhr": schmale Taille, Victory-Geste) als Maskottchen und den Look des Rexy-
+Systems (Artefakt "Rexy - Neobrutalism", Gymcreator) — Wunsch: "stimmig zu 100 % mit dem Artefakt".
+Bis Version -03 stand dort der mittlere Apfel-Rex — Verwechslung, gemeint war immer der Sanduhr-Rex.
+Rexy ordnet Sanduhr die Zielfarbe Gelb zu; der App-Akzent bleibt bewusst Rex-Pink ("sonst ist alles super").
 - Im `:root` stehen OBEN unveraendert die Tokens des Designsystems (--peach, --pink, --lilac, --sky,
   --yellow, --bg, --green, --prog-*, --cat-* ...). Diese Werte NIE aendern (tests/rex-maskottchen
   prueft das). DARUNTER im selben :root die App-Ebene: Rex-Farben (Werte wie im Rexy-System) und
@@ -112,19 +114,19 @@ aus Florians Motiv ("Apfel", Po von hinten) als Maskottchen und den Look des Rex
   pfeile (Tests klicken ueber Woche 1/12 hinaus). Gruene TEXTE bleiben --green (#6FC36A).
 - Peach-Orange kommt in der App nicht mehr vor (Wunsch: Tag A Lila statt Pastell-Orange). Lila nur
   noch als Tag A — Kopf/Seite in Lila waren "zu lila, nicht im Rex-Bild".
-- Bild: rex-apfel-frei.webp (198x330, WebP mit Alpha) = der mittlere Rex aus Rexis EIGENEM Freisteller
-  aller drei Rexe (23.10.2026), unveraendert ausgeschnitten und verkleinert, KEIN Schriftzug ("APFEL-PO"
-  ausdruecklich nicht). Nicht selbst freistellen (der erste eigene Versuch schnitt die Fuesse ab).
-  Die gerahmten Rexy-Ausschnitte (rex-apfel.webp / rex-apfel-kopf.webp) sind raus; das Home-Screen-
-  Icon wurde vorher aus dem Kopf-Ausschnitt gerendert und bleibt.
-- Platzierung: NUR im Kopf. Oben die Wortmarke, darunter links der freigestellte Rex (.hdr-rex,
-  drop-shadow 2px ink), der auf der Unterkante des Kopfs steht (margin-bottom = -padding-bottom),
-  rechts die Bedienung (.controls: Plan-Pills, Wochenwahl, Zyklus). Schmale iPhones (< 425 px): Bedienung
-  in 3 Zeilen, Rex 112 px hoch (fuellt die Spalte); ab 425 px 2 Zeilen, Rex 84 px; ab 600 px eine Zeile
-  (Plan, Zyklus, Wochenwahl rechts). Kopfhoehe 198 px auf 390 px — wie vor dem Umbau.
+- Bild: rex-sanduhr.webp (250x360) = der Rexy-Ausschnitt rex-sanduhr.webp (Flos Hintergrund: Gelb, Cyan-
+  Kanten, Rasterpunkte; KEIN Schriftzug — "SANDUHR"/"APFEL-PO" ausdruecklich nicht), nur verkleinert. Regel wie
+  Rexy: immer im ink-Rahmen. Rexis eigener Freisteller aller drei Rexe existiert (Upload 23.10.2026), wird in
+  der App aber NICHT genutzt: mit Hintergrund wirkt es poppiger (Rexis Wahl). Nicht selbst freistellen.
+- Platzierung: NUR im Kopf. Oben die Wortmarke, darunter links der Sanduhr-Rex als gerahmte Comic-Kachel
+  (.hdr-rex: --bw ink-Rahmen, --r-md, --sh-sm, object-fit cover, Fallback --rex-yellow), rechts die
+  Bedienung (.controls: Plan-Pills, Wochenwahl, Zyklus). Kachelhoehe 112 px (Bedienung in 3 Zeilen), 104 px
+  bis 380 px Breite (sonst passt die Zyklus-Zeile nicht daneben), 84 px ab 425 px (2 Zeilen); ab 600 px
+  eine Zeile. Kopfhoehe 198 px auf 375/390 px — wie vor dem Umbau.
   Verworfen (nicht wieder vorschlagen): runder Rex-Kopf im Header ("erkennt man nicht"), Rex-Karte unter
-  den Tagen ("angehaengt"), Rex im Kopf der Uebersicht ("zu viel"), Rex in der Wochen-Karte (doppelt,
-  seit der Rex gross im Kopf steht).
+  den Tagen ("angehaengt"), Rex im Kopf der Uebersicht ("zu viel"), Rex in der Wochen-Karte (doppelt),
+  Apfel-Rex (Verwechslung), Freisteller im Kopf (wirkt verloren), Freisteller vor gelbem Block mit Kopf
+  ueber der Kante (ohne Flos Hintergrund).
 
 ### Fonts
 - Display (Logo, Screen-Titel, Tag-Titel, grosse Zahlen): **Archivo Black**, UPPERCASE,
@@ -165,16 +167,18 @@ Designsystem-Tokens --prog-* (#6FC36A / #5EA8E0 / #F5CB44 / #EC6A6A) bleiben unv
 ### Marke / Assets
 Logo (seit 23.10.2026): Wortmarke wie im Rexy-System — "PEACH" (ohne "Project", Wunsch) als gelbes
   Schild (.wordmark: Archivo Black 20px, --rex-yellow, 3px ink-Rahmen --bw-bold, --r-sm, pinker
-  Druckversatz --sh-pop 5px), darunter der freigestellte Rex (siehe App-Ebene). Die Unterzeile
+  Druckversatz --sh-pop 5px), darunter der Sanduhr-Rex als Kachel (siehe App-Ebene). Die Unterzeile
   "Trainings-App" ist weg. Der Pixel-Pfirsich (16x16-SVG) ist aus der App raus, bleibt aber im
   Designsystem (assets/peach-logo.svg).
 Favicon: Pfirsich-Emoji als SVG-Data-URI im <head> (unveraendert).
 Home-Screen-Icon: apple-touch-icon.png (180x180), verlinkt mit apple-mobile-web-app-title und
-  ?v=rex (Cache-Bremse fuer das neue Motiv; bei einem neuen Icon den Wert aendern, auch im Manifest).
-  Motiv seit 23.10.2026: Rex-Kopf in einem Kreis mit 7px Ink-Rahmen + hartem 7px-Schatten auf
+  ?v=sanduhr (Cache-Bremse fuer das neue Motiv; bei einem neuen Icon den Wert aendern, auch im Manifest).
+  Motiv seit 23.10.2026 (Version -04): Sanduhr-Kopf (Rexy rex-sanduhr-kopf.webp, mit Hintergrund) in einem
+  Kreis mit 7px Ink-Rahmen + hartem 7px-Schatten auf
   Rosa (#FA9ECC) — spiegelt den Header. Vollflaechig (kein transparenter Rand), iOS rundet die Ecken
   selbst. Erzeugt durch Rendern eines kleinen Icon-HTML mit Playwright (Viewport 180x180, dsf 3) ->
-  Screenshot, mit Lanczos auf 180x180 verkleinert. (Davor: Pixel-Pfirsich im Cream-Kreis auf Lilac.)
+  Screenshot, mit Lanczos auf 180x180 verkleinert. (Davor: Apfel-Kopf ?v=rex, davor Pixel-Pfirsich auf Lilac.)
+  Verworfen: Freisteller gross auf Gelb, ganzer Rex aus gelbem Block (Rexi: Kopf im Ring).
 theme-color-Meta + manifest: theme_color #FA9ECC (Kopf), background_color #FDE7F2 (Seite).
 WICHTIG (localStorage!): Seit iOS 16.4 oeffnet Apple JEDES Home-Screen-Lesezeichen
 standardmaessig als eigenstaendige Web-App mit EIGENEM (leerem) localStorage-Container —
@@ -992,6 +996,12 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Sanduhr-Rex statt Apfel-Rex, mit Hintergrund (23.10.2026, Version 2026-10-23-04).** Rexi hatte sich
+   beim Rex vertan: gemeint ist der RECHTE (Sanduhr), ohne Schriftzug. Kopf: Sanduhr-Rex als gerahmte Comic-
+   Kachel mit Flos Hintergrund (Rexy-Ausschnitt, 112/104/84 px) statt Freisteller — im Vergleich A/B/C von
+   Rexi gewaehlt ("poppiger"). Icon: Sanduhr-Kopf im Tinten-Ring auf Rosa (?v=sanduhr). Freisteller-Datei
+   rex-apfel-frei.webp entfernt. Test rex-maskottchen angepasst (Kachel, 375-px-Fall); alle Testreihen gruen.
 
 NEU. **Rexy-Look: Wortmarke PEACH, freigestellter Rex im Kopf (23.10.2026, Version 2026-10-23-03).**
    Wunsch: Ueberschrift wie im Rexy-Artefakt (statt "Gymcreator" nur "PEACH"), Rexis eigener Freisteller

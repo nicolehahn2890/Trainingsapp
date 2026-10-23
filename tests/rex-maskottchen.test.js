@@ -1,7 +1,7 @@
 // Rex als Maskottchen + Rexy-Look (23.10.2026): App-Ebene "Rex" ueber dem unveraenderten
 // Peach-Designsystem. Prueft: Basis-Tokens (Designsystem) unveraendert, Wortmarke "PEACH" wie Rexy
-// (gelbes Schild, 3px-Rahmen, pinker Druckversatz), freigestellter Apfel-Rex im Kopf (steht auf der
-// Unterkante, 112 px schmal / 84 px ab 425 px), Kopf rosa mit tuerkisen Knoepfen, Seite hellrosa,
+// (gelbes Schild, 3px-Rahmen, pinker Druckversatz), Sanduhr-Rex als gerahmte Comic-Kachel im Kopf
+// (Flos Hintergrund, 112 px schmal / 84 px ab 425 px), Kopf rosa mit tuerkisen Knoepfen, Seite hellrosa,
 // Tagesfarben + Pill-Schrift, Rexy-Kategorie- und Status-Farben, Stern als Gold-Scheibe, Fokus-Ring ink,
 // Wochen-Karte OHNE Rex-Bild (Woche 1 ohne Karte), Uebersicht OHNE Bild mit tuerkisen Vorwochen,
 // theme-color, Icon/Manifest (display:browser!), kein Ueberlauf auf 375/390/430 px.
@@ -23,13 +23,14 @@ for(const W of [390,375,430]){
   await page.goto(PEACH_URL);
   await page.evaluate(d=>{localStorage.clear();localStorage.setItem('peach_mig_add','1');localStorage.setItem('peach_v4',JSON.stringify(d));localStorage.setItem('peach_ui',JSON.stringify({view:'training',week:2,cy:'cycle2',pt:'p4',openDays:{0:true}}));},d);
   await page.reload();await page.waitForLoadState('load');await page.waitForTimeout(300);
-  // Kopf: Wortmarke + freigestellter Rex (alle Breiten)
-  const hd=await page.evaluate(()=>{const h=document.getElementById('header').getBoundingClientRect(),i=document.querySelector('#header img.hdr-rex'),r=i&&i.getBoundingClientRect();
+  // Kopf: Wortmarke + Sanduhr-Rex als gerahmte Kachel (alle Breiten)
+  const hd=await page.evaluate(()=>{const h=document.getElementById('header').getBoundingClientRect(),i=document.querySelector('#header img.hdr-rex'),r=i&&i.getBoundingClientRect(),s=i&&getComputedStyle(i);
     return{h:Math.round(h.height),hb:Math.round(h.bottom),src:i&&i.getAttribute('src'),nw:i?i.naturalWidth:0,rh:r?Math.round(r.height):0,rb:r?Math.round(r.bottom):0,
-      txt:document.getElementById('header').innerText}});
-  ok(hd.src==='rex-apfel-frei.webp'&&hd.nw===198,W+' px: freigestellter Rex im Kopf geladen ('+hd.src+', '+hd.nw+' px)');
-  ok(hd.rh===(W>=425?84:112),W+' px: Rex '+hd.rh+' px hoch (schmal 112, ab 425 px 84)');
-  ok(Math.abs(hd.hb-hd.rb)<=4,W+' px: Rex steht auf der Unterkante des Kopfs (Kopf '+hd.hb+' / Rex '+hd.rb+')');
+      bw:s&&s.borderTopWidth,rad:s&&s.borderRadius,sh:s&&s.boxShadow,fit:s&&s.objectFit,txt:document.getElementById('header').innerText}});
+  ok(hd.src==='rex-sanduhr.webp'&&hd.nw===250,W+' px: Sanduhr-Rex (mit Hintergrund) im Kopf geladen ('+hd.src+', '+hd.nw+' px)');
+  ok(hd.rh===(W>=425?84:W<=380?104:112),W+' px: Kachel '+hd.rh+' px hoch (bis 380 px 104, schmal 112, ab 425 px 84)');
+  ok(parseFloat(hd.bw)>=2&&hd.rad==='12px'&&/3px 3px/.test(hd.sh)&&hd.fit==='cover',W+' px: Kachel im ink-Rahmen mit hartem Schatten, unverzerrt ('+[hd.bw,hd.rad,hd.sh,hd.fit].join(' / ')+')');
+  ok(hd.rb<=hd.hb-2,W+' px: Kachel liegt im Kopf (Kachel '+hd.rb+' / Kopf '+hd.hb+')');
   ok(!/Project/i.test(hd.txt)&&hd.h<=200,W+' px: Kopf ohne "Project", Hoehe '+hd.h+' px (max. 200 wie vorher)');
   if(W===390){
     // 1. Designsystem bleibt Basis: Tokens des Peach-Systems unveraendert
@@ -91,12 +92,12 @@ for(const W of [390,375,430]){
 }
 // 10. Dateien + Manifest: Icon 180x180, Manifest bleibt display:browser (sonst sind die Daten auf dem iPhone scheinbar weg)
 const ctx=await b.newContext();const st={r:{}};
-for(const f of ['rex-apfel-frei.webp','apple-touch-icon.png?v=rex','manifest.json'])st.r[f]=(await ctx.request.get(BASE+f)).status();
+for(const f of ['rex-sanduhr.webp','apple-touch-icon.png?v=sanduhr','manifest.json'])st.r[f]=(await ctx.request.get(BASE+f)).status();
 const m=JSON.parse(await (await ctx.request.get(BASE+'manifest.json')).text());
-const png=await (await ctx.request.get(BASE+'apple-touch-icon.png?v=rex')).body(); // PNG-Kopf: Breite/Hoehe ab Byte 16
+const png=await (await ctx.request.get(BASE+'apple-touch-icon.png?v=sanduhr')).body(); // PNG-Kopf: Breite/Hoehe ab Byte 16
 ok(Object.values(st.r).every(s=>s===200),'Rex-Bild, Icon und Manifest werden ausgeliefert ('+JSON.stringify(st.r)+')');
 ok(m.display==='browser','Manifest display bleibt "browser"');
-ok(m.theme_color.toUpperCase()===ROSE&&m.background_color.toUpperCase()===ROSE_PALE&&m.icons[0].src==='apple-touch-icon.png?v=rex','Manifest: Farben = Kopf/Seite, Icon mit neuer Version');
+ok(m.theme_color.toUpperCase()===ROSE&&m.background_color.toUpperCase()===ROSE_PALE&&m.icons[0].src==='apple-touch-icon.png?v=sanduhr','Manifest: Farben = Kopf/Seite, Icon mit neuer Version');
 ok(png.readUInt32BE(16)===180&&png.readUInt32BE(20)===180,'Home-Screen-Icon 180x180');
 ok(errs.length===0,'keine JS-Fehler'+(errs.length?' ('+errs.slice(0,2).join(' | ')+')':''));
 console.log(fails?'FAILS '+fails:'ALL PASS');process.exitCode=fails?1:0;await b.close();})();
