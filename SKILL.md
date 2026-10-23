@@ -777,7 +777,10 @@ Adduktoren (8): Adduktionsmaschine, Adduktion Kabel Stehend, Adduktion Kabel Lie
 
 Glute & Quad (11): Low Bar Squat, Beinpresse 45 Grad, Beinpresse, Step Ups, Split Squat Kurzhantel, Split Squat Langhantel, Split Squat Multipresse, Hack Squat, Reverse Lunge, Belt Squat, Super Squat
 
-Glute & Hams (8): RDL Langhantel, RDL Kurzhanteln, RDL Maschine, Belt Squat RDL, Glute Hyperextensions, Reverse Hack RDL, Good Mornings, Single-Leg RDL
+Glute & Hams (8): RDL Langhantel, RDL Kurzhanteln, RDL Maschine, Belt Squat RDL, Glute Hyperextensions, Reverse Hack RDL, Good Mornings, B-Stance RDL
+(B-Stance RDL seit 23.10.2026 statt Single-Leg RDL — Wunsch: Single-Leg raus. Name bewusst ohne KH/LH, Rexi legt
+sich noch nicht fest; der Tipp sagt "Gewicht immer gleich eintragen (bei Kurzhanteln pro Hantel)". Single-Leg RDL
+steht in RETIRED (Kategorie Glute & Hams), Tipp bleibt fuer alte Eintraege.)
 
 Beinbeuger (5, NEU Sept. 2026): Leg Curls sitzend (Precor), Leg Curls liegend (Panatta), Leg Curls liegend (Precor), Leg Curls stehend, Nordic Curls
 (Leg Curls + Nordic Curls NUR hier — keine Dopplung in Glute & Hams, ausdruecklicher Wunsch)
@@ -794,6 +797,9 @@ aber in CATOF bekannt (alte Eintraege bleiben unveraendert an ihrer Zeile, repai
 carryMap schlaegt sie in neuen Zyklen NICHT vor. Nicht umbenannt, weil das Geraet unbekannt ist —
 auf Wunsch per Migration (wie migLegCurl) auf die richtige Variante umbenennen, inkl. set__ex__/tip__ex__.
 TIPS der Varianten = TIPS des alten Namens (Schleife nach CATOF, nur fuer Namen in EXERCISES).
+RETIRED ist der allgemeine Weg, eine Uebung aus der Auswahl zu nehmen, ohne Daten zu verlieren (so auch
+Single-Leg RDL am 23.10.2026): Eintrag in RETIRED mit Kategorie, aus EXERCISES + REC entfernen, TIPS behalten.
+Die laufende Zeile behaelt die Uebung (inhEx), bis Rexi wechselt; erst der neue Zyklus schlaegt sie nicht mehr vor.
 
 Ruecken (21): LH Rudern, KH Rudern, KH Rudern (breit), Rudern Kabel (eng), Rudern Kabel (breit), Rudermaschine (Panatta), Rudermaschine (Precor), High Row Maschine, Latzug (eng), Latzug (breit), Latzug Maschine (Panatta), Latzug Maschine (Precor), Ueberzug am Kabel, T Bar Rudern (neutral), T Bar Rudern (breit), Assistierter Klimmzug (eng), Assistierter Klimmzug (breit), Face Pull Kabel, Straight-Arm Pulldown, Einarmiger Latzug Kabel, Diverging Low Row
 
@@ -927,6 +933,13 @@ Fallback (manuell, ohne Session):
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **B-Stance RDL statt Single-Leg RDL (23.10.2026, Version 2026-10-23-01).** Wunsch: B-Stance RDL als
+   Auswahl in Glute & Hams, Single-Leg RDL raus. Neue Uebung mit ausfuehrlichem Tipp (Stand + Ausfuehrung, Reps
+   pro Seite) und Stern; der Stern von Single-Leg RDL ist weg, sie steht in RETIRED (alte Eintraege bleiben an ihrer
+   Zeile, kein Vorschlag im neuen Zyklus). Kein Plan- oder Datenumbau. Neuer Test tests/b-stance.test.js (gegen
+   den alten Stand rot); alle 18 Testreihen gruen. Einsatz-Empfehlung an Rexi (sie entscheidet selbst): 6-10/8-12-
+   Zeilen (4 Tage Tag C/D), die schwere 4-8-Zeile Tag A eher mit beidbeinigem RDL.
 
 NEU. **Pruefung aller Aenderungen vom 07.10.2026 + SKILL-Abgleich (ohne App-Aenderung).** (1) Vorher/
    Nachher-Vergleich (3275d42 vs. a4de686) mit Rexi-aehnlichen Daten (Z1 alt, Z2 W1 mit Tag A/B fertig,
