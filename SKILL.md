@@ -42,8 +42,9 @@ auf main einmalig eine Sicherheitsfreigabe verlangen; dann kurz bestaetigen lass
   (Maskottchen Rex im Kopf, siehe App-Ebene "Rex"), rex-puh/-happy/-love/-wink/-wow.webp (Rex-Reaktionen, siehe
   Rex-Momente),
   manifest.json (display:browser — Icon oeffnet Safari, NICHT standalone!),
-  Peach_Project.pdf (Original-Handbuch des Trainers, 41 Seiten — nicht aendern), SKILL.md
-  (diese Datei), tests/ (Browser-Tests, siehe Abschnitt Tests)
+  SKILL.md (diese Datei), tests/ (Browser-Tests, siehe Abschnitt Tests).
+  Das Original-Handbuch des Trainers (Peach_Project.pdf, 41 Seiten) liegt seit 27.10.2026 NICHT mehr im Repo:
+  gekauftes Werk, das Repo ist oeffentlich. Rexi hat es lokal. NIE wieder ins Repo legen.
 - localStorage-Keys: peach_v4 (Trainingsdaten — NIEMALS umbenennen!),
   (peach_ver wird nicht mehr genutzt — Auto-Update zaehlt Versuche in sessionStorage
   peach_try_[BUILD_ID], siehe checkUpdate),
@@ -1061,6 +1062,11 @@ claude.ai. Frontmatter (name, description) dabei unveraendert lassen.
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Handbuch-PDF aus dem Repo entfernt (27.10.2026, keine App-Aenderung).** Wunsch: das gekaufte Handbuch
+   nicht oeffentlich auf GitHub, nur lokal bei Rexi. Peach_Project.pdf geloescht; index.html unveraendert,
+   BUILD_ID bleibt. In der Git-Historie stehen es und die aeltere Fassung "Peach%20Project.pdf.pdf" noch, bis
+   die Historie bereinigt ist (git filter-repo + Force-Push auf main, braucht Rexis ausdrueckliche Freigabe).
 
 NEU. **Wechselnde Rex-Gesichter bei "Training geschafft" (23.10.2026, Version 2026-10-23-10).** Wunsch: nicht
    immer dasselbe Gesicht. REX_DONE = Puh, Happy, Love, Wink (Rexy-Kit E05/E01/E03/E02, 192 px WebP),
