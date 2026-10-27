@@ -44,7 +44,10 @@ auf main einmalig eine Sicherheitsfreigabe verlangen; dann kurz bestaetigen lass
   manifest.json (display:browser — Icon oeffnet Safari, NICHT standalone!),
   SKILL.md (diese Datei), tests/ (Browser-Tests, siehe Abschnitt Tests).
   Das Original-Handbuch des Trainers (Peach_Project.pdf, 41 Seiten) liegt seit 27.10.2026 NICHT mehr im Repo:
-  gekauftes Werk, das Repo ist oeffentlich. Rexi hat es lokal. NIE wieder ins Repo legen.
+  gekauftes Werk, das Repo ist oeffentlich. NIE wieder ins Repo legen. Es liegt NUR im claude.ai-Skill unter
+  references/: Peach_Project_Handbuch.txt (Textfassung zum Nachlesen, Bilder und Tabellen nur im PDF),
+  Peach_Project.pdf und Peach_Project_alte_Fassung_10_Seiten.pdf (aeltere Anleitung). Bei Fragen zu den
+  Original-Regeln zuerst die Textfassung lesen.
 - localStorage-Keys: peach_v4 (Trainingsdaten — NIEMALS umbenennen!),
   (peach_ver wird nicht mehr genutzt — Auto-Update zaehlt Versuche in sessionStorage
   peach_try_[BUILD_ID], siehe checkUpdate),
@@ -1057,11 +1060,17 @@ Fallback (manuell, ohne Session):
 Skill aktualisieren: Der Skill "peach-project" in claude.ai ist eine KOPIE dieser Datei und aktualisiert
 sich nicht von selbst aus dem Repo. Nach Aenderungen an SKILL.md Rexi eine ZIP geben (Ordner peach-project/
 mit dieser SKILL.md darin, z. B. `zip -r peach-project.zip peach-project`) — sie ersetzt damit den Skill in
-claude.ai. Frontmatter (name, description) dabei unveraendert lassen.
+claude.ai. Frontmatter (name, description) dabei unveraendert lassen. Den Ordner references/ (Handbuecher) aus
+dem geladenen Skill-Verzeichnis ("Base directory for this skill") unveraendert mit in die ZIP legen — sonst sind
+die Handbuecher nach dem Ersetzen weg. Fehlt er dort, Rexi vorher fragen. references/ NIE ins Repo kopieren.
 
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Handbuecher im Skill (27.10.2026, keine App-Aenderung).** Wunsch: die Handbuecher fuer Rueckfragen im
+   claude.ai-Skill statt im Repo. Skill-ZIP mit references/ (Textfassung + beide PDFs), Regel "Skill
+   aktualisieren" ergaenzt.
 
 NEU. **Handbuch-PDF aus dem Repo entfernt (27.10.2026, keine App-Aenderung).** Wunsch: das gekaufte Handbuch
    nicht oeffentlich auf GitHub, nur lokal bei Rexi. Peach_Project.pdf geloescht; index.html unveraendert,
