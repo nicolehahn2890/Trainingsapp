@@ -275,12 +275,15 @@ S = {
 ### Key-Formate
 ```
 Workout:      [cycle]__w[week]__d[dayIdx]__e[exIdx]
-              [cycle] = cycle1-6 (4-Tage-Woche) ODER p3cycle1-6 (3-Tage-Woche).
+              [cycle] = cycle1-N (4-Tage-Woche) ODER p3cycle1-N (3-Tage-Woche). N = cycleCount():
+              mindestens 6, mehr ueber das "+" neben den Zyklus-Nummern (addCycle, Anzahl in cyc__n).
               (Bis Sept. 2026 nur 1-3 — nach Zyklus 3 ging es auf den befuellten Zyklus 1 zurueck.)
               Gespeichert bleibt strikt getrennt — NIEMALS Keys mischen/migrieren! Seit 02.10.2026
               enthaelt eine Zyklus-Nummer Wochen BEIDER Arten (flexible Woche, siehe weekPt).
               Optionales Feld base: einmaliger Uebungswechsel ("nur diese Woche") — exercise wird
               gezeigt, base vererbt (exBase). Ohne base wird exercise vererbt.
+              Optionales Feld noAuto: der Auto-Satz (autoExtraSets) wurde in dieser Woche per "−"
+              abgewaehlt; gilt nur fuer diese Woche, "+" holt ihn zurueck. Wird NICHT vererbt.
               Optionales Feld s0: Basis-Saetze, mit denen diese Woche trainiert wurde, wenn sie
               vom heutigen Plan abweichen (exState/exDone nehmen s0||Plan-Saetze). Wird NICHT vererbt.
               Optionales Feld r0: Wdh.-Bereich ("8-12"), mit dem diese Woche trainiert wurde, wenn er vom
@@ -684,7 +687,9 @@ Label "nur diese Woche" (.once-chip) in der Status-Zeile der Uebung.
    Einstell-Checkliste (Gelenk auf Drehachse, Polster-Positionen, Startposition fuer 169 cm)
    plus Ausfuehrungs-Cues, zugeschnitten auf Glute-Fokus / definierte, nicht massige Beine
 4. KEIN Grad-Zeichen (°) in Strings im Script — zerstoert den JS-Parser! "Grad" ausschreiben
-5. Keine renderT() in updRep/updW
+5. Keine renderT() in updRep/updW. Eingabefelder (Gewicht, Einstellung, Wdh.) speichern NUR ueber oninput —
+   kein onchange: das feuert auch, wenn ein aktives Feld beim Neuaufbau entfernt wird (Wert landete nach
+   einem Wochenwechsel in der neuen Woche, 11.11.2026)
 6. plan() = planOf(S.cy): 3 oder 4 Tage je nach Praefix, alte oder neue Version je nach
    pv__-Marker — alle Plaene folgen denselben Regeln
    (Steigerung, autoExtraSets, Vererbung, Woche-1-Regel); 3-Tage-Daten IMMER unter p3cycle-Keys
@@ -981,9 +986,10 @@ Reaktion "Wow" (rex-wow.webp, 64 px links), 2,5px Ink-Rahmen, harte Schatten (--
 ersetzt sie, Rexy: keine Emoji als Schmuck). "Training geschafft" erscheint in Woche 12 trotzdem (Ausnahme,
 Wunsch Version -09). Text EIN Satz: "Danach geht
 es mit Zyklus X weiter." bzw. (alter Zyklus -> naechster neu) "Danach startet Zyklus X mit dem
-neuen Plan – deine Übungen werden übernommen."  Nach Zyklus 6
-geht es auf "1 (neu)" — dort steht aber der alte Plan (Marker): spaetestens dann braucht es
-eine Loesung (z. B. mehr Zyklen oder Zyklus-Archiv).
+neuen Plan – deine Übungen werden übernommen."  Im LETZTEN vorhandenen Zyklus
+(seit 11.11.2026): "Für Zyklus X oben neben den Zyklen auf + tippen." — das "+" (addCycle) haengt nach
+Rueckfrage Zyklus N+1 an und springt in dessen Woche 1. Frueher stand dort "Zyklus 1 (neu)", Zyklus 1
+traegt aber die alten Daten.
 
 ---
 
@@ -1067,6 +1073,29 @@ die Handbuecher nach dem Ersetzen weg. Fehlt er dort, Rexi vorher fragen. refere
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Bugcheck ueber die ganze App: 14 Korrekturen + Zyklus hinzufuegen (11.11.2026, Version 2026-11-11-01).**
+   Auftrag: Bugsuche ohne Aenderung, danach Freigabe fuer alle Punkte. Test: tests/bugcheck-1111.test.js.
+   (1) prog(…, n): Wdh.-Vergleich erst, wenn jeder Satz des Vorwerts eingetragen ist (n = Satzzahl der Woche,
+   nur aus exState) — vorher "↑ Reps" schon nach dem 1. Satz (8 gegen den Schnitt aus 8/6/5). Gewicht zaehlt
+   sofort. weekStats/rexDayHTML zaehlen eine Uebung erst mit, wenn das Badge steht. autoExtraSets ruft prog
+   weiter OHNE n. (2) EINGABEFELDER NUR NOCH oninput, KEIN onchange (Gewicht, Einstellung, Wdh.): Gewicht und
+   Einstellung gingen ohne Feldwechsel verloren; und onchange feuert, wenn ein aktives Feld beim Neuaufbau
+   entfernt wird — nach einem Wochenwechsel landete der Wert in der NEUEN Woche. Tests: fill() loest input aus.
+   (3) selEx: andere Uebung bei vorhandenen Werten der Woche -> zweite Rueckfrage "Leeren / Behalten"
+   (Leeren entfernt weight + reps, Zusatzsaetze bleiben). (4) Auto-Satz abwaehlbar: "−" setzt noAuto am
+   Wocheneintrag, "+" holt ihn zurueck; eigene Zusatzsaetze gehen zuerst. (5) repairSlots laesst eine bewusst
+   geleerte Zeile (exercise '', ohne Werte) an ihrem Platz, wenn er nach dem Einsortieren frei ist — vorher kam
+   die geerbte Uebung nach dem Neustart zurueck. Eintraege ohne exercise-Feld fallen weiter weg. (6) inhXS:
+   Zusatzsaetze aus der letzten gespeicherten Woche der Zeile (wie inhEx), nicht nur aus der direkten Vorwoche.
+   (7) S.tipDraft: Notiz-Entwurf uebersteht renderT. (8) Assistiert: 0 kg Hilfe ist gueltig (cmpWeight, Uebersicht
+   ueber ws[].has, kein Hinweis "Hilfe senken" bei 0). (9) normW: langer Strich und "/" als Spanne, "2x20" -> 20.
+   (10) cleanData (load + impBackup) entfernt Trainingseintraege, die kein Objekt sind; repairSlots setzt bei
+   Abbruch den Stand davor zurueck — ein null-Eintrag loeschte sonst ALLE Trainingseintraege. (11) impBackup
+   setzt loadFailed=false. (12) load: nur ein einfaches Objekt ist gueltig, sonst loadFailed + Rohtext-Kopie.
+   (13) Zyklen: CYCLES ersetzt durch cycleCount() (min. 6, cyc__n in peach_v4), Buttons in render() gebaut
+   (#cycle-btns, seitlich scrollbar, IDs cycle-cycleN bleiben), "+" = addCycle mit Rueckfrage.
+   Nicht umgesetzt (Wunsch): Tab-Wechsel behaelt die Scroll-Position.
 
 NEU. **Handbuecher im Skill (27.10.2026, keine App-Aenderung).** Wunsch: die Handbuecher fuer Rueckfragen im
    claude.ai-Skill statt im Repo. Skill-ZIP mit references/ (Textfassung + beide PDFs), Regel "Skill

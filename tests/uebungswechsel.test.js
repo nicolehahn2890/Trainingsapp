@@ -69,8 +69,20 @@ ok(!(await sheet())&&d['cycle3__w4__d0__e0']&&d['cycle3__w4__d0__e0'].exercise==
 await pick(0,'Hip Thrust Maschine');ok(!(await sheet()),'Unveraenderte Auswahl erneut: keine Frage');
 await pick(2,'Abduktionsmaschine');d=await st();
 ok(!(await sheet())&&d['cycle3__w4__d0__e2'].exercise==='Abduktionsmaschine','Leere Vorwoche: keine Frage');
-await week(1);await pick(1,'Kickback Maschine');d=await st();
-ok(!(await sheet())&&d['cycle3__w1__d0__e1'].exercise==='Kickback Maschine','Woche 1: keine Frage');
+// Woche 1: keine Frage nach "nur diese Woche" — aber die Zeile hat schon Werte (20 kg, 12/12) einer anderen
+// Uebung, deshalb seit 11.11.2026 die Rueckfrage "Leeren / Behalten"
+await week(1);await pick(1,'Kickback Maschine');
+let vTxt=(await sheet())?await page.textContent('#sheet .sheet'):'';
+ok(vTxt.includes('Kabel Kickback Stehend')&&vTxt.includes('Leeren')&&vTxt.includes('Behalten')&&!vTxt.includes('Nur diese Woche'),'Woche 1 mit Werten: nur die Frage Leeren/Behalten');
+ok((await st())['cycle3__w1__d0__e1'].exercise==='Kabel Kickback Stehend','Vor der Antwort wird nichts geaendert');
+await page.click('#sheet .sheet-cancel');await page.waitForTimeout(100);
+ok(!(await sheet())&&(await txt(1))==='Kabel Kickback Stehend','Abbrechen: Uebung und Werte bleiben');
+await pick(1,'Kickback Maschine');await page.click('#sheet .sheet-btn:not(.pri)');await page.waitForTimeout(100);d=await st();
+ok(d['cycle3__w1__d0__e1'].exercise==='Kickback Maschine'&&d['cycle3__w1__d0__e1'].weight==='20'&&d['cycle3__w1__d0__e1'].reps.join()==='12,12','"Behalten": neue Uebung, Werte bleiben');
+await pick(1,'Kabel Kickback Stehend');await page.click('#sheet .sheet-btn.pri');await page.waitForTimeout(100);d=await st();
+ok(d['cycle3__w1__d0__e1'].exercise==='Kabel Kickback Stehend'&&!d['cycle3__w1__d0__e1'].weight&&!d['cycle3__w1__d0__e1'].reps&&d['cycle3__w1__d0__e1'].extraSets===0,'"Leeren": neue Uebung, Gewicht und Wdh. weg, Zusatzsaetze bleiben');
+await pick(1,'Kickback Maschine');d=await st();
+ok(!(await sheet())&&d['cycle3__w1__d0__e1'].exercise==='Kickback Maschine','Woche 1 ohne Werte: keine Frage');
 // Leeren der Zeile: keine Frage
 await week(5);await page.click('#pw-0-1 .pick-btn');await page.click('.dropdown .drop-empty-opt');await page.waitForTimeout(100);
 d=await st();ok(!(await sheet())&&d['cycle3__w5__d0__e1'].exercise==='','Zeile leeren: keine Frage');

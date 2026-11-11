@@ -114,6 +114,14 @@ button:disabled:active{transform:none;}
 .tab-btn.active{background:var(--head-accent);color:var(--ink);box-shadow:var(--sh-sm);}
 .tab-btn.inactive{background:var(--block-bg);color:var(--text);}
 .cycle-btn{padding:7px 0;min-width:32px;text-align:center;border-radius:999px;font-size:12px;font-weight:700;border:var(--bw) solid var(--ink);background:transparent;color:var(--ink);}
+/* Zyklen in EINER Zeile: die Nummern scrollen seitlich (beliebig viele), das "+" bleibt rechts stehen */
+.cycle-group{flex-wrap:nowrap;min-width:0;max-width:100%;}
+.cycle-strip{display:flex;gap:4px;align-items:center;flex:0 1 auto;min-width:0;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:2px 4px 4px 1px;margin:-2px 0 -4px -1px;position:relative;}
+.cycle-strip::-webkit-scrollbar{display:none;}
+.cycle-strip .cycle-btn{flex:0 0 auto;}
+/* iPhone-Breite: etwas schmaler, damit die 6 Standard-Zyklen samt "+" ohne Scrollen neben den Rex passen */
+@media(max-width:430px){.cycle-strip{gap:3px}.cycle-strip .cycle-btn{min-width:28px}}
+.cycle-add{flex:0 0 auto;width:30px;height:30px;border-radius:50%;background:var(--rex-lime);border:var(--bw) solid var(--ink);color:var(--ink);font-size:17px;font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center;padding:0;}
 .cycle-lbl{font-size:12px;font-weight:700;color:var(--ink);margin-right:2px;}
 .cycle-btn.active{background:var(--ink);color:var(--rex-cream);box-shadow:var(--sh-xs);}
 .plan-btn{padding:7px 13px;border-radius:999px;font-size:12px;font-weight:700;border:var(--bw) solid var(--ink);background:var(--block-bg);color:var(--ink);}
@@ -281,12 +289,8 @@ button:disabled:active{transform:none;}
       </div>
       <div class="cycle-group">
         <span class="cycle-lbl">Zyklus</span>
-        <button class="cycle-btn nb-shadow active" id="cycle-cycle1" onclick="setCycle('cycle1')" aria-label="Zyklus 1">1</button>
-        <button class="cycle-btn nb-shadow" id="cycle-cycle2" onclick="setCycle('cycle2')" aria-label="Zyklus 2">2</button>
-        <button class="cycle-btn nb-shadow" id="cycle-cycle3" onclick="setCycle('cycle3')" aria-label="Zyklus 3">3</button>
-        <button class="cycle-btn nb-shadow" id="cycle-cycle4" onclick="setCycle('cycle4')" aria-label="Zyklus 4">4</button>
-        <button class="cycle-btn nb-shadow" id="cycle-cycle5" onclick="setCycle('cycle5')" aria-label="Zyklus 5">5</button>
-        <button class="cycle-btn nb-shadow" id="cycle-cycle6" onclick="setCycle('cycle6')" aria-label="Zyklus 6">6</button>
+        <div class="cycle-strip" id="cycle-btns"></div>
+        <button class="cycle-add" onclick="addCycle()" aria-label="Zyklus hinzufügen" title="Zyklus hinzufügen">+</button>
       </div>
     </div>
   </div>
@@ -672,11 +676,36 @@ const P3_V1=[
 ];
 
 // STATE
-let S={view:'training',week:1,cy:'cycle1',pt:'p4',data:{},openDays:{},drop:null,dropSearch:'',tips:{},tipEdit:{},animDay:null,dropAnim:false};
+let S={view:'training',week:1,cy:'cycle1',pt:'p4',data:{},openDays:{},drop:null,dropSearch:'',tips:{},tipEdit:{},tipDraft:{},animDay:null,dropAnim:false};
 // Beschaedigte Daten NIE ueberschreiben: der Rohtext wird unter peach_v4_corrupt gesichert,
 // und bis zur ersten eigenen Eingabe speichert der Start nichts (siehe migPlanV2).
 let loadFailed=false;
-function load(){let r=null;try{r=localStorage.getItem('peach_v4');return r?JSON.parse(r):{}}catch{if(r){loadFailed=true;try{if(!localStorage.getItem('peach_v4_corrupt'))localStorage.setItem('peach_v4_corrupt',r)}catch{}}return{}}}
+// Gueltig ist nur ein einfaches Objekt — "null", eine Liste oder eine Zahl in peach_v4 liessen die App leer
+// stehen (11.11.2026). Einzelne kaputte Trainingseintraege (z. B. null) wirft cleanData heraus: an einem
+// solchen Eintrag brach repairSlots mitten im Umbau ab und ALLE Trainingseintraege waren weg.
+function isObj(v){return !!v&&typeof v==='object'&&!Array.isArray(v)}
+function cleanData(d){
+  let n=0;
+  for(const k in d){
+    if(!/^(p3)?cycle\d+__w\d+__d\d+__e\d+$/.test(k))continue;
+    const v=d[k];
+    if(!isObj(v)){delete d[k];n++;continue}
+    if(v.reps!==undefined&&!Array.isArray(v.reps)){d[k]={...v,reps:[]};n++}
+  }
+  return n;
+}
+function keepCorrupt(r){try{if(!localStorage.getItem('peach_v4_corrupt'))localStorage.setItem('peach_v4_corrupt',r)}catch{}}
+function load(){
+  let r=null;
+  try{
+    r=localStorage.getItem('peach_v4');
+    if(!r)return{};
+    const d=JSON.parse(r);
+    if(!isObj(d))throw new Error('kein Objekt');
+    if(cleanData(d))keepCorrupt(r); // Rohtext sichern, die lesbaren Eintraege laufen normal weiter
+    return d;
+  }catch{if(r){loadFailed=true;keepCorrupt(r)}return{}}
+}
 // Sichtbare Warnung, wenn Speichern nicht klappt (Speicher voll/gesperrt) — sonst gingen
 // Eingaben unbemerkt verloren.
 function saveWarn(t){const el=document.getElementById('save-warn');if(!el)return;el.textContent=t;el.classList.toggle('hidden',!t)}
@@ -697,7 +726,7 @@ try{
   if(u.view==='training'||u.view==='overview')S.view=u.view;
   if(typeof u.week==='number'&&u.week>=1&&u.week<=12)S.week=u.week;
   if(u.pt==='p3'||u.pt==='p4')S.pt=u.pt;
-  if(/^(p3)?cycle[1-6]$/.test(String(u.cy)))S.cy=(S.pt==='p3'?'p3':'')+String(u.cy).replace(/^p3/,'');
+  if(/^(p3)?cycle\d+$/.test(String(u.cy))){const n=parseInt(String(u.cy).replace(/^p3/,'').replace('cycle',''));if(n>=1&&n<=cycleCount())S.cy=(S.pt==='p3'?'p3':'')+'cycle'+n}
   if(u.openDays&&typeof u.openDays==='object'&&!Array.isArray(u.openDays))S.openDays=u.openDays;
 }catch{}
 
@@ -710,8 +739,10 @@ const REC=new Set(["Hip Thrusts Langhantel","Hip Thrusts Multipresse","Hip Thrus
 const ASSIST=new Set(["Assistierter Klimmzug (eng)","Assistierter Klimmzug (breit)"]);
 function isAssist(ex){return ASSIST.has(ex)}
 // Zyklen 1-6 (frueher 1-3): nach Zyklus 3 ging es sonst auf Zyklus 1 zurueck, der schon
-// Daten und die alte Plan-Aufteilung traegt.
-const CYCLES=['cycle1','cycle2','cycle3','cycle4','cycle5','cycle6'];
+// Daten und die alte Plan-Aufteilung traegt. Nach Zyklus 6 war dasselbe wieder der Fall.
+// Seit 11.11.2026 beliebig viele: 6 sind immer da, weitere kommen ueber das "+" neben den Zyklus-
+// Nummern dazu (addCycle). Die Anzahl steht als cyc__n IN peach_v4, damit ein Backup sie mitnimmt.
+function cycleCount(){return Math.min(99,Math.max(6,parseInt(S.data.cyc__n)||0))}
 function mk(c,w,d,e){return c+'__w'+w+'__d'+d+'__e'+e}
 function mkt(c,w,d,e){return 'tip__'+c+'__w'+w+'__d'+d+'__e'+e}
 
@@ -993,8 +1024,9 @@ migBBStart();
 migGMStart();
 migGXStart();
 function repairSlots(){
+  let before=null;
   try{
-    const before=JSON.stringify(S.data);
+    before=JSON.stringify(S.data);
     // nach Zyklus/Woche/Tag gruppieren
     const grp={};
     for(const k in S.data){
@@ -1008,7 +1040,7 @@ function repairSlots(){
       const parts=g.split('|'),cy=parts[0],w=parts[1],di=+parts[2];
       const day=planOf(cy)[di];
       if(!day){grp[g].forEach(function(it){S.data[cy+'__w'+w+'__d'+di+'__e'+it.slot]=it.val});continue}
-      const slots=day.e, items=grp[g].sort(function(a,b){return a.slot-b.slot}), taken=[], rest=[], leg=isLegacy(cy);
+      const slots=day.e, items=grp[g].sort(function(a,b){return a.slot-b.slot}), taken=[], rest=[], empties=[], leg=isLegacy(cy);
       // Eintrag ohne passende Zeile (z. B. gestrichene Uebung): hinter dem Plan parken, unsichtbar
       const park=function(it){taken[Math.max(taken.length,slots.length)]=it};
       // 1. Durchgang: was schon auf einer passenden Zeile sitzt, bleibt liegen
@@ -1022,6 +1054,7 @@ function repairSlots(){
         const ex=it.val.exercise||'';
         if(!ex){                               // leerer Platzhalter faellt weg — mit Werten nie:
           if(hasVals(it.val)){if(it.slot<slots.length&&!taken[it.slot])taken[it.slot]=it;else park(it)}
+          else if(it.val.exercise==='')empties.push(it); // bewusst geleerte Zeile (siehe unten)
           continue;
         }
         const cat=CATOF[ex];
@@ -1031,6 +1064,9 @@ function repairSlots(){
         if(t<0){ if(hasVals(it.val))park(it); continue }  // mit Werten: nie wegwerfen
         taken[t]=it;
       }
+      // Bewusst geleerte Zeile ("– Übung wählen –", exercise '') bleibt an ihrem Platz, wenn er danach noch
+      // frei ist — sonst kam die geerbte Uebung nach dem naechsten Start zurueck (11.11.2026).
+      for(const it of empties)if(it.slot<slots.length&&!taken[it.slot])taken[it.slot]=it;
       taken.forEach(function(it,i){if(it)S.data[cy+'__w'+w+'__d'+di+'__e'+i]=it.val});
     }
     if(JSON.stringify(S.data)!==before){
@@ -1040,7 +1076,11 @@ function repairSlots(){
       try{localStorage.setItem('peach_v4_pre_fix_last',before)}catch{} // Stand vor der JUENGSTEN Reparatur
       save();
     }
-  }catch{}
+  }catch{
+    // Abbruch mitten im Umbau: die Keys sind oben schon aus S.data geloescht — Stand davor zuruecksetzen,
+    // sonst schreibt die naechste Eingabe den halben Stand nach peach_v4 (11.11.2026).
+    if(before){try{S.data=JSON.parse(before);_exIdx=null;_carry={};_wk={}}catch{}}
+  }
 }
 repairSlots();
 function plan(){return planOf(S.cy)}
@@ -1199,6 +1239,12 @@ function carryMap(cy){
 // Feld (exercise '') bleibt leer.
 // Lief die Woche davor im anderen Plan (3/4 Tage), zaehlt die Partnerzeile. Bei einem einmaligen
 // Wechsel ("nur diese Woche") wird die Uebung davor vererbt (exBase).
+// Zusatzsaetze ("+") aus der letzten Woche davor, in der die Zeile gespeichert ist — wie die Uebung auch
+// ueber ausgelassene Wochen hinweg (vorher nur aus der direkten Vorwoche: Uebung blieb, Satz war weg).
+function inhXS(di,ei){
+  for(let w=S.week-1;w>=1;w--){const p=slotEntry(w,di,ei);if(p&&p.extraSets!==undefined)return p.extraSets||0}
+  return 0;
+}
 function inhEx(di,ei){
   for(let w=S.week-1;w>=1;w--){const p=slotEntry(w,di,ei);if(p&&p.exercise!==undefined)return exBase(p)}
   return carryMap(S.cy)[di+'|'+ei]||'';
@@ -1211,9 +1257,12 @@ function rcol(v,r){if(v===''||v==null)return'';const n=parseInt(v);if(isNaN(n))r
 // Parst Gewichtsangaben: "25-27" -> 27 (oberer Wert), "25" -> 25, "27,5" -> 27.5
 // inv=true (assistierte Uebung): aus einer Spanne zaehlt der KLEINERE Wert,
 // weil dort weniger Gegengewicht die bessere Leistung ist ("20-25" -> 20).
+// Schreibweisen vereinheitlichen (11.11.2026): Komma -> Punkt; langer Strich und Schraegstrich -> "-"
+// ("40\u201342", "40/42" zaehlten als 40); "2x20" -> 20 (zwei Kurzhanteln, zaehlte als 2).
+function normW(w){return String(w).trim().replace(/,/g,'.').replace(/[\u2013\u2014\u2212\/]/g,'-').replace(/^\d+\s*[x\u00d7*]\s*(?=\d)/i,'')}
 function parseWeight(w,inv){
   if(!w&&w!==0)return 0;
-  const s=String(w).trim().replace(/,/g,'.');
+  const s=normW(w);
   if(s.includes('-')){
     const parts=s.split('-').map(x=>parseFloat(x)).filter(n=>!isNaN(n));
     if(!parts.length)return 0;
@@ -1225,7 +1274,7 @@ function parseWeight(w,inv){
 // Untere und obere Grenze einer Gewichtsangabe: "40-45" -> {lo:40,hi:45}, "45" -> {lo:45,hi:45}
 function weightBounds(w){
   if(!w&&w!==0)return null;
-  const parts=String(w).trim().replace(/,/g,'.').split('-').map(x=>parseFloat(x)).filter(n=>!isNaN(n));
+  const parts=normW(w).split('-').map(x=>parseFloat(x)).filter(n=>!isNaN(n));
   if(!parts.length)return null;
   return {lo:Math.min.apply(null,parts),hi:Math.max.apply(null,parts)};
 }
@@ -1237,7 +1286,8 @@ function weightBounds(w){
 // heruntergesetztem Rahmen faelschlich "Gleiche Leistung"/"Mehr Wiederholungen".
 function cmpWeight(cw,pw,inv){
   const c=weightBounds(cw),p=weightBounds(pw);
-  if(!c||!p||c.hi<=0||p.hi<=0)return 0;
+  // Assistiert: 0 kg Hilfe ist ein gueltiger (der beste) Wert — sonst zaehlte 5 -> 0 als "Gleich" (11.11.2026)
+  if(!c||!p||(!inv&&(c.hi<=0||p.hi<=0)))return 0;
   const cBest=inv?c.lo:c.hi,pBest=inv?p.lo:p.hi;
   if(cBest!==pBest)return (inv?cBest<pBest:cBest>pBest)?1:-1;
   const cSec=inv?c.hi:c.lo,pSec=inv?p.hi:p.lo;
@@ -1245,7 +1295,10 @@ function cmpWeight(cw,pw,inv){
   return 0;
 }
 // exName wird nur gebraucht um assistierte Uebungen zu erkennen (umgekehrte Richtung).
-function prog(cr,pr,cw,pw,exName){
+// n (nur exState): Satzzahl dieser Woche. Damit wird der Wdh.-Vergleich erst gezogen, wenn jeder Satz, den es
+// beim Vorwert gab, eingetragen ist — sonst stand nach dem 1. Satz schon "↑ Reps" (8 gegen den Schnitt aus
+// 8/6/5) und der Wochenbalken zaehlte die Uebung als gesteigert (11.11.2026). Gewicht zaehlt sofort.
+function prog(cr,pr,cw,pw,exName,n){
   if(!pr||!pr.length)return null;
   // Keine Auswertung wenn aktuelle Woche noch keine Reps eingetragen
   const crFilled=cr&&cr.filter(v=>v!==''&&v!==undefined&&v!==null&&parseInt(v)>0);
@@ -1262,6 +1315,7 @@ function prog(cr,pr,cw,pw,exName){
   // Weniger Gewicht ODER heruntergesetzter Rahmen (45 -> "40-45") = weniger Leistung,
   // auch wenn dabei mehr Reps geschafft wurden.
   if(wc<0)return'd';
+  if(n){const has=v=>v!==''&&v!==undefined&&v!==null&&parseInt(v)>0;for(let i=0;i<n;i++)if(has(pr[i])&&!has(cr[i]))return null}
   // Reps als DURCHSCHNITT pro ausgefuelltem Satz vergleichen (nicht als Gesamtsumme).
   // So zaehlt 12/15 genauso viel wie 15/12 (Reihenfolge egal) UND unterschiedliche
   // Satz-Anzahlen verfaelschen das Ergebnis nicht mehr: ein zusaetzlicher Satz meldete
@@ -1286,7 +1340,17 @@ function pbadge(p,inv){
 function render(){
   document.getElementById('week-label').textContent='W '+S.week+' / 12';
   ['p3','p4'].forEach(p=>document.getElementById('plan-'+p).className='plan-btn nb-shadow'+(S.pt===p?' active':''));
-  CYCLES.forEach(c=>document.getElementById('cycle-'+c).className='cycle-btn nb-shadow'+(cyBase()===c?' active':''));
+  // Zyklus-Nummern: nur neu aufbauen, wenn sich etwas aendert; der aktive Zyklus wird in den sichtbaren Bereich geschoben
+  const cb=document.getElementById('cycle-btns');
+  if(cb){
+    let ch='';
+    for(let i=1,n=cycleCount();i<=n;i++)ch+='<button class="cycle-btn nb-shadow'+(cyBase()==='cycle'+i?' active':'')+'" id="cycle-cycle'+i+'" onclick="setCycle(\'cycle'+i+'\')" aria-label="Zyklus '+i+'">'+i+'</button>';
+    if(cb._h!==ch){
+      cb._h=ch;cb.innerHTML=ch;
+      const a=cb.querySelector('.active');
+      if(a){const l=a.offsetLeft,r=l+a.offsetWidth;if(r>cb.scrollLeft+cb.clientWidth)cb.scrollLeft=r-cb.clientWidth+6;else if(l<cb.scrollLeft)cb.scrollLeft=Math.max(0,l-6)}
+    }
+  }
   document.getElementById('btn-training').className='tab-btn nb-shadow'+(S.view==='training'?' active':' inactive');
   document.getElementById('btn-overview').className='tab-btn nb-shadow'+(S.view==='overview'?' active':' inactive');
   document.getElementById('view-training').classList.toggle('hidden',S.view!=='training');
@@ -1314,9 +1378,10 @@ function renderT(){
   S.animDay=null;
   if(S.week===12){
     const cn=parseInt(cyBase().replace('cycle',''))||1;
-    const nextCy=cn<CYCLES.length?String(cn+1):'1 (neu)';
-    const nextN=cn<CYCLES.length?cn+1:1,nextKey=(S.pt==='p3'?'p3':'')+'cycle'+nextN;
-    const nextTxt=pvOf(S.cy)&&!pvOf(nextKey)?'Danach startet Zyklus '+nextN+' mit dem neuen Plan – deine Übungen werden übernommen.':'Danach geht es mit Zyklus '+nextCy+' weiter.';
+    // Letzter vorhandener Zyklus: der naechste wird ueber das "+" angelegt (frueher stand hier "Zyklus 1 (neu)",
+    // Zyklus 1 traegt aber die alten Daten).
+    const nextN=cn+1,nextKey=(S.pt==='p3'?'p3':'')+'cycle'+nextN;
+    const nextTxt=cn>=cycleCount()?'Für Zyklus '+nextN+' oben neben den Zyklen auf + tippen.':pvOf(S.cy)&&!pvOf(nextKey)?'Danach startet Zyklus '+nextN+' mit dem neuen Plan – deine Übungen werden übernommen.':'Danach geht es mit Zyklus '+nextN+' weiter.';
     // Banner als Rex-Moment mit der Reaktion "Wow" (Meilenstein) statt der Zielflagge
     h+='<div class="rex-moment" id="cy-end" style="background:var(--highlight);margin-top:8px">'
       +'<img src="rex-wow.webp" alt="" width="64" height="64" decoding="async"/>'
@@ -1344,6 +1409,7 @@ function rexDayHTML(di){
     const st=exState(di,ei);
     if(!st.cur.exercise||!st.hasPrev||st.noCmp)return;
     if(!st.reps.some(v=>v!==''&&v!=null&&parseInt(v)>0))return;
+    if(!st.p)return;
     cmp++;if(st.p==='w'||st.p==='r')imp++;
   });
   if(done<total)return '';
@@ -1359,6 +1425,8 @@ function refreshRex(di){
 
 function autoExtraSets(di,ei){
   if(S.week<4)return 0;
+  // noAuto: der Auto-Satz wurde in dieser Woche per "−" abgewaehlt (11.11.2026) — gilt nur fuer diese Woche
+  if((S.data[mk(S.cy,S.week,di,ei)]||{}).noAuto)return 0;
   let streak=0;
   for(let w=S.week-1;w>=Math.max(1,S.week-3);w--){
     // slotEntry: Wochen im anderen Plan (3/4 Tage) zaehlen ueber die Partnerzeile mit
@@ -1493,10 +1561,9 @@ function exDone(di,ei){
   const ex=plan()[di].e[ei];
   const k=mk(S.cy,S.week,di,ei);
   const rawCur=S.data[k]||{};
-  const prevW=slotEntry(S.week-1,di,ei)||{};
   const exName=rawCur.exercise!==undefined?rawCur.exercise:inhEx(di,ei);
   if(!exName)return false;
-  const xs=rawCur.extraSets!==undefined?rawCur.extraSets:(prevW.extraSets||0);
+  const xs=rawCur.extraSets!==undefined?rawCur.extraSets:inhXS(di,ei);
   const ms=Math.min(5,(rawCur.s0||ex.s)+xs+autoExtraSets(di,ei));
   const reps=rawCur.reps||[];
   let filled=0;
@@ -1511,6 +1578,7 @@ function weekStats(){
     const st=exState(di,ei);
     if(!st.cur.exercise||!st.hasPrev||st.noCmp)return;
     if(!st.reps.some(v=>v!==''&&v!=null&&parseInt(v)>0))return;
+    if(!st.p)return; // noch nicht auswertbar (Saetze offen) -> zaehlt erst mit, wenn das Badge steht
     tot++;if(st.p==='w'||st.p==='r')imp++;
   }));
   return{tot,imp,pct:tot?Math.round(imp/tot*100):0};
@@ -1560,7 +1628,7 @@ function refreshDone(di,ei){
 // Badge, Hinweis und Balken nicht mehr auseinanderlaufen.
 function exState(di,ei){
   const k=mk(S.cy,S.week,di,ei);
-  const rawCur=S.data[k]||{},prevWeekData=slotEntry(S.week-1,di,ei)||{};
+  const rawCur=S.data[k]||{};
   // r0: Wdh.-Bereich, mit dem diese Woche trainiert wurde, wenn er vom heutigen Plan abweicht (migGXRange)
   const ex0=plan()[di].e[ei],ex=rawCur.r0?{...ex0,r:rawCur.r0.split('-').map(Number)}:ex0;
   // Übung + extraSets aus Vorwoche übernehmen wenn aktuelle Woche noch leer
@@ -1568,7 +1636,7 @@ function exState(di,ei){
   const cur={
     ...rawCur,
     exercise: rawCur.exercise!==undefined ? rawCur.exercise : inhEx(di,ei),
-    extraSets: rawCur.extraSets!==undefined ? rawCur.extraSets : (prevWeekData.extraSets||0),
+    extraSets: rawCur.extraSets!==undefined ? rawCur.extraSets : inhXS(di,ei),
   };
   // Vergleichswert: letzter gespeicherter Wert DIESER Uebung (nicht einfach Vorwoche)
   const prv=findLastExData(di,ei,cur.exercise);
@@ -1584,7 +1652,7 @@ function exState(di,ei){
   // Alle Saetze eingetragen (gleiche Regel wie exDone / Erledigt-Haken)
   const done=!!cur.exercise&&reps.filter(v=>v!==''&&v!=null&&parseInt(v)>0).length>=ms;
   return {ex,cur,prv,ms,autoX,reps,hasPrev,noCmp,done,inv:isAssist(cur.exercise),
-    p:noCmp?'':prog(reps,prv.reps||[],cur.weight,prv.weight,cur.exercise),
+    p:noCmp?'':prog(reps,prv.reps||[],cur.weight,prv.weight,cur.exercise,ms),
     srcL:hasPrev?srcLabel(prv._src):''};
 }
 // Herkunft des letzten Werts ("zuletzt: Z2 W11 · Tag C"). Gewicht und Reps stehen schon am
@@ -1607,6 +1675,7 @@ function incCand(st){
   const src=st.prv._src||{};
   const n=cyNum(S.cy),sameCy=src.cy===S.cy||(flexCy(n)&&cyNum(src.cy)===n);
   if(!sameCy||src.w<S.week-1)return false;
+  if(st.inv&&parseWeight(st.prv.weight,true)<=0)return false; // schon ohne Hilfe: nichts mehr zu senken
   const r0=parseInt((st.prv.reps||[])[0]);
   return !isNaN(r0)&&r0>=st.ex.r[1];
 }
@@ -1649,7 +1718,7 @@ function renderEx(ex,ei,di){
       const tid='ta-'+slotKey.replace(/[^a-z0-9]/gi,'_');
       const defH=defTip?'<p class="tip-text">'+esc(defTip)+'</p>':'';
       if(tipEdit){
-        tipH+='<div class="tip-panel">'+defH+'<div class="tip-note-lbl">&#9998; Deine Notiz:</div><textarea class="tip-ta" rows="4" id="'+tid+'" placeholder="Eigene Notiz zu dieser Übung…">'+esc(hasNote?stored:'')+'</textarea><div class="tip-acts"><button class="tip-save" onclick="savTip(\''+tk+'\',\''+tid+'\',\''+slotKey+'\')">Speichern</button><button class="tip-cancel" onclick="canTip(\''+slotKey+'\')">Abbrechen</button>'+(hasNote?'<button class="tip-reset" onclick="resTip(\''+tk+'\',\''+slotKey+'\')">&#8634; Notiz löschen</button>':'')+'</div></div>';
+        tipH+='<div class="tip-panel">'+defH+'<div class="tip-note-lbl">&#9998; Deine Notiz:</div><textarea class="tip-ta" rows="4" id="'+tid+'" placeholder="Eigene Notiz zu dieser Übung…" oninput="S.tipDraft[\''+slotKey+'\']=this.value">'+esc(S.tipDraft[slotKey]!==undefined?S.tipDraft[slotKey]:(hasNote?stored:''))+'</textarea><div class="tip-acts"><button class="tip-save" onclick="savTip(\''+tk+'\',\''+tid+'\',\''+slotKey+'\')">Speichern</button><button class="tip-cancel" onclick="canTip(\''+slotKey+'\')">Abbrechen</button>'+(hasNote?'<button class="tip-reset" onclick="resTip(\''+tk+'\',\''+slotKey+'\')">&#8634; Notiz löschen</button>':'')+'</div></div>';
       }else{
         const noteH=hasNote?'<div class="tip-note"><div class="tip-note-lbl">&#9998; Deine Notiz:</div><p class="tip-text">'+esc(stored)+'</p></div>':'';
         const emptyH=(!defTip&&!hasNote)?'<p class="tip-text"><span style="color:var(--text-faint)">Noch kein Tipp.</span></p>':'';
@@ -1668,9 +1737,9 @@ function renderEx(ex,ei,di){
     const c=rcol(reps[i],ex.r),pr=(prv.reps||[])[i];
     const prevLabel=hasPrevReps?(pr!=null&&pr!==''?pr:'0'):'';
     const repBg=c?c:'var(--field-bg)';
-    rh+='<div class="rep-col"><span class="rep-lbl">S'+(i+1)+'</span><input class="rep-inp" id="rp-'+di+'-'+ei+'-'+i+'" type="text" inputmode="numeric" value="'+esc(reps[i]||'')+'" placeholder="–" style="background:'+repBg+'" oninput="updRep('+di+','+ei+','+i+',this.value)" onchange="updRep('+di+','+ei+','+i+',this.value)"/>'+(prevLabel!==''?'<span class="rep-prev" style="'+(pr==null||pr===''?'color:var(--text-ghost)':'')+'">'+prevLabel+'</span>':'')+'</div>';
+    rh+='<div class="rep-col"><span class="rep-lbl">S'+(i+1)+'</span><input class="rep-inp" id="rp-'+di+'-'+ei+'-'+i+'" type="text" inputmode="numeric" value="'+esc(reps[i]||'')+'" placeholder="–" style="background:'+repBg+'" oninput="updRep('+di+','+ei+','+i+',this.value)"/>'+(prevLabel!==''?'<span class="rep-prev" style="'+(pr==null||pr===''?'color:var(--text-ghost)':'')+'">'+prevLabel+'</span>':'')+'</div>';
   }
-  if(xs>0)rh+='<button class="add-set-btn nb-shadow" style="background:var(--block-bg)" onclick="removeSet('+di+','+ei+')">−</button>';
+  if(xs>0||st.autoX>0)rh+='<button class="add-set-btn nb-shadow" style="background:var(--block-bg)" onclick="removeSet('+di+','+ei+')">−</button>';
   if(ms<5)rh+='<button class="add-set-btn nb-shadow" onclick="addSet('+di+','+ei+')">+</button>';
 
   const incH=incCand(st)?'<span class="inc-hint'+(incDue(st)?'':' hidden')+'" id="ih-'+di+'-'+ei+'">'+(st.inv?'▼ Hilfe senken':'▲ Gewicht steigern')+'</span>':'';
@@ -1686,7 +1755,7 @@ function renderEx(ex,ei,di){
   let setH='';
   if(cur.exercise){
     const sv=S.data['set__ex__'+cur.exercise]||'';
-    setH='<div class="setting-row"><span class="set-lbl" title="Deine Maschinen-Einstellung – wird pro Übung gespeichert und jede Woche angezeigt">⚙</span><input class="set-input" type="text" value="'+esc(sv)+'" placeholder="Meine Einstellung (z. B. Sitz 4, Lehne 2)" onchange="updSetting('+di+','+ei+',this.value)"/></div>';
+    setH='<div class="setting-row"><span class="set-lbl" title="Deine Maschinen-Einstellung – wird pro Übung gespeichert und jede Woche angezeigt">⚙</span><input class="set-input" type="text" value="'+esc(sv)+'" placeholder="Meine Einstellung (z. B. Sitz 4, Lehne 2)" oninput="updSetting('+di+','+ei+',this.value)"/></div>';
   }
 
   return '<div class="ex-row">'
@@ -1697,7 +1766,7 @@ function renderEx(ex,ei,di){
     +'<span class="pick-btn-arr">'+(dropOpen?'▲':'▼')+'</span></button>'+dh+'</div>'
     +'<div class="ex-status"><span id="pb-'+di+'-'+ei+'" style="display:contents">'+pbadge(p,st.inv)+'</span>'+doneChip+onceChip+'</div></div>'
     +'<div class="ex-meta"><span class="sets-info">'+ms+' Sätze · <span style="color:var(--text)">'+ex.r[0]+'–'+ex.r[1]+' Reps</span>'+incH+autoLabel+'</span>'
-    +'<div class="w-wrap"><span class="w-label"'+(st.inv?' title="Gegengewicht der Maschine – weniger Hilfe bedeutet mehr eigene Kraft"':'')+'>'+(st.inv?'Hilfe:':'Gewicht:')+'</span><input class="w-input" type="text" value="'+esc(cur.weight||'')+'" placeholder="kg" onchange="updW('+di+','+ei+',this.value)"/>'+(prv.weight?'<span style="color:var(--text-faint);font-size:11px" title="Letzter Eintrag dieser Übung'+(srcL?': '+esc(srcL):'')+'">(zuletzt '+esc(prv.weight)+')</span>':'')+'</div></div>'
+    +'<div class="w-wrap"><span class="w-label"'+(st.inv?' title="Gegengewicht der Maschine – weniger Hilfe bedeutet mehr eigene Kraft"':'')+'>'+(st.inv?'Hilfe:':'Gewicht:')+'</span><input class="w-input" type="text" value="'+esc(cur.weight||'')+'" placeholder="kg" oninput="updW('+di+','+ei+',this.value)"/>'+(prv.weight?'<span style="color:var(--text-faint);font-size:11px" title="Letzter Eintrag dieser Übung'+(srcL?': '+esc(srcL):'')+'">(zuletzt '+esc(prv.weight)+')</span>':'')+'</div></div>'
     +setH
     +'<div class="reps-row">'+rh+'</div>'+hint+tipH+'</div>';
 }
@@ -1711,8 +1780,9 @@ function renderOv(){
       // slotEntry: Wochen im anderen Plan (3/4 Tage) kommen ueber die Partnerzeile mit in den Verlauf
       // rr: Wdh.-Bereich der Woche (r0 = mit altem Bereich trainiert, migGXRange)
       const prr=ex.r[0]+'-'+ex.r[1];
-      const ws=Array.from({length:12},(_,i)=>{const d=slotEntry(i+1,di,ei)||{};return{w:i+1,name:d.exercise||'',rr:d.r0||prr,wt:parseWeight(d.weight,isAssist(d.exercise))||0}});
-      const filled=ws.filter(x=>x.wt>0),nums=ws.map(x=>x.wt),mx=Math.max(...nums,1);
+      // has: Woche hat ein Gewicht — bei assistierten Uebungen zaehlt auch 0 kg Hilfe (hoechster Balken)
+      const ws=Array.from({length:12},(_,i)=>{const d=slotEntry(i+1,di,ei)||{},a=isAssist(d.exercise),wt=parseWeight(d.weight,a)||0;return{w:i+1,name:d.exercise||'',rr:d.r0||prr,wt:wt,has:wt>0||(a&&!!weightBounds(d.weight))}});
+      const filled=ws.filter(x=>x.has),nums=ws.map(x=>x.wt),mx=Math.max(...nums,1);
       // Angezeigt wird die ZULETZT trainierte Uebung dieses Platzes. Wurde die Uebung
       // im Zyklus gewechselt, darf der kg-Zugewinn NICHT ueber beide Uebungen gerechnet
       // werden (60 kg Langhantel -> 100 kg Maschine sind keine +40 kg Fortschritt).
@@ -1737,8 +1807,9 @@ function renderOv(){
         const isCur=(i+1)===S.week;
         const other=!!(ws[i].name&&name&&!isSame(ws[i]));
         const fillCol=other?'var(--text-ghost)':(isCur?'var(--accent)':'var(--bar-past)');
-        const hPct=v>0?Math.max(8,Math.round(score(v)/mx*100)):0;
-        return '<div class="ov-bar" title="W'+(i+1)+': '+(v||'–')+(inv?' kg Hilfe':' kg')+(ws[i].name?' · '+ws[i].name:'')+'"><div class="ov-bar-fill" style="height:'+hPct+'%;background:'+(v>0?fillCol:'transparent')+'"></div></div>';
+        const has=ws[i].has;
+        const hPct=has?Math.max(8,Math.round(score(v)/mx*100)):0;
+        return '<div class="ov-bar" title="W'+(i+1)+': '+(has?v:'–')+(inv?' kg Hilfe':' kg')+(ws[i].name?' · '+ws[i].name:'')+'"><div class="ov-bar-fill" style="height:'+hPct+'%;background:'+(has?fillCol:'transparent')+'"></div></div>';
       }).join('');
       h+='<div class="ov-ex"><div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px"><span style="font-weight:700;color:var(--text)">'+(name?esc(name):'<span style="color:var(--text-faint)">—</span>')+'</span><div style="display:flex;gap:12px;align-items:center"><span style="color:var(--text-mid);font-size:11px">'+esc(ex.c)+'</span>'+(gainTxt?'<span class="gain-pill">'+gainTxt+'</span>':'')+'</div></div><div class="ov-bars">'+bars+'</div><div style="display:flex;justify-content:space-between;margin-top:4px"><span style="font-size:10px;color:var(--text-faint)">W1</span><span style="font-size:10px;color:var(--text-faint)">W12</span></div>'+(sameEx.length?'<div style="font-size:11px;color:var(--text-dim);margin-top:4px">Start: <b style="color:var(--text)">'+sameEx[0].wt+' kg</b>'+(sameEx.length>1?' · Aktuell: <b style="color:var(--text)">'+sameEx[sameEx.length-1].wt+' kg</b>':'')+'</div>':'')+swapNote+'</div>';
     });
@@ -1772,16 +1843,21 @@ function impBackup(){
   if(!ta||!ta.value.trim()){bkMsg('Bitte zuerst den kopierten Backup-Text in das Feld einfügen.');return}
   let p;
   try{p=JSON.parse(ta.value.trim())}catch{bkMsg('Das sieht nicht wie ein Backup aus – bitte den kompletten kopierten Text einfügen.');return}
-  const data=p&&p.app==='peach'&&p.data?p.data:(p&&typeof p==='object'&&!Array.isArray(p)?p:null);
+  let data=p&&p.app==='peach'&&p.data?p.data:p;
+  if(!isObj(data))data=null;
+  if(data)cleanData(data); // kaputte Eintraege (z. B. null) raus, bevor gezaehlt und einsortiert wird
   const looksValid=data&&Object.keys(data).some(k=>/__w\d+__d\d+__e\d+/.test(k)||k.indexOf('tip__')===0||k.indexOf('set__')===0);
   if(!looksValid){bkMsg('Backup ist leer oder ungültig – bitte den Text aus "Backup kopieren" verwenden.');return}
   // pv__-Marker (Plan-Version) und wt__-Marker (3/4 Tage pro Woche) sind keine Trainingseintraege
-  const cnt=o=>Object.keys(o).filter(k=>k.indexOf('pv__')!==0&&k.indexOf('wt__')!==0).length;
+  const cnt=o=>Object.keys(o).filter(k=>k.indexOf('pv__')!==0&&k.indexOf('wt__')!==0&&k.indexOf('cyc__')!==0).length;
   const n=cnt(data),have=cnt(S.data);
   if(have>0&&!confirm('Achtung: Hier sind bereits '+have+' Einträge gespeichert. Wirklich mit dem Backup ('+n+' Einträge) überschreiben?'))return;
   // Gleiche Korrekturen wie beim Start (sonst zeigte ein aelteres Backup bis zum Neustart verschobene
   // Zeilen, und Eingaben landeten im falschen Eintrag): Plan-Marker, Umbenennung, Reihenfolge, Zuordnung.
-  S.data=data;markLegacy(S.data);markV3(S.data);migLegCurl();migOrderV2();migBBSets(S.data);migGMSets(S.data);migGXRange(S.data);repairSlots();save();
+  S.data=data;markLegacy(S.data);markV3(S.data);migLegCurl();migOrderV2();migBBSets(S.data);migGMSets(S.data);migGXRange(S.data);repairSlots();
+  loadFailed=false; // gueltige Daten sind da: Speichern wieder normal, die Lese-Warnung verschwindet (save)
+  save();
+  if(cyNum(S.cy)>cycleCount())S.cy='cycle'+cycleCount(); // Backup mit weniger Zyklen als angezeigt
   syncPt();saveUI();render();
   bkMsg('✓ Backup eingespielt – '+n+' Einträge wiederhergestellt!');
 }
@@ -1814,6 +1890,18 @@ function setPlan(pt){
   go();
 }
 function setCycle(c){S.cy=c;syncPt();saveUI();render();flashView()}
+// NEUER ZYKLUS ueber das "+" (11.11.2026): haengt Zyklus N+1 an und springt in dessen Woche 1.
+// Vorher Rueckfrage, damit ein versehentlicher Tipp nichts anlegt. Uebungen kommen wie immer aus carryMap.
+function addCycle(){
+  const n=cycleCount()+1;
+  if(n>99)return;
+  showSheet('Zyklus '+n+' hinzufügen?','Startet in Woche 1. Deine Übungen werden übernommen.',[
+    {l:'Hinzufügen',pri:true,fn:()=>{
+      S.data.cyc__n=n;if(loadFailed){_exIdx=null;_carry={};_wk={}}else save(); // unlesbare Daten nie ueberschreiben
+      S.week=1;S.openDays={};S.drop=null;setCycle('cycle'+n);
+    }},
+    {l:'Abbrechen',cancel:true}]);
+}
 // WOCHE DIREKT WAEHLEN: Tipp auf "W x / 12" oeffnet ein Raster 1-12 (die Pfeile bleiben).
 // Ink = aktuelle Woche, Lila = Woche hat im aktuellen Zyklus schon Eintraege.
 function weekHasVals(cy,w){const pre=cy+'__w'+w+'__';for(const k in S.data)if(k.indexOf(pre)===0&&hasVals(S.data[k]))return true;return false}
@@ -1895,17 +1983,30 @@ function selEx(di,ei,v){
   S.drop=null;S.dropSearch='';
   const raw=S.data[mk(S.cy,S.week,di,ei)]||{};
   const inh=S.week>1?inhEx(di,ei):'';
-  const set=once=>{
+  const curEx=raw.exercise!==undefined?raw.exercise:inhEx(di,ei);
+  const set=(once,clear)=>{
     const k=initKey(di,ei),d={...S.data[k],exercise:v};
     if(once)d.base=inh;else delete d.base;
+    if(clear){delete d.weight;delete d.reps}
     S.data[k]=d;save();renderT();
   };
-  if(!v||!inh||v===inh){set(false);return}
+  // Stehen in der Woche schon Werte und es wird eine ANDERE Uebung gewaehlt, gehoeren sie zur bisherigen:
+  // nachfragen statt sie stillschweigend der neuen Uebung zuzuschlagen (145 kg Langhantel wurden sonst
+  // zum Verlauf der Maschine, 11.11.2026).
+  const ask=once=>{
+    if(!v||v===curEx||!hasVals(raw)){set(once,false);return}
+    renderT();
+    showSheet('Eingetragene Werte','Gewicht und Wiederholungen dieser Woche stammen von '+(curEx?'<b>'+esc(curEx)+'</b>':'einer anderen Übung')+'.',[
+      {l:'Leeren',pri:true,fn:()=>set(once,true)},
+      {l:'Behalten',fn:()=>set(once,false)},
+      {l:'Abbrechen',cancel:true}]);
+  };
+  if(!v||!inh||v===inh){ask(false);return}
   if(v===raw.exercise&&raw.base===undefined){renderT();return} // unveraendert
   renderT();
   showSheet('Übung wechseln','<b>'+esc(v)+'</b> statt '+esc(inh),[
-    {l:'Nur diese Woche',fn:()=>set(true)},
-    {l:'Ab jetzt im Zyklus',pri:true,fn:()=>set(false)},
+    {l:'Nur diese Woche',fn:()=>ask(true)},
+    {l:'Ab jetzt im Zyklus',pri:true,fn:()=>ask(false)},
     {l:'Abbrechen',cancel:true}]);
 }
 // ABFRAGE-FENSTER (Neobrutalism-Sheet unten): showSheet(Titel, Text-HTML, [{l, fn, pri, cancel}])
@@ -1919,11 +2020,14 @@ function showSheet(ttl,txt,btns){
 }
 function closeSheet(){const el=document.getElementById('sheet');if(el){el.classList.add('hidden');el.innerHTML=''}_sheetActs=[]}
 function sheetAct(i){const fn=_sheetActs[i];closeSheet();if(fn)fn()}
+// EINGABEFELDER SPEICHERN NUR BEI oninput (11.11.2026) — bei jedem Tastendruck, nie bei onchange.
+// Gewicht und Einstellung hingen nur an onchange: wer danach kein anderes Feld antippte (App-Wechsel,
+// Neuladen), verlor die Eingabe. Und onchange feuert auch, wenn ein noch aktives Feld beim Neuaufbau der
+// Ansicht entfernt wird — nach einem Wochenwechsel schrieb das den Wert in die NEUE Woche.
 function initKey(di,ei){
   const k=mk(S.cy,S.week,di,ei);
   if(!S.data[k]){
-    const prv=slotEntry(S.week-1,di,ei)||{};
-    S.data[k]={exercise:inhEx(di,ei),extraSets:prv.extraSets||0};
+    S.data[k]={exercise:inhEx(di,ei),extraSets:inhXS(di,ei)};
   }
   return k;
 }
@@ -1943,13 +2047,18 @@ function updRep(di,ei,i,v){
   S.data[k]={...cur,reps:r};save();
   refreshDone(di,ei);refreshProg(di,ei);
 }
-function addSet(di,ei){const k=initKey(di,ei);S.data[k]={...S.data[k],extraSets:(S.data[k].extraSets||0)+1};save();renderT()}
-function removeSet(di,ei){const k=initKey(di,ei);S.data[k]={...S.data[k],extraSets:Math.max(0,(S.data[k].extraSets||0)-1)};save();renderT()}
-function togTip(tk){S.tips[tk]=!S.tips[tk];if(!S.tips[tk])S.tipEdit[tk]=false;renderT()}
+// "+": erst einen abgewaehlten Auto-Satz zurueckholen, sonst ein Zusatzsatz mehr.
+// "−": erst die eigenen Zusatzsaetze, danach den Auto-Satz dieser Woche abwaehlen (noAuto) — vorher liess
+// er sich nicht entfernen, die Uebung bekam ohne ihn keinen ✓ (11.11.2026).
+function addSet(di,ei){const k=initKey(di,ei),d={...S.data[k]};if(d.noAuto)delete d.noAuto;else d.extraSets=(d.extraSets||0)+1;S.data[k]=d;save();renderT()}
+function removeSet(di,ei){const k=initKey(di,ei),d={...S.data[k]};if((d.extraSets||0)>0)d.extraSets=d.extraSets-1;else if(autoExtraSets(di,ei)>0)d.noAuto=true;S.data[k]=d;save();renderT()}
+// tipDraft: angefangener Notiz-Text je Zeile — bleibt stehen, wenn eine andere Aktion die Ansicht neu aufbaut
+// (z. B. "+" Satz); weg bei Speichern, Abbrechen, Loeschen und Zuklappen.
+function togTip(tk){S.tips[tk]=!S.tips[tk];if(!S.tips[tk]){S.tipEdit[tk]=false;delete S.tipDraft[tk]}renderT()}
 function edTip(tk){S.tipEdit[tk]=true;renderT()}
-function canTip(tk){S.tipEdit[tk]=false;renderT()}
-function savTip(tk,tid,sk){const el=document.getElementById(tid);if(el){if(el.value.trim()==='')delete S.data[tk];else S.data[tk]=el.value;save()}S.tipEdit[sk]=false;renderT()}
-function resTip(tk,sk){delete S.data[tk];save();S.tipEdit[sk]=false;renderT()}
+function canTip(tk){S.tipEdit[tk]=false;delete S.tipDraft[tk];renderT()}
+function savTip(tk,tid,sk){const el=document.getElementById(tid);if(el){if(el.value.trim()==='')delete S.data[tk];else S.data[tk]=el.value;save()}S.tipEdit[sk]=false;delete S.tipDraft[sk];renderT()}
+function resTip(tk,sk){delete S.data[tk];save();S.tipEdit[sk]=false;delete S.tipDraft[sk];renderT()}
 
 document.addEventListener('click',e=>{
   if(S.drop&&!e.target.closest('.picker-wrap')){S.drop=null;renderT()}
@@ -1972,7 +2081,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeWeekPick();clo
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-10-23-10';
+const BUILD_ID='2026-11-11-01';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();

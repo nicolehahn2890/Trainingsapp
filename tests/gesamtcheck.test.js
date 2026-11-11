@@ -122,6 +122,8 @@ ok((await active())==='plan-p3','W3 als 3-Tage-Woche erkannt');
 await rows(0);const w3ex=await page.textContent('#pw-0-0 .pick-btn-txt');
 await page.click('#pw-0-0 .pick-btn');await page.click('.dropdown .drop-opt[data-val="Hip Thrust Maschine"]');await page.waitForTimeout(60);
 ok(await sheet(),'W3: Uebungswechsel fragt');await page.click('#sheet .sheet-btn:not(.pri)');await page.waitForTimeout(60);
+// W3 hat schon Werte -> zweite Rueckfrage "Leeren / Behalten" (11.11.2026)
+ok((await sheet())&&(await page.textContent('#sheet .sheet')).includes('Behalten'),'W3: Werte vorhanden -> Rueckfrage Leeren/Behalten');await page.click('#sheet .sheet-btn:not(.pri)');await page.waitForTimeout(60);
 ok((await page.$$('.once-chip')).length===1,'W3: Label "nur diese Woche"');
 await page.evaluate(()=>setWeek(4));await page.waitForTimeout(60);await rows(0);
 ok((await page.textContent('#pw-0-0 .pick-btn-txt'))===w3ex,'W4 (4 Tage) wieder mit Standard-Uebung '+w3ex);
