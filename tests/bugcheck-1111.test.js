@@ -94,9 +94,9 @@ const ov=await page.$$eval('.ov-ex',els=>{const e=els.find(x=>x.textContent.incl
 ok(ov.t.includes('Start: 5 kg')&&ov.t.includes('Aktuell: 0 kg')&&ov.t.includes('5.0 kg Hilfe')&&ov.h[1]==='100%'&&parseInt(ov.h[0])<100,'8: Uebersicht zeigt die 0-kg-Woche als hoechsten Balken ('+ov.h.join('/')+')');
 
 // --- 9: Gewichts-Schreibweisen
-ok(await page.evaluate(()=>cmpWeight('40–42','40')===1&&cmpWeight('40/42','40')===1&&cmpWeight('40 — 42','40-42')===0&&parseWeight('40–42')===42&&parseWeight('40/42')===42),'9: langer Strich und Schraegstrich zaehlen als Spanne');
+ok(await page.evaluate(()=>cmpWeight('40–42','40')===1&&cmpWeight('40/42','40')===1&&cmpWeight('40 — 42','40-42')===0&&parseWeight('40–42')===41&&parseWeight('40/42')===41),'9: langer Strich und Schraegstrich zaehlen als Spanne');
 ok(await page.evaluate(()=>cmpWeight('2x20','20')===0&&cmpWeight('2 x 22,5','20')===1&&parseWeight('2x20')===20&&parseWeight('2×20')===20),'9: "2x20" zaehlt als 20');
-ok(await page.evaluate(()=>cmpWeight('40-42','40')===1&&cmpWeight('42,5','40')===1&&cmpWeight('45','40-45')===1&&cmpWeight('40-45','45')===-1&&parseWeight('25-27')===27&&parseWeight('20-25',true)===20&&parseWeight('')===0),'9: bisherige Schreibweisen unveraendert');
+ok(await page.evaluate(()=>cmpWeight('40-42','40')===1&&cmpWeight('42,5','40')===1&&cmpWeight('45','40-45')===1&&cmpWeight('40-45','45')===-1&&parseWeight('25-27')===26&&parseWeight('20-25')===22.5&&parseWeight('')===0),'9: bisherige Schreibweisen unveraendert');
 
 // --- 10: kaputter Eintrag (null) loescht nichts — Start und Import
 const good={cycle3__w1__d0__e0:HT('140',['8','7','6']),cycle3__w1__d1__e2:{exercise:'Latzug (breit)',weight:'40',reps:['10','9','8']}};

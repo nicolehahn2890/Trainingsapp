@@ -409,16 +409,16 @@ setPlan(pt)             Header-Pills "3 Tage"/"4 Tage" (.plan-btn) — gelten fu
                         Behaellt die Zyklus-Nummer, schliesst offene Tage/Dropdown, saveUI(). In alten
                         Zyklen (flexCy false) wie frueher: globaler Umschalter ohne Marker. Bei loadFailed
                         (unlesbares peach_v4) nur im Speicher — nie speichern.
-parseWeight(w,inv)      Parst "25-27" -> 27 (oberer Wert), "27,5" -> 27.5 (Komma -> Punkt).
-                        inv=true (assistierte Uebung): aus einer Spanne zaehlt der KLEINERE
-                        Wert ("20-25" -> 20), weil weniger Hilfe die bessere Leistung ist.
+parseWeight(w)          Gewichtsangabe als EINE Zahl: "27,5" -> 27.5 (Komma -> Punkt), Spanne ->
+                        MITTELWERT ("105-107" -> 106, "25-27" -> 26). Seit 14.11.2026; vorher zaehlte
+                        der obere Wert (assistiert der untere). Kein inv-Parameter mehr.
 isAssist(ex)            true fuer Uebungen aus ASSIST (Gegengewichts-Maschinen)
 weightBounds(w)         Untere/obere Grenze einer Gewichtsangabe: "40-45" -> {lo:40,hi:45},
                         "45" -> {lo:45,hi:45}, "27,5" -> {lo:27.5,hi:27.5}; leer -> null
 cmpWeight(cw,pw,inv)    Gewichtsvergleich: 1 = mehr Leistung, -1 = weniger, 0 = gleich/unbekannt.
-                        Erst der BESTWERT (obere Grenze; bei assistierten Uebungen die untere),
-                        bei Gleichstand die ZWEITE Grenze. Damit ist ein heruntergesetzter
-                        Rahmen (45 -> "40-45") weniger und ein angezogener ("40-45" -> 45) mehr.
+                        Verglichen wird der MITTELWERT der Angabe (seit 14.11.2026): 106 nach
+                        "105-107" = gleich. Ein heruntergesetzter Rahmen (45 -> "40-45") ist weiter
+                        weniger, ein angezogener ("40-45" -> 45) mehr. inv dreht die Richtung um.
                         Leeres Gewichtsfeld liefert 0 und gilt nie als Abstieg.
 prog(cr,pr,cw,pw,ex)    'w'|'r'|'s'|'d' Fortschritts-Status. ex nur noetig um assistierte
                         Uebungen zu erkennen (dort dreht sich die Gewichtsrichtung um).
@@ -580,11 +580,10 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
   Zeile hat keinen Vorrang (nicht flexibel). Bewusst NICHT korrigiert (nur Altdaten; Pruefung
   07.10.2026: in flexiblen Zyklen 0 Abweichungen auf 15.000 Zufallspositionen).
 - Wenn Uebung gewechselt wird, startet Vergleich frisch
-- Gewicht: parseWeight() unterstuetzt Bereiche wie "25-27" (nimmt oberen Wert 27) und Komma wie "27,5". Auch renderOv (Uebersicht) nutzt parseWeight() — nie parseFloat(), das gibt bei "42-45" nur 42 zurueck.
+- Gewicht: parseWeight() unterstuetzt Bereiche wie "25-27" (Mittelwert 26) und Komma wie "27,5". Auch renderOv (Uebersicht) nutzt parseWeight() — nie parseFloat(), das gibt bei "42-45" nur 42 zurueck.
 - ASSISTIERTE UEBUNGEN (Set ASSIST, aktuell die beiden "Assistierter Klimmzug"-Varianten):
   Das eingetragene Gewicht ist das GEGENGEWICHT der Maschine — WENIGER ist mehr Leistung.
-  Fuer diese Uebungen dreht sich alles um: prog() ('w' bei cu<pu), parseWeight nimmt aus einer
-  Spanne den kleineren Wert, das Badge heisst "↓ Hilfe"/"↑ Hilfe", das Eingabefeld heisst
+  Fuer diese Uebungen dreht sich alles um: prog() ('w' bei cu<pu), das Badge heisst "↓ Hilfe"/"↑ Hilfe", das Eingabefeld heisst
   "Hilfe:" statt "Gewicht:", der Steigerungs-Hinweis heisst "▼ Hilfe senken",
   und in der Uebersicht wird die Balkenhoehe gespiegelt (weniger Hilfe = hoeherer Balken)
   plus Bilanz als "−X kg Hilfe". Neue Maschinen dieser Art NUR in ASSIST eintragen — der
@@ -594,13 +593,15 @@ repairSlots()           Selbstheilung der Slot-Zuordnung, laeuft BEI JEDEM START
   Erst bei gleichem Gewicht (oder fehlendem Vorgewicht) entscheiden die Reps.
   Ein noch LEERES Gewichtsfeld (cu=0) zaehlt NICHT als Abstieg — sonst waere jede Uebung
   waehrend der Eingabe rot.
-- GEWICHTSRAHMEN werden ueber BEIDE Grenzen verglichen (cmpWeight): zuerst der Bestwert
-  (oben, bei assistierten Uebungen unten), bei Gleichstand die zweite Grenze. Ein glatter
-  Einzelwert schlaegt deshalb eine gleich hoch endende Spanne (45 > 42-45 -> 'w'), ein
-  angezogener Rahmen ebenfalls (42-45 > 40-45 -> 'w') — und ein HERUNTERGESETZTER Rahmen
-  ist 'd' (45 -> 40-45, weil ein Teil der Saetze mit 40 lief). Frueher fiel genau dieser Fall
-  auf den Rep-Vergleich durch und meldete faelschlich 'Mehr Wiederholungen ✓'. Identische
-  Angaben (zwei gleiche Spannen oder Einzelwerte) -> Reps entscheiden.
+- GEWICHTSRAHMEN zaehlen mit ihrem MITTELWERT (cmpWeight, Wunsch 14.11.2026): "105-107" ist 106.
+  106 nach "105-107" ist deshalb GLEICHES Gewicht, die Reps entscheiden (vorher zaehlte nur der
+  obere Wert 107 -> "↓ Weniger" trotz mehr Reps). Alles ueber der Mitte ist 'w', alles darunter 'd'.
+  Die frueheren Faelle bleiben: glatter Einzelwert schlaegt eine gleich hoch endende Spanne
+  (45 > 42-45), angezogener Rahmen ist mehr (42-45 > 40-45), HERUNTERGESETZTER Rahmen ist 'd'
+  (45 -> 40-45, Mitte 42,5). Anders als frueher: "40-45" nach 44 ist weniger (Mitte 42,5 < 44).
+  Gleiche Mitte (auch "104-108" gegen "105-107") -> Reps entscheiden. Dieselbe Zahl nutzt die
+  Uebersicht (Balken, Start/Aktuell, kg-Zugewinn). Am Gewichtsfeld steht weiter die Eingabe
+  ("(zuletzt 105-107)").
 - Reps: Vergleich ueber den DURCHSCHNITT pro ausgefuelltem Satz, NICHT Satz-fuer-Satz und
   NICHT als Gesamtsumme. 12/15 zaehlt gleich wie 15/12 -> 's'. Hoeherer Schnitt -> 'r',
   niedriger -> 'd'. (Positionsweise meldete faelschlich 'd' sobald ein einzelner Satz
@@ -695,7 +696,7 @@ Label "nur diese Woche" (.once-chip) in der Status-Zeile der Uebung.
    (Steigerung, autoExtraSets, Vererbung, Woche-1-Regel); 3-Tage-Daten IMMER unter p3cycle-Keys
 7. Bei groesseren Aenderungen: Python-Script verwenden, am Ende node --check ausfuehren
 8. Sonderzeichen generell meiden in JS-Strings
-9. Gewicht IMMER mit parseWeight() parsen, nie parseFloat() — sonst geht der obere Bereichswert verloren ("42-45" -> 42)
+9. Gewicht IMMER mit parseWeight() parsen (Spanne = Mittelwert), nie parseFloat() — das liest aus "42-45" nur 42
 10. **Bei JEDEM Deploy die Konstante BUILD_ID in index.html hochzaehlen** (Format
     JJJJ-MM-TT-NN). Sie wird NUR auf GLEICH/UNGLEICH geprueft — niemals groesser/kleiner,
     und niemals gegen ein Datum: ein Stempel, der versehentlich in der Zukunft lag, liess
@@ -961,9 +962,9 @@ Spezial: 3D Abduktor Maschine, Belt Squat, Belt Squat RDL, Beinpresse 45 Grad, R
 - Auto: 3 stagnierende Wochenvergleiche = +1 Satz automatisch (greift fruehestens Woche 5, nur bei gleicher Uebung)
 - Satzanzahl + Uebung werden in Folgewoche vererbt (auch zwischen 3- und 4-Tage-Wochen)
 - Uebungswechsel ab Woche 2: Abfrage "Nur diese Woche" / "Ab jetzt im Zyklus" (selEx)
-- Gewichtsbereiche ("25-27kg") und Komma ("27,5") werden korrekt ausgewertet (oberer Wert zaehlt)
-- Glatter Einzelwert schlaegt eine gleich hoch endende Spanne (45 > 42-45 = Steigerung),
-  umgekehrt ist ein heruntergesetzter Rahmen (45 -> 40-45) weniger Gewicht
+- Gewichtsbereiche ("25-27") zaehlen mit ihrem Mittelwert (26), Komma ("27,5") wird gelesen
+- 106 nach "105-107" ist gleiches Gewicht (Reps entscheiden); 45 nach "42-45" ist eine Steigerung,
+  ein heruntergesetzter Rahmen (45 -> 40-45) weniger Gewicht
 - Weniger Gewicht = 'Weniger', auch bei mehr Reps (Gewicht wird zuerst verglichen)
 - Reps werden als Durchschnitt pro Satz verglichen, nicht satzweise und nicht als Summe
   (Reihenfolge der Saetze egal, zusaetzliche oder noch leere Saetze verfaelschen nichts)
@@ -1073,6 +1074,14 @@ die Handbuecher nach dem Ersetzen weg. Fehlt er dort, Rexi vorher fragen. refere
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Gewichtsspanne zaehlt mit dem Mittelwert (14.11.2026, Version 2026-11-14-01).** Screenshot Z2 W6 Tag B:
+   Abduktionsmaschine 106 kg nach "105-107", Reps 15/20 nach 12/15 -> Badge "↓ Weniger". Ursache: cmpWeight
+   verglich den oberen Wert der Spanne (107). Jetzt Mittelwert (cmpWeight + parseWeight, dadurch auch Uebersicht:
+   Balken, Start/Aktuell, kg-Zugewinn). Vorher/Nachher ueber 4050 Wertepaare: Einzelwerte unveraendert, alle
+   Abweichungen betreffen Spannen und folgen der Mittelwert-Regel. Folge: Badges alter Wochen mit Spannen und
+   damit vereinzelt der Auto-Satz koennen sich aendern. Neuer Test tests/gewicht-mittelwert.test.js; funktion und
+   bugcheck-1111 (parseWeight-Erwartungen) angepasst.
 
 NEU. **Bugcheck ueber die ganze App: 14 Korrekturen + Zyklus hinzufuegen (11.11.2026, Version 2026-11-11-01).**
    Auftrag: Bugsuche ohne Aenderung, danach Freigabe fuer alle Punkte. Test: tests/bugcheck-1111.test.js.

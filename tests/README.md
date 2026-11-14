@@ -27,6 +27,7 @@ iPhone werden dabei nie beruehrt.
 | `steigerung.test.js` | Hinweis "Gewicht steigern" nach der Peach-Regel, nicht beim Vorblaettern mit leerer Vorwoche, weg sobald die Uebung fertig ist |
 | `tag-a-erweiterung.test.js` | 4-Tage Tag A mit 2x Glute Med, ohne Beinbeuger (seit 04.10.2026): Wochen aus allen drei frueheren Fassungen (7er mit Beinbeuger, 8er, 7er vom 02.10.) werden per Kategorie einsortiert, neue Zeile bleibt frei, Beinbeuger-Werte geparkt (kein Verlust), Tag C Beinbeuger 3 Saetze |
 | `bugcheck-1111.test.js` | Bugcheck 11.11.2026: Wdh.-Badge erst bei vollstaendigen Saetzen, Felder speichern bei jedem Tastendruck (nichts landet in der naechsten Woche), Auto-Satz abwaehlbar, geleerte Zeile bleibt leer, Zusatzsatz ueber ausgelassene Woche, Notiz-Entwurf, assistiert 0 kg, Gewichts-Schreibweisen, kaputte Eintraege/Daten, Zyklus ueber "+" hinzufuegen |
+| `gewicht-mittelwert.test.js` | Gewichtsspanne zaehlt mit dem Mittelwert (14.11.2026): 106 nach "105-107" ist gleiches Gewicht (Reps entscheiden), darueber/darunter mehr/weniger, Spanne gegen Spanne, assistiert, bisherige Rahmen-Faelle, Badge live, Uebersicht mit gleicher Zahl |
 | `tag-b-erweiterung.test.js` | 4-Tage Tag B (2. Ruecken, 2. Schulter, ohne Arme): Einsortierung aller frueheren Aufteilungen, Arm-Werte bleiben gespeichert, Vorbelegung ohne Dopplung |
 
 Voraussetzung: Node.js mit `playwright` (in Claude-Cloud-Sessions vorinstalliert).

@@ -1254,23 +1254,13 @@ function cyBase(){return String(S.cy).replace(/^p3/,'')}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
 // Performance-Farbe fuer ausgefuelltes Rep-Feld (leer -> '' = weisses Feld)
 function rcol(v,r){if(v===''||v==null)return'';const n=parseInt(v);if(isNaN(n))return'';if(n>=r[1])return'var(--st-up)';if(n>=r[0])return'var(--st-same)';return'var(--st-down)'}
-// Parst Gewichtsangaben: "25-27" -> 27 (oberer Wert), "25" -> 25, "27,5" -> 27.5
-// inv=true (assistierte Uebung): aus einer Spanne zaehlt der KLEINERE Wert,
-// weil dort weniger Gegengewicht die bessere Leistung ist ("20-25" -> 20).
+// Parst Gewichtsangaben zu EINER Zahl: "25" -> 25, "27,5" -> 27.5, Spanne -> MITTELWERT ("105-107" -> 106).
+// Bis 14.11.2026 zaehlte aus einer Spanne nur der obere Wert (assistiert: der untere) — 106 nach "105-107"
+// galt dadurch als weniger Gewicht, obwohl es genau die Mitte ist.
 // Schreibweisen vereinheitlichen (11.11.2026): Komma -> Punkt; langer Strich und Schraegstrich -> "-"
 // ("40\u201342", "40/42" zaehlten als 40); "2x20" -> 20 (zwei Kurzhanteln, zaehlte als 2).
 function normW(w){return String(w).trim().replace(/,/g,'.').replace(/[\u2013\u2014\u2212\/]/g,'-').replace(/^\d+\s*[x\u00d7*]\s*(?=\d)/i,'')}
-function parseWeight(w,inv){
-  if(!w&&w!==0)return 0;
-  const s=normW(w);
-  if(s.includes('-')){
-    const parts=s.split('-').map(x=>parseFloat(x)).filter(n=>!isNaN(n));
-    if(!parts.length)return 0;
-    return inv?Math.min(...parts):parts[parts.length-1];
-  }
-  const n=parseFloat(s);
-  return isNaN(n)?0:n;
-}
+function parseWeight(w){const b=weightBounds(w);return b?(b.lo+b.hi)/2:0}
 // Untere und obere Grenze einer Gewichtsangabe: "40-45" -> {lo:40,hi:45}, "45" -> {lo:45,hi:45}
 function weightBounds(w){
   if(!w&&w!==0)return null;
@@ -1279,20 +1269,16 @@ function weightBounds(w){
   return {lo:Math.min.apply(null,parts),hi:Math.max.apply(null,parts)};
 }
 // Vergleicht zwei Gewichtsangaben: 1 = mehr Leistung, -1 = weniger, 0 = gleich/unbekannt.
-// Zuerst zaehlt der BESTWERT (obere Grenze; bei assistierten Uebungen das kleinste
-// Gegengewicht). Bei Gleichstand entscheidet die ZWEITE Grenze, sonst faellt ein
-// heruntergesetzter Rahmen durchs Raster: 45 -> "40-45" ist WENIGER Gewicht (ein Teil der
-// Saetze lief mit 40), "40-45" -> 45 ist mehr. Ohne diese Stufe meldete die App bei
-// heruntergesetztem Rahmen faelschlich "Gleiche Leistung"/"Mehr Wiederholungen".
+// Verglichen wird der MITTELWERT der Angabe (Wunsch 14.11.2026): 106 nach "105-107" ist gleich, dann
+// entscheiden die Reps. Die bisherigen Faelle bleiben: 45 -> "40-45" ist weniger (Mitte 42,5),
+// "40-45" -> 45 und "40-45" -> "42-45" sind mehr. Assistiert umgekehrt (weniger Hilfe = mehr Leistung).
 function cmpWeight(cw,pw,inv){
   const c=weightBounds(cw),p=weightBounds(pw);
   // Assistiert: 0 kg Hilfe ist ein gueltiger (der beste) Wert — sonst zaehlte 5 -> 0 als "Gleich" (11.11.2026)
   if(!c||!p||(!inv&&(c.hi<=0||p.hi<=0)))return 0;
-  const cBest=inv?c.lo:c.hi,pBest=inv?p.lo:p.hi;
-  if(cBest!==pBest)return (inv?cBest<pBest:cBest>pBest)?1:-1;
-  const cSec=inv?c.hi:c.lo,pSec=inv?p.hi:p.lo;
-  if(cSec!==pSec)return (inv?cSec<pSec:cSec>pSec)?1:-1;
-  return 0;
+  const d=(c.lo+c.hi)/2-(p.lo+p.hi)/2;
+  if(Math.abs(d)<1e-9)return 0;
+  return (inv?d<0:d>0)?1:-1;
 }
 // exName wird nur gebraucht um assistierte Uebungen zu erkennen (umgekehrte Richtung).
 // n (nur exState): Satzzahl dieser Woche. Damit wird der Wdh.-Vergleich erst gezogen, wenn jeder Satz, den es
@@ -1675,7 +1661,7 @@ function incCand(st){
   const src=st.prv._src||{};
   const n=cyNum(S.cy),sameCy=src.cy===S.cy||(flexCy(n)&&cyNum(src.cy)===n);
   if(!sameCy||src.w<S.week-1)return false;
-  if(st.inv&&parseWeight(st.prv.weight,true)<=0)return false; // schon ohne Hilfe: nichts mehr zu senken
+  if(st.inv&&parseWeight(st.prv.weight)<=0)return false; // schon ohne Hilfe: nichts mehr zu senken
   const r0=parseInt((st.prv.reps||[])[0]);
   return !isNaN(r0)&&r0>=st.ex.r[1];
 }
@@ -1781,7 +1767,7 @@ function renderOv(){
       // rr: Wdh.-Bereich der Woche (r0 = mit altem Bereich trainiert, migGXRange)
       const prr=ex.r[0]+'-'+ex.r[1];
       // has: Woche hat ein Gewicht — bei assistierten Uebungen zaehlt auch 0 kg Hilfe (hoechster Balken)
-      const ws=Array.from({length:12},(_,i)=>{const d=slotEntry(i+1,di,ei)||{},a=isAssist(d.exercise),wt=parseWeight(d.weight,a)||0;return{w:i+1,name:d.exercise||'',rr:d.r0||prr,wt:wt,has:wt>0||(a&&!!weightBounds(d.weight))}});
+      const ws=Array.from({length:12},(_,i)=>{const d=slotEntry(i+1,di,ei)||{},a=isAssist(d.exercise),wt=parseWeight(d.weight)||0;return{w:i+1,name:d.exercise||'',rr:d.r0||prr,wt:wt,has:wt>0||(a&&!!weightBounds(d.weight))}});
       const filled=ws.filter(x=>x.has),nums=ws.map(x=>x.wt),mx=Math.max(...nums,1);
       // Angezeigt wird die ZULETZT trainierte Uebung dieses Platzes. Wurde die Uebung
       // im Zyklus gewechselt, darf der kg-Zugewinn NICHT ueber beide Uebungen gerechnet
@@ -2081,7 +2067,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeWeekPick();clo
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-11-11-01';
+const BUILD_ID='2026-11-14-01';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();

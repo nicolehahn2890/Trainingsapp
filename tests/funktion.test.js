@@ -61,7 +61,7 @@ const u=await page.evaluate(()=>{const t=[];const c=(n,got,exp)=>t.push([n,got==
  c('Assistiert weniger Hilfe',prog(['8'],['8'],'20','25','Assistierter Klimmzug (breit)'),'w');
  c('Assistiert mehr Hilfe',prog(['8'],['8'],'30','25','Assistierter Klimmzug (breit)'),'d');
  c('leeres Gewicht kein Abstieg',prog(['8'],['8'],'','100','x'),'s');
- c('parseWeight Spanne',parseWeight('42-45'),45);c('parseWeight Komma',parseWeight('27,5'),27.5);
+ c('parseWeight Spanne = Mittelwert',parseWeight('42-45'),43.5);c('parseWeight Komma',parseWeight('27,5'),27.5);
  return t});
 u.forEach(x=>ok('Logik',x[1],x[0]+(x[1]?'':' (bekommen '+x[2]+', erwartet '+x[3]+')')));
 
