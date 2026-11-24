@@ -72,7 +72,7 @@ let fails=0; const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m); if(!c)fails++;
   const ghi=B.findIndex(r=>r[0]==='Glute & Hams');
   await page.click('.day-body .pick-btn >> nth='+ghi); await page.waitForTimeout(120);
   let opts=await page.$$eval('.dropdown .drop-opt:not(.drop-empty-opt)',e=>e.map(x=>x.getAttribute('data-val')));
-  ok(opts.length===8&&!opts.some(o=>/Curl/.test(o)),'Glute & Hams Dropdown ohne Leg Curls ('+opts.length+')');
+  ok(opts.length===9&&!opts.some(o=>/Curl/.test(o)),'Glute & Hams Dropdown ohne Leg Curls ('+opts.length+')');
   await page.keyboard.press('Escape'); await page.click('body',{position:{x:5,y:5}}); await page.waitForTimeout(100);
   const bi=B.findIndex(r=>r[0]==='Beinbeuger');
   await page.click('.day-body .pick-btn >> nth='+bi); await page.waitForTimeout(120);

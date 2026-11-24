@@ -907,7 +907,10 @@ Adduktoren (8): Adduktionsmaschine, Adduktion Kabel Stehend, Adduktion Kabel Lie
 
 Glute & Quad (11): Low Bar Squat, Beinpresse 45 Grad, Beinpresse, Step Ups, Split Squat Kurzhantel, Split Squat Langhantel, Split Squat Multipresse, Hack Squat, Reverse Lunge, Belt Squat, Super Squat
 
-Glute & Hams (8): RDL Langhantel, RDL Kurzhanteln, RDL Maschine, Belt Squat RDL, Glute Hyperextensions, Reverse Hack RDL, Good Mornings, B-Stance RDL
+Glute & Hams (9): RDL Langhantel, RDL Kurzhanteln, RDL Maschine, Belt Squat RDL, Glute Hyperextensions, Reverse Hack RDL, Good Mornings, B-Stance RDL, Trap Bar Deadlift
+(Trap Bar Deadlift seit 24.11.2026 — Wunsch. Bewusst OHNE Stern: mit tiefer Kniebeuge quad-lastiger als ein RDL
+(Swinton 2011, Camara 2016); der Tipp beschreibt die hueftbetonte Ausfuehrung. Sinnvoll vor allem fuer die schwere
+4-8-Zeile Tag A.)
 (B-Stance RDL seit 23.10.2026 statt Single-Leg RDL — Wunsch: Single-Leg raus. Name bewusst ohne KH/LH, Rexi legt
 sich noch nicht fest; der Tipp sagt "Gewicht immer gleich eintragen (bei Kurzhanteln pro Hantel)". Single-Leg RDL
 steht in RETIRED (Kategorie Glute & Hams), Tipp bleibt fuer alte Eintraege.)
@@ -1074,6 +1077,12 @@ die Handbuecher nach dem Ersetzen weg. Fehlt er dort, Rexi vorher fragen. refere
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Trap Bar Deadlift in Glute & Hams (24.11.2026, Version 2026-11-24-01).** Wunsch: Trap Bar fuer Deadlift mit
+   Glute-Fokus in die Auswahl. Rein additiv (EXERCISES + TIPS, 9 Uebungen in Glute & Hams, 143 gesamt), kein Plan- oder
+   Datenumbau. Tipp im Format Stand/Ausfuehrung mit Po-Fokus-Hinweis (Huefte hoch, Knie nur leicht gebeugt — tief in die
+   Knie = mehr Quad). Kein Stern (siehe Uebungslisten). Neuer Test tests/trap-bar.test.js (gegen den alten Stand rot);
+   b-stance und planwechsel zaehlen jetzt 9 Optionen. Alle 22 Testreihen gruen.
 
 NEU. **Gewichtsspanne zaehlt mit dem Mittelwert (14.11.2026, Version 2026-11-14-01).** Screenshot Z2 W6 Tag B:
    Abduktionsmaschine 106 kg nach "105-107", Reps 15/20 nach 12/15 -> Badge "↓ Weniger". Ursache: cmpWeight

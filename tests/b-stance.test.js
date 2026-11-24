@@ -23,7 +23,7 @@ ok(await page.evaluate(()=>EXERCISES['Glute & Hams'].includes('B-Stance RDL')&&C
 // Dropdown
 await page.click('#pw-2-3 .pick-btn');await page.waitForTimeout(120);
 const opts=await page.$$eval('.dropdown .drop-opt:not(.drop-empty-opt)',e=>e.map(x=>({v:x.getAttribute('data-val'),t:x.textContent})));
-ok(opts.length===8&&opts.some(o=>o.v==='B-Stance RDL'&&o.t.includes('★'))&&!opts.some(o=>o.v==='Single-Leg RDL'),'Glute-&-Hams-Auswahl: B-Stance RDL mit Stern, kein Single-Leg RDL ('+opts.map(o=>o.v).join(', ')+')');
+ok(opts.length===9&&opts.some(o=>o.v==='B-Stance RDL'&&o.t.includes('★'))&&!opts.some(o=>o.v==='Single-Leg RDL'),'Glute-&-Hams-Auswahl: B-Stance RDL mit Stern, kein Single-Leg RDL ('+opts.map(o=>o.v).join(', ')+')');
 await page.click('.dropdown .drop-opt[data-val="B-Stance RDL"]');await page.waitForTimeout(150);
 ok(await page.isVisible('#sheet .sheet'),'Wechsel ab Woche 2 fragt nach (nur diese Woche / ab jetzt)');
 await page.click('#sheet .sheet-btn.pri');await page.waitForTimeout(120);
