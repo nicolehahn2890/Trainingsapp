@@ -925,7 +925,7 @@ HERSTELLER-VARIANTEN (30.09.2026, Wunsch): Maschinen mit unterschiedlichen Gewic
 NUR bei Precor (keine Panatta-Variante, 30.09.2026 korrigiert). Alte Eintraege NICHT umbenennen
 (ausdruecklicher Wunsch 30.09.2026: im alten Zyklus allgemein lassen). Bis dahin nur Leg Curls
 stehend trainiert (Name unveraendert) — die Umstellung betrifft ihre Historie praktisch nicht. Die alten Namen "Leg Curls
-sitzend", "Leg Curls liegend", "Beinstrecker Maschine" stehen in RETIRED: nicht mehr in der Auswahl,
+sitzend", "Leg Curls liegend", "Beinstrecker Maschine" (seit 27.11.2026 auch "Ueberkopfmaschine") stehen in RETIRED: nicht mehr in der Auswahl,
 aber in CATOF bekannt (alte Eintraege bleiben unveraendert an ihrer Zeile, repairSlots findet sie),
 carryMap schlaegt sie in neuen Zyklen NICHT vor. Nicht umbenannt, weil das Geraet unbekannt ist —
 auf Wunsch per Migration (wie migLegCurl) auf die richtige Variante umbenennen, inkl. set__ex__/tip__ex__.
@@ -938,7 +938,7 @@ Ruecken (21): LH Rudern, KH Rudern, KH Rudern (breit), Rudern Kabel (eng), Ruder
 
 Brust (15): LH Bankdruecken, KH Bankdruecken, Bankdruecken Multipresse, Bankdruecken Maschine, LH Schraegbankdruecken, KH Schraegbankdruecken, Schraegbankdruecken Multipresse, Schraegbankdruecken Maschine, Brustpresse (Panatta), Brustpresse (Precor), Butterfly Maschine, Flys von oben Kabel, Flys von unten Kabel, Flachbank KH Flys, Schraegbank KH Flys
 
-Schultern (14): KH Seitheben, Vorgebeugtes KH Seitheben, Seithebemaschine (sitzend), Seithebemaschine (stehend), Seitheben Kabel, Vorgebeugtes Seitheben Kabel, LH Ueberkopfdruecken, KH Ueberkopfdruecken, Ueberkopfmaschine, Butterfly Reverse Maschine, Butterfly Reverse Kabel, Upright Row Kabel, Arnold Press, Einarmiges Ueberkopfdruecken Kabel
+Schultern (15): KH Seitheben, Vorgebeugtes KH Seitheben, Seithebemaschine (sitzend), Seithebemaschine (stehend), Seitheben Kabel, Vorgebeugtes Seitheben Kabel, LH Ueberkopfdruecken, KH Ueberkopfdruecken, Ueberkopfmaschine (Panatta), Ueberkopfmaschine (Precor), Butterfly Reverse Maschine, Butterfly Reverse Kabel, Upright Row Kabel, Arnold Press, Einarmiges Ueberkopfdruecken Kabel
 
 Bizeps (12): SZ Curls, LH Curls, KH Curls, Kabel Curls, KH Hammer Curls, SZ Preacher Curls, KH Preacher Curls, Bizeps Maschine, Konzentrations Curls, Spinne Curls, Kabel Curls einarmig, Reverse Curls
 
@@ -953,7 +953,7 @@ Bauch (14): Crunches, Crunches am Kabelzug, Panatta Super Crunch, Panatta Low Cr
 Bauch: Panatta Super Crunch, Panatta Low Crunch, Panatta High Crunch, Panatta Side Crunch, Bauch Maschine (Precor)
 Ruecken: Rudermaschine (Panatta), Rudermaschine (Precor), High Row Maschine, Latzug Maschine (Panatta), Latzug Maschine (Precor)
 Brust: Brustpresse (Panatta), Brustpresse (Precor)
-Schultern: Seithebemaschine (sitzend), Seithebemaschine (stehend)
+Schultern: Seithebemaschine (sitzend), Seithebemaschine (stehend), Ueberkopfmaschine (Panatta), Ueberkopfmaschine (Precor)
 Spezial: 3D Abduktor Maschine, Belt Squat, Belt Squat RDL, Beinpresse 45 Grad, RDL Maschine, Diverging Low Row
 
 ---
@@ -1077,6 +1077,14 @@ die Handbuecher nach dem Ersetzen weg. Fehlt er dort, Rexi vorher fragen. refere
 ---
 
 ## Aenderungs-Historie (Kurzfassung, neueste zuerst)
+
+NEU. **Ueberkopfmaschine nach Hersteller (27.11.2026, Version 2026-11-27-01).** Wunsch: bei Schultern Panatta und
+   Precor unterscheiden, der allgemeine Eintrag raus. "Ueberkopfmaschine (Panatta)" + "(Precor)" an der Stelle der
+   allgemeinen in EXERCISES (Schultern 15, 144 gesamt), "Ueberkopfmaschine" in RETIRED (Kategorie Schultern). Tipp der
+   Varianten = bisheriger Tipp (Schleife nach CATOF), kein Stern (wie vorher). Alte Eintraege, Einstellung und Notiz
+   unter dem allgemeinen Namen bleiben unveraendert; die laufende Zeile zeigt ihn bis zum Wechsel, eine Variante startet
+   ohne Vorwert. Kein Plan- oder Datenumbau. Neuer Test tests/ueberkopfmaschine.test.js (gegen den alten Stand rot);
+   alle 23 Testreihen gruen.
 
 NEU. **Trap Bar Deadlift in Glute & Hams (24.11.2026, Version 2026-11-24-01).** Wunsch: Trap Bar fuer Deadlift mit
    Glute-Fokus in die Auswahl. Rein additiv (EXERCISES + TIPS, 9 Uebungen in Glute & Hams, 143 gesamt), kein Plan- oder

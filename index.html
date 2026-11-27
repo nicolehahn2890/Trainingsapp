@@ -313,7 +313,7 @@ const EXERCISES={
 "Beinbeuger":["Leg Curls sitzend (Precor)","Leg Curls liegend (Panatta)","Leg Curls liegend (Precor)","Leg Curls stehend","Nordic Curls"],
 "Rücken":["LH Rudern","KH Rudern","KH Rudern (breit)","Rudern Kabel (eng)","Rudern Kabel (breit)","Rudermaschine (Panatta)","Rudermaschine (Precor)","High Row Maschine","Latzug (eng)","Latzug (breit)","Latzug Maschine (Panatta)","Latzug Maschine (Precor)","Überzug am Kabel","T Bar Rudern (neutral)","T Bar Rudern (breit)","Assistierter Klimmzug (eng)","Assistierter Klimmzug (breit)","Face Pull Kabel","Straight-Arm Pulldown","Einarmiger Latzug Kabel","Diverging Low Row"],
 "Brust":["LH Bankdrücken","KH Bankdrücken","Bankdrücken Multipresse","Bankdrücken Maschine","LH Schrägbankdrücken","KH Schrägbankdrücken","Schrägbankdrücken Multipresse","Schrägbankdrücken Maschine","Brustpresse (Panatta)","Brustpresse (Precor)","Butterfly Maschine","Flys von oben Kabel","Flys von unten Kabel","Flachbank KH Flys","Schrägbank KH Flys"],
-"Schultern":["KH Seitheben","Vorgebeugtes KH Seitheben","Seithebemaschine (sitzend)","Seithebemaschine (stehend)","Seitheben Kabel","Vorgebeugtes Seitheben Kabel","LH Überkopfdrücken","KH Überkopfdrücken","Überkopfmaschine","Butterfly Reverse Maschine","Butterfly Reverse Kabel","Upright Row Kabel","Arnold Press","Einarmiges Überkopfdrücken Kabel"],
+"Schultern":["KH Seitheben","Vorgebeugtes KH Seitheben","Seithebemaschine (sitzend)","Seithebemaschine (stehend)","Seitheben Kabel","Vorgebeugtes Seitheben Kabel","LH Überkopfdrücken","KH Überkopfdrücken","Überkopfmaschine (Panatta)","Überkopfmaschine (Precor)","Butterfly Reverse Maschine","Butterfly Reverse Kabel","Upright Row Kabel","Arnold Press","Einarmiges Überkopfdrücken Kabel"],
 "Bizeps":["SZ Curls","LH Curls","KH Curls","Kabel Curls","KH Hammer Curls","SZ Preacher Curls","KH Preacher Curls","Bizeps Maschine","Konzentrations Curls","Spinne Curls","Kabel Curls einarmig","Reverse Curls"],
 "Trizeps":["SZ Skullcrusher","Enges Bankdrücken","Pushdown Kabel","Pushdown Kabel einarmig","SZ Überkopf Tri. Drücken","KH Überkopf Tri. Drücken","Kabel Überkopf Tri. Drücken","Dips Maschine","Trizeps Maschine","KH Kickback Trizeps"],
 "Bauch":["Crunches","Crunches am Kabelzug","Panatta Super Crunch","Panatta Low Crunch","Panatta High Crunch","Panatta Side Crunch","Bauch Maschine (Precor)","Beinheben (Liegend)","Beinheben (Hängend)","Reverse Crunch","Dead Bug","Ab Rollout","Pallof Press","Hollow Body Hold"]
@@ -829,7 +829,7 @@ for(const c in EXERCISES)for(const ex of EXERCISES[c])CATOF[ex]=c;
 // unveraendert an ihrer Zeile stehen; umbenannt wird nichts, weil unklar ist, welches Geraet es
 // war. Neue Zyklen schlagen sie nicht mehr vor (carryMap), die Auswahl zeigt nur die Varianten.
 // Single-Leg RDL (23.10.2026): ersetzt durch B-Stance RDL, alte Eintraege bleiben wie oben bekannt.
-const RETIRED={"Leg Curls sitzend":"Beinbeuger","Leg Curls liegend":"Beinbeuger","Beinstrecker Maschine":"Beinstrecker","Single-Leg RDL":"Glute & Hams"};
+const RETIRED={"Leg Curls sitzend":"Beinbeuger","Leg Curls liegend":"Beinbeuger","Beinstrecker Maschine":"Beinstrecker","Single-Leg RDL":"Glute & Hams","Überkopfmaschine":"Schultern"};
 for(const ex in RETIRED)if(!CATOF[ex])CATOF[ex]=RETIRED[ex];
 for(const ex in CATOF){const base=ex.replace(/ \((Panatta|Precor)\)$/,'');if(RETIRED[base]&&TIPS[base]&&!TIPS[ex])TIPS[ex]=TIPS[base]}
 // Ordnet jeden gespeicherten Eintrag der Zeile zu, in die er GEHOERT — anhand der
@@ -2068,7 +2068,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeWeekPick();clo
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-11-24-01';
+const BUILD_ID='2026-11-27-01';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();
