@@ -1073,11 +1073,15 @@ Fallback (manuell, ohne Session):
 4. ~2 Min warten > Live-URL pruefen
 
 Skill aktualisieren: Der Skill "peach-project" in claude.ai ist eine KOPIE dieser Datei und aktualisiert
-sich nicht von selbst aus dem Repo. Nach Aenderungen an SKILL.md Rexi eine ZIP geben (Ordner peach-project/
-mit dieser SKILL.md darin, z. B. `zip -r peach-project.zip peach-project`) — sie ersetzt damit den Skill in
-claude.ai. Frontmatter (name, description) dabei unveraendert lassen. Den Ordner references/ (Handbuecher) aus
-dem geladenen Skill-Verzeichnis ("Base directory for this skill") unveraendert mit in die ZIP legen — sonst sind
-die Handbuecher nach dem Ersetzen weg. Fehlt er dort, Rexi vorher fragen. references/ NIE ins Repo kopieren.
+sich nicht von selbst aus dem Repo. Nach Aenderungen an SKILL.md Rexi eine .skill-Datei geben — seit 27.11.2026
+nimmt claude.ai beim Ersetzen ("Neue Version hochladen") NUR noch .skill oder eine einzelne SKILL.md, KEINE .zip.
+Eine einzelne SKILL.md NICHT geben: das Hochladen ersetzt alle Dateien, die Handbuecher in references/ waeren weg.
+Bauen: Ordner peach-project/ mit dieser SKILL.md + references/, dann mit dem Pack-Skript des Skill-Creators
+(aus dessen Ordner: `python3 -m scripts.package_skill <pfad>/peach-project <ausgabeordner>`, prueft auch das
+Frontmatter) -> peach-project.skill (eine ZIP mit anderer Endung). Frontmatter (name, description) des GELADENEN
+Skills unveraendert lassen. Den Ordner references/ (Handbuecher) aus dem geladenen Skill-Verzeichnis ("Base
+directory for this skill") unveraendert mitnehmen — sonst sind die Handbuecher nach dem Ersetzen weg. Fehlt er
+dort, Rexi vorher fragen. references/ NIE ins Repo kopieren.
 
 ---
 
