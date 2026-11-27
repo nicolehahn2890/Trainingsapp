@@ -53,7 +53,7 @@ auf main einmalig eine Sicherheitsfreigabe verlangen; dann kurz bestaetigen lass
   peach_try_[BUILD_ID], siehe checkUpdate),
   peach_ui (zuletzt offene Position: view/week/cy/pt/openDays — getrennt von peach_v4).
   Sicherheitskopien vor Daten-Eingriffen: peach_v4_pre_add, peach_v4_pre_fix, peach_v4_pre_v2,
-  peach_v4_pre_v3, peach_v4_pre_order. Unlesbares peach_v4 (kaputtes JSON) wird beim Start als Rohtext nach
+  peach_v4_pre_v3, peach_v4_pre_order, peach_v4_pre_ukm (Umbenennung Ueberkopfmaschine). Unlesbares peach_v4 (kaputtes JSON) wird beim Start als Rohtext nach
   peach_v4_corrupt kopiert und NICHT ueberschrieben (load/loadFailed).
   Plan-Version pro Zyklus steht als pv__-Marker IN peach_v4 (siehe Key-Formate).
   (peach_theme wurde entfernt — es gibt keinen Dark Mode mehr.)
@@ -930,6 +930,11 @@ aber in CATOF bekannt (alte Eintraege bleiben unveraendert an ihrer Zeile, repai
 carryMap schlaegt sie in neuen Zyklen NICHT vor. Nicht umbenannt, weil das Geraet unbekannt ist —
 auf Wunsch per Migration (wie migLegCurl) auf die richtige Variante umbenennen, inkl. set__ex__/tip__ex__.
 TIPS der Varianten = TIPS des alten Namens (Schleife nach CATOF, nur fuer Namen in EXERCISES).
+AUSNAHME Ueberkopfmaschine (27.11.2026): Rexi wusste, dass die allgemeine die Precor war -> migUeberkopf benennt bei
+jedem Start (und in impBackup, nach migLegCurl, VOR repairSlots) alle Eintraege (exercise UND base; base == exercise
+wird entfernt), set__ex__ und tip__ex__ auf "Ueberkopfmaschine (Precor)" um. Hat die Variante schon eine eigene
+Einstellung/Notiz, bleibt die alte unter dem alten Namen stehen. Sicherheitskopie peach_v4_pre_ukm, kein Guard
+(idempotent). Der alte Name bleibt trotzdem in RETIRED — die Tipp-Kopie fuer die Varianten haengt daran.
 RETIRED ist der allgemeine Weg, eine Uebung aus der Auswahl zu nehmen, ohne Daten zu verlieren (so auch
 Single-Leg RDL am 23.10.2026): Eintrag in RETIRED mit Kategorie, aus EXERCISES + REC entfernen, TIPS behalten.
 Die laufende Zeile behaelt die Uebung (inhEx), bis Rexi wechselt; erst der neue Zyklus schlaegt sie nicht mehr vor.
@@ -1085,6 +1090,9 @@ NEU. **Ueberkopfmaschine nach Hersteller (27.11.2026, Version 2026-11-27-01).** 
    unter dem allgemeinen Namen bleiben unveraendert; die laufende Zeile zeigt ihn bis zum Wechsel, eine Variante startet
    ohne Vorwert. Kein Plan- oder Datenumbau. Neuer Test tests/ueberkopfmaschine.test.js (gegen den alten Stand rot);
    alle 23 Testreihen gruen.
+   Nachtrag Version 2026-11-27-02: die bisherige war die Precor (Rexi) -> Umbenennung per migUeberkopf (Eintraege inkl.
+   base und alter Zyklen, Einstellung, Notiz, auch beim Backup-Import), Vorwerte laufen bei der Precor-Variante weiter.
+   Test erweitert (Konflikt Einstellung, einmaliger Wechsel, Backup, Idempotenz, keine Kopie ohne betroffene Daten).
 
 NEU. **Trap Bar Deadlift in Glute & Hams (24.11.2026, Version 2026-11-24-01).** Wunsch: Trap Bar fuer Deadlift mit
    Glute-Fokus in die Auswahl. Rein additiv (EXERCISES + TIPS, 9 Uebungen in Glute & Hams, 143 gesamt), kein Plan- oder

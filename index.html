@@ -809,6 +809,39 @@ function migLegCurl(){
   }catch{}
 }
 migLegCurl();
+// UMBENENNUNG "Überkopfmaschine" -> "Überkopfmaschine (Precor)" (27.11.2026, Wunsch: die bisherige
+// allgemeine Ueberkopfmaschine war die Precor). Benennt Trainingseintraege (exercise und base) sowie
+// Einstellung (set__ex__) und Notiz (tip__ex__) um, damit Vorwerte, Einstellung und Notiz bei der
+// Precor-Variante weiterlaufen. Hat die Variante schon eine eigene Einstellung/Notiz, bleibt die alte
+// unter dem alten Namen stehen (nichts geht verloren). Kein Guard noetig: danach gibt es den alten Namen
+// in den Eintraegen nicht mehr. Sicherheitskopie vor der ersten Aenderung: peach_v4_pre_ukm.
+// Laeuft VOR repairSlots und in impBackup. Der alte Name bleibt in RETIRED (Kategorie + Tipp-Kopie).
+function migUeberkopf(){
+  try{
+    const OLD='Überkopfmaschine', NEW='Überkopfmaschine (Precor)';
+    const hit=k=>{const v=S.data[k];return v&&typeof v==='object'&&(v.exercise===OLD||v.base===OLD)};
+    const keys=Object.keys(S.data);
+    const moveKey=pre=>{const ok=pre+OLD,nk=pre+NEW;return (ok in S.data)&&!(String(S.data[nk]||'').trim()!=='')};
+    if(!keys.some(hit)&&!moveKey('tip__ex__')&&!moveKey('set__ex__'))return;
+    if(!localStorage.getItem('peach_v4_pre_ukm')){try{localStorage.setItem('peach_v4_pre_ukm',JSON.stringify(S.data))}catch{}}
+    for(const k of keys){
+      if(!hit(k))continue;
+      const v={...S.data[k]};
+      if(v.exercise===OLD)v.exercise=NEW;
+      if(v.base===OLD)v.base=NEW;
+      if(v.base===v.exercise)delete v.base; // einmaliger Wechsel auf dieselbe Maschine ist keiner
+      S.data[k]=v;
+    }
+    for(const pre of ['tip__ex__','set__ex__']){
+      if(!moveKey(pre))continue;
+      const ok=pre+OLD;
+      if(String(S.data[ok]||'').trim()!=='')S.data[pre+NEW]=S.data[ok];
+      delete S.data[ok];
+    }
+    save();
+  }catch{}
+}
+migUeberkopf();
 
 // SELBSTHEILUNG DER SLOT-ZUORDNUNG (Nachtrag zur Migration oben).
 // Die Migration hat STUR alle Wochen um +1 geschoben. Wer aber trainiert hat, WAEHREND die
@@ -1841,7 +1874,7 @@ function impBackup(){
   if(have>0&&!confirm('Achtung: Hier sind bereits '+have+' Einträge gespeichert. Wirklich mit dem Backup ('+n+' Einträge) überschreiben?'))return;
   // Gleiche Korrekturen wie beim Start (sonst zeigte ein aelteres Backup bis zum Neustart verschobene
   // Zeilen, und Eingaben landeten im falschen Eintrag): Plan-Marker, Umbenennung, Reihenfolge, Zuordnung.
-  S.data=data;markLegacy(S.data);markV3(S.data);migLegCurl();migOrderV2();migBBSets(S.data);migGMSets(S.data);migGXRange(S.data);repairSlots();
+  S.data=data;markLegacy(S.data);markV3(S.data);migLegCurl();migUeberkopf();migOrderV2();migBBSets(S.data);migGMSets(S.data);migGXRange(S.data);repairSlots();
   loadFailed=false; // gueltige Daten sind da: Speichern wieder normal, die Lese-Warnung verschwindet (save)
   save();
   if(cyNum(S.cy)>cycleCount())S.cy='cycle'+cycleCount(); // Backup mit weniger Zyklen als angezeigt
@@ -2068,7 +2101,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeWeekPick();clo
 // weiter die alte Datei an, wird es beim naechsten Start einfach wieder versucht.
 // Die Zaehlung liegt in sessionStorage, damit ein hartnaeckiger Cache nicht endlos neu laedt,
 // der naechste App-Start es aber erneut probiert. Daten in peach_v4 bleiben unberuehrt.
-const BUILD_ID='2026-11-27-01';
+const BUILD_ID='2026-11-27-02';
 let verLastCheck=0,verReloading=false;
 function checkUpdate(){
   const now=Date.now();
